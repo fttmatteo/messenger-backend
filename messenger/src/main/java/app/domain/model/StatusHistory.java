@@ -6,7 +6,7 @@ import app.domain.model.enums.Status;
 public class StatusHistory {
     private Long id_status_history;
     private Status previous_status;
-    private Status new_status;
+    private Status status;
     private LocalDateTime change_date;
     private Service service;
 
@@ -26,12 +26,12 @@ public class StatusHistory {
         this.previous_status = previous_status;
     }
 
-    public Status getNew_status() {
-        return new_status;
+    public Status getStatus() {
+        return status;
     }
 
-    public void setNew_status(Status new_status) {
-        this.new_status = new_status;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public LocalDateTime getChange_date() {

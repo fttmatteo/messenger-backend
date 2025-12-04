@@ -7,6 +7,7 @@ public class Signature {
     private String signature_path;
     private LocalDateTime upload_date;
     private Service service;
+    private Employee employee;
 
     public Long getId_signature() {
         return id_signature;
@@ -38,5 +39,13 @@ public class Signature {
 
     public void setService(Service service) {
         this.service = service;
+    }
+
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
     }
 }

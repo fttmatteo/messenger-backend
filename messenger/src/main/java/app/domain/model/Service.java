@@ -6,12 +6,14 @@ import app.domain.model.enums.Status;
 
 public class Service {
     private Long id_service;
-    private String plate;
-    private PlateType type_plate;
+    private Plate plate;
+    private PlateType plate_type;
     private Status status;
+    private StatusHistory statusHistory;
     private LocalDateTime pending_date, assigned_date, delivered_date, failed_date, 
     returned_date, canceled_date, observed_date, resolved_date;
-    private Employee messenger;
+    private Employee employee;
+    private Dealership dealership;
     private String observation;
 
     public Long getId_service() {
@@ -22,20 +24,39 @@ public class Service {
         this.id_service = id_service;
     }
 
-    public String getPlate() {
+    public Plate getPlate() {
         return plate;
     }
 
-    public void setPlate(String plate) {
+    public void setPlate(Plate plate) {
         this.plate = plate;
     }
 
-    public PlateType getType_plate() {
-        return type_plate;
+    public PlateType getPlate_type() {
+        return plate_type;
     }
 
-    public void setType_plate(PlateType type_plate) {
-        this.type_plate = type_plate;
+    public void setPlate_type(PlateType plate_type) {
+        this.plate_type = plate_type;
+    }
+
+    private Signature signature;
+    private Photo visitPhoto;
+
+    public Signature getSignature() {
+        return signature;
+    }
+
+    public void setSignature(Signature signature) {
+        this.signature = signature;
+    }
+
+    public Photo getVisitPhoto() {
+        return visitPhoto;
+    }
+
+    public void setVisitPhoto(Photo visitPhoto) {
+        this.visitPhoto = visitPhoto;
     }
 
     public Status getStatus() {
@@ -44,6 +65,10 @@ public class Service {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public StatusHistory getStatusHistory() {
+        return statusHistory;
     }
 
     public LocalDateTime getPending_date() {
@@ -110,12 +135,20 @@ public class Service {
         this.resolved_date = resolved_date;
     }
 
-    public Employee getMessenger() {
-        return messenger;
+    public Employee getEmployee() {
+        return employee;
     }
 
-    public void setMessenger(Employee messenger) {
-        this.messenger = messenger;
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
+    }
+
+    public Dealership getDealership() {
+        return dealership;
+    }
+
+    public void setDealership(Dealership dealership) {
+        this.dealership = dealership;
     }
 
     public String getObservation() {

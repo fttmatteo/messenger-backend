@@ -7,9 +7,7 @@ public class Plate {
     private Long id_plate;
     private String plateNumber;
     private PlateType plateType;
-    private LocalDateTime registrationDate;
-    private Employee employee;
-    private Service service;
+    private LocalDateTime upload_date;
 
     public Long getId_plate() {
         return id_plate;
@@ -35,28 +33,12 @@ public class Plate {
         this.plateType = plateType;
     }
 
-    public LocalDateTime getRegistrationDate() {
-        return registrationDate;
+    public LocalDateTime getUpload_date() {
+        return upload_date;
     }
 
-    public void setRegistrationDate(LocalDateTime registrationDate) {
-        this.registrationDate = registrationDate;
-    }
-
-    public Employee getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
-    }
-
-    public Service getService() {
-        return service;
-    }
-
-    public void setService(Service service) {
-        this.service = service;
+    public void setUpload_date(LocalDateTime upload_date) {
+        this.upload_date = upload_date;
     }
 
 }
