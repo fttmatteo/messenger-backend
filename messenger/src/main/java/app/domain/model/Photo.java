@@ -2,7 +2,7 @@ package app.domain.model;
 
 import java.time.LocalDateTime;
 import app.domain.model.enums.FileType;
-import app.domain.model.enums.PhotoPurpose;
+import app.domain.model.enums.PhotoType;
 
 public class Photo {
     private Long id_photo;
@@ -10,7 +10,7 @@ public class Photo {
     private FileType file_type;
     private LocalDateTime upload_date;
     private Service service;
-    private PhotoPurpose photo_purpose;
+    private PhotoType photo_purpose;
 
     public Long getId_photo() {
         return id_photo;
@@ -52,11 +52,11 @@ public class Photo {
         this.service = service;
     }
 
-    public PhotoPurpose getPhoto_purpose() {
+    public PhotoType getPhoto_purpose() {
         return photo_purpose;
     }
 
-    public void sethoto_purpose(PhotoPurpose photo_purpose) {
+    public void sethoto_purpose(PhotoType photo_purpose) {
         this.photo_purpose = photo_purpose;
     }
 
