@@ -1,6 +1,6 @@
 package app.domain.model.enums;
 
-public enum PhotoPurpose {
+public enum PhotoType {
     PLATE,
     VISIT,
     SIGNATURE,
