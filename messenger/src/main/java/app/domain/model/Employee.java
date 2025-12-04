@@ -6,9 +6,9 @@ import app.domain.model.enums.Zone;
 public class Employee {
     private Long id_empleado;
     private Long document;
-    private String fullName;
+    private String full_name;
     private String phone;
-    private String userName;
+    private String user_name;
     private String password;
     private Role role;
     private Zone zone;
@@ -29,12 +29,12 @@ public class Employee {
         this.document = document;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getFull_name() {
+        return full_name;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setFull_name(String full_name) {
+        this.full_name = full_name;
     }
 
     public String getPhone() {
@@ -45,12 +45,12 @@ public class Employee {
         this.phone = phone;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUser_name() {
+        return user_name;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUser_name(String user_name) {
+        this.user_name = user_name;
     }
 
     public String getPassword() {

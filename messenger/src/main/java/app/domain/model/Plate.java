@@ -5,8 +5,8 @@ import app.domain.model.enums.PlateType;
 
 public class Plate {
     private Long id_plate;
-    private String plateNumber;
-    private PlateType plateType;
+    private String plate_number;
+    private PlateType plate_type;
     private LocalDateTime upload_date;
 
     public Long getId_plate() {
@@ -17,20 +17,20 @@ public class Plate {
         this.id_plate = id_plate;
     }
 
-    public String getPlateNumber() {
-        return plateNumber;
+    public String getPlate_number() {
+        return plate_number;
     }
 
-    public void setPlateNumber(String plateNumber) {
-        this.plateNumber = plateNumber;
+    public void setPlate_number(String plate_number) {
+        this.plate_number = plate_number;
     }
 
-    public PlateType getPlateType() {
-        return plateType;
+    public PlateType getPlate_type() {
+        return plate_type;
     }
 
-    public void setPlateType(PlateType plateType) {
-        this.plateType = plateType;
+    public void setPlate_type(PlateType plate_type) {
+        this.plate_type = plate_type;
     }
 
     public LocalDateTime getUpload_date() {
