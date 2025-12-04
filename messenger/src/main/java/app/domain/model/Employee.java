@@ -1,6 +1,7 @@
 package app.domain.model;
 
 import app.domain.model.enums.Role;
+import app.domain.model.enums.Zone;
 
 public class Employee {
     private Long id_empleado;
@@ -10,6 +11,7 @@ public class Employee {
     private String userName;
     private String password;
     private Role role;
+    private Zone zone;
 
     public Long getId_empleado() {
         return id_empleado;
@@ -42,7 +44,7 @@ public class Employee {
     public void setPhone(String phone) {
         this.phone = phone;
     }
-    
+
     public String getUserName() {
         return userName;
     }
@@ -65,5 +67,13 @@ public class Employee {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public Zone getZone() {
+        return zone;
+    }
+
+    public void setZone(Zone zone) {
+        this.zone = zone;
     }
 }

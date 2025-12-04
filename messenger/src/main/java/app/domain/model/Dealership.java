@@ -1,10 +1,13 @@
 package app.domain.model;
 
-public class Concessionarie {
+import app.domain.model.enums.Zone;
+
+public class Dealership {
     private Long id_concesionarie;
     private String name;
     private String address;
     private String phone;
+    private Zone zone;
 
     public Long getId_concesionarie() {
         return id_concesionarie;
@@ -36,5 +39,13 @@ public class Concessionarie {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public Zone getZone() {
+        return zone;
+    }
+
+    public void setZone(Zone zone) {
+        this.zone = zone;
     }
 }
