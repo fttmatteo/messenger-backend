@@ -1,15 +1,15 @@
 package app.domain.model.auth;
 
 public class AuthCredentials {
-    private String user_name;
+    private String userName;
     private String password;
 
-    public String getUser_name() {
-        return user_name;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setUser_name(String user_name) {
-        this.user_name = user_name;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getPassword() {

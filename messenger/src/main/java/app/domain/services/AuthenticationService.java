@@ -27,7 +27,7 @@ public class AuthenticationService {
 
     public TokenResponse authenticate(AuthCredentials credentials) throws Exception {
         Employee query = new Employee();
-        query.setUser_name(credentials.getUser_name());
+        query.setUserName(credentials.getUserName());
         Employee employee = employeePort.findByUserName(query);
         if (employee == null) {
             throw new BusinessException("Usuario no encontrado");

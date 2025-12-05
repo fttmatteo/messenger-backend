@@ -2,18 +2,18 @@ package app.adapter.in.rest.request;
 
 public class EmployeeRequest {
     private String document;
-    private String full_name;
+    private String fullName;
     private String phone;
-    private String user_name;
+    private String userName;
     private String password;
     private String zone;
 
     public String getFullName() {
-        return full_name;
+        return fullName;
     }
 
     public void setFullName(String fullName) {
-        this.full_name = fullName;
+        this.fullName = fullName;
     }
 
     public String getDocument() {
@@ -33,11 +33,11 @@ public class EmployeeRequest {
     }
 
     public String getUserName() {
-        return user_name;
+        return userName;
     }
 
     public void setUserName(String userName) {
-        this.user_name = userName;
+        this.userName = userName;
     }
 
     public String getPassword() {

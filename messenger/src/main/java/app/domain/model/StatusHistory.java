@@ -4,42 +4,42 @@ import java.time.LocalDateTime;
 import app.domain.model.enums.Status;
 
 public class StatusHistory {
-    private Long id_status_history;
-    private Status previous_status;
-    private Status new_status;
-    private LocalDateTime change_date;
+    private Long idStatusHistory;
+    private Status previousStatus;
+    private Status newStatus;
+    private LocalDateTime changeDate;
     private Service service;
-
-    public Long getId_status_history() {
-        return id_status_history;
+    
+    public Long getIdStatusHistory() {
+        return idStatusHistory;
     }
 
-    public void setId_status_history(Long id_status_history) {
-        this.id_status_history = id_status_history;
+    public void setIdStatusHistory(Long idStatusHistory) {
+        this.idStatusHistory = idStatusHistory;
     }
 
-    public Status getPrevious_status() {
-        return previous_status;
+    public Status getPreviousStatus() {
+        return previousStatus;
     }
 
-    public void setPrevious_status(Status previous_status) {
-        this.previous_status = previous_status;
+    public void setPreviousStatus(Status previousStatus) {
+        this.previousStatus = previousStatus;
     }
 
-    public Status getNew_status() {
-        return new_status;
+    public Status getNewStatus() {
+        return newStatus;
     }
 
-    public void setNew_status(Status new_status) {
-        this.new_status = new_status;
+    public void setNewStatus(Status newStatus) {
+        this.newStatus = newStatus;
     }
 
-    public LocalDateTime getChange_date() {
-        return change_date;
+    public LocalDateTime getChangeDate() {
+        return changeDate;
     }
 
-    public void setChange_date(LocalDateTime change_date) {
-        this.change_date = change_date;
+    public void setChangeDate(LocalDateTime changeDate) {
+        this.changeDate = changeDate;
     }
 
     public Service getService() {

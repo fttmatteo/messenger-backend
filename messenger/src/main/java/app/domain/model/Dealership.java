@@ -3,18 +3,18 @@ package app.domain.model;
 import app.domain.model.enums.Zone;
 
 public class Dealership {
-    private Long id_dealership;
+    private Long idDealership;
     private String name;
     private String address;
     private String phone;
     private Zone zone;
 
-    public Long getId_dealership() {
-        return id_dealership;
+    public Long getIdDealership() {
+        return idDealership;
     }
 
-    public void setId_dealership(Long id_dealership) {
-        this.id_dealership = id_dealership;
+    public void setIdDealership(Long idDealership) {
+        this.idDealership = idDealership;
     }
 
     public String getName() {

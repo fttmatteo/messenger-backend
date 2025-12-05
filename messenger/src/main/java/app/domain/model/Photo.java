@@ -5,43 +5,43 @@ import app.domain.model.enums.FileType;
 import app.domain.model.enums.PhotoType;
 
 public class Photo {
-    private Long id_photo;
-    private String photo_path;
-    private FileType file_type;
-    private LocalDateTime upload_date;
+    private Long idPhoto;
+    private String photoPath;
+    private FileType fileType;
+    private LocalDateTime uploadDate;
     private Service service;
-    private PhotoType photo_purpose;
+    private PhotoType photoPurpose;
 
-    public Long getId_photo() {
-        return id_photo;
+    public Long getIdPhoto() {
+        return idPhoto;
     }
 
-    public void setId_photo(Long id_photo) {
-        this.id_photo = id_photo;
+    public void setIdPhoto(Long idPhoto) {
+        this.idPhoto = idPhoto;
     }
 
-    public String getPhoto_path() {
-        return photo_path;
+    public String getPhotoPath() {
+        return photoPath;
     }
 
-    public void setPhoto_path(String photo_path) {
-        this.photo_path = photo_path;
+    public void setPhotoPath(String photoPath) {
+        this.photoPath = photoPath;
     }
 
-    public FileType getFile_type() {
-        return file_type;
+    public FileType getFileType() {
+        return fileType;
     }
 
-    public void setFile_type(FileType file_type) {
-        this.file_type = file_type;
+    public void setFileType(FileType fileType) {
+        this.fileType = fileType;
     }
 
-    public LocalDateTime getUpload_date() {
-        return upload_date;
+    public LocalDateTime getUploadDate() {
+        return uploadDate;
     }
 
-    public void setUpload_date(LocalDateTime upload_date) {
-        this.upload_date = upload_date;
+    public void setUploadDate(LocalDateTime uploadDate) {
+        this.uploadDate = uploadDate;
     }
 
     public Service getService() {
@@ -52,12 +52,12 @@ public class Photo {
         this.service = service;
     }
 
-    public PhotoType getPhoto_purpose() {
-        return photo_purpose;
+    public PhotoType getPhotoPurpose() {
+        return photoPurpose;
     }
 
-    public void sethoto_purpose(PhotoType photo_purpose) {
-        this.photo_purpose = photo_purpose;
+    public void setPhotoPurpose(PhotoType photoPurpose) {
+        this.photoPurpose = photoPurpose;
     }
 
 }

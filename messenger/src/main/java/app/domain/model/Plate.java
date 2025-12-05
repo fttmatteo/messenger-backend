@@ -4,41 +4,41 @@ import java.time.LocalDateTime;
 import app.domain.model.enums.PlateType;
 
 public class Plate {
-    private Long id_plate;
-    private String plate_number;
-    private PlateType plate_type;
-    private LocalDateTime upload_date;
+    private Long idPlate;
+    private String plateNumber;
+    private PlateType plateType;
+    private LocalDateTime uploadDate;
 
-    public Long getId_plate() {
-        return id_plate;
+    public Long getIdPlate() {
+        return idPlate;
     }
 
-    public void setId_plate(Long id_plate) {
-        this.id_plate = id_plate;
+    public void setIdPlate(Long idPlate) {
+        this.idPlate = idPlate;
     }
 
-    public String getPlate_number() {
-        return plate_number;
+    public String getPlateNumber() {
+        return plateNumber;
     }
 
-    public void setPlate_number(String plate_number) {
-        this.plate_number = plate_number;
+    public void setPlateNumber(String plateNumber) {
+        this.plateNumber = plateNumber;
     }
 
-    public PlateType getPlate_type() {
-        return plate_type;
+    public PlateType getPlateType() {
+        return plateType;
     }
 
-    public void setPlate_type(PlateType plate_type) {
-        this.plate_type = plate_type;
+    public void setPlateType(PlateType plateType) {
+        this.plateType = plateType;
     }
 
-    public LocalDateTime getUpload_date() {
-        return upload_date;
+    public LocalDateTime getUploadDate() {
+        return uploadDate;
     }
 
-    public void setUpload_date(LocalDateTime upload_date) {
-        this.upload_date = upload_date;
+    public void setUploadDate(LocalDateTime uploadDate) {
+        this.uploadDate = uploadDate;
     }
 
 }

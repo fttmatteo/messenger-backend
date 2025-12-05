@@ -3,34 +3,34 @@ package app.domain.model;
 import java.time.LocalDateTime;
 
 public class Signature {
-    private Long id_signature;
-    private String signature_path;
-    private LocalDateTime upload_date;
+    private Long idSignature;
+    private String signaturePath;
+    private LocalDateTime uploadDate;
     private Service service;
     private Employee employee;
 
-    public Long getId_signature() {
-        return id_signature;
+    public Long getIdSignature() {
+        return idSignature;
     }
 
-    public void setId_signature(Long id_signature) {
-        this.id_signature = id_signature;
+    public void setIdSignature(Long idSignature) {
+        this.idSignature = idSignature;
     }
 
-    public String getSignature_path() {
-        return signature_path;
+    public String getSignaturePath() {
+        return signaturePath;
     }
 
-    public void setSignature_path(String signature_path) {
-        this.signature_path = signature_path;
+    public void setSignaturePath(String signaturePath) {
+        this.signaturePath = signaturePath;
     }
 
-    public LocalDateTime getUpload_date() {
-        return upload_date;
+    public LocalDateTime getUploadDate() {
+        return uploadDate;
     }
 
-    public void setUpload_date(LocalDateTime upload_date) {
-        this.upload_date = upload_date;
+    public void setUploadDate(LocalDateTime uploadDate) {
+        this.uploadDate = uploadDate;
     }
 
     public Service getService() {

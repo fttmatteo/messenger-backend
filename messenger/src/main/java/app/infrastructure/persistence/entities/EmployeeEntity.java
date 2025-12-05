@@ -2,8 +2,6 @@ package app.infrastructure.persistence.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,45 +12,43 @@ import jakarta.persistence.Table;
 public class EmployeeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_empleado;
+    private Long idEmpleado;
 
     @Column(nullable = false, unique = true, length = 10)
     private Long document;
 
     @Column(nullable = false, length = 100)
-    private String full_name;
+    private String fullName;
 
     @Column(nullable = false, length = 10)
     private String phone;
 
     @Column(nullable = false, unique = true, length = 15)
-    private String user_name;
+    private String userName;
 
     @Column(nullable = false)
     private String password;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private String role;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private String zone;
 
-    public Long getId_empleado() {
-        return id_empleado;
+    public Long getIdEmpleado() {
+        return idEmpleado;
     }
 
-    public void setId_empleado(Long id_empleado) {
-        this.id_empleado = id_empleado;
+    public void setIdEmpleado(Long idEmpleado) {
+        this.idEmpleado = idEmpleado;
     }
 
-    public String getFull_name() {
-        return full_name;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setFull_name(String full_name) {
-        this.full_name = full_name;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public Long getDocument() {
@@ -71,12 +67,12 @@ public class EmployeeEntity {
         this.phone = phone;
     }
 
-    public String getUser_name() {
-        return user_name;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setUser_name(String user_name) {
-        this.user_name = user_name;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public void setPassword(String password) {

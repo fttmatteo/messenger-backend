@@ -18,7 +18,7 @@ public class CreateEmployee {
 
     public void create(Employee employee) throws Exception {
         documentIsUnique(employee.getDocument());
-        userNameIsUnique(employee.getUser_name());
+        userNameIsUnique(employee.getUserName());
         if (employee.getPassword() != null) {
             String encoded = passwordEncoder.encode(employee.getPassword());
             employee.setPassword(encoded);
@@ -36,7 +36,7 @@ public class CreateEmployee {
 
     public void userNameIsUnique(String userName) throws Exception {
         Employee probe = new Employee();
-        probe.setUser_name(userName);
+        probe.setUserName(userName);
         if (employeePort.findByUserName(probe) != null) {
             throw new BusinessException("ya existe una persona registrada con ese nombre de usuario");
         }

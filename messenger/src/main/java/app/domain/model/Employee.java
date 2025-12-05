@@ -4,21 +4,21 @@ import app.domain.model.enums.Role;
 import app.domain.model.enums.Zone;
 
 public class Employee {
-    private Long id_empleado;
+    private Long idEmpleado;
     private Long document;
-    private String full_name;
+    private String fullName;
     private String phone;
-    private String user_name;
+    private String userName;
     private String password;
     private Role role;
     private Zone zone;
 
-    public Long getId_empleado() {
-        return id_empleado;
+    public Long getIdEmpleado() {
+        return idEmpleado;
     }
 
-    public void setId_empleado(Long id_empleado) {
-        this.id_empleado = id_empleado;
+    public void setIdEmpleado(Long idEmpleado) {
+        this.idEmpleado = idEmpleado;
     }
 
     public Long getDocument() {
@@ -29,12 +29,12 @@ public class Employee {
         this.document = document;
     }
 
-    public String getFull_name() {
-        return full_name;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setFull_name(String full_name) {
-        this.full_name = full_name;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getPhone() {
@@ -45,12 +45,12 @@ public class Employee {
         this.phone = phone;
     }
 
-    public String getUser_name() {
-        return user_name;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setUser_name(String user_name) {
-        this.user_name = user_name;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getPassword() {

@@ -11,12 +11,12 @@ public class EmployeeBuilder {
     @Autowired
     private EmployeeValidator validator;
     
-    public Employee build( String document, String full_name, String phone, String user_name, String password, String zone) throws Exception {
+    public Employee build( String document, String fullName, String phone, String userName, String password, String zone) throws Exception {
         Employee employee = new Employee();
         employee.setDocument(validator.documentValidator(document));
-        employee.setFull_name(validator.fullNameValidator(full_name));
+        employee.setFullName(validator.fullNameValidator(fullName));
         employee.setPhone(validator.phoneValidator(phone));
-        employee.setUser_name(validator.userNameValidator(user_name));
+        employee.setUserName(validator.userNameValidator(userName));
         employee.setPassword(validator.passwordValidator(password));
         employee.setZone(validator.zoneValidator(zone));
         return employee;

@@ -21,7 +21,7 @@ public class EmployeeAdapter implements EmployeePort {
 
     @Override
     public Employee findByUserName(Employee employee) throws Exception {
-        EmployeeEntity entity = employeeRepository.findByUserName(employee.getUser_name());
+        EmployeeEntity entity = employeeRepository.findByUserName(employee.getUserName());
         return EmployeeMapper.toDomain(entity);
     }
 
@@ -29,7 +29,7 @@ public class EmployeeAdapter implements EmployeePort {
     public void save(Employee employee) throws Exception {
         EmployeeEntity entity = EmployeeMapper.toEntity(employee);
         employeeRepository.save(entity);
-        employee.setId_empleado(entity.getId_empleado());
+        employee.setIdEmpleado(entity.getIdEmpleado());
     }
 
     @Override

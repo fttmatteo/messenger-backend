@@ -8,11 +8,11 @@ public class EmployeeMapper {
     public static EmployeeEntity toEntity(Employee employee) {
         if (employee == null) return null;
         EmployeeEntity entity = new EmployeeEntity();
-        entity.setId_empleado(employee.getId_empleado());
+        entity.setIdEmpleado(employee.getIdEmpleado());
         entity.setDocument(employee.getDocument());
-        entity.setFull_name(employee.getFull_name());
+        entity.setFullName(employee.getFullName());
         entity.setPhone(employee.getPhone());
-        entity.setUser_name(employee.getUser_name());
+        entity.setUserName(employee.getUserName());
         entity.setPassword(employee.getPassword());
         if (employee.getRole() != null) {
             entity.setRole(employee.getRole().name());
@@ -26,11 +26,11 @@ public class EmployeeMapper {
     public static Employee toDomain(EmployeeEntity entity) {
         if (entity == null) return null;
         Employee employee = new Employee();
-        employee.setId_empleado(entity.getId_empleado());
+        employee.setIdEmpleado(entity.getIdEmpleado());
         employee.setDocument(entity.getDocument());
-        employee.setFull_name(entity.getFull_name());
+        employee.setFullName(entity.getFullName());
         employee.setPhone(entity.getPhone());
-        employee.setUser_name(entity.getUser_name());
+        employee.setUserName(entity.getUserName());
         employee.setPassword(entity.getPassword());
         if (entity.getRole() != null) {
             employee.setRole(Role.valueOf(entity.getRole()));
