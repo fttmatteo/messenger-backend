@@ -2,13 +2,19 @@ package app.application.usecase;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import app.domain.model.Dealership;
 import app.domain.model.Employee;
 import app.domain.model.enums.Role;
+import app.domain.services.CreateDealership;
 import app.domain.services.CreateEmployee;
 import app.domain.services.DeleteEmployee;
+import app.domain.services.DeleteDealership;
 
 @Service
 public class AdminUseCase {
+
+    @Autowired
+    private CreateDealership createDealership;
 
     @Autowired
     private CreateEmployee createEmployee;
@@ -16,9 +22,16 @@ public class AdminUseCase {
     @Autowired
     private DeleteEmployee deleteEmployee;
 
+    @Autowired
+    private DeleteDealership deleteDealership;
+
     public void createMessenger(Employee employee) throws Exception {
         employee.setRole(Role.MESSENGER);
         createEmployee.create(employee);
+    }
+
+    public void createDealership(Dealership dealership) throws Exception {
+        createDealership.create(dealership);
     }
 
     public void documentIsUnique(Long document) throws Exception {
@@ -31,5 +44,9 @@ public class AdminUseCase {
 
     public void deleteEmployee(Long document) throws Exception {
         deleteEmployee.deleteByDocument(document);
+    }
+
+    public void deleteDealership(Long idDealership) throws Exception {
+        deleteDealership.deleteById(idDealership);
     }
 }

@@ -12,21 +12,27 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import app.adapter.in.builder.EmployeeBuilder;
+import app.adapter.in.builder.DealershipBuilder;
+import app.adapter.in.rest.request.DealershipRequest;
 import app.adapter.in.rest.request.EmployeeRequest;
 import app.application.exceptions.BusinessException;
 import app.application.exceptions.InputsException;
 import app.application.usecase.AdminUseCase;
 import app.domain.model.Employee;
+import app.domain.model.Dealership;
 import app.adapter.in.validators.EmployeeValidator;
 
 @RestController
 @RequestMapping("/employees")
-    @PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
     @Autowired
     private EmployeeBuilder employeeBuilder;
-    
+
+    @Autowired
+    private DealershipBuilder dealershipBuilder;
+
     @Autowired
     private AdminUseCase adminUseCase;
 
@@ -34,7 +40,7 @@ public class AdminController {
     private EmployeeValidator employeeValidator;
 
     @PostMapping("/messenger")
-        @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createMessenger(@RequestBody EmployeeRequest request) {
         try {
             Employee employee = employeeBuilder.build(
@@ -42,8 +48,7 @@ public class AdminController {
                     request.getFullName(),
                     request.getPhone(),
                     request.getUserName(),
-                    request.getPassword()
-            );
+                    request.getPassword());
             adminUseCase.createMessenger(employee);
             return ResponseEntity.status(HttpStatus.CREATED).body(employee);
         } catch (InputsException ie) {
@@ -55,13 +60,48 @@ public class AdminController {
         }
     }
 
+    @PostMapping("/dealership")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> createDealership(@RequestBody DealershipRequest request) {
+        try {
+            Dealership dealership = dealershipBuilder.build(
+                    request.getName(),
+                    request.getAddress(),
+                    request.getPhone(),
+                    request.getZone());
+            adminUseCase.createDealership(dealership);
+            return ResponseEntity.status(HttpStatus.CREATED).body(dealership);
+        } catch (InputsException ie) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ie.getMessage());
+        } catch (BusinessException be) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(be.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
     @DeleteMapping("/{document}")
-        @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteEmployee(@PathVariable String document) {
         try {
             long doc = employeeValidator.documentValidator(document);
             adminUseCase.deleteEmployee(doc);
             return ResponseEntity.ok(Map.of("message", "empleado eliminado"));
+        } catch (InputsException ie) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ie.getMessage());
+        } catch (BusinessException be) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(be.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/dealership/{idDealership}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteDealership(@PathVariable Long idDealership) {
+        try {
+            adminUseCase.deleteDealership(idDealership);
+            return ResponseEntity.ok(Map.of("message", "dealership eliminado"));
         } catch (InputsException ie) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ie.getMessage());
         } catch (BusinessException be) {

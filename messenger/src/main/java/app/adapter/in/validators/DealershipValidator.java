@@ -14,7 +14,11 @@ public class DealershipValidator extends SimpleValidator {
     }
 
     public String phoneValidator(String value) throws InputsException {
-        return stringValidator("telefono", value);
+        stringValidator("número de teléfono", value);
+        if (!value.matches("\\d{10}")) {
+            throw new InputsException("el número de teléfono debe contener 10 dígitos");
+        }
+        return value;
     }
 
     public String zoneValidator(String value) throws InputsException {
