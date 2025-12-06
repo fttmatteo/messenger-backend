@@ -29,7 +29,7 @@ public class EmployeeAdapter implements EmployeePort {
     public void save(Employee employee) throws Exception {
         EmployeeEntity entity = EmployeeMapper.toEntity(employee);
         employeeRepository.save(entity);
-        employee.setIdEmpleado(entity.getIdEmpleado());
+        employee.setIdEmployee(entity.getIdEmployee());
     }
 
     @Override

@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
 public class EmployeeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idEmpleado;
+    private Long idEmployee;
 
     @Column(nullable = false, unique = true, length = 10)
     private Long document;
@@ -32,13 +32,12 @@ public class EmployeeEntity {
     @Column(nullable = false)
     private String role;
 
-
-    public Long getIdEmpleado() {
-        return idEmpleado;
+    public Long getIdEmployee() {
+        return idEmployee;
     }
 
-    public void setIdEmpleado(Long idEmpleado) {
-        this.idEmpleado = idEmpleado;
+    public void setIdEmployee(Long idEmployee) {
+        this.idEmployee = idEmployee;
     }
 
     public String getFullName() {

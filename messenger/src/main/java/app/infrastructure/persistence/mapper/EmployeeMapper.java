@@ -6,9 +6,10 @@ import app.infrastructure.persistence.entities.EmployeeEntity;
 
 public class EmployeeMapper {
     public static EmployeeEntity toEntity(Employee employee) {
-        if (employee == null) return null;
+        if (employee == null)
+            return null;
         EmployeeEntity entity = new EmployeeEntity();
-        entity.setIdEmpleado(employee.getIdEmpleado());
+        entity.setIdEmployee(employee.getIdEmployee());
         entity.setDocument(employee.getDocument());
         entity.setFullName(employee.getFullName());
         entity.setPhone(employee.getPhone());
@@ -21,9 +22,10 @@ public class EmployeeMapper {
     }
 
     public static Employee toDomain(EmployeeEntity entity) {
-        if (entity == null) return null;
+        if (entity == null)
+            return null;
         Employee employee = new Employee();
-        employee.setIdEmpleado(entity.getIdEmpleado());
+        employee.setIdEmployee(entity.getIdEmployee());
         employee.setDocument(entity.getDocument());
         employee.setFullName(entity.getFullName());
         employee.setPhone(entity.getPhone());

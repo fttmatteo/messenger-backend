@@ -23,8 +23,8 @@ public class EmployeeValidator extends SimpleValidator {
 
     public String phoneValidator(String value) throws InputsException {
         stringValidator("número de teléfono", value);
-        if (!value.matches("\\d{1,10}")) {
-            throw new InputsException("el número de teléfono debe contener entre 1 y 10 dígitos");
+        if (!value.matches("\\d{10}")) {
+            throw new InputsException("el número de teléfono debe contener 10 dígitos");
         }
         return value;
     }

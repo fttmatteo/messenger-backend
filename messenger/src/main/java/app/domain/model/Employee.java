@@ -3,7 +3,7 @@ package app.domain.model;
 import app.domain.model.enums.Role;
 
 public class Employee {
-    private Long idEmpleado;
+    private Long idEmployee;
     private Long document;
     private String fullName;
     private String phone;
@@ -11,12 +11,12 @@ public class Employee {
     private String password;
     private Role role;
 
-    public Long getIdEmpleado() {
-        return idEmpleado;
+    public Long getIdEmployee() {
+        return idEmployee;
     }
 
-    public void setIdEmpleado(Long idEmpleado) {
-        this.idEmpleado = idEmpleado;
+    public void setIdEmployee(Long idEmployee) {
+        this.idEmployee = idEmployee;
     }
 
     public Long getDocument() {
