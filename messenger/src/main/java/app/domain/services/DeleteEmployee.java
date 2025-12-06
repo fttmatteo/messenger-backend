@@ -24,8 +24,7 @@ public class DeleteEmployee {
             employeePort.deleteByDocument(document);
         } catch (DataIntegrityViolationException dive) {
             throw new BusinessException(
-                "no se puede eliminar el usuario porque tiene registros asociados en el sistema"
-            );
+                    "no se puede eliminar el usuario porque tiene registros asociados en el sistema");
         } catch (BusinessException be) {
             throw be;
         } catch (Exception e) {
