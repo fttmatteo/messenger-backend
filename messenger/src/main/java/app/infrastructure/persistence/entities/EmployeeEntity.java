@@ -32,8 +32,6 @@ public class EmployeeEntity {
     @Column(nullable = false)
     private String role;
 
-    @Column(nullable = false)
-    private String zone;
 
     public Long getIdEmpleado() {
         return idEmpleado;
@@ -89,13 +87,5 @@ public class EmployeeEntity {
 
     public void setRole(String role) {
         this.role = role;
-    }
-
-    public String getZone() {
-        return zone;
-    }
-
-    public void setZone(String zone) {
-        this.zone = zone;
     }
 }

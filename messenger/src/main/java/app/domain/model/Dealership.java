@@ -1,13 +1,11 @@
 package app.domain.model;
 
-import app.domain.model.enums.Zone;
-
 public class Dealership {
     private Long idDealership;
     private String name;
     private String address;
     private String phone;
-    private Zone zone;
+    private String zone;
 
     public Long getIdDealership() {
         return idDealership;
@@ -41,11 +39,11 @@ public class Dealership {
         this.phone = phone;
     }
 
-    public Zone getZone() {
+    public String getZone() {
         return zone;
     }
 
-    public void setZone(Zone zone) {
+    public void setZone(String zone) {
         this.zone = zone;
     }
 }

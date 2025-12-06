@@ -6,7 +6,6 @@ public class EmployeeRequest {
     private String phone;
     private String userName;
     private String password;
-    private String zone;
 
     public String getFullName() {
         return fullName;
@@ -46,13 +45,5 @@ public class EmployeeRequest {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getZone() {
-        return zone;
-    }
-
-    public void setZone(String zone) {
-        this.zone = zone;
     }
 }

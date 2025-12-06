@@ -17,9 +17,6 @@ public class EmployeeMapper {
         if (employee.getRole() != null) {
             entity.setRole(employee.getRole().name());
         }
-        if (employee.getZone() != null) {
-            entity.setZone(employee.getZone().name());
-        }
         return entity;
     }
 

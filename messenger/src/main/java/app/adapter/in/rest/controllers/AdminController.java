@@ -42,8 +42,7 @@ public class AdminController {
                     request.getFullName(),
                     request.getPhone(),
                     request.getUserName(),
-                    request.getPassword(),
-                    request.getZone()
+                    request.getPassword()
             );
             adminUseCase.createMessenger(employee);
             return ResponseEntity.status(HttpStatus.CREATED).body(employee);

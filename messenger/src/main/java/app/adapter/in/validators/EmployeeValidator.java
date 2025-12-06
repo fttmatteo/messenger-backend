@@ -3,7 +3,6 @@ package app.adapter.in.validators;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
 import app.application.exceptions.InputsException;
-import app.domain.model.enums.Zone;
 
 @Component
 public class EmployeeValidator extends SimpleValidator {
@@ -56,27 +55,5 @@ public class EmployeeValidator extends SimpleValidator {
             throw new InputsException("la contraseña debe contener al menos un carácter especial");
         }
         return value;
-    }
-
-    public Zone zoneValidator(String value) throws InputsException {
-        stringValidator("zona", value);
-        String v = value.trim().toLowerCase();
-
-        for (Zone z : Zone.values()) {
-            if (z.name().equalsIgnoreCase(v)) {
-                return z;
-            }
-        }
-
-        switch (v) {
-            case "norte":
-                return Zone.NORTH;
-            case "sur":
-                return Zone.SOUTH;
-            case "centro":
-                return Zone.CENTER;
-            default:
-                throw new InputsException("la zona debe ser norte, sur o centro");
-        }
     }
 }
