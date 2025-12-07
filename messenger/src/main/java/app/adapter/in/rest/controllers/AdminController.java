@@ -6,32 +6,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import app.adapter.in.builder.EmployeeBuilder;
-import app.adapter.in.builder.PlateBuilder;
 import app.adapter.in.builder.DealershipBuilder;
 import app.adapter.in.rest.request.DealershipRequest;
 import app.adapter.in.rest.request.EmployeeRequest;
-import app.adapter.in.rest.request.PlateRequest;
-import app.adapter.in.rest.request.ServiceUpdateRequest;
 import app.application.exceptions.BusinessException;
 import app.application.exceptions.InputsException;
 import app.application.usecase.AdminUseCase;
 import app.domain.model.Employee;
-import app.domain.model.Plate;
 import app.domain.model.Dealership;
 import app.adapter.in.validators.EmployeeValidator;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import app.domain.services.ManageService;
 
 @RestController
-@RequestMapping("/employees")
+@RequestMapping("/administrator")
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
@@ -40,15 +32,11 @@ public class AdminController {
     @Autowired
     private DealershipBuilder dealershipBuilder;
     @Autowired
-    private PlateBuilder plateBuilder;
-    @Autowired
     private AdminUseCase adminUseCase;
     @Autowired
     private EmployeeValidator employeeValidator;
-    @Autowired
-    private ManageService manageService;
 
-    @PostMapping("/messenger")
+    @PostMapping("/create-messenger")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createMessenger(@RequestBody EmployeeRequest request) {
         try {
@@ -69,7 +57,7 @@ public class AdminController {
         }
     }
 
-    @PostMapping("/dealership")
+    @PostMapping("/create-dealership")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createDealership(@RequestBody DealershipRequest request) {
         try {
@@ -89,28 +77,7 @@ public class AdminController {
         }
     }
 
-    @PostMapping("/plates")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> createPlate(@RequestBody PlateRequest request) {
-        try {
-            if (request.getIdDealership() == null) {
-                throw new InputsException("El id del concesionario es obligatorio");
-            }
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            String username = auth.getName();
-            Plate plate = plateBuilder.build(request.getPlateNumber());
-            adminUseCase.createPlate(plate, username, request.getIdDealership());
-            return ResponseEntity.status(HttpStatus.CREATED).body(plate);
-        } catch (InputsException ie) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ie.getMessage());
-        } catch (BusinessException be) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(be.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/employee/{document}")
+    @DeleteMapping("/delete-employee/{document}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteEmployee(@PathVariable String document) {
         try {
@@ -126,7 +93,7 @@ public class AdminController {
         }
     }
 
-    @DeleteMapping("/plates/{idPlate}")
+    @DeleteMapping("/delete-plate/{idPlate}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deletePlate(@PathVariable Long idPlate) {
         try {
@@ -141,7 +108,7 @@ public class AdminController {
         }
     }
 
-    @DeleteMapping("/dealership/{idDealership}")
+    @DeleteMapping("/delete-dealership/{idDealership}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteDealership(@PathVariable Long idDealership) {
         try {
@@ -149,29 +116,6 @@ public class AdminController {
             return ResponseEntity.ok(Map.of("message", "Dealership eliminado correctamente"));
         } catch (InputsException ie) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ie.getMessage());
-        } catch (BusinessException be) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(be.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
-
-    @PatchMapping("/service/{idService}/status")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> updateServiceStatus(@PathVariable Long idService,
-            @RequestBody ServiceUpdateRequest request) {
-        try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            String username = auth.getName();
-            manageService.updateStatus(
-                    idService,
-                    request.getStatus(),
-                    request.getObservation(),
-                    request.getSignature(),
-                    request.getPhoto(),
-                    username,
-                    "ADMIN");
-            return ResponseEntity.ok(Map.of("message", "Servicio actualizado por Administrador"));
         } catch (BusinessException be) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(be.getMessage());
         } catch (Exception e) {

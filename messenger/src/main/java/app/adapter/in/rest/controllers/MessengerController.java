@@ -4,7 +4,7 @@ import app.application.exceptions.BusinessException;
 import app.application.exceptions.InputsException;
 import app.domain.model.Plate;
 import app.adapter.in.builder.PlateBuilder;
-import app.adapter.in.rest.request.ServiceUpdateRequest;
+import app.adapter.in.rest.request.ServiceRequest;
 import app.adapter.in.validators.PlateValidator;
 import app.domain.model.Service;
 import app.domain.ports.OcrPort;
@@ -25,7 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 @RestController
 @RequestMapping("/messenger")
-@PreAuthorize("hasRole('MESSENGER')")
+@PreAuthorize("hasRole('MESSENGER') or hasRole('ADMIN')")
 public class MessengerController {
 
     @Autowired
@@ -41,8 +41,8 @@ public class MessengerController {
     @Autowired
     private PlateValidator plateValidator;
 
-    @PostMapping(value = "/plates", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('MESSENGER')")
+    @PostMapping(value = "/create-plate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('MESSENGER') or hasRole('ADMIN')")
     public ResponseEntity<?> createPlate(
             @RequestParam("image") MultipartFile image,
             @RequestParam("idDealership") Long idDealership) {
@@ -56,7 +56,7 @@ public class MessengerController {
             System.out.println("Texto limpio: " + cleanPlateText);
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String username = auth.getName();
-            Plate plate = plateBuilder.build(cleanPlateText);
+            Plate plate = plateBuilder.build(cleanPlateText, idDealership);
             messengerUseCase.createPlateAndService(plate, username, idDealership);
             return ResponseEntity.status(HttpStatus.CREATED).body(plate);
         } catch (InputsException ie) {
@@ -70,7 +70,8 @@ public class MessengerController {
         }
     }
 
-    @GetMapping("/my-services")
+    @GetMapping("/query-services")
+    @PreAuthorize("hasRole('MESSENGER') or hasRole('ADMIN')")
     public ResponseEntity<List<Service>> getMyServices() {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -82,10 +83,10 @@ public class MessengerController {
         }
     }
 
-    @PatchMapping("/service/{idService}/status")
-    @PreAuthorize("hasRole('MESSENGER')")
+    @PatchMapping("/update-service/{idService}/status")
+    @PreAuthorize("hasRole('MESSENGER') or hasRole('ADMIN')")
     public ResponseEntity<?> updateServiceStatus(@PathVariable Long idService,
-            @RequestBody ServiceUpdateRequest request) {
+            @RequestBody ServiceRequest request) {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String username = auth.getName();

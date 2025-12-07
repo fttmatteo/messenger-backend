@@ -15,6 +15,22 @@ import java.io.InputStream;
 @Component
 public class TesseractAdapter implements OcrPort {
 
+    static {
+        if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+            // Configuración explícita para que JNA encuentre libtesseract en macOS con
+            // Homebrew
+            String jnaPath = System.getProperty("jna.library.path", "");
+            String homebrewPath = "/opt/homebrew/lib";
+            String intelPath = "/usr/local/lib";
+
+            if (jnaPath.isEmpty()) {
+                System.setProperty("jna.library.path", homebrewPath + ":" + intelPath);
+            } else {
+                System.setProperty("jna.library.path", jnaPath + ":" + homebrewPath + ":" + intelPath);
+            }
+        }
+    }
+
     @Override
     public String extractText(InputStream imageStream) throws Exception {
         // 1. Configurar Tesseract
@@ -29,25 +45,37 @@ public class TesseractAdapter implements OcrPort {
         tesseract.setDatapath(datapath);
         tesseract.setLanguage("eng"); // Funciona bien para placas
 
-        // 2. Pre-procesamiento de imagen (Limpieza)
+        // 2. Leer la imagen original
         BufferedImage originalImage = ImageIO.read(imageStream);
         if (originalImage == null) {
             throw new Exception("El archivo subido no es una imagen válida.");
         }
 
-        // Aplicamos filtros para mejorar la lectura
-        BufferedImage cleanImage = processImage(originalImage);
-
         try {
-            // 3. Ejecutar OCR sobre la imagen limpia
+            // 3. Intento 1: Ejecutar OCR sobre la imagen PROCESADA (Escala de grises +
+            // Upscaling)
+            BufferedImage cleanImage = processImage(originalImage);
             String result = tesseract.doOCR(cleanImage);
 
-            // 4. Limpieza del texto resultante
-            return result.replaceAll("\\n", " ").trim();
+            // Si el resultado está vacío o muy corto, intentamos con la imagen original
+            if (result == null || result.trim().length() < 3) {
+                System.out
+                        .println("OCR con procesado falló (resultado vacío/corto). Intentando con imagen original...");
+                String fallbackResult = tesseract.doOCR(originalImage);
+                return cleanResult(fallbackResult);
+            }
+
+            return cleanResult(result);
 
         } catch (TesseractException e) {
             throw new Exception("Error al procesar la imagen con Tesseract: " + e.getMessage());
         }
+    }
+
+    private String cleanResult(String text) {
+        if (text == null)
+            return "";
+        return text.replaceAll("\\n", " ").trim();
     }
 
     /**
