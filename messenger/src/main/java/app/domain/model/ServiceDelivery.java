@@ -11,11 +11,8 @@ public class ServiceDelivery {
     private Status currentStatus;
     private String observation;
     private Signature signature;
-    // Inicializamos las listas para evitar NullPointerException
-    private List<Photo> photos = new ArrayList<>();
-    // Historial completo para auditoría
+    private List<Photo> photos = new ArrayList<>(); // Inicializamos las listas para evitar NullPointerException
     private List<StatusHistory> history = new ArrayList<>();
-    // Métodos utilitarios para mantener encapsulamiento (opcional pero recomendado)
     
     public void addPhoto(Photo photo) {
         this.photos.add(photo);
