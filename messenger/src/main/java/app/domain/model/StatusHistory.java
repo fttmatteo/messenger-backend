@@ -1,21 +1,30 @@
 package app.domain.model;
 
-import java.time.LocalDateTime;
 import app.domain.model.enums.Status;
+import java.time.LocalDateTime;
 
 public class StatusHistory {
     private Long idStatusHistory;
+    private ServiceDelivery serviceDelivery;
     private Status previousStatus;
     private Status newStatus;
     private LocalDateTime changeDate;
-    private Service service;
-    
+    private Employee changedBy; // El usuario (admin o mensajero) que hizo el cambio
+
     public Long getIdStatusHistory() {
         return idStatusHistory;
     }
 
     public void setIdStatusHistory(Long idStatusHistory) {
         this.idStatusHistory = idStatusHistory;
+    }
+
+    public ServiceDelivery getServiceDelivery() {
+        return serviceDelivery;
+    }
+
+    public void setServiceDelivery(ServiceDelivery serviceDelivery) {
+        this.serviceDelivery = serviceDelivery;
     }
 
     public Status getPreviousStatus() {
@@ -42,12 +51,11 @@ public class StatusHistory {
         this.changeDate = changeDate;
     }
 
-    public Service getService() {
-        return service;
+    public Employee getChangedBy() {
+        return changedBy;
     }
 
-    public void setService(Service service) {
-        this.service = service;
+    public void setChangedBy(Employee changedBy) {
+        this.changedBy = changedBy;
     }
-
 }

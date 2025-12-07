@@ -6,8 +6,7 @@ public class Signature {
     private Long idSignature;
     private String signaturePath;
     private LocalDateTime uploadDate;
-    private Service service;
-    private Employee employee;
+    private ServiceDelivery serviceDelivery;
 
     public Long getIdSignature() {
         return idSignature;
@@ -33,19 +32,11 @@ public class Signature {
         this.uploadDate = uploadDate;
     }
 
-    public Service getService() {
-        return service;
+    public ServiceDelivery getServiceDelivery() {
+        return serviceDelivery;
     }
 
-    public void setService(Service service) {
-        this.service = service;
-    }
-
-    public Employee getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
+    public void setServiceDelivery(ServiceDelivery serviceDelivery) {
+        this.serviceDelivery = serviceDelivery;
     }
 }

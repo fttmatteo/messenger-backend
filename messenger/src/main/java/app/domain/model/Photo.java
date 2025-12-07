@@ -1,16 +1,14 @@
 package app.domain.model;
 
-import java.time.LocalDateTime;
-import app.domain.model.enums.FileType;
 import app.domain.model.enums.PhotoType;
+import java.time.LocalDateTime;
 
 public class Photo {
     private Long idPhoto;
     private String photoPath;
-    private FileType fileType;
     private LocalDateTime uploadDate;
-    private Service service;
-    private PhotoType photoPurpose;
+    private PhotoType photoType;
+    private ServiceDelivery serviceDelivery;
 
     public Long getIdPhoto() {
         return idPhoto;
@@ -28,14 +26,6 @@ public class Photo {
         this.photoPath = photoPath;
     }
 
-    public FileType getFileType() {
-        return fileType;
-    }
-
-    public void setFileType(FileType fileType) {
-        this.fileType = fileType;
-    }
-
     public LocalDateTime getUploadDate() {
         return uploadDate;
     }
@@ -44,20 +34,19 @@ public class Photo {
         this.uploadDate = uploadDate;
     }
 
-    public Service getService() {
-        return service;
+    public PhotoType getPhotoType() {
+        return photoType;
     }
 
-    public void setService(Service service) {
-        this.service = service;
+    public void setPhotoType(PhotoType photoType) {
+        this.photoType = photoType;
     }
 
-    public PhotoType getPhotoPurpose() {
-        return photoPurpose;
+    public ServiceDelivery getServiceDelivery() {
+        return serviceDelivery;
     }
 
-    public void setPhotoPurpose(PhotoType photoPurpose) {
-        this.photoPurpose = photoPurpose;
+    public void setServiceDelivery(ServiceDelivery serviceDelivery) {
+        this.serviceDelivery = serviceDelivery;
     }
-
 }
