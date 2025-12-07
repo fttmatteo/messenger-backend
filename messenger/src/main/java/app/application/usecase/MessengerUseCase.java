@@ -22,11 +22,11 @@ public class MessengerUseCase {
     private EmployeePort employeePort;
 
     @Transactional
-    public void createPlateAndService(Plate plate, String username) throws Exception {
+    public void createPlateAndService(Plate plate, String username, Long idDealership) throws Exception {
         createPlateService.create(plate);
         Employee query = new Employee();
         query.setUserName(username);
         Employee messenger = employeePort.findByUserName(query);
-        manageService.createServiceFromPlate(plate, messenger);
+        manageService.createServiceFromPlate(plate, messenger, idDealership);
     }
 }

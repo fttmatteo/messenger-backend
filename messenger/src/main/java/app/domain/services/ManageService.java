@@ -1,6 +1,7 @@
 package app.domain.services;
 
 import app.application.exceptions.BusinessException;
+import app.domain.model.Dealership;
 import app.domain.model.Employee;
 import app.domain.model.Photo;
 import app.domain.model.Signature;
@@ -11,6 +12,7 @@ import app.domain.model.Service;
 import app.domain.model.StatusHistory;
 import app.domain.ports.EmployeePort;
 import app.domain.ports.ServicePort;
+import app.domain.ports.DealershipPort;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDateTime;
 
@@ -19,11 +21,17 @@ public class ManageService {
 
     @Autowired
     private ServicePort servicePort;
-
     @Autowired
     private EmployeePort employeePort;
+    @Autowired
+    private DealershipPort dealershipPort;
 
-    public void createServiceFromPlate(app.domain.model.Plate plate, Employee messenger) throws Exception {
+    public void createServiceFromPlate(app.domain.model.Plate plate, Employee messenger, Long idDealership)
+            throws Exception {
+        Dealership dealership = dealershipPort.findById(idDealership);
+        if (dealership == null) {
+            throw new BusinessException("El concesionario seleccionado no existe");
+        }
         Service service = new Service();
         service.setPlate(plate);
         service.setEmployee(messenger);

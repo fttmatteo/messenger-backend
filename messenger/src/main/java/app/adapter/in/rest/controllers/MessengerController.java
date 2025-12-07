@@ -43,10 +43,13 @@ public class MessengerController {
     @PreAuthorize("hasRole('MESSENGER')")
     public ResponseEntity<?> createPlate(@RequestBody app.adapter.in.rest.request.PlateRequest request) {
         try {
+            if (request.getIdDealership() == null) {
+                throw new InputsException("El id del concesionario es obligatorio");
+            }
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String username = auth.getName();
             Plate plate = plateBuilder.build(request.getPlateNumber());
-            messengerUseCase.createPlateAndService(plate, username);
+            messengerUseCase.createPlateAndService(plate, username, request.getIdDealership());
             return ResponseEntity.status(HttpStatus.CREATED).body(plate);
         } catch (InputsException ie) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ie.getMessage());

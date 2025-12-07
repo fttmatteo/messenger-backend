@@ -37,7 +37,6 @@ public class AdminUseCase {
     @Autowired
     private DeleteDealership deleteDealership;
 
-    // ✅ Inyecciones nuevas para garantizar el flujo de Servicio
     @Autowired
     private ManageService manageService;
 
@@ -69,22 +68,13 @@ public class AdminUseCase {
         deleteDealership.deleteById(idDealership);
     }
 
-    // ✅ MÉTODO ACTUALIZADO: Crea Placa + Servicio (Flujo completo)
     @Transactional
-    public void createPlate(Plate plate, String username) throws Exception {
-        // 1. Guardar la Placa (física)
+    public void createPlate(Plate plate, String username, Long idDealership) throws Exception {
         createPlateService.create(plate);
-
-        // 2. Buscar al usuario Admin que está registrando (para la auditoría)
         Employee query = new Employee();
         query.setUserName(username);
         Employee adminUser = employeePort.findByUserName(query);
-
-        // 3. Crear el Servicio asociado usando la lógica centralizada
-        // Nota: El servicio quedará asignado inicialmente a este Admin.
-        // Si prefieres que quede sin asignar, podrías pasar 'null' aquí
-        // y ajustar ManageService para tolerar empleados nulos.
-        manageService.createServiceFromPlate(plate, adminUser);
+        manageService.createServiceFromPlate(plate, adminUser, idDealership);
     }
 
     public void deletePlate(Long idPlate) throws Exception {

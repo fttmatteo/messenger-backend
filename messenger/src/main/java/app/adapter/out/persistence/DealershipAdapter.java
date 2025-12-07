@@ -31,4 +31,11 @@ public class DealershipAdapter implements DealershipPort {
         DealershipEntity entity = dealershipRepository.findByName(dealership.getName());
         return DealershipMapper.toDomain(entity);
     }
+
+    @Override
+    public Dealership findById(Long idDealership) throws Exception {
+        return dealershipRepository.findById(idDealership)
+                .map(DealershipMapper::toDomain)
+                .orElse(null);
+    }
 }
