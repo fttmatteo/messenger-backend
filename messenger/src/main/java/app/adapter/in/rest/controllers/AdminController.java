@@ -89,22 +89,6 @@ public class AdminController {
         }
     }
 
-    @DeleteMapping("/employee/{document}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteEmployee(@PathVariable String document) {
-        try {
-            long doc = employeeValidator.documentValidator(document);
-            adminUseCase.deleteEmployee(doc);
-            return ResponseEntity.ok(Map.of("message", "Empleado eliminado correctamente"));
-        } catch (InputsException ie) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ie.getMessage());
-        } catch (BusinessException be) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(be.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
-
     @PostMapping("/plates")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createPlate(@RequestBody PlateRequest request) {
@@ -117,6 +101,22 @@ public class AdminController {
             Plate plate = plateBuilder.build(request.getPlateNumber());
             adminUseCase.createPlate(plate, username, request.getIdDealership());
             return ResponseEntity.status(HttpStatus.CREATED).body(plate);
+        } catch (InputsException ie) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ie.getMessage());
+        } catch (BusinessException be) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(be.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/employee/{document}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteEmployee(@PathVariable String document) {
+        try {
+            long doc = employeeValidator.documentValidator(document);
+            adminUseCase.deleteEmployee(doc);
+            return ResponseEntity.ok(Map.of("message", "Empleado eliminado correctamente"));
         } catch (InputsException ie) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ie.getMessage());
         } catch (BusinessException be) {

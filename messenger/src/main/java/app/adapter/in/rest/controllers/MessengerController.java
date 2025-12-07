@@ -5,19 +5,17 @@ import app.application.exceptions.InputsException;
 import app.domain.model.Plate;
 import app.adapter.in.builder.PlateBuilder;
 import app.adapter.in.rest.request.ServiceUpdateRequest;
+import app.adapter.in.validators.PlateValidator;
 import app.domain.model.Service;
 import app.domain.ports.ServicePort;
 import app.domain.services.ManageService;
+import app.domain.services.OcrService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import app.application.usecase.MessengerUseCase;
 import java.util.List;
@@ -38,25 +36,32 @@ public class MessengerController {
     private PlateBuilder plateBuilder;
     @Autowired
     private MessengerUseCase messengerUseCase;
+    @Autowired
+    private OcrService ocrService;
+    @Autowired
+    private PlateValidator plateValidator;
 
-    @PostMapping("/plates")
+    @PostMapping(value = "/plates", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('MESSENGER')")
-    public ResponseEntity<?> createPlate(@RequestBody app.adapter.in.rest.request.PlateRequest request) {
+    public ResponseEntity<?> createPlate(
+            @RequestParam("image") MultipartFile image,
+            @RequestParam("idDealership") Long idDealership) {
         try {
-            if (request.getIdDealership() == null) {
-                throw new InputsException("El id del concesionario es obligatorio");
-            }
+            plateValidator.validateOCRInput(image, idDealership);
+            String ocrResult = ocrService.extractTextFromImage(image);
+            String cleanPlateText = ocrResult.toUpperCase().replaceAll("\\n", " ").trim();
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String username = auth.getName();
-            Plate plate = plateBuilder.build(request.getPlateNumber());
-            messengerUseCase.createPlateAndService(plate, username, request.getIdDealership());
+            Plate plate = plateBuilder.build(cleanPlateText);
+            messengerUseCase.createPlateAndService(plate, username, idDealership);
             return ResponseEntity.status(HttpStatus.CREATED).body(plate);
         } catch (InputsException ie) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ie.getMessage());
         } catch (BusinessException be) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(be.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error procesando la solicitud: " + e.getMessage());
         }
     }
 

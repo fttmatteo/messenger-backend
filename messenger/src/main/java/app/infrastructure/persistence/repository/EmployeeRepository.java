@@ -7,5 +7,6 @@ import app.infrastructure.persistence.entities.EmployeeEntity;
 @Repository
 public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Long> {
     EmployeeEntity findByDocument(Long document);
+
     EmployeeEntity findByUserName(String userName);
 }

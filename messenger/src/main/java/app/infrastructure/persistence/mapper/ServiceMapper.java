@@ -44,6 +44,12 @@ public class ServiceMapper {
         service.setVisitPhoto(PhotoMapper.toDomain(entity.getVisitPhoto()));
         service.setAssignedDate(entity.getAssignedDate());
         service.setDeliveredDate(entity.getDeliveredDate());
+        service.setPendingDate(entity.getPendingDate());
+        service.setFailedDate(entity.getFailedDate());
+        service.setReturnedDate(entity.getReturnedDate());
+        service.setCanceledDate(entity.getCanceledDate());
+        service.setObservedDate(entity.getObservedDate());
+        service.setResolvedDate(entity.getResolvedDate());
         return service;
     }
 }
