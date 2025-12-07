@@ -6,4 +6,5 @@ import app.infrastructure.persistence.entities.DealershipEntity;
 
 @Repository
 public interface DealershipRepository extends JpaRepository<DealershipEntity, Long> {
+    DealershipEntity findByName(String name);
 }

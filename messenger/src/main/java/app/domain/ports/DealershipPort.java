@@ -7,5 +7,5 @@ public interface DealershipPort {
 
     void deleteById(Long idDealership) throws Exception;
 
-    Dealership findById(Long idDealership) throws Exception;
+    Dealership findByName(Dealership dealership) throws Exception;
 }

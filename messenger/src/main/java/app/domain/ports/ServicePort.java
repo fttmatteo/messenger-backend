@@ -1,11 +1,12 @@
 package app.domain.ports;
 
-import java.security.Provider.Service;
+import app.domain.model.Service;
+import java.util.List;
 
 public interface ServicePort {
-    void save(Service service) throws Exception;
-
-    void deleteById(Long idService) throws Exception;
+    Service save(Service service) throws Exception;
 
     Service findById(Long idService) throws Exception;
+
+    List<Service> findAllByEmployee(Long idEmployee) throws Exception;
 }

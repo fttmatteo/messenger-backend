@@ -1,6 +1,5 @@
 package app.adapter.out.persistence;
 
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import app.domain.model.Dealership;
@@ -28,8 +27,8 @@ public class DealershipAdapter implements DealershipPort {
     }
 
     @Override
-    public Dealership findById(Long idDealership) throws Exception {
-        Optional<DealershipEntity> entity = dealershipRepository.findById(idDealership);
-        return entity.map(DealershipMapper::toDomain).orElse(null);
+    public Dealership findByName(Dealership dealership) throws Exception {
+        DealershipEntity entity = dealershipRepository.findByName(dealership.getName());
+        return DealershipMapper.toDomain(entity);
     }
 }
