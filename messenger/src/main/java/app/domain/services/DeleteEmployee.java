@@ -13,20 +13,17 @@ public class DeleteEmployee {
     @Autowired
     private EmployeePort employeePort;
 
-    public void deleteByDocument(long document) throws Exception {
+    public void deleteByDocument(Long document) throws Exception {
         try {
-            Employee probe = new Employee();
-            probe.setDocument(document);
-            Employee existing = employeePort.findByDocument(probe);
+            Employee existing = employeePort.findByDocument(document);
             if (existing == null) {
-                throw new BusinessException("el empleado con documento " + document + " no existe");
+                throw new BusinessException("El empleado con documento " + document + " no existe");
             }
             employeePort.deleteByDocument(document);
+
         } catch (DataIntegrityViolationException dive) {
             throw new BusinessException(
-                    "no se puede eliminar el usuario porque tiene registros asociados en el sistema");
-        } catch (BusinessException be) {
-            throw be;
+                    "No se puede eliminar el usuario porque tiene registros asociados en el sistema");
         } catch (Exception e) {
             throw e;
         }

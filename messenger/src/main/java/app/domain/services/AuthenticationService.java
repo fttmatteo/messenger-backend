@@ -14,44 +14,40 @@ import app.domain.ports.EmployeePort;
 @Service
 public class AuthenticationService {
 
-    private static final Pattern BCRYPT_PATTERN = Pattern.compile("\\A\\$2[ayb]\\$\\d\\d\\$[./A-Za-z0-9]{53}\\z");
+    private static final Pattern BCRYPT_PATTERN = Pattern.compile("^\\$2[ayb]\\$\\d{2}\\$[./A-Za-z0-9]{53}$");
 
     @Autowired
     private AuthenticationPort authenticationPort;
-
     @Autowired
     private EmployeePort employeePort;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     public TokenResponse authenticate(AuthCredentials credentials) throws Exception {
-        Employee query = new Employee();
-        query.setUserName(credentials.getUserName());
-        Employee employee = employeePort.findByUserName(query);
+        Employee employee = employeePort.findByUserName(credentials.getUserName());
         if (employee == null) {
             throw new BusinessException("Usuario no encontrado");
         }
-        if (!passwordEncoder.matches(credentials.getPassword(), employee.getPassword())) {
-            if (!isPasswordEncoded(employee.getPassword())
-                    && credentials.getPassword().equals(employee.getPassword())) {
-                String encoded = passwordEncoder.encode(credentials.getPassword());
+
+        String storedPassword = employee.getPassword();
+        String inputPassword = credentials.getPassword();
+
+        if (!passwordEncoder.matches(inputPassword, storedPassword)) {
+            if (!isPasswordEncoded(storedPassword) && inputPassword.equals(storedPassword)) {
+                String encoded = passwordEncoder.encode(inputPassword);
                 employee.setPassword(encoded);
                 employeePort.save(employee);
             } else {
-                throw new BusinessException("Contrasena incorrecta");
+                throw new BusinessException("Contraseña incorrecta");
             }
         }
         return authenticationPort.authenticate(credentials, String.valueOf(employee.getRole()));
     }
 
-    private boolean isPasswordEncoded(String storedPassword) {
-        if (storedPassword == null) {
+    private boolean isPasswordEncoded(String password) {
+        if (password == null)
             return false;
-        }
-        String normalized = storedPassword.startsWith("{bcrypt}")
-                ? storedPassword.substring("{bcrypt}".length())
-                : storedPassword;
-        return BCRYPT_PATTERN.matcher(normalized).matches();
+        String cleanPassword = password.startsWith("{bcrypt}") ? password.substring(8) : password;
+        return BCRYPT_PATTERN.matcher(cleanPassword).matches();
     }
 }
