@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import app.adapter.in.builder.EmployeeBuilder;
+import app.adapter.in.builder.PlateBuilder;
 import app.adapter.in.builder.DealershipBuilder;
 import app.adapter.in.rest.request.DealershipRequest;
 import app.adapter.in.rest.request.EmployeeRequest;
@@ -19,6 +20,7 @@ import app.application.exceptions.BusinessException;
 import app.application.exceptions.InputsException;
 import app.application.usecase.AdminUseCase;
 import app.domain.model.Employee;
+import app.domain.model.Plate;
 import app.domain.model.Dealership;
 import app.adapter.in.validators.EmployeeValidator;
 
@@ -32,6 +34,9 @@ public class AdminController {
 
     @Autowired
     private DealershipBuilder dealershipBuilder;
+
+    @Autowired
+    private PlateBuilder plateBuilder;
 
     @Autowired
     private AdminUseCase adminUseCase;
@@ -80,13 +85,44 @@ public class AdminController {
         }
     }
 
-    @DeleteMapping("/{document}")
+    @DeleteMapping("/employee/{document}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteEmployee(@PathVariable String document) {
         try {
             long doc = employeeValidator.documentValidator(document);
             adminUseCase.deleteEmployee(doc);
             return ResponseEntity.ok(Map.of("message", "empleado eliminado"));
+        } catch (InputsException ie) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ie.getMessage());
+        } catch (BusinessException be) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(be.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/plates")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> createPlate(@RequestBody app.adapter.in.rest.request.PlateRequest request) {
+        try {
+            Plate plate = plateBuilder.build(request.getPlateNumber());
+            adminUseCase.createPlate(plate);
+            return ResponseEntity.status(HttpStatus.CREATED).body(plate);
+        } catch (InputsException ie) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ie.getMessage());
+        } catch (BusinessException be) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(be.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/plates/{idPlate}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deletePlate(@PathVariable Long idPlate) {
+        try {
+            adminUseCase.deletePlate(idPlate);
+            return ResponseEntity.ok(Map.of("message", "Placa eliminada correctamente"));
         } catch (InputsException ie) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ie.getMessage());
         } catch (BusinessException be) {
