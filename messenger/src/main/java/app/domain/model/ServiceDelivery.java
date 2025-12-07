@@ -9,16 +9,23 @@ public class ServiceDelivery {
     private Dealership dealership;
     private Employee messenger; // El mensajero asignado
     private Status currentStatus;
-
     // Observación actual (requerida para estados fallidos, opcional para entregado)
     private String observation;
-
     // Relaciones para evidencias actuales
     private Signature signature;
-    private List<Photo> photos;
-
+    // Inicializamos las listas para evitar NullPointerException
+    private List<Photo> photos = new ArrayList<>();
     // Historial completo para auditoría
-    private List<StatusHistory> history;
+    private List<StatusHistory> history = new ArrayList<>();
+    // Métodos utilitarios para mantener encapsulamiento (opcional pero recomendado)
+    
+    public void addPhoto(Photo photo) {
+        this.photos.add(photo);
+    }
+    
+    public void addHistory(StatusHistory statusHistory) {
+        this.history.add(statusHistory);
+    }
 
     public Long getIdServiceDelivery() {
         return idServiceDelivery;

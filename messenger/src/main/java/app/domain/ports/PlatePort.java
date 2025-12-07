@@ -1,18 +1,19 @@
+// Archivo: app/domain/ports/PlatePort.java
 package app.domain.ports;
 
 import app.domain.model.Plate;
 import java.util.List;
 
 public interface PlatePort {
-    Plate save(Plate plate);
-
-    Plate update(Plate plate);
-
-    void deleteById(Long idPlate);
-
+    
+    // Eliminamos save, update y delete. 
+    // La gestión se hace a través de ServiceDeliveryPort.save()
+    
+    // Mantenemos solo búsquedas para validaciones o consultas rápidas
     Plate findById(Long idPlate);
-
-    List<Plate> findAll();
-
+    
+    // Útil para saber si una placa ya está registrada o buscar su historial
     Plate findByPlateNumber(String plateNumber);
+    
+    List<Plate> findAll();
 }
