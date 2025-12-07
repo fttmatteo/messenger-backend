@@ -25,7 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 @RestController
 @RequestMapping("/messenger")
-@PreAuthorize("hasRole('MESSENGER') or hasRole('ADMIN')")
+@PreAuthorize("hasAnyRole('MESSENGER', 'ADMIN')")
 public class MessengerController {
 
     @Autowired
@@ -42,7 +42,7 @@ public class MessengerController {
     private PlateValidator plateValidator;
 
     @PostMapping(value = "/create-plate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('MESSENGER') or hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('MESSENGER', 'ADMIN')")
     public ResponseEntity<?> createPlate(
             @RequestParam("image") MultipartFile image,
             @RequestParam("idDealership") Long idDealership) {
@@ -71,7 +71,7 @@ public class MessengerController {
     }
 
     @GetMapping("/query-services")
-    @PreAuthorize("hasRole('MESSENGER') or hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('MESSENGER', 'ADMIN')")
     public ResponseEntity<List<Service>> getMyServices() {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -84,7 +84,7 @@ public class MessengerController {
     }
 
     @PatchMapping("/update-service/{idService}/status")
-    @PreAuthorize("hasRole('MESSENGER') or hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('MESSENGER', 'ADMIN')")
     public ResponseEntity<?> updateServiceStatus(@PathVariable Long idService,
             @RequestBody ServiceRequest request) {
         try {
