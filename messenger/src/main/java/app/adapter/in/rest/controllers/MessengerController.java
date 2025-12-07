@@ -7,9 +7,9 @@ import app.adapter.in.builder.PlateBuilder;
 import app.adapter.in.rest.request.ServiceUpdateRequest;
 import app.adapter.in.validators.PlateValidator;
 import app.domain.model.Service;
+import app.domain.ports.OcrPort;
 import app.domain.ports.ServicePort;
 import app.domain.services.ManageService;
-import app.domain.services.OcrService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +37,7 @@ public class MessengerController {
     @Autowired
     private MessengerUseCase messengerUseCase;
     @Autowired
-    private OcrService ocrService;
+    private OcrPort ocrPort;
     @Autowired
     private PlateValidator plateValidator;
 
@@ -48,8 +48,12 @@ public class MessengerController {
             @RequestParam("idDealership") Long idDealership) {
         try {
             plateValidator.validateOCRInput(image, idDealership);
-            String ocrResult = ocrService.extractTextFromImage(image);
-            String cleanPlateText = ocrResult.toUpperCase().replaceAll("\\n", " ").trim();
+            String ocrResult = ocrPort.extractText(image.getInputStream());
+            String cleanPlateText = ocrResult.toUpperCase()
+                    .replaceAll("[^A-Z0-9 ]", "")
+                    .trim();
+            System.out.println("Texto crudo OCR: " + ocrResult);
+            System.out.println("Texto limpio: " + cleanPlateText);
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String username = auth.getName();
             Plate plate = plateBuilder.build(cleanPlateText);
@@ -60,6 +64,7 @@ public class MessengerController {
         } catch (BusinessException be) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(be.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error procesando la solicitud: " + e.getMessage());
         }
