@@ -30,7 +30,7 @@ public class CreateEmployee {
         Employee probe = new Employee();
         probe.setDocument(document);
         if (employeePort.findByDocument(probe) != null) {
-            throw new BusinessException("ya existe una persona registrada con esa cedula");
+            throw new BusinessException("Ya existe una persona registrada con esa cedula");
         }
     }
 
@@ -38,7 +38,7 @@ public class CreateEmployee {
         Employee probe = new Employee();
         probe.setUserName(userName);
         if (employeePort.findByUserName(probe) != null) {
-            throw new BusinessException("ya existe una persona registrada con ese nombre de usuario");
+            throw new BusinessException("Ya existe una persona registrada con ese nombre de usuario");
         }
     }
 }

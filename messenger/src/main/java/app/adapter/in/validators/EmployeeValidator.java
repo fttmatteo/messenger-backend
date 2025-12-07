@@ -16,7 +16,7 @@ public class EmployeeValidator extends SimpleValidator {
     public long documentValidator(String value) throws InputsException {
         long doc = longValidator("número de cédula", value);
         if (String.valueOf(Math.abs(doc)).length() > 10) {
-            throw new InputsException("la cédula no puede exceder 10 dígitos");
+            throw new InputsException("La cédula no puede exceder 10 dígitos");
         }
         return doc;
     }
@@ -24,7 +24,7 @@ public class EmployeeValidator extends SimpleValidator {
     public String phoneValidator(String value) throws InputsException {
         stringValidator("número de teléfono", value);
         if (!value.matches("\\d{10}")) {
-            throw new InputsException("el número de teléfono debe contener 10 dígitos");
+            throw new InputsException("El número de teléfono debe contener 10 dígitos");
         }
         return value;
     }
@@ -32,10 +32,10 @@ public class EmployeeValidator extends SimpleValidator {
     public String userNameValidator(String value) throws InputsException {
         stringValidator("nombre de usuario", value);
         if (value.length() > 15) {
-            throw new InputsException("el nombre de usuario no puede exceder 15 caracteres");
+            throw new InputsException("El nombre de usuario no puede exceder 15 caracteres");
         }
         if (!USERNAME_PATTERN.matcher(value).matches()) {
-            throw new InputsException("el nombre de usuario solo debe contener letras y números");
+            throw new InputsException("El nombre de usuario solo debe contener letras y números");
         }
         return value;
     }
@@ -43,16 +43,16 @@ public class EmployeeValidator extends SimpleValidator {
     public String passwordValidator(String value) throws InputsException {
         stringValidator("contraseña", value);
         if (value.length() < 8) {
-            throw new InputsException("la contraseña debe contener al menos 8 caracteres");
+            throw new InputsException("La contraseña debe contener al menos 8 caracteres");
         }
         if (!value.matches(".*[A-Z].*")) {
-            throw new InputsException("la contraseña debe contener al menos una letra mayúscula");
+            throw new InputsException("La contraseña debe contener al menos una letra mayúscula");
         }
         if (!value.matches(".*[0-9].*")) {
-            throw new InputsException("la contraseña debe contener al menos un número");
+            throw new InputsException("La contraseña debe contener al menos un número");
         }
         if (!value.matches(".*[^A-Za-z0-9].*")) {
-            throw new InputsException("la contraseña debe contener al menos un carácter especial");
+            throw new InputsException("La contraseña debe contener al menos un carácter especial");
         }
         return value;
     }

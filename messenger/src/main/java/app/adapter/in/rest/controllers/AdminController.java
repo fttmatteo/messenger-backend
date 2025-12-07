@@ -91,7 +91,7 @@ public class AdminController {
         try {
             long doc = employeeValidator.documentValidator(document);
             adminUseCase.deleteEmployee(doc);
-            return ResponseEntity.ok(Map.of("message", "empleado eliminado"));
+            return ResponseEntity.ok(Map.of("message", "Empleado eliminado correctamente"));
         } catch (InputsException ie) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ie.getMessage());
         } catch (BusinessException be) {

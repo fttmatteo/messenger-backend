@@ -19,12 +19,12 @@ public class DeleteEmployee {
             probe.setDocument(document);
             Employee existing = employeePort.findByDocument(probe);
             if (existing == null) {
-                throw new BusinessException("el empleado con documento " + document + " no existe");
+                throw new BusinessException("El empleado con documento " + document + " no existe");
             }
             employeePort.deleteByDocument(document);
         } catch (DataIntegrityViolationException dive) {
             throw new BusinessException(
-                    "no se puede eliminar el usuario porque tiene registros asociados en el sistema");
+                    "No se puede eliminar el usuario porque tiene registros asociados en el sistema");
         } catch (BusinessException be) {
             throw be;
         } catch (Exception e) {
