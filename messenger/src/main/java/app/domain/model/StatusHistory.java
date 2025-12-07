@@ -9,7 +9,9 @@ public class StatusHistory {
     private Status newStatus;
     private LocalDateTime changeDate;
     private Service service;
-    
+    private String observation;
+    private String modifiedBy;
+
     public Long getIdStatusHistory() {
         return idStatusHistory;
     }
@@ -48,6 +50,22 @@ public class StatusHistory {
 
     public void setService(Service service) {
         this.service = service;
+    }
+
+    public String getObservation() {
+        return observation;
+    }
+
+    public void setObservation(String observation) {
+        this.observation = observation;
+    }
+
+    public String getModifiedBy() {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy = modifiedBy;
     }
 
 }

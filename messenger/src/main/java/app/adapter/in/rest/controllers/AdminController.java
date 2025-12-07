@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,8 @@ import app.adapter.in.builder.PlateBuilder;
 import app.adapter.in.builder.DealershipBuilder;
 import app.adapter.in.rest.request.DealershipRequest;
 import app.adapter.in.rest.request.EmployeeRequest;
+import app.adapter.in.rest.request.PlateRequest;
+import app.adapter.in.rest.request.ServiceUpdateRequest;
 import app.application.exceptions.BusinessException;
 import app.application.exceptions.InputsException;
 import app.application.usecase.AdminUseCase;
@@ -23,6 +26,9 @@ import app.domain.model.Employee;
 import app.domain.model.Plate;
 import app.domain.model.Dealership;
 import app.adapter.in.validators.EmployeeValidator;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import app.domain.services.ManageService;
 
 @RestController
 @RequestMapping("/employees")
@@ -31,18 +37,16 @@ public class AdminController {
 
     @Autowired
     private EmployeeBuilder employeeBuilder;
-
     @Autowired
     private DealershipBuilder dealershipBuilder;
-
     @Autowired
     private PlateBuilder plateBuilder;
-
     @Autowired
     private AdminUseCase adminUseCase;
-
     @Autowired
     private EmployeeValidator employeeValidator;
+    @Autowired
+    private ManageService manageService;
 
     @PostMapping("/messenger")
     @PreAuthorize("hasRole('ADMIN')")
@@ -103,10 +107,12 @@ public class AdminController {
 
     @PostMapping("/plates")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> createPlate(@RequestBody app.adapter.in.rest.request.PlateRequest request) {
+    public ResponseEntity<?> createPlate(@RequestBody PlateRequest request) {
         try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String username = auth.getName();
             Plate plate = plateBuilder.build(request.getPlateNumber());
-            adminUseCase.createPlate(plate);
+            adminUseCase.createPlate(plate, username);
             return ResponseEntity.status(HttpStatus.CREATED).body(plate);
         } catch (InputsException ie) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ie.getMessage());
@@ -137,9 +143,32 @@ public class AdminController {
     public ResponseEntity<?> deleteDealership(@PathVariable Long idDealership) {
         try {
             adminUseCase.deleteDealership(idDealership);
-            return ResponseEntity.ok(Map.of("message", "dealership eliminado"));
+            return ResponseEntity.ok(Map.of("message", "Dealership eliminado correctamente"));
         } catch (InputsException ie) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ie.getMessage());
+        } catch (BusinessException be) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(be.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PatchMapping("/service/{idService}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateServiceStatus(@PathVariable Long idService,
+            @RequestBody ServiceUpdateRequest request) {
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String username = auth.getName();
+            manageService.updateStatus(
+                    idService,
+                    request.getStatus(),
+                    request.getObservation(),
+                    request.getSignature(),
+                    request.getPhoto(),
+                    username,
+                    "ADMIN");
+            return ResponseEntity.ok(Map.of("message", "Servicio actualizado por Administrador"));
         } catch (BusinessException be) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(be.getMessage());
         } catch (Exception e) {

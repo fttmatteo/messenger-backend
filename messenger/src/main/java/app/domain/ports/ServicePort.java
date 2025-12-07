@@ -9,4 +9,6 @@ public interface ServicePort {
     Service findById(Long idService) throws Exception;
 
     List<Service> findAllByEmployee(Long idEmployee) throws Exception;
+
+    List<Service> findAllByEmployeeUserName(String username) throws Exception;
 }
