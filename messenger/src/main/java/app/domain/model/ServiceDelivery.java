@@ -7,11 +7,9 @@ public class ServiceDelivery {
     private Long idServiceDelivery;
     private Plate plate;
     private Dealership dealership;
-    private Employee messenger; // El mensajero asignado
+    private Employee messenger;
     private Status currentStatus;
-    // Observación actual (requerida para estados fallidos, opcional para entregado)
     private String observation;
-    // Relaciones para evidencias actuales
     private Signature signature;
     // Inicializamos las listas para evitar NullPointerException
     private List<Photo> photos = new ArrayList<>();

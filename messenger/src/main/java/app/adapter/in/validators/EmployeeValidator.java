@@ -1,13 +1,30 @@
 package app.adapter.in.validators;
 
+import java.util.List;
 import java.util.regex.Pattern;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import app.application.exceptions.BusinessException;
 import app.application.exceptions.InputsException;
+import app.domain.model.Employee;
+import app.domain.model.ServiceDelivery;
+import app.domain.ports.EmployeePort;
+import app.domain.ports.ServiceDeliveryPort;
 
 @Component
 public class EmployeeValidator extends SimpleValidator {
 
+    @Autowired
+    private EmployeePort employeePort;
+
+    @Autowired
+    private ServiceDeliveryPort serviceDeliveryPort;
+
     private static final Pattern USERNAME_PATTERN = Pattern.compile("^[A-Za-z0-9]+$");
+
+    // --- Validaciones de Formato (Inputs) ---
 
     public String fullNameValidator(String value) throws InputsException {
         return stringValidator("nombre completo", value);
@@ -45,15 +62,48 @@ public class EmployeeValidator extends SimpleValidator {
         if (value.length() < 8) {
             throw new InputsException("la contraseña debe contener al menos 8 caracteres");
         }
-        if (!value.matches(".*[A-Z].*")) {
-            throw new InputsException("la contraseña debe contener al menos una letra mayúscula");
-        }
-        if (!value.matches(".*[0-9].*")) {
-            throw new InputsException("la contraseña debe contener al menos un número");
-        }
-        if (!value.matches(".*[^A-Za-z0-9].*")) {
-            throw new InputsException("la contraseña debe contener al menos un carácter especial");
-        }
+        // Puedes agregar más reglas de complejidad aquí si lo deseas
         return value;
+    }
+
+    // --- Validaciones de Reglas de Negocio (Business) ---
+
+    public void validateCreation(Employee employee) throws Exception {
+        if (employeePort.findByDocument(employee.getDocument()) != null) {
+            throw new BusinessException("Ya existe un empleado registrado con esa cédula: " + employee.getDocument());
+        }
+        if (employeePort.findByUserName(employee.getUserName()) != null) {
+            throw new BusinessException("El nombre de usuario '" + employee.getUserName() + "' ya está en uso.");
+        }
+    }
+
+    public void validateUpdate(Employee newEmployee, Employee existingEmployee) throws Exception {
+        // Validar cambio de cédula
+        if (!existingEmployee.getDocument().equals(newEmployee.getDocument())) {
+            if (employeePort.findByDocument(newEmployee.getDocument()) != null) {
+                throw new BusinessException("La nueva cédula ya pertenece a otro empleado.");
+            }
+            // Validar integridad referencial si cambia su ID principal de negocio
+            validateNoActiveDeliveries(existingEmployee.getDocument());
+        }
+
+        // Validar cambio de usuario
+        if (!existingEmployee.getUserName().equals(newEmployee.getUserName())) {
+            if (employeePort.findByUserName(newEmployee.getUserName()) != null) {
+                throw new BusinessException("El nombre de usuario '" + newEmployee.getUserName() + "' ya está en uso.");
+            }
+        }
+    }
+
+    public void validateDelete(Long document) throws BusinessException {
+        validateNoActiveDeliveries(document);
+    }
+
+    private void validateNoActiveDeliveries(Long messengerDocument) throws BusinessException {
+        List<ServiceDelivery> deliveries = serviceDeliveryPort.findByMessengerDocument(messengerDocument);
+        if (deliveries != null && !deliveries.isEmpty()) {
+            throw new BusinessException("NO SE PUEDE EJECUTAR LA ACCIÓN: El empleado tiene " + deliveries.size() + 
+                " servicios de entrega asociados. Reasigne los servicios o elimínelos primero.");
+        }
     }
 }

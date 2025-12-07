@@ -9,10 +9,7 @@ public class Photo {
     private String photoPath;
     private LocalDateTime uploadDate;
     private PhotoType photoType;
-    // Eliminamos la referencia circular 'ServiceDelivery' del modelo de dominio puro
-    // para evitar ciclos infinitos, a menos que sea estrictamente necesario para navegación.
-    // Generalmente, se accede a la foto DESDE el servicio.
-
+    
     public Long getIdPhoto() { return idPhoto; }
     public void setIdPhoto(Long idPhoto) { this.idPhoto = idPhoto; }
     public String getPhotoPath() { return photoPath; }

@@ -8,7 +8,6 @@ public interface DealershipPort {
     Dealership save(Dealership dealership);
     void deleteById(Long idDealership);
     void deleteByName(String dealershipName); // Utilidad extra
-
     Dealership findById(Long idDealership);
     Dealership findByName(String name);
     List<Dealership> findAll();
