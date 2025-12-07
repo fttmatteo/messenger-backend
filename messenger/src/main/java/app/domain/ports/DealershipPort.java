@@ -1,10 +1,20 @@
 package app.domain.ports;
 
 import app.domain.model.Dealership;
+import java.util.List;
 
 public interface DealershipPort {
-    void save(Dealership dealership) throws Exception;
-    void update(Dealership dealership) throws Exception;
-    void deleteById(Long idDealership) throws Exception;
-    Dealership findById(Long idDealership) throws Exception;
+    Dealership save(Dealership dealership);
+
+    Dealership update(Dealership dealership);
+
+    void deleteByName(String dealershipName);
+
+    void deleteById(Long idDealership);
+
+    Dealership findById(Long idDealership);
+
+    Dealership findByDealershipName(String dealershipName);
+
+    List<Dealership> findAll();
 }
