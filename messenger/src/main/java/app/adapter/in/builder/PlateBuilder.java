@@ -11,11 +11,12 @@ public class PlateBuilder {
     @Autowired
     private PlateValidator validator;
 
-    public Plate build(String plateNumber, Long idDealership) throws Exception {
-        validator.validateCreatePlate(plateNumber, idDealership);
+    public Plate build(String rawInput, Long idDealership) throws Exception {
+        validator.validateCreatePlate(rawInput, idDealership);
         Plate plate = new Plate();
-        plate.setPlateNumber(validator.plateNumberValidator(plateNumber));
-        plate.setPlateType(validator.identifyPlateType(plateNumber));
+        String cleanPlate = validator.plateNumberValidator(rawInput);
+        plate.setPlateNumber(cleanPlate);
+        plate.setPlateType(validator.identifyPlateType(cleanPlate));
         return plate;
     }
 }

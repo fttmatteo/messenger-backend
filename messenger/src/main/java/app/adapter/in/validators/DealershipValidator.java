@@ -5,6 +5,7 @@ import app.application.exceptions.InputsException;
 
 @Component
 public class DealershipValidator extends SimpleValidator {
+
     public String nameValidator(String value) throws InputsException {
         return stringValidator("nombre", value);
     }
@@ -22,6 +23,10 @@ public class DealershipValidator extends SimpleValidator {
     }
 
     public String zoneValidator(String value) throws InputsException {
-        return stringValidator("zona", value);
+        stringValidator("zona", value);
+        if (!value.equalsIgnoreCase("centro") && !value.equalsIgnoreCase("sur") && !value.equalsIgnoreCase("norte")) {
+            throw new InputsException("La zona debe ser centro, sur o norte");
+        }
+        return value;
     }
 }

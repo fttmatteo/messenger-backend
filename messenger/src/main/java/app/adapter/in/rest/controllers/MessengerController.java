@@ -42,16 +42,14 @@ public class MessengerController {
     private PlateValidator plateValidator;
 
     @PostMapping(value = "/create-plate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyRole('MESSENGER', 'ADMIN')")
+    @PreAuthorize("hasRole('MESSENGER') or hasRole('ADMIN')")
     public ResponseEntity<?> createPlate(
             @RequestParam("image") MultipartFile image,
             @RequestParam("idDealership") Long idDealership) {
         try {
             plateValidator.validateOCRInput(image, idDealership);
             String ocrResult = ocrPort.extractText(image.getInputStream());
-            String cleanPlateText = ocrResult.toUpperCase()
-                    .replaceAll("[^A-Z0-9 ]", "")
-                    .trim();
+            String cleanPlateText = ocrResult.toUpperCase();
             System.out.println("Texto crudo OCR: " + ocrResult);
             System.out.println("Texto limpio: " + cleanPlateText);
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();

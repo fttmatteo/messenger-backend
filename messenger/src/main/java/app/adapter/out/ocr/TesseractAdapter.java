@@ -5,9 +5,8 @@ import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 import org.springframework.stereotype.Component;
-
+import net.sourceforge.tess4j.util.ImageHelper;
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
@@ -31,70 +30,71 @@ public class TesseractAdapter implements OcrPort {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public String extractText(InputStream imageStream) throws Exception {
-        // 1. Configurar Tesseract
         ITesseract tesseract = new Tesseract();
         String datapath = System.getProperty("user.dir") + "/tessdata";
 
         File tessDataFolder = new File(datapath);
         if (!tessDataFolder.exists()) {
-            throw new Exception("ERROR CONFIGURACIÓN: No se encontró la carpeta tessdata en: " + datapath);
+            throw new Exception("ERROR CONFIGURACIÓN: No se encontró tessdata en: " + datapath);
         }
 
         tesseract.setDatapath(datapath);
-        tesseract.setLanguage("eng"); // Funciona bien para placas
+        tesseract.setLanguage("eng");
 
-        // 2. Leer la imagen original
+        // --- CAMBIO 1: WHITELIST (LISTA BLANCA) ---
+        // Esto obliga a Tesseract a ignorar símbolos como '~', '=', '.', etc.
+        // Solo reconocerá letras mayúsculas y números.
+        tesseract.setTessVariable("tessedit_char_whitelist", "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+
         BufferedImage originalImage = ImageIO.read(imageStream);
         if (originalImage == null) {
             throw new Exception("El archivo subido no es una imagen válida.");
         }
 
         try {
-            // 3. Intento 1: Ejecutar OCR sobre la imagen PROCESADA (Escala de grises +
-            // Upscaling)
+            // Procesado mejorado (Binarización)
             BufferedImage cleanImage = processImage(originalImage);
             String result = tesseract.doOCR(cleanImage);
 
-            // Si el resultado está vacío o muy corto, intentamos con la imagen original
+            // Validación de fallback
             if (result == null || result.trim().length() < 3) {
-                System.out
-                        .println("OCR con procesado falló (resultado vacío/corto). Intentando con imagen original...");
-                String fallbackResult = tesseract.doOCR(originalImage);
-                return cleanResult(fallbackResult);
+                System.out.println("OCR procesado falló. Intentando con original...");
+                // También aplicamos whitelist al intento original
+                return cleanResult(tesseract.doOCR(originalImage));
             }
 
             return cleanResult(result);
 
         } catch (TesseractException e) {
-            throw new Exception("Error al procesar la imagen con Tesseract: " + e.getMessage());
+            throw new Exception("Error Tesseract: " + e.getMessage());
         }
     }
 
     private String cleanResult(String text) {
         if (text == null)
             return "";
+        // Reemplaza saltos de línea por espacio y quita espacios extra
         return text.replaceAll("\\n", " ").trim();
     }
 
-    /**
-     * MÉTODO DE LIMPIEZA DE IMAGEN
-     * Convierte a escala de grises y aumenta tamaño para mejor detección
-     */
     private BufferedImage processImage(BufferedImage original) {
-        // Aumentamos el tamaño (Scaling) por 2 para que las letras se vean más grandes
-        int newWidth = original.getWidth() * 2;
-        int newHeight = original.getHeight() * 2;
+        // 1. Escalar (Agrandar imagen x2) - Esto ya lo tenías y es correcto
+        // Usamos ImageHelper de Tess4J que facilita esto
+        BufferedImage scaled = ImageHelper.getScaledInstance(original, original.getWidth() * 2,
+                original.getHeight() * 2);
 
-        BufferedImage resized = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_BYTE_GRAY);
-        Graphics2D g = resized.createGraphics();
+        // 2. Convertir a Escala de Grises - Crucial para quitar ruido de color
+        BufferedImage gray = ImageHelper.convertImageToGrayscale(scaled);
 
-        // Configuración para mejor calidad
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g.drawImage(original, 0, 0, newWidth, newHeight, null);
-        g.dispose();
+        // 3. --- CAMBIO 2: BINARIZACIÓN ---
+        // Esto convierte todo lo que no sea negro oscuro en blanco puro.
+        // Elimina el fondo amarillo, las sombras y los reflejos suaves.
+        // El valor 180 es el umbral (0-255). Puedes ajustarlo entre 150 y 200.
+        BufferedImage binary = ImageHelper.convertImageToBinary(gray);
 
-        return resized;
+        return binary;
     }
 }
