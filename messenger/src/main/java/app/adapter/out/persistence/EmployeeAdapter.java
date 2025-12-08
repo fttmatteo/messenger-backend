@@ -1,5 +1,8 @@
 package app.adapter.out.persistence;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import app.domain.model.Employee;
@@ -14,30 +17,47 @@ public class EmployeeAdapter implements EmployeePort {
     private EmployeeRepository employeeRepository;
 
     @Override
-    public Employee findByDocument(Employee employee) throws Exception {
-        EmployeeEntity entity = employeeRepository.findByDocument(employee.getDocument());
+    public Employee findByDocument(Long document) {
+        EmployeeEntity entity = employeeRepository.findByDocument(document);
         return EmployeeMapper.toDomain(entity);
     }
 
     @Override
-    public Employee findByUserName(Employee employee) throws Exception {
-        EmployeeEntity entity = employeeRepository.findByUserName(employee.getUserName());
+    public Employee findByUserName(String userName) {
+        EmployeeEntity entity = employeeRepository.findByUserName(userName);
         return EmployeeMapper.toDomain(entity);
     }
 
     @Override
-    public void save(Employee employee) throws Exception {
+    public Employee save(Employee employee) {
         EmployeeEntity entity = EmployeeMapper.toEntity(employee);
-        employeeRepository.save(entity);
-        employee.setIdEmployee(entity.getIdEmployee());
+        EmployeeEntity saved = employeeRepository.save(entity);
+        return EmployeeMapper.toDomain(saved);
     }
 
     @Override
-    public void deleteByDocument(Long document) throws Exception {
+    public void deleteByDocument(Long document) {
         EmployeeEntity entity = employeeRepository.findByDocument(document);
         if (entity != null) {
             employeeRepository.delete(entity);
         }
     }
 
+    @Override
+    public List<Employee> findAll() {
+        List<EmployeeEntity> entities = employeeRepository.findAll();
+        return entities.stream().map(EmployeeMapper::toDomain).collect(Collectors.toList());
+    }
+
+    @Override
+    public Employee findById(Long id) {
+        return employeeRepository.findById(id)
+                .map(EmployeeMapper::toDomain)
+                .orElse(null);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        employeeRepository.findById(id).ifPresent(entity -> employeeRepository.delete(entity));
+    }
 }
