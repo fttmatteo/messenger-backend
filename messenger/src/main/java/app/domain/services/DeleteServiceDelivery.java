@@ -14,7 +14,6 @@ public class DeleteServiceDelivery {
     private ServiceDeliveryPort serviceDeliveryPort;
 
     public void deleteById(Long id) throws Exception {
-        // 1. Verificar existencia
         ServiceDelivery service = serviceDeliveryPort.findById(id);
         if (service == null) {
             throw new BusinessException("El servicio de entrega que intenta eliminar no existe.");
@@ -22,10 +21,10 @@ public class DeleteServiceDelivery {
 
         // 2. Reglas de negocio opcionales (Integridad)
         // Podríamos restringir la eliminación si el servicio ya está finalizado,
-        // pero dado que esta función suele ser administrativa para corrección de errores,
+        // pero dado que esta función suele ser administrativa para corrección de
+        // errores,
         // permitimos la eliminación directa.
-        
-        // 3. Ejecutar eliminación
+
         serviceDeliveryPort.deleteById(id);
     }
 }

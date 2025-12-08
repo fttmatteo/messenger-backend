@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface PlatePort {
     Plate findById(Long idPlate);
+
     Plate findByPlateNumber(String plateNumber);
+
     List<Plate> findAll();
 }

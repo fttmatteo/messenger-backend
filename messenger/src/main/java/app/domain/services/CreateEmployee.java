@@ -24,7 +24,7 @@ public class CreateEmployee {
             String encoded = passwordEncoder.encode(employee.getPassword());
             employee.setPassword(encoded);
         }
-        
+
         employeePort.save(employee);
     }
 

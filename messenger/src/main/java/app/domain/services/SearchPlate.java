@@ -1,5 +1,11 @@
 package app.domain.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import app.domain.model.Plate;
+import app.domain.ports.PlatePort;
+
 @Service
 public class SearchPlate {
 

@@ -1,6 +1,8 @@
 package app.domain.model;
 
 import app.domain.model.enums.Status;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class ServiceDelivery {
@@ -13,11 +15,11 @@ public class ServiceDelivery {
     private Signature signature;
     private List<Photo> photos = new ArrayList<>(); // Inicializamos las listas para evitar NullPointerException
     private List<StatusHistory> history = new ArrayList<>();
-    
+
     public void addPhoto(Photo photo) {
         this.photos.add(photo);
     }
-    
+
     public void addHistory(StatusHistory statusHistory) {
         this.history.add(statusHistory);
     }

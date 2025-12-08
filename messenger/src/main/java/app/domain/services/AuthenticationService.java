@@ -26,9 +26,7 @@ public class AuthenticationService {
     private PasswordEncoder passwordEncoder;
 
     public TokenResponse authenticate(AuthCredentials credentials) throws Exception {
-        Employee query = new Employee();
-        query.setUserName(credentials.getUsername());
-        Employee employee = employeePort.findByUserName(query);
+        Employee employee = employeePort.findByUserName(credentials.getUserName());
         if (employee == null) {
             throw new BusinessException("Usuario no encontrado");
         }

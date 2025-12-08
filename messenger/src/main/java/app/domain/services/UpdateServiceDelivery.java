@@ -25,9 +25,9 @@ public class UpdateServiceDelivery {
     @Autowired
     private EmployeePort employeePort;
 
-    public void updateStatus(Long serviceId, Status newStatus, String observation, 
-                             Signature signature, List<Photo> photos, Long userDocument) throws Exception {
-        
+    public void updateStatus(Long serviceId, Status newStatus, String observation,
+            Signature signature, List<Photo> photos, Long userDocument) throws Exception {
+
         // 1. Recuperar Servicio y Usuario
         ServiceDelivery service = serviceDeliveryPort.findById(serviceId);
         if (service == null) {
@@ -53,17 +53,18 @@ public class UpdateServiceDelivery {
 
         // 4. Actualizar Datos del Servicio
         service.setCurrentStatus(newStatus);
-        
-        // Si hay observación nueva, la actualizamos (o concatenamos según lógica de negocio)
+
+        // Si hay observación nueva, la actualizamos (o concatenamos según lógica de
+        // negocio)
         if (observation != null && !observation.isEmpty()) {
             service.setObservation(observation);
         }
-        
+
         if (signature != null) {
             signature.setUploadDate(LocalDateTime.now());
             service.setSignature(signature);
         }
-        
+
         if (photos != null && !photos.isEmpty()) {
             for (Photo p : photos) {
                 p.setUploadDate(LocalDateTime.now());
@@ -77,22 +78,24 @@ public class UpdateServiceDelivery {
         history.setNewStatus(newStatus);
         history.setChangeDate(LocalDateTime.now());
         history.setChangedBy(user); // Quién hizo el cambio
-        
+
         service.addHistory(history);
 
         // 6. Guardar Cambios
         serviceDeliveryPort.save(service);
     }
 
-    private void validateEvidence(Status status, Signature signature, List<Photo> photos, String observation) throws BusinessException {
+    private void validateEvidence(Status status, Signature signature, List<Photo> photos, String observation)
+            throws BusinessException {
         // Regla: Para ENTREGADO, firma obligatoria. Foto y obs opcionales.
         if (status == Status.DELIVERED) {
             if (signature == null) {
                 throw new BusinessException("Para marcar como ENTREGADO, la firma de recibido es obligatoria.");
             }
             // Foto y Observación son opcionales aquí, no lanzamos error si faltan.
-        } 
-        // Regla: Para PENDIENTE, DEVUELTO, FALLIDO (y otros flujos operativos no admin), todo obligatorio.
+        }
+        // Regla: Para PENDIENTE, DEVUELTO, FALLIDO (y otros flujos operativos no
+        // admin), todo obligatorio.
         else if (status == Status.PENDING || status == Status.RETURNED || status == Status.FAILED) {
             if (signature == null) {
                 throw new BusinessException("Para el estado " + status + " la firma es obligatoria.");
@@ -104,7 +107,9 @@ public class UpdateServiceDelivery {
                 throw new BusinessException("Para el estado " + status + " la observación es obligatoria.");
             }
         }
-        // Para ASSIGNED, CANCELED, OBSERVED, RESOLVED no se especificaron reglas estrictas de evidencia en el prompt,
-        // pero se asume que Admin gestiona CANCELED/OBSERVED sin necesidad de firmar él mismo en campo.
+        // Para ASSIGNED, CANCELED, OBSERVED, RESOLVED no se especificaron reglas
+        // estrictas de evidencia en el prompt,
+        // pero se asume que Admin gestiona CANCELED/OBSERVED sin necesidad de firmar él
+        // mismo en campo.
     }
 }

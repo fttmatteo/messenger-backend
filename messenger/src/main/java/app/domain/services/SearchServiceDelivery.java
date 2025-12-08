@@ -34,7 +34,11 @@ public class SearchServiceDelivery {
     public List<ServiceDelivery> findByMessenger(Long messengerDocument) {
         return serviceDeliveryPort.findByMessengerDocument(messengerDocument);
     }
-    
+
+    public List<ServiceDelivery> findByDealership(Long dealershipId) {
+        return serviceDeliveryPort.findByDealershipId(dealershipId);
+    }
+
     public List<ServiceDelivery> findByPlate(String plateNumber) {
         String normalized = plateNumber.trim().toUpperCase();
         return serviceDeliveryPort.findByPlateNumber(normalized);

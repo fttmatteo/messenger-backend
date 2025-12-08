@@ -24,7 +24,8 @@ public class DeleteEmployee {
 
         var deliveries = serviceDeliveryPort.findByMessengerDocument(document);
         if (deliveries != null && !deliveries.isEmpty()) {
-            throw new BusinessException("No se puede eliminar el empleado porque tiene servicios de entrega asociados.");
+            throw new BusinessException(
+                    "No se puede eliminar el empleado porque tiene servicios de entrega asociados.");
         }
 
         employeePort.deleteByDocument(document);
@@ -38,9 +39,10 @@ public class DeleteEmployee {
 
         var deliveries = serviceDeliveryPort.findByMessengerDocument(employee.getDocument());
         if (deliveries != null && !deliveries.isEmpty()) {
-            throw new BusinessException("No se puede eliminar el empleado porque tiene servicios de entrega asociados.");
+            throw new BusinessException(
+                    "No se puede eliminar el empleado porque tiene servicios de entrega asociados.");
         }
 
         employeePort.deleteById(id);
     }
-}   
+}

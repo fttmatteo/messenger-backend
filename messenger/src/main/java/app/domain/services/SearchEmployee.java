@@ -20,15 +20,15 @@ public class SearchEmployee {
         Employee employee = employeePort.findByDocument(document);
         if (employee == null) {
             throw new Exception("El empleado con documento " + document + " no existe.");
-        }     
+        }
         return employee;
-    }   
-    
+    }
+
     public Employee findById(Long id) {
         Employee employee = employeePort.findById(id);
         if (employee == null) {
             throw new RuntimeException("El empleado con ID " + id + " no existe.");
-    }     
+        }
         return employee;
     }
 
@@ -36,7 +36,7 @@ public class SearchEmployee {
         Employee employee = employeePort.findByUserName(userName);
         if (employee == null) {
             throw new RuntimeException("El empleado con nombre de usuario " + userName + " no existe.");
-        }     
-        return employee;    
-    }   
-}   
+        }
+        return employee;
+    }
+}

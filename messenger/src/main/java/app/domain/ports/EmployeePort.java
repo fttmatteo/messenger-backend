@@ -6,10 +6,16 @@ import java.util.List;
 
 public interface EmployeePort {
     Employee save(Employee employee);
+
     void deleteById(Long idEmployee);
+
     void deleteByDocument(Long document);
+
     Employee findById(Long idEmployee);
+
     Employee findByDocument(Long document);
+
     Employee findByUserName(String userName);
+
     List<Employee> findAll();
 }
