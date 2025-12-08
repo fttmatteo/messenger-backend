@@ -2,23 +2,26 @@ package app.infrastructure.persistence.entities;
 
 import app.domain.model.enums.Status;
 import jakarta.persistence.*;
-import lombok.Data;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "status_history")
-@Data
 public class StatusHistoryEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idHistory;
+    @Column(name = "id_status_history")
+    private Long idStatusHistory;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "previous_status")
     private Status previousStatus;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "new_status", nullable = false)
     private Status newStatus;
 
+    @Column(name = "change_date", nullable = false)
     private LocalDateTime changeDate;
 
     @ManyToOne
@@ -28,4 +31,52 @@ public class StatusHistoryEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "service_delivery_id")
     private ServiceDeliveryEntity serviceDelivery;
+
+    public Long getIdStatusHistory() {
+        return idStatusHistory;
+    }
+
+    public void setIdStatusHistory(Long idStatusHistory) {
+        this.idStatusHistory = idStatusHistory;
+    }
+
+    public Status getPreviousStatus() {
+        return previousStatus;
+    }
+
+    public void setPreviousStatus(Status previousStatus) {
+        this.previousStatus = previousStatus;
+    }
+
+    public Status getNewStatus() {
+        return newStatus;
+    }
+
+    public void setNewStatus(Status newStatus) {
+        this.newStatus = newStatus;
+    }
+
+    public LocalDateTime getChangeDate() {
+        return changeDate;
+    }
+
+    public void setChangeDate(LocalDateTime changeDate) {
+        this.changeDate = changeDate;
+    }
+
+    public EmployeeEntity getChangedBy() {
+        return changedBy;
+    }
+
+    public void setChangedBy(EmployeeEntity changedBy) {
+        this.changedBy = changedBy;
+    }
+
+    public ServiceDeliveryEntity getServiceDelivery() {
+        return serviceDelivery;
+    }
+
+    public void setServiceDelivery(ServiceDeliveryEntity serviceDelivery) {
+        this.serviceDelivery = serviceDelivery;
+    }
 }

@@ -1,17 +1,13 @@
 package app.infrastructure.persistence.repository;
 
-import java.util.List;
-
+import app.infrastructure.persistence.entities.EmployeeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import app.infrastructure.persistence.entities.EmployeeEntity;
+import java.util.Optional;
 
 @Repository
 public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Long> {
-    EmployeeEntity findByDocument(Long document);
+    Optional<EmployeeEntity> findByDocument(Long document);
 
-    EmployeeEntity findByUserName(String userName);
-
-    List<EmployeeEntity> findAll();
-
+    Optional<EmployeeEntity> findByUserName(String userName);
 }
