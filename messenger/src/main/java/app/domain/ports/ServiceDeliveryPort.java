@@ -5,7 +5,7 @@ import app.domain.model.enums.Status;
 import java.util.List;
 
 public interface ServiceDeliveryPort {
-    ServiceDelivery save(ServiceDelivery serviceDelivery);
+    void save(ServiceDelivery serviceDelivery);
 
     void deleteById(Long idServiceDelivery);
 

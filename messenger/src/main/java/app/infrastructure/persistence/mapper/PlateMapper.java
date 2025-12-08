@@ -7,6 +7,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class PlateMapper {
 
+    public PlateEntity toEntity(Plate domain) {
+        if (domain == null)
+            return null;
+        PlateEntity entity = new PlateEntity();
+        entity.setIdPlate(domain.getIdPlate());
+        entity.setPlateNumber(domain.getPlateNumber());
+        entity.setPlateType(domain.getPlateType());
+        entity.setUploadDate(domain.getUploadDate());
+        return entity;
+    }
+
     public Plate toDomain(PlateEntity entity) {
         if (entity == null)
             return null;
@@ -18,14 +29,4 @@ public class PlateMapper {
         return model;
     }
 
-    public PlateEntity toEntity(Plate domain) {
-        if (domain == null)
-            return null;
-        PlateEntity entity = new PlateEntity();
-        entity.setIdPlate(domain.getIdPlate());
-        entity.setPlateNumber(domain.getPlateNumber());
-        entity.setPlateType(domain.getPlateType());
-        entity.setUploadDate(domain.getUploadDate());
-        return entity;
-    }
 }

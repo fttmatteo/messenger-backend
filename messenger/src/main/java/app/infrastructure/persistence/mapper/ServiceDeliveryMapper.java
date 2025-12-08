@@ -16,74 +16,28 @@ public class ServiceDeliveryMapper {
     @Autowired
     private EmployeeMapper employeeMapper;
 
-    public ServiceDelivery toDomain(ServiceDeliveryEntity entity) {
-        if (entity == null)
-            return null;
-
-        ServiceDelivery domain = new ServiceDelivery();
-        domain.setIdServiceDelivery(entity.getIdServiceDelivery());
-        domain.setPlate(plateMapper.toDomain(entity.getPlate()));
-        domain.setDealership(dealershipMapper.toDomain(entity.getDealership()));
-        domain.setMessenger(employeeMapper.toDomain(entity.getMessenger()));
-        domain.setCurrentStatus(entity.getCurrentStatus());
-        domain.setObservation(entity.getObservation());
-
-        if (entity.getSignature() != null) {
-            Signature sig = new Signature();
-            sig.setIdSignature(entity.getSignature().getIdSignature());
-            sig.setSignaturePath(entity.getSignature().getSignaturePath());
-            sig.setUploadDate(entity.getSignature().getUploadDate());
-            domain.setSignature(sig);
-        }
-
-        if (entity.getPhotos() != null) {
-            domain.setPhotos(entity.getPhotos().stream().map(p -> {
-                Photo photo = new Photo();
-                photo.setIdPhoto(p.getIdPhoto());
-                photo.setPhotoPath(p.getPhotoPath());
-                photo.setUploadDate(p.getUploadDate());
-                photo.setPhotoType(p.getPhotoType());
-                return photo;
-            }).collect(Collectors.toList()));
-        }
-
-        if (entity.getHistory() != null) {
-            domain.setHistory(entity.getHistory().stream().map(h -> {
-                StatusHistory history = new StatusHistory();
-                history.setIdStatusHistory(h.getIdStatusHistory());
-                history.setPreviousStatus(h.getPreviousStatus());
-                history.setNewStatus(h.getNewStatus());
-                history.setChangeDate(h.getChangeDate());
-                history.setChangedBy(employeeMapper.toDomain(h.getChangedBy()));
-                return history;
-            }).collect(Collectors.toList()));
-        }
-
-        return domain;
-    }
-
-    public ServiceDeliveryEntity toEntity(ServiceDelivery domain) {
-        if (domain == null)
+    public ServiceDeliveryEntity toEntity(ServiceDelivery serviceDelivery) {
+        if (serviceDelivery == null)
             return null;
 
         ServiceDeliveryEntity entity = new ServiceDeliveryEntity();
-        entity.setIdServiceDelivery(domain.getIdServiceDelivery());
-        entity.setPlate(plateMapper.toEntity(domain.getPlate()));
-        entity.setDealership(dealershipMapper.toEntity(domain.getDealership()));
-        entity.setMessenger(employeeMapper.toEntity(domain.getMessenger()));
-        entity.setCurrentStatus(domain.getCurrentStatus());
-        entity.setObservation(domain.getObservation());
+        entity.setIdServiceDelivery(serviceDelivery.getIdServiceDelivery());
+        entity.setPlate(plateMapper.toEntity(serviceDelivery.getPlate()));
+        entity.setDealership(dealershipMapper.toEntity(serviceDelivery.getDealership()));
+        entity.setMessenger(employeeMapper.toEntity(serviceDelivery.getMessenger()));
+        entity.setCurrentStatus(serviceDelivery.getCurrentStatus());
+        entity.setObservation(serviceDelivery.getObservation());
 
-        if (domain.getSignature() != null) {
+        if (serviceDelivery.getSignature() != null) {
             SignatureEntity sigEntity = new SignatureEntity();
-            sigEntity.setIdSignature(domain.getSignature().getIdSignature());
-            sigEntity.setSignaturePath(domain.getSignature().getSignaturePath());
-            sigEntity.setUploadDate(domain.getSignature().getUploadDate());
+            sigEntity.setIdSignature(serviceDelivery.getSignature().getIdSignature());
+            sigEntity.setSignaturePath(serviceDelivery.getSignature().getSignaturePath());
+            sigEntity.setUploadDate(serviceDelivery.getSignature().getUploadDate());
             entity.setSignature(sigEntity);
         }
 
-        if (domain.getPhotos() != null) {
-            entity.setPhotos(domain.getPhotos().stream().map(p -> {
+        if (serviceDelivery.getPhotos() != null) {
+            entity.setPhotos(serviceDelivery.getPhotos().stream().map(p -> {
                 PhotoEntity pEntity = new PhotoEntity();
                 pEntity.setIdPhoto(p.getIdPhoto());
                 pEntity.setPhotoPath(p.getPhotoPath());
@@ -94,8 +48,8 @@ public class ServiceDeliveryMapper {
             }).collect(Collectors.toList()));
         }
 
-        if (domain.getHistory() != null) {
-            entity.setHistory(domain.getHistory().stream().map(h -> {
+        if (serviceDelivery.getHistory() != null) {
+            entity.setHistory(serviceDelivery.getHistory().stream().map(h -> {
                 StatusHistoryEntity hEntity = new StatusHistoryEntity();
                 hEntity.setIdStatusHistory(h.getIdStatusHistory());
                 hEntity.setPreviousStatus(h.getPreviousStatus());
@@ -108,5 +62,51 @@ public class ServiceDeliveryMapper {
         }
 
         return entity;
+    }
+
+    public ServiceDelivery toDomain(ServiceDeliveryEntity entity) {
+        if (entity == null)
+            return null;
+
+        ServiceDelivery serviceDelivery = new ServiceDelivery();
+        serviceDelivery.setIdServiceDelivery(entity.getIdServiceDelivery());
+        serviceDelivery.setPlate(plateMapper.toDomain(entity.getPlate()));
+        serviceDelivery.setDealership(dealershipMapper.toDomain(entity.getDealership()));
+        serviceDelivery.setMessenger(employeeMapper.toDomain(entity.getMessenger()));
+        serviceDelivery.setCurrentStatus(entity.getCurrentStatus());
+        serviceDelivery.setObservation(entity.getObservation());
+
+        if (entity.getSignature() != null) {
+            Signature sig = new Signature();
+            sig.setIdSignature(entity.getSignature().getIdSignature());
+            sig.setSignaturePath(entity.getSignature().getSignaturePath());
+            sig.setUploadDate(entity.getSignature().getUploadDate());
+            serviceDelivery.setSignature(sig);
+        }
+
+        if (entity.getPhotos() != null) {
+            serviceDelivery.setPhotos(entity.getPhotos().stream().map(p -> {
+                Photo photo = new Photo();
+                photo.setIdPhoto(p.getIdPhoto());
+                photo.setPhotoPath(p.getPhotoPath());
+                photo.setUploadDate(p.getUploadDate());
+                photo.setPhotoType(p.getPhotoType());
+                return photo;
+            }).collect(Collectors.toList()));
+        }
+
+        if (entity.getHistory() != null) {
+            serviceDelivery.setHistory(entity.getHistory().stream().map(h -> {
+                StatusHistory history = new StatusHistory();
+                history.setIdStatusHistory(h.getIdStatusHistory());
+                history.setPreviousStatus(h.getPreviousStatus());
+                history.setNewStatus(h.getNewStatus());
+                history.setChangeDate(h.getChangeDate());
+                history.setChangedBy(employeeMapper.toDomain(h.getChangedBy()));
+                return history;
+            }).collect(Collectors.toList()));
+        }
+
+        return serviceDelivery;
     }
 }

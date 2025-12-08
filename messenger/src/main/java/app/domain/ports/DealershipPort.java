@@ -4,7 +4,7 @@ import app.domain.model.Dealership;
 import java.util.List;
 
 public interface DealershipPort {
-    Dealership save(Dealership dealership);
+    void save(Dealership dealership);
 
     void deleteById(Long idDealership);
 

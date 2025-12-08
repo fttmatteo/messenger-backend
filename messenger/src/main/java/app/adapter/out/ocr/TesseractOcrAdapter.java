@@ -8,7 +8,6 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
-
 import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;

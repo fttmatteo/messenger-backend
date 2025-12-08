@@ -4,7 +4,7 @@ import app.domain.model.Employee;
 import java.util.List;
 
 public interface EmployeePort {
-    Employee save(Employee employee);
+    void save(Employee employee);
 
     void deleteById(Long idEmployee);
 
