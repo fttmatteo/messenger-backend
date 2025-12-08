@@ -1,4 +1,3 @@
-// Archivo: app/domain/model/StatusHistory.java
 package app.domain.model;
 
 import app.domain.model.enums.Status;
@@ -9,7 +8,7 @@ public class StatusHistory {
     private Status previousStatus;
     private Status newStatus;
     private LocalDateTime changeDate;
-    private Employee changedBy; // Usuario auditor
+    private Employee changedBy;
 
     public Long getIdStatusHistory() {
         return idStatusHistory;

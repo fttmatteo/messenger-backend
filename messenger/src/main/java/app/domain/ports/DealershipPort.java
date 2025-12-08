@@ -1,4 +1,3 @@
-// Archivo: app/domain/ports/DealershipPort.java
 package app.domain.ports;
 
 import app.domain.model.Dealership;

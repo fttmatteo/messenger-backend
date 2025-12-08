@@ -22,7 +22,7 @@ public class SearchServiceDelivery {
     public ServiceDelivery findById(Long id) throws BusinessException {
         ServiceDelivery service = serviceDeliveryPort.findById(id);
         if (service == null) {
-            throw new BusinessException("ID de servicio no encontrado.");
+            throw new BusinessException("El servicio con ID " + id + " no existe.");
         }
         return service;
     }

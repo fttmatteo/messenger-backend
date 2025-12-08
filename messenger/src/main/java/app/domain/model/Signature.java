@@ -1,4 +1,3 @@
-// Archivo: app/domain/model/Signature.java
 package app.domain.model;
 
 import java.time.LocalDateTime;

@@ -15,7 +15,7 @@ public class SearchPlate {
     public Plate findById(Long idPlate) {
         Plate plate = platePort.findById(idPlate);
         if (plate == null) {
-            throw new RuntimeException("Placa no encontrada.");
+            throw new RuntimeException("El placa con ID " + idPlate + " no existe.");
         }
         return plate;
     }
@@ -23,7 +23,7 @@ public class SearchPlate {
     public Plate findByPlateNumber(String plateNumber) {
         Plate plate = platePort.findByPlateNumber(plateNumber);
         if (plate == null) {
-            throw new RuntimeException("Placa no encontrada.");
+            throw new RuntimeException("El placa con número " + plateNumber + " no existe.");
         }
         return plate;
     }

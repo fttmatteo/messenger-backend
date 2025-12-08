@@ -1,4 +1,3 @@
-// Archivo: app/domain/model/Photo.java
 package app.domain.model;
 
 import app.domain.model.enums.PhotoType;

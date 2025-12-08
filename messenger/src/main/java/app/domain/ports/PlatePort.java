@@ -1,4 +1,3 @@
-// Archivo: app/domain/ports/PlatePort.java
 package app.domain.ports;
 
 import app.domain.model.Plate;

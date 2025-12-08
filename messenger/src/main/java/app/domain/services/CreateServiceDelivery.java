@@ -1,10 +1,8 @@
 package app.domain.services;
 
 import java.time.LocalDateTime;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import app.application.exceptions.BusinessException;
 import app.domain.model.Dealership;
 import app.domain.model.Employee;

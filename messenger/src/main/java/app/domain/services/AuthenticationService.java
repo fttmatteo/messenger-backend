@@ -5,7 +5,6 @@ import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import app.application.exceptions.BusinessException;
 import app.domain.model.Employee;
 import app.domain.model.auth.AuthCredentials;

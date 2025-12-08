@@ -19,7 +19,7 @@ public class SearchDealership {
     public Dealership findById(Long id) {
         Dealership dealership = dealershipPort.findById(id);
         if (dealership == null) {
-            throw new RuntimeException("ID del concesionario no encontrado.");
+            throw new RuntimeException("El concesionario con ID " + id + " no existe.");
         }
         return dealership;
     }
@@ -27,7 +27,7 @@ public class SearchDealership {
     public Dealership findByName(String name) {
         Dealership dealership = dealershipPort.findByName(name);
         if (dealership == null) {
-            throw new RuntimeException("Nombre del concesionario no encontrado.");
+            throw new RuntimeException("El concesionario con nombre " + name + " no existe.");
         }
         return dealership;
     }
