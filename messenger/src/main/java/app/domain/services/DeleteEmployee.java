@@ -29,4 +29,18 @@ public class DeleteEmployee {
 
         employeePort.deleteByDocument(document);
     }
-}
+
+    public void deleteById(Long id) throws Exception {
+        Employee employee = employeePort.findById(id);
+        if (employee == null) {
+            throw new BusinessException("El empleado con ID " + id + " no existe.");
+        }
+
+        var deliveries = serviceDeliveryPort.findByMessengerDocument(employee.getDocument());
+        if (deliveries != null && !deliveries.isEmpty()) {
+            throw new BusinessException("No se puede eliminar el empleado porque tiene servicios de entrega asociados.");
+        }
+
+        employeePort.deleteById(id);
+    }
+}   
