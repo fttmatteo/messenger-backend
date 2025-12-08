@@ -1,6 +1,5 @@
 package app.infrastructure.persistence.repository;
 
-import app.domain.model.ServiceDelivery;
 import app.domain.model.enums.Status;
 import app.infrastructure.persistence.entities.ServiceDeliveryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,11 +8,11 @@ import java.util.List;
 
 @Repository
 public interface ServiceDeliveryRepository extends JpaRepository<ServiceDeliveryEntity, Long> {
-    List<ServiceDelivery> findByStatus(Status status);
+    List<ServiceDeliveryEntity> findByCurrentStatus(Status currentStatus);
 
-    List<ServiceDelivery> findByMessengerDocument(Long messengerDocument);
+    List<ServiceDeliveryEntity> findByMessenger_Document(Long messengerDocument);
 
-    List<ServiceDelivery> findByPlateNumber(String plateNumber);
+    List<ServiceDeliveryEntity> findByPlate_PlateNumber(String plateNumber);
 
-    List<ServiceDelivery> findByDealershipId(Long dealershipId);
+    List<ServiceDeliveryEntity> findByDealership_IdDealership(Long dealershipId);
 }
