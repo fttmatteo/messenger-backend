@@ -7,7 +7,7 @@ import app.domain.model.enums.PlateType;
 import java.util.regex.Pattern;
 
 @Service
-public class PlateRecognitionService {
+public class PlateRecognition {
 
     // Regex para Carro: ABC 123 (3 letras, espacio, 3 números)
     private static final Pattern CAR_PATTERN = Pattern.compile("^[A-Z]{3} \\d{3}$");
