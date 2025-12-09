@@ -124,3 +124,92 @@
   cursor: not-allowed;
   transform: none;
 }
+
+/* Camera capture styles */
+.capture-mode-toggle {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 10px 20px;
+  background-color: #f0f0f0;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.toggle-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.toggle-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: #667eea;
+}
+
+.camera-container {
+  margin-top: 15px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  background-color: #000;
+  text-align: center;
+}
+
+.camera-preview {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: 5px;
+  display: block;
+  margin-bottom: 15px;
+}
+
+.capture-btn {
+  padding: 12px 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.capture-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.retake-btn {
+  margin-top: 10px;
+  padding: 8px 20px;
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.retake-btn:hover {
+  background-color: #ff5252;
+  transform: translateY(-2px);
+}
+
+.image-preview {
+  position: relative;
+  text-align: center;
+}
+
