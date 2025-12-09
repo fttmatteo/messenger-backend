@@ -27,8 +27,8 @@ public class EmployeeUseCase {
         createEmployee.create(employee);
     }
 
-    public void update(Employee employee) throws Exception {
-        updateEmployee.update(null, employee);
+    public void update(Long id, Employee employee) throws Exception {
+        updateEmployee.update(id, employee);
     }
 
     public Employee findById(Long id) {

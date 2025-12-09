@@ -77,11 +77,11 @@ public class ServiceDeliveryMapper {
         serviceDelivery.setObservation(entity.getObservation());
 
         if (entity.getSignature() != null) {
-            Signature sig = new Signature();
-            sig.setIdSignature(entity.getSignature().getIdSignature());
-            sig.setSignaturePath(entity.getSignature().getSignaturePath());
-            sig.setUploadDate(entity.getSignature().getUploadDate());
-            serviceDelivery.setSignature(sig);
+            Signature signature = new Signature();
+            signature.setIdSignature(entity.getSignature().getIdSignature());
+            signature.setSignaturePath(entity.getSignature().getSignaturePath());
+            signature.setUploadDate(entity.getSignature().getUploadDate());
+            serviceDelivery.setSignature(signature);
         }
 
         if (entity.getPhotos() != null) {

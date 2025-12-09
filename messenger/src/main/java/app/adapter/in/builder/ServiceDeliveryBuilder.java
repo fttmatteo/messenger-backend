@@ -2,6 +2,8 @@ package app.adapter.in.builder;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import app.adapter.in.rest.request.ServiceDeliveryCreateRequest;
+import app.adapter.in.rest.request.ServiceDeliveryUpdateStatusRequest;
 import app.adapter.in.validators.ServiceDeliveryValidator;
 import app.domain.model.enums.Status;
 
@@ -11,23 +13,61 @@ public class ServiceDeliveryBuilder {
     @Autowired
     private ServiceDeliveryValidator validator;
 
-    public Long buildDealershipId(String dealershipId) throws Exception {
-        return validator.idValidator(dealershipId);
+    public ServiceDeliveryCreateData buildCreateData(ServiceDeliveryCreateRequest request) throws Exception {
+        Long dealershipId = validator.idValidator(request.getDealershipId());
+        Long messengerDocument = validator.documentValidator(request.getMessengerDocument());
+
+        return new ServiceDeliveryCreateData(dealershipId, messengerDocument);
     }
 
-    public Long buildMessengerDocument(String messengerDocument) throws Exception {
-        return validator.documentValidator(messengerDocument);
+    public ServiceDeliveryUpdateData buildUpdateStatusData(ServiceDeliveryUpdateStatusRequest request)
+            throws Exception {
+        Status status = validator.statusValidator(request.getStatus());
+        String observation = validator.observationValidator(request.getObservation());
+        Long userDocument = validator.documentValidator(request.getUserDocument());
+
+        return new ServiceDeliveryUpdateData(status, observation, userDocument);
     }
 
-    public Status buildStatus(String status) throws Exception {
-        return validator.statusValidator(status);
+    public static class ServiceDeliveryCreateData {
+        private final Long dealershipId;
+        private final Long messengerDocument;
+
+        public ServiceDeliveryCreateData(Long dealershipId, Long messengerDocument) {
+            this.dealershipId = dealershipId;
+            this.messengerDocument = messengerDocument;
+        }
+
+        public Long getDealershipId() {
+            return dealershipId;
+        }
+
+        public Long getMessengerDocument() {
+            return messengerDocument;
+        }
     }
 
-    public String buildObservation(String observation) throws Exception {
-        return validator.observationValidator(observation);
-    }
+    public static class ServiceDeliveryUpdateData {
+        private final Status status;
+        private final String observation;
+        private final Long userDocument;
 
-    public Long buildUserDocument(String userDocument) throws Exception {
-        return validator.documentValidator(userDocument);
+        public ServiceDeliveryUpdateData(Status status, String observation, Long userDocument) {
+            this.status = status;
+            this.observation = observation;
+            this.userDocument = userDocument;
+        }
+
+        public Status getStatus() {
+            return status;
+        }
+
+        public String getObservation() {
+            return observation;
+        }
+
+        public Long getUserDocument() {
+            return userDocument;
+        }
     }
 }

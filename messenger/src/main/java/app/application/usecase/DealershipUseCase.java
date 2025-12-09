@@ -27,8 +27,8 @@ public class DealershipUseCase {
         createDealership.create(dealership);
     }
 
-    public void update(Dealership dealership) throws Exception {
-        updateDealership.update(null, dealership);
+    public void update(Long id, Dealership dealership) throws Exception {
+        updateDealership.update(id, dealership);
     }
 
     public Dealership findById(Long id) throws Exception {

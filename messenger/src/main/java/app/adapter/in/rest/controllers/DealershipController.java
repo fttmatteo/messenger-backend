@@ -13,7 +13,6 @@ import app.application.exceptions.BusinessException;
 import app.application.exceptions.InputsException;
 import app.application.usecase.DealershipUseCase;
 import app.domain.model.Dealership;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -71,8 +70,7 @@ public class DealershipController {
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody DealershipRequest request) {
         try {
             Dealership dealership = builder.build(request);
-            dealership.setIdDealership(id);
-            dealershipUseCase.update(dealership);
+            dealershipUseCase.update(id, dealership);
             return ResponseEntity.ok("Concesionario actualizado exitosamente");
         } catch (InputsException | BusinessException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

@@ -1,12 +1,10 @@
 package app.infrastructure.persistence.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "signatures")
-@Data
 public class SignatureEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,4 +15,28 @@ public class SignatureEntity {
 
     @Column(nullable = false)
     private LocalDateTime uploadDate;
+
+    public Long getIdSignature() {
+        return idSignature;
+    }
+
+    public void setIdSignature(Long idSignature) {
+        this.idSignature = idSignature;
+    }
+
+    public String getSignaturePath() {
+        return signaturePath;
+    }
+
+    public void setSignaturePath(String signaturePath) {
+        this.signaturePath = signaturePath;
+    }
+
+    public LocalDateTime getUploadDate() {
+        return uploadDate;
+    }
+
+    public void setUploadDate(LocalDateTime uploadDate) {
+        this.uploadDate = uploadDate;
+    }
 }
