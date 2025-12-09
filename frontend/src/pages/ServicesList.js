@@ -77,34 +77,31 @@ function ServicesList() {
             <div className="no-data">No services found</div>
           ) : (
             services.map((service) => (
-              <div key={service.id} className="service-card">
+              <div key={service.idServiceDelivery} className="service-card">
                 <div className="service-header">
-                  <h3>Service #{service.id}</h3>
+                  <h3>Service #{service.idServiceDelivery}</h3>
                   <span
                     className="status-badge"
-                    style={{ backgroundColor: getStatusColor(service.status) }}
+                    style={{ backgroundColor: getStatusColor(service.currentStatus) }}
                   >
-                    {service.status}
+                    {service.currentStatus}
                   </span>
                 </div>
                 <div className="service-details">
                   <p>
-                    <strong>Plate:</strong> {service.plateNumber || 'N/A'}
+                    <strong>Plate:</strong> {service.plate?.plateNumber || 'N/A'}
                   </p>
                   <p>
-                    <strong>Messenger:</strong> {service.messengerName || 'N/A'}
+                    <strong>Messenger:</strong> {service.messenger?.fullName || 'N/A'}
                   </p>
                   <p>
-                    <strong>Dealership:</strong> {service.dealershipName || 'N/A'}
+                    <strong>Dealership:</strong> {service.dealership?.name || 'N/A'}
                   </p>
                   <p>
-                    <strong>Created:</strong>{' '}
-                    {service.createdAt
-                      ? new Date(service.createdAt).toLocaleDateString()
-                      : 'N/A'}
+                    <strong>Status:</strong> {service.currentStatus || 'N/A'}
                   </p>
                 </div>
-                <Link to={`/dashboard/services/${service.id}`} className="view-btn">
+                <Link to={`/dashboard/services/${service.idServiceDelivery}`} className="view-btn">
                   View Details
                 </Link>
               </div>

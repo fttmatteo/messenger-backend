@@ -59,15 +59,15 @@ function ServiceDetail() {
       const formData = new FormData();
       formData.append('status', updateData.status);
       formData.append('userDocument', updateData.userDocument);
-      
+
       if (updateData.observation) {
         formData.append('observation', updateData.observation);
       }
-      
+
       if (updateData.signature) {
         formData.append('signature', updateData.signature);
       }
-      
+
       updateData.photos.forEach((photo) => {
         formData.append('photos', photo);
       });
@@ -111,7 +111,7 @@ function ServiceDetail() {
   return (
     <div className="service-detail">
       <div className="page-header">
-        <h1>Service Details #{service.id}</h1>
+        <h1>Service Details #{service.idServiceDelivery}</h1>
         <button onClick={() => navigate('/dashboard/services')} className="btn-secondary">
           Back to List
         </button>
@@ -124,46 +124,45 @@ function ServiceDetail() {
             <span className="label">Status:</span>
             <span
               className="status-badge"
-              style={{ backgroundColor: getStatusColor(service.status) }}
+              style={{ backgroundColor: getStatusColor(service.currentStatus) }}
             >
-              {service.status}
+              {service.currentStatus}
             </span>
           </div>
           <div className="detail-row">
             <span className="label">Plate Number:</span>
-            <span>{service.plateNumber || 'N/A'}</span>
+            <span>{service.plate?.plateNumber || 'N/A'}</span>
+          </div>
+          <div className="detail-row">
+            <span className="label">Plate Type:</span>
+            <span>{service.plate?.plateType || 'N/A'}</span>
           </div>
           <div className="detail-row">
             <span className="label">Messenger:</span>
-            <span>{service.messengerName || 'N/A'}</span>
+            <span>{service.messenger?.fullName || 'N/A'}</span>
           </div>
           <div className="detail-row">
             <span className="label">Dealership:</span>
-            <span>{service.dealershipName || 'N/A'}</span>
+            <span>{service.dealership?.name || 'N/A'}</span>
           </div>
           <div className="detail-row">
-            <span className="label">Created At:</span>
-            <span>
-              {service.createdAt
-                ? new Date(service.createdAt).toLocaleString()
-                : 'N/A'}
-            </span>
+            <span className="label">Zone:</span>
+            <span>{service.dealership?.zone || 'N/A'}</span>
           </div>
         </div>
 
-        {service.statusHistory && service.statusHistory.length > 0 && (
+        {service.history && service.history.length > 0 && (
           <div className="detail-section">
             <h2>Status History</h2>
             <div className="history-list">
-              {service.statusHistory.map((history, index) => (
-                <div key={index} className="history-item">
-                  <div className="history-status" style={{ backgroundColor: getStatusColor(history.status) }}>
-                    {history.status}
+              {service.history.map((history, index) => (
+                <div key={history.idStatusHistory || index} className="history-item">
+                  <div className="history-status" style={{ backgroundColor: getStatusColor(history.newStatus) }}>
+                    {history.previousStatus} → {history.newStatus}
                   </div>
                   <div className="history-details">
-                    <p><strong>Date:</strong> {new Date(history.changedAt).toLocaleString()}</p>
-                    <p><strong>Changed By:</strong> {history.changedBy || 'N/A'}</p>
-                    {history.observation && <p><strong>Observation:</strong> {history.observation}</p>}
+                    <p><strong>Date:</strong> {new Date(history.changeDate).toLocaleString()}</p>
+                    <p><strong>Changed By:</strong> {history.changedBy?.fullName || 'N/A'}</p>
                   </div>
                 </div>
               ))}
