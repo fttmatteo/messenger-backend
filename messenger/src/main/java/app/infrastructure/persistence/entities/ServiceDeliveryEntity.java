@@ -117,7 +117,7 @@ public class ServiceDeliveryEntity {
         this.history = history;
     }
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = true, updatable = false)
     private java.time.LocalDateTime createdAt;
 
     @PrePersist
