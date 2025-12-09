@@ -3,18 +3,23 @@ package app.adapter.in.rest.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import app.adapter.in.builder.EmployeeBuilder;
+import app.adapter.in.rest.mapper.EmployeeResponseMapper;
 import app.adapter.in.rest.request.EmployeeRequest;
+import app.adapter.in.rest.response.EmployeeResponse;
 import app.application.exceptions.BusinessException;
 import app.application.exceptions.InputsException;
 import app.application.usecase.EmployeeUseCase;
 import app.domain.model.Employee;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/employees")
+@PreAuthorize("hasRole('ADMIN')")
 public class EmployeeController {
 
     @Autowired
@@ -23,7 +28,11 @@ public class EmployeeController {
     @Autowired
     private EmployeeBuilder builder;
 
+    @Autowired
+    private EmployeeResponseMapper responseMapper;
+
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> create(@RequestBody EmployeeRequest request) {
         try {
             Employee employee = builder.build(request.getDocument(), request.getFullName(), request.getPhone(),
@@ -38,24 +47,30 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Employee>> findAll() {
-        return ResponseEntity.ok(employeeUseCase.findAll());
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<EmployeeResponse>> findAll() {
+        List<EmployeeResponse> responses = employeeUseCase.findAll().stream()
+                .map(responseMapper::toResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> findById(@PathVariable Long id) {
         try {
             Employee employee = employeeUseCase.findById(id);
             if (employee == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Empleado no encontrado");
             }
-            return ResponseEntity.ok(employee);
+            return ResponseEntity.ok(responseMapper.toResponse(employee));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody EmployeeRequest request) {
         try {
             // Nota: El Builder actual espera todos los campos, incluido password y
@@ -99,6 +114,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         try {
             employeeUseCase.deleteById(id);
