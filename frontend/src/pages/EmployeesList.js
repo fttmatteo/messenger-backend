@@ -8,8 +8,10 @@ function EmployeesList() {
   const [error, setError] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newEmployee, setNewEmployee] = useState({
-    name: '',
+    fullName: '',
     document: '',
+    phone: '',
+    userName: '',
     password: '',
     role: 'MESSENGER',
   });
@@ -44,7 +46,7 @@ function EmployeesList() {
     try {
       await employeeService.create(newEmployee);
       setShowCreateForm(false);
-      setNewEmployee({ name: '', document: '', password: '', role: 'MESSENGER' });
+      setNewEmployee({ fullName: '', document: '', phone: '', userName: '', password: '', role: 'MESSENGER' });
       loadEmployees();
       alert('Employee created successfully!');
     } catch (err) {
@@ -69,14 +71,14 @@ function EmployeesList() {
           <h2>Create New Employee</h2>
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>Name *</label>
+              <label>Full Name *</label>
               <input
                 type="text"
-                name="name"
-                value={newEmployee.name}
+                name="fullName"
+                value={newEmployee.fullName}
                 onChange={handleChange}
                 required
-                placeholder="Enter employee name"
+                placeholder="Enter full name"
               />
             </div>
 
@@ -89,6 +91,29 @@ function EmployeesList() {
                 onChange={handleChange}
                 required
                 placeholder="Enter document number"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>User Name *</label>
+              <input
+                type="text"
+                name="userName"
+                value={newEmployee.userName}
+                onChange={handleChange}
+                required
+                placeholder="Enter username for login"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Phone</label>
+              <input
+                type="text"
+                name="phone"
+                value={newEmployee.phone}
+                onChange={handleChange}
+                placeholder="Enter phone number"
               />
             </div>
 
@@ -142,9 +167,9 @@ function EmployeesList() {
                 </tr>
               ) : (
                 employees.map((employee) => (
-                  <tr key={employee.id}>
-                    <td>{employee.id}</td>
-                    <td>{employee.name}</td>
+                  <tr key={employee.idEmployee}>
+                    <td>{employee.idEmployee}</td>
+                    <td>{employee.fullName}</td>
                     <td>{employee.document}</td>
                     <td>
                       <span className={`role-badge ${employee.role.toLowerCase()}`}>
