@@ -20,13 +20,13 @@ VALUES (
     'ADMIN'
 );
 
--- Mensajero 1 (usuario: cmensajero, password: admin123)
+-- Mensajero 1 (usuario: mensajero, password: admin123)
 INSERT INTO employees (document, full_name, phone, user_name, password, role)
 VALUES (
     222222222,
     'Carlos Mensajero',
     '3009876543',
-    'cmensajero',
+    'mensajero',
     '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhfS',
     'MESSENGER'
 );

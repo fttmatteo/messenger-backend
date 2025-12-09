@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/services")
-
 public class ServiceDeliveryController {
 
     @Autowired

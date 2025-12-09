@@ -36,7 +36,8 @@ public class EmployeeController {
                     request.getFullName(),
                     request.getPhone(),
                     request.getUserName(),
-                    request.getPassword());
+                    request.getPassword(),
+                    request.getRole());
             employeeUseCase.create(employee);
             return ResponseEntity.status(HttpStatus.CREATED).body("Empleado creado exitosamente");
         } catch (InputsException | BusinessException e) {
@@ -78,7 +79,8 @@ public class EmployeeController {
                     request.getFullName(),
                     request.getPhone(),
                     request.getUserName(),
-                    request.getPassword());
+                    request.getPassword(),
+                    request.getRole());
             employeeUseCase.update(id, employee);
             return ResponseEntity.ok("Empleado actualizado exitosamente");
         } catch (InputsException | BusinessException e) {

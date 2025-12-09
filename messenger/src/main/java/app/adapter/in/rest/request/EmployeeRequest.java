@@ -6,6 +6,7 @@ public class EmployeeRequest {
     private String phone;
     private String userName;
     private String password;
+    private String role;
 
     public String getFullName() {
         return fullName;
@@ -45,5 +46,13 @@ public class EmployeeRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
