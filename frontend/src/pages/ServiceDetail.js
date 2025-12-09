@@ -60,7 +60,9 @@ function ServiceDetail() {
   return (
     <div className="service-detail">
       <div className="page-header">
-        <h1 className="plate-header">{service.plate?.plateNumber || 'Unknown Plate'}</h1>
+        <h1 className="plate-header">
+          {service.plate?.plateNumber ? service.plate.plateNumber.replace(/^(.{3})(.*)$/, '$1 $2') : 'Unknown Plate'}
+        </h1>
         <button onClick={() => navigate('/dashboard/services')} className="btn-secondary">
           Back to List
         </button>

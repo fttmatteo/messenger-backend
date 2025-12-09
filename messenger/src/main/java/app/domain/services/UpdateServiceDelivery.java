@@ -82,27 +82,38 @@ public class UpdateServiceDelivery {
 
     private void validateEvidence(Status status, Signature signature, List<Photo> photos, String observation)
             throws BusinessException {
+
+        // CANCELED or OBSERVED: No evidence required
+        if (status == Status.CANCELED || status == Status.OBSERVED || status == Status.ASSIGNED) {
+            return;
+        }
+
+        // DELIVERED: Only signature required
         if (status == Status.DELIVERED) {
             if (signature == null) {
                 throw new BusinessException("Para marcar como ENTREGADO, la firma de recibido es obligatoria.");
             }
+            return;
         }
 
-        else if (status == Status.PENDING || status == Status.RETURNED || status == Status.FAILED) {
-            if (signature == null) {
-                throw new BusinessException("Para el estado " + status + " la firma es obligatoria.");
-            }
-            if (photos == null || photos.isEmpty()) {
-                throw new BusinessException("Para el estado " + status + " al menos una foto es obligatoria.");
-            }
-            if (observation == null || observation.trim().isEmpty()) {
-                throw new BusinessException("Para el estado " + status + " la observación es obligatoria.");
-            }
+        // ALL OTHER STATUSES (Pending, Failed, Returned, etc.): All evidence required
+        if (signature == null) {
+            throw new BusinessException("Para el estado " + status + " la firma es obligatoria.");
+        }
+        if (photos == null || photos.isEmpty()) {
+            throw new BusinessException("Para el estado " + status + " al menos una foto es obligatoria.");
+        }
+        if (observation == null || observation.trim().isEmpty()) {
+            throw new BusinessException("Para el estado " + status + " la observación es obligatoria.");
         }
     }
 
     private void validateStateTransition(Status currentStatus, Status newStatus, Role userRole)
             throws BusinessException {
+
+        if (currentStatus == Status.DELIVERED) {
+            throw new BusinessException("El servicio ya fue entregado y no se puede modificar su estado.");
+        }
 
         if (currentStatus == newStatus) {
             throw new BusinessException("El servicio ya se encuentra en estado " + currentStatus);

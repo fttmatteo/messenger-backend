@@ -56,6 +56,12 @@ function ServicesList() {
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
     try {
+      if (updateData.status === 'DELIVERED') {
+        if (!window.confirm('Warning: Setting the status to DELIVERED is a final action. You will not be able to change the status afterwards. Do you want to proceed?')) {
+          return;
+        }
+      }
+
       const formData = new FormData();
       formData.append('status', updateData.status);
 
@@ -71,6 +77,30 @@ function ServicesList() {
         formData.append('photos', photo);
       });
 
+      // Validation logic matchin backend rules
+      if (['CANCELED', 'CANCELLED', 'OBSERVED', 'ASSIGNED'].includes(updateData.status)) {
+        // No evidence required
+      } else if (updateData.status === 'DELIVERED') {
+        if (!updateData.signature) {
+          alert('Signature is required for DELIVERED status.');
+          return;
+        }
+      } else {
+        // All others (PENDING, FAILED, RETURNED, etc.)
+        if (!updateData.signature) {
+          alert('Signature is required.');
+          return;
+        }
+        if (updateData.photos.length === 0) {
+          alert('At least one photo is required.');
+          return;
+        }
+        if (!updateData.observation || !updateData.observation.trim()) {
+          alert('Observation is required.');
+          return;
+        }
+      }
+
       await serviceDeliveryService.updateStatus(updatingServiceId, formData);
       setUpdatingServiceId(null);
       loadServices();
@@ -78,6 +108,18 @@ function ServicesList() {
     } catch (err) {
       alert(err.response?.data || 'Failed to update status');
     }
+  };
+
+  const isSignatureRequired = () => {
+    return !['CANCELED', 'CANCELLED', 'OBSERVED', 'ASSIGNED'].includes(updateData.status);
+  };
+
+  const isPhotoRequired = () => {
+    return !['DELIVERED', 'CANCELED', 'CANCELLED', 'OBSERVED', 'ASSIGNED'].includes(updateData.status);
+  };
+
+  const isObservationRequired = () => {
+    return !['DELIVERED', 'CANCELED', 'CANCELLED', 'OBSERVED', 'ASSIGNED'].includes(updateData.status);
   };
 
   const loadServices = async () => {
@@ -184,7 +226,9 @@ function ServicesList() {
             filteredServices.map((service) => (
               <div key={service.idServiceDelivery} className="service-card">
                 <div className="service-header">
-                  <h3 className="plate-header-small">{service.plate?.plateNumber || 'Unknown Plate'}</h3>
+                  <h3 className="plate-header-small">
+                    {service.plate?.plateNumber ? service.plate.plateNumber.replace(/^(.{3})(.*)$/, '$1 $2') : 'Unknown Plate'}
+                  </h3>
                   <span
                     className="status-badge"
                     style={{ backgroundColor: getStatusColor(service.currentStatus) }}
@@ -208,12 +252,14 @@ function ServicesList() {
                   <Link to={`/dashboard/services/${service.idServiceDelivery}`} className="view-btn">
                     View Details
                   </Link>
-                  <button
-                    className="action-btn"
-                    onClick={() => updatingServiceId === service.idServiceDelivery ? handleUpdateCancel() : handleUpdateClick(service)}
-                  >
-                    {updatingServiceId === service.idServiceDelivery ? 'Cancel' : 'Change Status'}
-                  </button>
+                  {service.currentStatus !== 'DELIVERED' && (
+                    <button
+                      className="action-btn"
+                      onClick={() => updatingServiceId === service.idServiceDelivery ? handleUpdateCancel() : handleUpdateClick(service)}
+                    >
+                      {updatingServiceId === service.idServiceDelivery ? 'Cancel' : 'Change Status'}
+                    </button>
+                  )}
                 </div>
 
                 {updatingServiceId === service.idServiceDelivery && (
@@ -240,7 +286,7 @@ function ServicesList() {
                       </div>
 
                       <div className="form-group">
-                        <label>Observation</label>
+                        <label>Observation {isObservationRequired() && '*'}</label>
                         <textarea
                           name="observation"
                           value={updateData.observation}
@@ -250,26 +296,30 @@ function ServicesList() {
                         />
                       </div>
 
-                      <div className="form-group">
-                        <label>Signature</label>
-                        <input
-                          type="file"
-                          name="signature"
-                          onChange={handleFileChange}
-                          accept="image/*"
-                        />
-                      </div>
+                      {isSignatureRequired() && (
+                        <div className="form-group">
+                          <label>Signature *</label>
+                          <input
+                            type="file"
+                            name="signature"
+                            onChange={handleFileChange}
+                            accept="image/*"
+                          />
+                        </div>
+                      )}
 
-                      <div className="form-group">
-                        <label>Photos</label>
-                        <input
-                          type="file"
-                          name="photos"
-                          onChange={handleFileChange}
-                          accept="image/*"
-                          multiple
-                        />
-                      </div>
+                      {isPhotoRequired() && (
+                        <div className="form-group">
+                          <label>Photos *</label>
+                          <input
+                            type="file"
+                            name="photos"
+                            onChange={handleFileChange}
+                            accept="image/*"
+                            multiple
+                          />
+                        </div>
+                      )}
 
                       <button type="submit" className="btn-primary full-width">
                         Submit
