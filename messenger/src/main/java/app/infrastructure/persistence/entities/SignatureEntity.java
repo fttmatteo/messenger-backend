@@ -8,12 +8,13 @@ import java.time.LocalDateTime;
 public class SignatureEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_signature")
     private Long idSignature;
 
-    @Column(nullable = false)
+    @Column(name = "signature_path", nullable = false)
     private String signaturePath;
 
-    @Column(nullable = false)
+    @Column(name = "upload_date", nullable = false)
     private LocalDateTime uploadDate;
 
     public Long getIdSignature() {

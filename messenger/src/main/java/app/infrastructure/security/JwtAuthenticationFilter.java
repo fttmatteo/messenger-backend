@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import app.domain.ports.AuthenticationPort;
 import jakarta.servlet.FilterChain;
@@ -13,13 +14,16 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+@Component
+
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private AuthenticationPort authenticationPort;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
         String token = this.extractToken(request);
         if (token != null) {
             this.processToken(token);
@@ -51,10 +55,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             ArrayList<SimpleGrantedAuthority> authorities = new ArrayList<>();
             authorities.add(new SimpleGrantedAuthority(normalized));
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                username,
-                null,
-                authorities
-            );
+                    username,
+                    null,
+                    authorities);
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
     }
