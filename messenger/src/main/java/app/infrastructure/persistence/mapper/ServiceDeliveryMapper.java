@@ -58,6 +58,20 @@ public class ServiceDeliveryMapper {
                 hEntity.setChangeDate(h.getChangeDate());
                 hEntity.setChangedBy(employeeMapper.toEntity(h.getChangedBy()));
                 hEntity.setServiceDelivery(entity);
+                if (h.getPhotos() != null) {
+                    hEntity.setPhotos(h.getPhotos().stream().map(p -> {
+                        PhotoEntity pEntity = new PhotoEntity();
+                        pEntity.setIdPhoto(p.getIdPhoto());
+                        pEntity.setPhotoPath(p.getPhotoPath());
+                        pEntity.setUploadDate(p.getUploadDate());
+                        pEntity.setPhotoType(p.getPhotoType());
+                        pEntity.setStatusHistory(hEntity);
+                        pEntity.setServiceDelivery(entity); // Maintain service link too? UpdateServiceDelivery logic
+                                                            // will decide. Safest to set if possible, but might be
+                                                            // redundant.
+                        return pEntity;
+                    }).collect(Collectors.toList()));
+                }
                 return hEntity;
             }).collect(Collectors.toList()));
         }
@@ -104,6 +118,16 @@ public class ServiceDeliveryMapper {
                 history.setNewStatus(h.getNewStatus());
                 history.setChangeDate(h.getChangeDate());
                 history.setChangedBy(employeeMapper.toDomain(h.getChangedBy()));
+                if (h.getPhotos() != null) {
+                    history.setPhotos(h.getPhotos().stream().map(p -> {
+                        Photo photo = new Photo();
+                        photo.setIdPhoto(p.getIdPhoto());
+                        photo.setPhotoPath(p.getPhotoPath());
+                        photo.setUploadDate(p.getUploadDate());
+                        photo.setPhotoType(p.getPhotoType());
+                        return photo;
+                    }).collect(Collectors.toList()));
+                }
                 return history;
             }).collect(Collectors.toList()));
         }

@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/dealerships")
-@PreAuthorize("hasRole('ADMIN')")
 public class DealershipController {
 
     @Autowired
@@ -43,7 +42,7 @@ public class DealershipController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<DealershipResponse>> findAll() {
         List<DealershipResponse> responses = dealershipUseCase.findAll().stream()
                 .map(responseMapper::toResponse)
@@ -52,7 +51,7 @@ public class DealershipController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> findById(@PathVariable Long id) {
         try {
             Dealership dealership = dealershipUseCase.findById(id);

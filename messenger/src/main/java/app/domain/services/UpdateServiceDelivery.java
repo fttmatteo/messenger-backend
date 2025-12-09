@@ -70,6 +70,11 @@ public class UpdateServiceDelivery {
         history.setNewStatus(newStatus);
         history.setChangeDate(LocalDateTime.now());
         history.setChangedBy(user);
+
+        if (photos != null && !photos.isEmpty()) {
+            history.setPhotos(new java.util.ArrayList<>(photos));
+        }
+
         service.addHistory(history);
 
         serviceDeliveryPort.save(service);

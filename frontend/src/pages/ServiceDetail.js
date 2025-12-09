@@ -163,6 +163,22 @@ function ServiceDetail() {
                   <div className="history-details">
                     <p><strong>Date:</strong> {new Date(history.changeDate).toLocaleString()}</p>
                     <p><strong>Changed By:</strong> {history.changedBy?.fullName || 'N/A'}</p>
+                    {history.photos && history.photos.length > 0 && (
+                      <div className="history-photos">
+                        <p><strong>Evidence Photos:</strong></p>
+                        <div className="photos-grid">
+                          {history.photos.map(photo => (
+                            <a key={photo.idPhoto} href={`http://localhost:8080/api/files/${photo.photoPath.split('/').pop()}`} target="_blank" rel="noopener noreferrer">
+                              <img
+                                src={`http://localhost:8080/api/files/${photo.photoPath.split('/').pop()}`}
+                                alt="Status evidence"
+                                className="history-photo-thumbnail"
+                              />
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

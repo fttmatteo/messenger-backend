@@ -58,12 +58,25 @@ public class ServiceDeliveryResponseMapper {
 
         if (service.getHistory() != null) {
             response.setHistory(service.getHistory().stream()
-                    .map(h -> new StatusHistoryResponse(
-                            h.getIdStatusHistory(),
-                            h.getPreviousStatus(),
-                            h.getNewStatus(),
-                            h.getChangeDate(),
-                            employeeMapper.toResponse(h.getChangedBy())))
+                    .map(h -> {
+                        StatusHistoryResponse historyResponse = new StatusHistoryResponse(
+                                h.getIdStatusHistory(),
+                                h.getPreviousStatus(),
+                                h.getNewStatus(),
+                                h.getChangeDate(),
+                                employeeMapper.toResponse(h.getChangedBy()));
+
+                        if (h.getPhotos() != null) {
+                            historyResponse.setPhotos(h.getPhotos().stream()
+                                    .map(p -> new PhotoResponse(
+                                            p.getIdPhoto(),
+                                            p.getPhotoPath(),
+                                            p.getUploadDate(),
+                                            p.getPhotoType()))
+                                    .collect(Collectors.toList()));
+                        }
+                        return historyResponse;
+                    })
                     .collect(Collectors.toList()));
         }
 

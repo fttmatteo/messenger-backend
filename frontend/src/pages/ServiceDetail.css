@@ -124,3 +124,29 @@
   outline: none;
   border-color: #667eea;
 }
+
+.history-photos {
+  margin-top: 10px;
+  border-top: 1px dashed #eee;
+  padding-top: 10px;
+}
+
+.photos-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.history-photo-thumbnail {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  transition: transform 0.2s;
+}
+
+.history-photo-thumbnail:hover {
+  transform: scale(1.05);
+}

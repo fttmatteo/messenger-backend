@@ -42,11 +42,21 @@ public class StatusHistory {
         this.changeDate = changeDate;
     }
 
+    private java.util.List<Photo> photos;
+
     public Employee getChangedBy() {
         return changedBy;
     }
 
     public void setChangedBy(Employee changedBy) {
         this.changedBy = changedBy;
+    }
+
+    public java.util.List<Photo> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(java.util.List<Photo> photos) {
+        this.photos = photos;
     }
 }

@@ -37,12 +37,19 @@ function CreateService() {
 
   const loadData = async () => {
     try {
-      const [dealershipsData, employeesData] = await Promise.all([
-        dealershipService.getAll(),
-        employeeService.getAll(),
-      ]);
-      setDealerships(dealershipsData);
-      setEmployees(employeesData);
+      const promises = [dealershipService.getAll()];
+      const role = localStorage.getItem('role');
+
+      if (role === 'ADMIN') {
+        promises.push(employeeService.getAll());
+      }
+
+      const results = await Promise.all(promises);
+      setDealerships(results[0]);
+
+      if (role === 'ADMIN') {
+        setEmployees(results[1]);
+      }
     } catch (err) {
       setError('Failed to load data');
       console.error(err);

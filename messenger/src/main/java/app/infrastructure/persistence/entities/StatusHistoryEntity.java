@@ -72,6 +72,17 @@ public class StatusHistoryEntity {
         this.changedBy = changedBy;
     }
 
+    @OneToMany(mappedBy = "statusHistory", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<PhotoEntity> photos = new java.util.ArrayList<>();
+
+    public java.util.List<PhotoEntity> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(java.util.List<PhotoEntity> photos) {
+        this.photos = photos;
+    }
+
     public ServiceDeliveryEntity getServiceDelivery() {
         return serviceDelivery;
     }

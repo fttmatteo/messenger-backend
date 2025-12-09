@@ -9,6 +9,7 @@ public class StatusHistoryResponse {
     private Status newStatus;
     private LocalDateTime changeDate;
     private EmployeeResponse changedBy;
+    private java.util.List<PhotoResponse> photos;
 
     public StatusHistoryResponse() {
     }
@@ -60,5 +61,13 @@ public class StatusHistoryResponse {
 
     public void setChangedBy(EmployeeResponse changedBy) {
         this.changedBy = changedBy;
+    }
+
+    public java.util.List<PhotoResponse> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(java.util.List<PhotoResponse> photos) {
+        this.photos = photos;
     }
 }

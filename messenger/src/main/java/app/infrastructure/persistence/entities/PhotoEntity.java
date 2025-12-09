@@ -66,4 +66,16 @@ public class PhotoEntity {
     public void setServiceDelivery(ServiceDeliveryEntity serviceDelivery) {
         this.serviceDelivery = serviceDelivery;
     }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "status_history_id")
+    private StatusHistoryEntity statusHistory;
+
+    public StatusHistoryEntity getStatusHistory() {
+        return statusHistory;
+    }
+
+    public void setStatusHistory(StatusHistoryEntity statusHistory) {
+        this.statusHistory = statusHistory;
+    }
 }
