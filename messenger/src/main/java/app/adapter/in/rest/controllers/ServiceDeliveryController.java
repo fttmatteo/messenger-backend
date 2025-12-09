@@ -31,17 +31,41 @@ public class ServiceDeliveryController {
     private ServiceDeliveryBuilder builder;
     @Autowired
     private ServiceDeliveryResponseMapper responseMapper;
+    @Autowired
+    private app.domain.ports.EmployeePort employeePort;
 
     @PostMapping("/create")
     public ResponseEntity<?> createService(
             @RequestParam("image") MultipartFile image,
             @RequestParam("dealershipId") String dealershipId,
-            @RequestParam("messengerDocument") String messengerDocument,
+            @RequestParam(value = "messengerDocument", required = false) String messengerDocument,
             @RequestParam(value = "manualPlateNumber", required = false) String manualPlateNumber) {
 
         File imageFile = null;
         try {
-            ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest(dealershipId, messengerDocument);
+            org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
+                    .getContext().getAuthentication();
+            String currentUserName = auth.getName();
+            app.domain.model.Employee currentUser = employeePort.findByUserName(currentUserName);
+
+            if (currentUser == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User authentication not found or invalid.");
+            }
+
+            // If user is not ADMIN, force assignment to themselves
+            String finalMessengerDocument = messengerDocument;
+            if (currentUser.getRole() != app.domain.model.enums.Role.ADMIN) {
+                finalMessengerDocument = String.valueOf(currentUser.getDocument());
+            } else {
+                // If ADMIN, messengerDocument is required
+                if (messengerDocument == null || messengerDocument.trim().isEmpty()) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body("Messenger document is required for Admin users.");
+                }
+            }
+
+            ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest(dealershipId,
+                    finalMessengerDocument);
             request.setManualPlateNumber(manualPlateNumber);
 
             ServiceDeliveryBuilder.ServiceDeliveryCreateData data = builder.buildCreateData(request);
@@ -75,9 +99,6 @@ public class ServiceDeliveryController {
             }
         }
     }
-
-    @Autowired
-    private app.domain.ports.EmployeePort employeePort;
 
     @PutMapping("/{id}/status")
     public ResponseEntity<?> updateStatus(
@@ -154,7 +175,20 @@ public class ServiceDeliveryController {
 
     @GetMapping
     public ResponseEntity<List<ServiceDeliveryResponse>> findAll() {
-        List<ServiceDeliveryResponse> responses = serviceDeliveryUseCase.findAll().stream()
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication();
+        String currentUserName = auth.getName();
+        app.domain.model.Employee currentUser = employeePort.findByUserName(currentUserName);
+
+        List<ServiceDelivery> services;
+
+        if (currentUser != null && currentUser.getRole() == app.domain.model.enums.Role.MESSENGER) {
+            services = serviceDeliveryUseCase.findByMessenger(currentUser.getIdEmployee());
+        } else {
+            services = serviceDeliveryUseCase.findAll();
+        }
+
+        List<ServiceDeliveryResponse> responses = services.stream()
                 .map(responseMapper::toResponse)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(responses);

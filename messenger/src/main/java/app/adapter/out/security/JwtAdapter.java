@@ -39,6 +39,7 @@ public class JwtAdapter implements AuthenticationPort {
         String token = this.generateToken(credentials.getUserName(), role);
         TokenResponse response = new TokenResponse();
         response.setToken(token);
+        response.setRole(role);
         return response;
     }
 

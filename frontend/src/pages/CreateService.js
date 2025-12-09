@@ -19,10 +19,15 @@ function CreateService() {
   const [success, setSuccess] = useState('');
   const [imagePreview, setImagePreview] = useState(null);
   const [captureMode, setCaptureMode] = useState('camera'); // 'file' or 'camera'
+  const [userRole, setUserRole] = useState('');
   const [stream, setStream] = useState(null);
   const navigate = useNavigate();
   const videoRef = React.useRef(null);
   const canvasRef = React.useRef(null);
+
+  useEffect(() => {
+    setUserRole(localStorage.getItem('role'));
+  }, []);
 
   useEffect(() => {
     loadData();
@@ -185,25 +190,27 @@ function CreateService() {
             </select>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="messengerDocument">Messenger *</label>
-            <select
-              id="messengerDocument"
-              name="messengerDocument"
-              value={formData.messengerDocument}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select a messenger</option>
-              {employees
-                .filter((employee) => employee.role === 'MESSENGER')
-                .map((employee) => (
-                  <option key={employee.idEmployee} value={employee.document}>
-                    {employee.fullName}
-                  </option>
-                ))}
-            </select>
-          </div>
+          {userRole === 'ADMIN' && (
+            <div className="form-group">
+              <label htmlFor="messengerDocument">Messenger *</label>
+              <select
+                id="messengerDocument"
+                name="messengerDocument"
+                value={formData.messengerDocument}
+                onChange={handleChange}
+                required={userRole === 'ADMIN'}
+              >
+                <option value="">Select a messenger</option>
+                {employees
+                  .filter((employee) => employee.role === 'MESSENGER')
+                  .map((employee) => (
+                    <option key={employee.idEmployee} value={employee.document}>
+                      {employee.fullName}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          )}
 
           <div className="form-group">
             <label>Plate Image *</label>
