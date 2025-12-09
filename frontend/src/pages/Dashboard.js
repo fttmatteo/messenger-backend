@@ -24,12 +24,16 @@ function Dashboard() {
           <li>
             <Link to="/dashboard/services/create">Create Service</Link>
           </li>
-          <li>
-            <Link to="/dashboard/employees">Employees</Link>
-          </li>
-          <li>
-            <Link to="/dashboard/dealerships">Dealerships</Link>
-          </li>
+          {localStorage.getItem('role') === 'ADMIN' && (
+            <>
+              <li>
+                <Link to="/dashboard/employees">Employees</Link>
+              </li>
+              <li>
+                <Link to="/dashboard/dealerships">Dealerships</Link>
+              </li>
+            </>
+          )}
         </ul>
         <div className="sidebar-footer">
           <button onClick={handleLogout} className="logout-btn">
