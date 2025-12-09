@@ -8,6 +8,7 @@ function ServicesList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [updatingServiceId, setUpdatingServiceId] = useState(null);
   const [updateData, setUpdateData] = useState({
     status: '',
@@ -105,18 +106,40 @@ function ServicesList() {
 
   const getStatusColor = (status) => {
     switch (status) {
+      case 'ASSIGNED':
+        return '#9c27b0';
       case 'PENDING':
         return '#ffc107';
       case 'IN_TRANSIT':
         return '#2196f3';
       case 'DELIVERED':
         return '#4caf50';
+      case 'FAILED':
+        return '#e91e63';
+      case 'RETURNED':
+        return '#ff9800';
       case 'CANCELLED':
+      case 'CANCELED':
         return '#f44336';
+      case 'OBSERVED':
+        return '#795548';
+      case 'RESOLVED':
+        return '#009688';
       default:
         return '#9e9e9e';
     }
   };
+
+  // Filter services by search term
+  const filteredServices = services.filter((service) => {
+    const term = searchTerm.toLowerCase();
+    return (
+      service.plate?.plateNumber?.toLowerCase().includes(term) ||
+      service.messenger?.fullName?.toLowerCase().includes(term) ||
+      service.dealership?.name?.toLowerCase().includes(term) ||
+      service.currentStatus?.toLowerCase().includes(term)
+    );
+  });
 
   return (
     <div className="services-list">
@@ -128,14 +151,26 @@ function ServicesList() {
       </div>
 
       <div className="filter-section">
-        <label>Filter by Status:</label>
-        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
-          <option value="">All</option>
-          <option value="PENDING">Pending</option>
-          <option value="IN_TRANSIT">In Transit</option>
-          <option value="DELIVERED">Delivered</option>
-          <option value="CANCELLED">Cancelled</option>
-        </select>
+        <div className="filter-row">
+          <input
+            type="text"
+            placeholder="Search by plate, messenger, dealership..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+            <option value="">All Statuses</option>
+            <option value="ASSIGNED">Assigned</option>
+            <option value="PENDING">Pending</option>
+            <option value="DELIVERED">Delivered</option>
+            <option value="FAILED">Failed</option>
+            <option value="RETURNED">Returned</option>
+            <option value="CANCELED">Canceled</option>
+            <option value="OBSERVED">Observed</option>
+            <option value="RESOLVED">Resolved</option>
+          </select>
+        </div>
       </div>
 
       {loading && <div className="loading">Loading services...</div>}
@@ -143,10 +178,10 @@ function ServicesList() {
 
       {!loading && !error && (
         <div className="services-grid">
-          {services.length === 0 ? (
+          {filteredServices.length === 0 ? (
             <div className="no-data">No services found</div>
           ) : (
-            services.map((service) => (
+            filteredServices.map((service) => (
               <div key={service.idServiceDelivery} className="service-card">
                 <div className="service-header">
                   <h3 className="plate-header-small">{service.plate?.plateNumber || 'Unknown Plate'}</h3>
@@ -193,10 +228,14 @@ function ServicesList() {
                           required
                         >
                           <option value="">Select status</option>
+                          <option value="ASSIGNED">Assigned</option>
                           <option value="PENDING">Pending</option>
-                          <option value="IN_TRANSIT">In Transit</option>
                           <option value="DELIVERED">Delivered</option>
-                          <option value="CANCELLED">Cancelled</option>
+                          <option value="FAILED">Failed</option>
+                          <option value="RETURNED">Returned</option>
+                          <option value="CANCELED">Canceled</option>
+                          <option value="OBSERVED">Observed</option>
+                          <option value="RESOLVED">Resolved</option>
                         </select>
                       </div>
 

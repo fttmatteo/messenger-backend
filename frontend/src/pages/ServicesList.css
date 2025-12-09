@@ -2,6 +2,8 @@
 
 .services-list {
   max-width: 1200px;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .page-header {
@@ -42,6 +44,29 @@
   border-radius: 8px;
   margin-bottom: 15px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.filter-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  align-items: stretch;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #667eea;
 }
 
 .filter-section label {
@@ -260,6 +285,17 @@
 
   .filter-section {
     padding: 20px;
+  }
+
+  .filter-row {
+    flex-direction: row;
+    gap: 15px;
+  }
+
+  .search-input {
+    max-width: 400px;
+    padding: 8px 12px;
+    font-size: 14px;
   }
 
   .filter-section label {
