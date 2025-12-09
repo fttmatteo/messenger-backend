@@ -18,6 +18,21 @@
   border-bottom: none;
 }
 
+.service-detail h1 {
+  font-size: 24px;
+  color: #333;
+}
+
+.plate-header {
+  font-family: Arial, Helvetica, sans-serif;
+  /* Sans-serif for clean look */
+  font-size: 3rem !important;
+  font-weight: 800;
+  color: #2962ff !important;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
 .detail-section h2 {
   margin: 0 0 20px 0;
   color: #333;

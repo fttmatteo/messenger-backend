@@ -9,14 +9,6 @@ function ServiceDetail() {
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showUpdateForm, setShowUpdateForm] = useState(false);
-  const [updateData, setUpdateData] = useState({
-    status: '',
-    observation: '',
-    signature: null,
-    photos: [],
-    photos: [],
-  });
 
   const loadService = async () => {
     try {
@@ -37,49 +29,6 @@ function ServiceDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const handleUpdateChange = (e) => {
-    setUpdateData({
-      ...updateData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleFileChange = (e) => {
-    const { name, files } = e.target;
-    if (name === 'signature') {
-      setUpdateData({ ...updateData, signature: files[0] });
-    } else if (name === 'photos') {
-      setUpdateData({ ...updateData, photos: Array.from(files) });
-    }
-  };
-
-  const handleUpdateSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const formData = new FormData();
-      formData.append('status', updateData.status);
-
-
-      if (updateData.observation) {
-        formData.append('observation', updateData.observation);
-      }
-
-      if (updateData.signature) {
-        formData.append('signature', updateData.signature);
-      }
-
-      updateData.photos.forEach((photo) => {
-        formData.append('photos', photo);
-      });
-
-      await serviceDeliveryService.updateStatus(id, formData);
-      setShowUpdateForm(false);
-      loadService();
-      alert('Status updated successfully!');
-    } catch (err) {
-      alert(err.response?.data || 'Failed to update status');
-    }
-  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -111,7 +60,7 @@ function ServiceDetail() {
   return (
     <div className="service-detail">
       <div className="page-header">
-        <h1>Service Details #{service.idServiceDelivery}</h1>
+        <h1 className="plate-header">{service.plate?.plateNumber || 'Unknown Plate'}</h1>
         <button onClick={() => navigate('/dashboard/services')} className="btn-secondary">
           Back to List
         </button>
@@ -129,10 +78,7 @@ function ServiceDetail() {
               {service.currentStatus}
             </span>
           </div>
-          <div className="detail-row">
-            <span className="label">Plate Number:</span>
-            <span>{service.plate?.plateNumber || 'N/A'}</span>
-          </div>
+
           <div className="detail-row">
             <span className="label">Plate Type:</span>
             <span>{service.plate?.plateType || 'N/A'}</span>
@@ -202,73 +148,7 @@ function ServiceDetail() {
           </div>
         )}
 
-        <div className="actions-section">
-          <button
-            onClick={() => setShowUpdateForm(!showUpdateForm)}
-            className="btn-primary"
-          >
-            {showUpdateForm ? 'Cancel Update' : 'Update Status'}
-          </button>
-        </div>
 
-        {showUpdateForm && (
-          <div className="detail-section update-form">
-            <h2>Update Service Status</h2>
-            <form onSubmit={handleUpdateSubmit}>
-              <div className="form-group">
-                <label>Status *</label>
-                <select
-                  name="status"
-                  value={updateData.status}
-                  onChange={handleUpdateChange}
-                  required
-                >
-                  <option value="">Select status</option>
-                  <option value="PENDING">Pending</option>
-                  <option value="IN_TRANSIT">In Transit</option>
-                  <option value="DELIVERED">Delivered</option>
-                  <option value="CANCELLED">Cancelled</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Observation</label>
-                <textarea
-                  name="observation"
-                  value={updateData.observation}
-                  onChange={handleUpdateChange}
-                  rows="3"
-                  placeholder="Add any observations..."
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Signature</label>
-                <input
-                  type="file"
-                  name="signature"
-                  onChange={handleFileChange}
-                  accept="image/*"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Photos</label>
-                <input
-                  type="file"
-                  name="photos"
-                  onChange={handleFileChange}
-                  accept="image/*"
-                  multiple
-                />
-              </div>
-
-              <button type="submit" className="btn-primary">
-                Submit Update
-              </button>
-            </form>
-          </div>
-        )}
       </div>
     </div>
   );
