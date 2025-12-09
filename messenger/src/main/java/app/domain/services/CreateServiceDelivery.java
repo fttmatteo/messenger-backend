@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import app.application.exceptions.BusinessException;
 import app.domain.model.Dealership;
 import app.domain.model.Employee;
+import app.domain.model.Photo;
 import app.domain.model.Plate;
 import app.domain.model.ServiceDelivery;
 import app.domain.model.StatusHistory;
@@ -29,7 +30,8 @@ public class CreateServiceDelivery {
     @Autowired
     private PlateRecognition plateRecognition;
 
-    public void create(String plateNumber, Long dealershipId, Long messengerDocument) throws Exception {
+    public void create(String plateNumber, String photoPath, Long dealershipId, Long messengerDocument)
+            throws Exception {
         Employee messenger = employeePort.findByDocument(messengerDocument);
         if (messenger == null) {
             throw new BusinessException("El mensajero no existe.");
@@ -48,6 +50,8 @@ public class CreateServiceDelivery {
             plate.setPlateNumber(normalizedPlate);
             plate.setPlateType(plateRecognition.determinePlateType(normalizedPlate));
             plate.setUploadDate(LocalDateTime.now());
+            // Nota: La entidad Plate representa el vehículo en general.
+            // La foto específica de ESTA detección se guarda en el servicio.
         }
 
         ServiceDelivery service = new ServiceDelivery();
@@ -56,6 +60,15 @@ public class CreateServiceDelivery {
         service.setMessenger(messenger);
         service.setCurrentStatus(Status.ASSIGNED);
         service.setObservation(null);
+
+        // Guardar la foto de detección
+        if (photoPath != null) {
+            Photo detectionPhoto = new Photo();
+            detectionPhoto.setPhotoPath(photoPath);
+            detectionPhoto.setPhotoType(app.domain.model.enums.PhotoType.PLATE_DETECTION);
+            detectionPhoto.setUploadDate(LocalDateTime.now());
+            service.addPhoto(detectionPhoto);
+        }
 
         StatusHistory history = new StatusHistory();
         history.setPreviousStatus(null);

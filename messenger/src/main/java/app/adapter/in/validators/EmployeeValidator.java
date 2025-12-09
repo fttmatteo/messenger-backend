@@ -3,6 +3,9 @@ package app.adapter.in.validators;
 import app.application.exceptions.InputsException;
 import java.util.regex.Pattern;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class EmployeeValidator extends SimpleValidator {
 
     private static final Pattern USERNAME_PATTERN = Pattern.compile("^[A-Za-z0-9]+$");

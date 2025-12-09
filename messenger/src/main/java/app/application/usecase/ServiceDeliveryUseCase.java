@@ -11,6 +11,7 @@ import app.domain.model.ServiceDelivery;
 import app.domain.model.Signature;
 import app.domain.model.enums.Status;
 import app.domain.ports.OcrPort;
+import app.domain.ports.StoragePort;
 import app.domain.services.CreateServiceDelivery;
 import app.domain.services.DeleteServiceDelivery;
 import app.domain.services.SearchServiceDelivery;
@@ -28,15 +29,47 @@ public class ServiceDeliveryUseCase {
     @Autowired
     private DeleteServiceDelivery deleteService;
     @Autowired
+    private StoragePort storagePort;
+    @Autowired
     private OcrPort ocrPort;
 
     public void createServiceFromImage(File imageFile, Long dealershipId, Long messengerDocument) throws Exception {
-        String extractedText = ocrPort.extractText(imageFile);
-        createService.create(extractedText, dealershipId, messengerDocument);
+        String savedPath = storagePort.save(imageFile, "detections");
+        // Usamos el archivo guardado para el OCR para asegurar consistencia
+        File savedFile = storagePort.get(savedPath);
+
+        String extractedText = ocrPort.extractText(savedFile);
+        createService.create(extractedText, savedPath, dealershipId, messengerDocument);
     }
 
+    // Mantenemos este método para compatibilidad interna o tests, pero agregamos el
+    // que maneja Archivos
     public void updateStatus(Long serviceId, Status newStatus, String observation,
             Signature signature, List<Photo> photos, Long userDocument) throws Exception {
+        updateService.updateStatus(serviceId, newStatus, observation, signature, photos, userDocument);
+    }
+
+    public void updateStatusWithFiles(Long serviceId, Status newStatus, String observation,
+            File signatureFile, List<File> photoFiles, Long userDocument) throws Exception {
+
+        Signature signature = null;
+        if (signatureFile != null) {
+            String path = storagePort.save(signatureFile, "signatures");
+            signature = new Signature();
+            signature.setSignaturePath(path);
+        }
+
+        List<Photo> photos = new java.util.ArrayList<>();
+        if (photoFiles != null && !photoFiles.isEmpty()) {
+            for (File f : photoFiles) {
+                String path = storagePort.save(f, "evidence");
+                Photo p = new Photo();
+                p.setPhotoPath(path);
+                p.setPhotoType(app.domain.model.enums.PhotoType.EVIDENCE);
+                photos.add(p);
+            }
+        }
+
         updateService.updateStatus(serviceId, newStatus, observation, signature, photos, userDocument);
     }
 
