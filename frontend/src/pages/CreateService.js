@@ -52,7 +52,7 @@ function CreateService() {
         ...formData,
         image: file,
       });
-      
+
       // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -108,7 +108,7 @@ function CreateService() {
             >
               <option value="">Select a dealership</option>
               {dealerships.map((dealership) => (
-                <option key={dealership.id} value={dealership.id}>
+                <option key={dealership.idDealership} value={dealership.idDealership}>
                   {dealership.name}
                 </option>
               ))}
@@ -125,11 +125,13 @@ function CreateService() {
               required
             >
               <option value="">Select a messenger</option>
-              {employees.map((employee) => (
-                <option key={employee.id} value={employee.document}>
-                  {employee.name} - {employee.document}
-                </option>
-              ))}
+              {employees
+                .filter((employee) => employee.role === 'MESSENGER')
+                .map((employee) => (
+                  <option key={employee.idEmployee} value={employee.document}>
+                    {employee.fullName}
+                  </option>
+                ))}
             </select>
           </div>
 
