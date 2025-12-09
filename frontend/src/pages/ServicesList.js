@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import SignatureCanvas from 'react-signature-canvas';
 import { Link } from 'react-router-dom';
 import { serviceDeliveryService } from '../services/serviceDeliveryService';
 import './ServicesList.css';
@@ -13,9 +14,15 @@ function ServicesList() {
   const [updateData, setUpdateData] = useState({
     status: '',
     observation: '',
-    signature: null,
+    status: '',
+    observation: '',
     photos: [],
   });
+  const sigCanvas = useRef({});
+
+  const clearSignature = () => {
+    sigCanvas.current.clear();
+  };
 
   const handleUpdateClick = (service) => {
     setUpdatingServiceId(service.idServiceDelivery);
@@ -69,28 +76,29 @@ function ServicesList() {
         formData.append('observation', updateData.observation);
       }
 
-      if (updateData.signature) {
-        formData.append('signature', updateData.signature);
+      if (updateData.status === 'DELIVERED') {
+        if (sigCanvas.current.isEmpty()) {
+          alert('Signature is required for DELIVERED status.');
+          return;
+        }
+        const signatureBlob = await new Promise(resolve => sigCanvas.current.getCanvas().toBlob(resolve, 'image/png'));
+        formData.append('signature', signatureBlob, 'signature.png');
+      } else if (!['CANCELED', 'CANCELLED', 'OBSERVED', 'ASSIGNED'].includes(updateData.status)) {
+        // for other statuses where signature is required
+        if (sigCanvas.current.isEmpty()) {
+          alert('Signature is required.');
+          return;
+        }
+        const signatureBlob = await new Promise(resolve => sigCanvas.current.getCanvas().toBlob(resolve, 'image/png'));
+        formData.append('signature', signatureBlob, 'signature.png');
       }
 
       updateData.photos.forEach((photo) => {
         formData.append('photos', photo);
       });
 
-      // Validation logic matchin backend rules
-      if (['CANCELED', 'CANCELLED', 'OBSERVED', 'ASSIGNED'].includes(updateData.status)) {
-        // No evidence required
-      } else if (updateData.status === 'DELIVERED') {
-        if (!updateData.signature) {
-          alert('Signature is required for DELIVERED status.');
-          return;
-        }
-      } else {
-        // All others (PENDING, FAILED, RETURNED, etc.)
-        if (!updateData.signature) {
-          alert('Signature is required.');
-          return;
-        }
+      // Validation already handled above with canvas check
+      if (!['CANCELED', 'CANCELLED', 'OBSERVED', 'ASSIGNED', 'DELIVERED'].includes(updateData.status)) {
         if (updateData.photos.length === 0) {
           alert('At least one photo is required.');
           return;
@@ -299,12 +307,29 @@ function ServicesList() {
                       {isSignatureRequired() && (
                         <div className="form-group">
                           <label>Signature *</label>
-                          <input
-                            type="file"
-                            name="signature"
-                            onChange={handleFileChange}
-                            accept="image/*"
-                          />
+                          <div style={{ border: '1px solid #ddd', borderRadius: '4px', background: 'white' }}>
+                            <SignatureCanvas
+                              ref={sigCanvas}
+                              penColor='black'
+                              canvasProps={{ width: 300, height: 150, className: 'sigCanvas' }}
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={clearSignature}
+                            style={{
+                              marginTop: '5px',
+                              padding: '5px 10px',
+                              fontSize: '12px',
+                              background: '#f44336',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '3px',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Clear Signature
+                          </button>
                         </div>
                       )}
 

@@ -113,6 +113,22 @@ function ServiceDetail() {
               </div>
             </div>
           )}
+
+          {service.signature && (
+            <div className="detail-row">
+              <span className="label">Signature:</span>
+              <div className="signature-container">
+                <a href={`http://${window.location.hostname}:8080/api/files/${service.signature.signaturePath.split('/').pop()}`} target="_blank" rel="noopener noreferrer">
+                  <img
+                    src={`http://${window.location.hostname}:8080/api/files/${service.signature.signaturePath.split('/').pop()}`}
+                    alt="Signature"
+                    className="signature-image"
+                    style={{ maxHeight: '120px', border: '1px solid #ddd', padding: '5px', backgroundColor: 'white', borderRadius: '4px' }}
+                  />
+                </a>
+              </div>
+            </div>
+          )}
         </div>
 
         {service.history && service.history.length > 0 && (
