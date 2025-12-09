@@ -27,6 +27,7 @@ public class ServiceDeliveryMapper {
         entity.setMessenger(employeeMapper.toEntity(serviceDelivery.getMessenger()));
         entity.setCurrentStatus(serviceDelivery.getCurrentStatus());
         entity.setObservation(serviceDelivery.getObservation());
+        entity.setCreatedAt(serviceDelivery.getCreatedAt());
 
         if (serviceDelivery.getSignature() != null) {
             SignatureEntity sigEntity = new SignatureEntity();
@@ -106,6 +107,8 @@ public class ServiceDeliveryMapper {
                 return history;
             }).collect(Collectors.toList()));
         }
+
+        serviceDelivery.setCreatedAt(entity.getCreatedAt());
 
         return serviceDelivery;
     }

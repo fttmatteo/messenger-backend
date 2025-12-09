@@ -15,6 +15,15 @@ public class ServiceDeliveryResponse {
     private SignatureResponse signature;
     private List<PhotoResponse> photos = new ArrayList<>();
     private List<StatusHistoryResponse> history = new ArrayList<>();
+    private java.time.LocalDateTime createdAt;
+
+    public java.time.LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(java.time.LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
     public ServiceDeliveryResponse() {
     }

@@ -48,14 +48,21 @@ public class ServiceDeliveryController {
 
             imageFile = convertToFile(image);
 
+            // Use manual plate number if provided, otherwise use OCR
             if (manualPlateNumber != null && !manualPlateNumber.isEmpty()) {
-                System.out.println("Placa manual proporcionada como fallback: " + manualPlateNumber);
+                System.out.println("Using manual plate number: " + manualPlateNumber);
+                serviceDeliveryUseCase.createServiceWithManualPlate(
+                        imageFile,
+                        manualPlateNumber,
+                        data.getDealershipId(),
+                        data.getMessengerDocument());
+            } else {
+                System.out.println("Using OCR to detect plate number");
+                serviceDeliveryUseCase.createServiceFromImage(
+                        imageFile,
+                        data.getDealershipId(),
+                        data.getMessengerDocument());
             }
-
-            serviceDeliveryUseCase.createServiceFromImage(
-                    imageFile,
-                    data.getDealershipId(),
-                    data.getMessengerDocument());
 
             return ResponseEntity.status(HttpStatus.CREATED).body("Servicio creado exitosamente.");
         } catch (InputsException | BusinessException e) {

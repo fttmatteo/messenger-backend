@@ -55,6 +55,26 @@ public class ServiceDeliveryUseCase {
         }
     }
 
+    @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
+    public void createServiceWithManualPlate(File imageFile, String manualPlateNumber, Long dealershipId,
+            Long messengerDocument) throws Exception {
+        String timestamp = LocalDateTime.now().format(DATE_FORMAT);
+        String fileName = manualPlateNumber + "_ASSIGNED_" + timestamp;
+
+        String savedPath = storagePort.save(imageFile, "detections", fileName);
+
+        try {
+            createService.create(manualPlateNumber, savedPath, dealershipId, messengerDocument);
+        } catch (Exception e) {
+            try {
+                java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(savedPath));
+            } catch (Exception deleteError) {
+                System.err.println("No se pudo eliminar la imagen: " + deleteError.getMessage());
+            }
+            throw e;
+        }
+    }
+
     public void updateStatus(Long serviceId, Status newStatus, String observation,
             Signature signature, List<Photo> photos, Long userDocument) throws Exception {
         updateService.updateStatus(serviceId, newStatus, observation, signature, photos, userDocument);

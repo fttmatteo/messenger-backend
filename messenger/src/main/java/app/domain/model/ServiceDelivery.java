@@ -95,4 +95,14 @@ public class ServiceDelivery {
     public void setHistory(List<StatusHistory> history) {
         this.history = history;
     }
+
+    private java.time.LocalDateTime createdAt;
+
+    public java.time.LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(java.time.LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }

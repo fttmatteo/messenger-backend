@@ -24,6 +24,7 @@ public class ServiceDeliveryResponseMapper {
         response.setIdServiceDelivery(service.getIdServiceDelivery());
         response.setCurrentStatus(service.getCurrentStatus());
         response.setObservation(service.getObservation());
+        response.setCreatedAt(service.getCreatedAt());
 
         if (service.getPlate() != null) {
             Plate plate = service.getPlate();
