@@ -1,0 +1,50 @@
+.dealerships-list {
+  max-width: 1200px;
+}
+
+.dealerships-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.dealership-card {
+  background: white;
+  border-radius: 8px;
+  padding: 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.dealership-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.dealership-card h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 20px;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 10px;
+}
+
+.dealership-details p {
+  margin: 10px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.dealership-details strong {
+  color: #333;
+}
+
+.no-data {
+  background: white;
+  padding: 40px;
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #999;
+  grid-column: 1 / -1;
+}
