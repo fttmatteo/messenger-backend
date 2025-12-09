@@ -5,7 +5,7 @@ import './Login.css';
 
 function Login() {
   const [credentials, setCredentials] = useState({
-    document: '',
+    userName: '',
     password: '',
   });
   const [error, setError] = useState('');
@@ -41,12 +41,12 @@ function Login() {
         <h2>Login</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="document">Document</label>
+            <label htmlFor="userName">User Name</label>
             <input
               type="text"
-              id="document"
-              name="document"
-              value={credentials.document}
+              id="userName"
+              name="userName"
+              value={credentials.userName}
               onChange={handleChange}
               required
               placeholder="Enter your document number"
