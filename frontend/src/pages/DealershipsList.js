@@ -7,10 +7,14 @@ function DealershipsList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [editingId, setEditingId] = useState(null);
+
   const [newDealership, setNewDealership] = useState({
     name: '',
     address: '',
     phone: '',
+    zone: '',
   });
 
   useEffect(() => {
@@ -38,34 +42,81 @@ function DealershipsList() {
     });
   };
 
+  const handleEdit = (dealership) => {
+    setNewDealership({
+      name: dealership.name,
+      address: dealership.address,
+      phone: dealership.phone,
+      zone: dealership.zone || '',
+    });
+    setEditingId(dealership.idDealership);
+    setShowCreateForm(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this dealership?')) {
+      try {
+        await dealershipService.delete(id);
+        alert('Dealership deleted successfully');
+        loadDealerships();
+      } catch (err) {
+        alert(err.response?.data || 'Failed to delete dealership');
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await dealershipService.create(newDealership);
+      if (editingId) {
+        await dealershipService.update(editingId, newDealership);
+        alert('Dealership updated successfully!');
+      } else {
+        await dealershipService.create(newDealership);
+        alert('Dealership created successfully!');
+      }
       setShowCreateForm(false);
-      setNewDealership({ name: '', address: '', phone: '' });
+      setEditingId(null);
+      setNewDealership({ name: '', address: '', phone: '', zone: '' });
       loadDealerships();
-      alert('Dealership created successfully!');
     } catch (err) {
-      alert(err.response?.data || 'Failed to create dealership');
+      alert(err.response?.data || 'Failed to save dealership');
     }
   };
+
+  const filteredDealerships = dealerships.filter(d =>
+    d.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    d.address.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="dealerships-list">
       <div className="page-header">
         <h1>Dealerships</h1>
-        <button
-          onClick={() => setShowCreateForm(!showCreateForm)}
-          className="btn-primary"
-        >
-          {showCreateForm ? 'Cancel' : 'Create New Dealership'}
-        </button>
+        <div className="header-actions">
+          <input
+            type="text"
+            placeholder="Search dealerships..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+          <button
+            onClick={() => {
+              setShowCreateForm(!showCreateForm);
+              setEditingId(null);
+              setNewDealership({ name: '', address: '', phone: '', zone: '' });
+            }}
+            className="btn-primary"
+          >
+            {showCreateForm ? 'Cancel' : 'Create New Dealership'}
+          </button>
+        </div>
       </div>
 
       {showCreateForm && (
         <div className="create-form">
-          <h2>Create New Dealership</h2>
+          <h2>{editingId ? 'Edit Dealership' : 'Create New Dealership'}</h2>
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Name *</label>
@@ -103,8 +154,19 @@ function DealershipsList() {
               />
             </div>
 
+            <div className="form-group">
+              <label>Zone </label>
+              <input
+                type="text"
+                name="zone"
+                value={newDealership.zone}
+                onChange={handleChange}
+                placeholder="Enter zone"
+              />
+            </div>
+
             <button type="submit" className="btn-primary">
-              Create Dealership
+              {editingId ? 'Update Dealership' : 'Create Dealership'}
             </button>
           </form>
         </div>
@@ -115,11 +177,11 @@ function DealershipsList() {
 
       {!loading && !error && (
         <div className="dealerships-grid">
-          {dealerships.length === 0 ? (
+          {filteredDealerships.length === 0 ? (
             <div className="no-data">No dealerships found</div>
           ) : (
-            dealerships.map((dealership) => (
-              <div key={dealership.id} className="dealership-card">
+            filteredDealerships.map((dealership) => (
+              <div key={dealership.idDealership} className="dealership-card">
                 <h3>{dealership.name}</h3>
                 <div className="dealership-details">
                   <p>
@@ -128,6 +190,13 @@ function DealershipsList() {
                   <p>
                     <strong>Phone:</strong> {dealership.phone}
                   </p>
+                  <p>
+                    <strong>Zone:</strong> {dealership.zone || 'N/A'}
+                  </p>
+                </div>
+                <div className="card-actions">
+                  <button onClick={() => handleEdit(dealership)} className="btn-small edit-btn">Edit</button>
+                  <button onClick={() => handleDelete(dealership.idDealership)} className="btn-small delete-btn">Delete</button>
                 </div>
               </div>
             ))

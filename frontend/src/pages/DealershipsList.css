@@ -2,6 +2,51 @@
   max-width: 1200px;
 }
 
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.search-input {
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 25px;
+  width: 300px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  width: 320px;
+}
+
+.create-form {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+}
+
+.create-form h2 {
+  margin: 0 0 20px 0;
+  color: #333;
+  font-size: 20px;
+}
+
 .dealerships-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -14,29 +59,46 @@
   padding: 25px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
 }
 
 .dealership-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
 .dealership-card h3 {
   margin: 0 0 15px 0;
   color: #333;
-  font-size: 20px;
-  border-bottom: 2px solid #667eea;
-  padding-bottom: 10px;
+  font-size: 18px;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 12px;
+}
+
+.dealership-details {
+  flex-grow: 1;
 }
 
 .dealership-details p {
-  margin: 10px 0;
+  margin: 8px 0;
   color: #666;
   font-size: 14px;
+  line-height: 1.5;
 }
 
 .dealership-details strong {
   color: #333;
+  margin-right: 5px;
+}
+
+.card-actions {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 .no-data {
@@ -47,4 +109,36 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   color: #999;
   grid-column: 1 / -1;
+}
+
+/* Button styles matching EmployeesList to keep consistency */
+.btn-small {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-btn {
+  background-color: #fff8e1 !important;
+  /* Force override inline styles if any */
+  color: #ffa000 !important;
+  border: 1px solid #ffe082 !important;
+}
+
+.edit-btn:hover {
+  background-color: #ffecb3 !important;
+}
+
+.delete-btn {
+  background-color: #ffebee !important;
+  color: #d32f2f !important;
+  border: 1px solid #ef9a9a !important;
+}
+
+.delete-btn:hover {
+  background-color: #ffcdd2 !important;
 }

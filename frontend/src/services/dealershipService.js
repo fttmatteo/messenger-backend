@@ -15,4 +15,14 @@ export const dealershipService = {
     const response = await api.get(`/dealerships/${id}`);
     return response.data;
   },
+
+  update: async (id, dealership) => {
+    const response = await api.put(`/dealerships/${id}`, dealership);
+    return response.data;
+  },
+
+  delete: async (id) => {
+    const response = await api.delete(`/dealerships/${id}`);
+    return response.data;
+  },
 };

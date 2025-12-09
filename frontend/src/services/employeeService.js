@@ -15,4 +15,14 @@ export const employeeService = {
     const response = await api.get(`/employees/${id}`);
     return response.data;
   },
+
+  update: async (id, employee) => {
+    const response = await api.put(`/employees/${id}`, employee);
+    return response.data;
+  },
+
+  delete: async (id) => {
+    const response = await api.delete(`/employees/${id}`);
+    return response.data;
+  },
 };
