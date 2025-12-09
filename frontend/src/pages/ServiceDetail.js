@@ -149,6 +149,22 @@ function ServiceDetail() {
             <span className="label">Zone:</span>
             <span>{service.dealership?.zone || 'N/A'}</span>
           </div>
+          {service.photos && service.photos.length > 0 && (
+            <div className="detail-row service-photos">
+              <span className="label">Service Photos:</span>
+              <div className="photos-grid">
+                {service.photos.map(photo => (
+                  <a key={photo.idPhoto} href={`http://localhost:8080/api/files/${photo.photoPath.split('/').pop()}`} target="_blank" rel="noopener noreferrer">
+                    <img
+                      src={`http://localhost:8080/api/files/${photo.photoPath.split('/').pop()}`}
+                      alt="Service photo"
+                      className="history-photo-thumbnail"
+                    />
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {service.history && service.history.length > 0 && (
