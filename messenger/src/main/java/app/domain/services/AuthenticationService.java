@@ -39,7 +39,7 @@ public class AuthenticationService {
                 throw new BusinessException("Contrasena incorrecta");
             }
         }
-        return authenticationPort.authenticate(credentials, employee.getRole().name());
+        return authenticationPort.authenticate(credentials, String.valueOf(employee.getRole()));
     }
 
     private boolean isPasswordEncoded(String storedPassword) {

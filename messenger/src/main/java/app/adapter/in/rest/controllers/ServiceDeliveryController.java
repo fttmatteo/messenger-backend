@@ -36,13 +36,24 @@ public class ServiceDeliveryController {
     public ResponseEntity<?> createService(
             @RequestParam("image") MultipartFile image,
             @RequestParam("dealershipId") String dealershipId,
-            @RequestParam("messengerDocument") String messengerDocument) {
+            @RequestParam("messengerDocument") String messengerDocument,
+            @RequestParam(value = "manualPlateNumber", required = false) String manualPlateNumber) {
         try {
             ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest(dealershipId, messengerDocument);
+            request.setManualPlateNumber(manualPlateNumber); // NUEVO: Parámetro opcional
+
             ServiceDeliveryBuilder.ServiceDeliveryCreateData data = builder.buildCreateData(request);
 
             File imageFile = convertToFile(image);
-            serviceDeliveryUseCase.createServiceFromImage(imageFile, data.getDealershipId(),
+
+            // NUEVO: Log si se proporciona placa manual como fallback
+            if (manualPlateNumber != null && !manualPlateNumber.isEmpty()) {
+                System.out.println("Placa manual proporcionada como fallback: " + manualPlateNumber);
+            }
+
+            serviceDeliveryUseCase.createServiceFromImage(
+                    imageFile,
+                    data.getDealershipId(),
                     data.getMessengerDocument());
 
             return ResponseEntity.status(HttpStatus.CREATED).body("Servicio creado exitosamente.");
