@@ -1,6 +1,8 @@
 package app.adapter.in.validators;
 
 import app.application.exceptions.InputsException;
+import app.domain.model.enums.Role;
+
 import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Component;
@@ -56,5 +58,14 @@ public class EmployeeValidator extends SimpleValidator {
             throw new InputsException("la contraseña debe contener al menos un carácter especial");
         }
         return value;
+    }
+
+    public Role roleValidator(String value) throws InputsException {
+        stringValidator("rol", value);
+        try {
+            return Role.valueOf(value.toUpperCase().trim());
+        } catch (IllegalArgumentException e) {
+            throw new InputsException("Rol inválido. Debe ser ADMIN o MESSENGER");
+        }
     }
 }
