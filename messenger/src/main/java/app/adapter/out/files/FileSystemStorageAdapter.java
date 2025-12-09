@@ -20,6 +20,25 @@ public class FileSystemStorageAdapter implements StoragePort {
 
     @Override
     public String save(File file, String subDirectory) throws IOException {
+        // Generate unique filename using UUID
+        String originalName = file.getName();
+        String extension = getExtension(originalName);
+        String fileName = UUID.randomUUID().toString() + extension;
+
+        return saveWithFileName(file, subDirectory, fileName);
+    }
+
+    @Override
+    public String save(File file, String subDirectory, String customFileName) throws IOException {
+        // Use custom filename provided
+        String originalName = file.getName();
+        String extension = getExtension(originalName);
+        String fileName = customFileName + extension;
+
+        return saveWithFileName(file, subDirectory, fileName);
+    }
+
+    private String saveWithFileName(File file, String subDirectory, String fileName) throws IOException {
         Path rootLocation = Paths.get(storageLocation);
         Path targetDir = rootLocation.resolve(subDirectory);
 
@@ -27,19 +46,18 @@ public class FileSystemStorageAdapter implements StoragePort {
             Files.createDirectories(targetDir);
         }
 
-        // Generate unique filename to avoid collisions
-        String originalName = file.getName();
-        String extension = "";
-        int i = originalName.lastIndexOf('.');
-        if (i > 0) {
-            extension = originalName.substring(i);
-        }
-        String fileName = UUID.randomUUID().toString() + extension;
-
         Path targetPath = targetDir.resolve(fileName);
         Files.copy(file.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
 
         return targetPath.toString();
+    }
+
+    private String getExtension(String fileName) {
+        int i = fileName.lastIndexOf('.');
+        if (i > 0) {
+            return fileName.substring(i);
+        }
+        return "";
     }
 
     @Override

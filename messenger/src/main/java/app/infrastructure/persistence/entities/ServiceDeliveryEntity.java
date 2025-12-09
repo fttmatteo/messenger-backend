@@ -14,7 +14,7 @@ public class ServiceDeliveryEntity {
     @Column(name = "id_service_delivery")
     private Long idServiceDelivery;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "plate_id", nullable = false)
     private PlateEntity plate;
 

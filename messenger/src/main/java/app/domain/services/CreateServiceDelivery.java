@@ -50,8 +50,8 @@ public class CreateServiceDelivery {
             plate.setPlateNumber(normalizedPlate);
             plate.setPlateType(plateRecognition.determinePlateType(normalizedPlate));
             plate.setUploadDate(LocalDateTime.now());
-            // Nota: La entidad Plate representa el vehículo en general.
-            // La foto específica de ESTA detección se guarda en el servicio.
+            // Guardar la placa nueva antes de asociarla al servicio
+            platePort.save(plate);
         }
 
         ServiceDelivery service = new ServiceDelivery();

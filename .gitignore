@@ -28,3 +28,8 @@ replay_pid*
 
 # McOS
 **/.DS_Store
+
+# Google Cloud Credentials
+config/google-vision-credentials.json
+*.json
+!package*.json

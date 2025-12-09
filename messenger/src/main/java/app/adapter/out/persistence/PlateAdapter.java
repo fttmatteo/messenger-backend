@@ -21,6 +21,13 @@ public class PlateAdapter implements PlatePort {
     private PlateMapper mapper;
 
     @Override
+    public void save(Plate plate) {
+        PlateEntity entity = mapper.toEntity(plate);
+        PlateEntity savedEntity = repository.save(entity);
+        plate.setIdPlate(savedEntity.getIdPlate());
+    }
+
+    @Override
     public Plate findById(Long id) {
         Optional<PlateEntity> entity = repository.findById(id);
         if (entity.isPresent()) {

@@ -1,6 +1,8 @@
 package app.application.usecase;
 
 import java.io.File;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,8 @@ import app.domain.services.UpdateServiceDelivery;
 @Service
 public class ServiceDeliveryUseCase {
 
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+
     @Autowired
     private CreateServiceDelivery createService;
     @Autowired
@@ -34,11 +38,16 @@ public class ServiceDeliveryUseCase {
     private OcrPort ocrPort;
 
     public void createServiceFromImage(File imageFile, Long dealershipId, Long messengerDocument) throws Exception {
-        String savedPath = storagePort.save(imageFile, "detections");
-        // Usamos el archivo guardado para el OCR para asegurar consistencia
-        File savedFile = storagePort.get(savedPath);
+        // Primero extraemos el texto para obtener el número de placa
+        String extractedText = ocrPort.extractText(imageFile);
 
-        String extractedText = ocrPort.extractText(savedFile);
+        // Generamos nombre: PLACA_FECHA.ext (ej: COZ92E_20231209_143052.jpeg)
+        String timestamp = LocalDateTime.now().format(DATE_FORMAT);
+        String fileName = extractedText + "_" + timestamp;
+
+        // Guardamos con nombre personalizado
+        String savedPath = storagePort.save(imageFile, "detections", fileName);
+
         createService.create(extractedText, savedPath, dealershipId, messengerDocument);
     }
 
@@ -52,21 +61,28 @@ public class ServiceDeliveryUseCase {
     public void updateStatusWithFiles(Long serviceId, Status newStatus, String observation,
             File signatureFile, List<File> photoFiles, Long userDocument) throws Exception {
 
+        String timestamp = LocalDateTime.now().format(DATE_FORMAT);
+
         Signature signature = null;
         if (signatureFile != null) {
-            String path = storagePort.save(signatureFile, "signatures");
+            String signatureFileName = "signature_" + timestamp;
+            String path = storagePort.save(signatureFile, "signatures", signatureFileName);
             signature = new Signature();
             signature.setSignaturePath(path);
         }
 
         List<Photo> photos = new java.util.ArrayList<>();
         if (photoFiles != null && !photoFiles.isEmpty()) {
+            int count = 1;
             for (File f : photoFiles) {
-                String path = storagePort.save(f, "evidence");
+                // Nombre: evidence_FECHA_N.ext (ej: evidence_20231209_143052_1.jpeg)
+                String evidenceFileName = "evidence_" + timestamp + "_" + count;
+                String path = storagePort.save(f, "evidence", evidenceFileName);
                 Photo p = new Photo();
                 p.setPhotoPath(path);
                 p.setPhotoType(app.domain.model.enums.PhotoType.EVIDENCE);
                 photos.add(p);
+                count++;
             }
         }
 
