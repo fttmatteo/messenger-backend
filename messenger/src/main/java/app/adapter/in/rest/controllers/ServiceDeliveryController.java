@@ -183,7 +183,7 @@ public class ServiceDeliveryController {
         List<ServiceDelivery> services;
 
         if (currentUser != null && currentUser.getRole() == app.domain.model.enums.Role.MESSENGER) {
-            services = serviceDeliveryUseCase.findByMessenger(currentUser.getIdEmployee());
+            services = serviceDeliveryUseCase.findByMessenger(currentUser.getDocument());
         } else {
             services = serviceDeliveryUseCase.findAll();
         }
