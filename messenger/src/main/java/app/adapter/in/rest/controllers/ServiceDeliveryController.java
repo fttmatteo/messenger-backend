@@ -38,15 +38,16 @@ public class ServiceDeliveryController {
             @RequestParam("dealershipId") String dealershipId,
             @RequestParam("messengerDocument") String messengerDocument,
             @RequestParam(value = "manualPlateNumber", required = false) String manualPlateNumber) {
+
+        File imageFile = null;
         try {
             ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest(dealershipId, messengerDocument);
-            request.setManualPlateNumber(manualPlateNumber); // NUEVO: Parámetro opcional
+            request.setManualPlateNumber(manualPlateNumber);
 
             ServiceDeliveryBuilder.ServiceDeliveryCreateData data = builder.buildCreateData(request);
 
-            File imageFile = convertToFile(image);
+            imageFile = convertToFile(image);
 
-            // NUEVO: Log si se proporciona placa manual como fallback
             if (manualPlateNumber != null && !manualPlateNumber.isEmpty()) {
                 System.out.println("Placa manual proporcionada como fallback: " + manualPlateNumber);
             }
@@ -61,6 +62,10 @@ public class ServiceDeliveryController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno: " + e.getMessage());
+        } finally {
+            if (imageFile != null && imageFile.exists()) {
+                imageFile.delete();
+            }
         }
     }
 
@@ -160,8 +165,60 @@ public class ServiceDeliveryController {
     }
 
     private File convertToFile(MultipartFile multipartFile) throws IOException {
-        // Create a temp file
-        File tempFile = File.createTempFile("upload-", multipartFile.getOriginalFilename());
+        String originalName = multipartFile.getOriginalFilename();
+        String extension = "";
+
+        if (originalName != null && originalName.contains(".")) {
+            extension = originalName.substring(originalName.lastIndexOf("."));
+        }
+
+        if (extension.isEmpty()) {
+            String contentType = multipartFile.getContentType();
+            if (contentType != null) {
+                switch (contentType) {
+                    case "image/jpeg":
+                    case "image/jpg":
+                        extension = ".jpeg";
+                        break;
+                    case "image/png":
+                        extension = ".png";
+                        break;
+                    case "application/pdf":
+                        extension = ".pdf";
+                        break;
+                }
+            }
+        }
+
+        if (extension.isEmpty() || ".bin".equals(extension)) {
+            try (java.io.InputStream is = multipartFile.getInputStream()) {
+                byte[] header = new byte[8];
+                int read = is.read(header);
+                if (read >= 4) {
+                    if (header[0] == (byte) 0x89 && header[1] == (byte) 0x50 &&
+                            header[2] == (byte) 0x4E && header[3] == (byte) 0x47) {
+                        extension = ".png";
+                    } else if (header[0] == (byte) 0xFF && header[1] == (byte) 0xD8 && header[2] == (byte) 0xFF) {
+                        extension = ".jpeg";
+                    } else if (header[0] == (byte) 0x25 && header[1] == (byte) 0x50 &&
+                            header[2] == (byte) 0x44 && header[3] == (byte) 0x46) {
+                        extension = ".pdf";
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Error detecting extension from bytes: " + e.getMessage());
+            }
+        }
+
+        if (extension.isEmpty()) {
+            extension = ".tmp";
+        }
+
+        System.out.println("DEBUG: Incoming file: " + originalName);
+        System.out.println("DEBUG: Content-Type: " + multipartFile.getContentType());
+        System.out.println("DEBUG: Final Extension: " + extension);
+
+        File tempFile = File.createTempFile("upload-", extension);
         multipartFile.transferTo(tempFile);
         return tempFile;
     }

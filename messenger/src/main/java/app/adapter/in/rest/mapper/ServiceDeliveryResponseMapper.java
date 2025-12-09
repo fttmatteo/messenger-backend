@@ -12,7 +12,6 @@ public class ServiceDeliveryResponseMapper {
 
     @Autowired
     private EmployeeResponseMapper employeeMapper;
-
     @Autowired
     private DealershipResponseMapper dealershipMapper;
 
@@ -26,7 +25,6 @@ public class ServiceDeliveryResponseMapper {
         response.setCurrentStatus(service.getCurrentStatus());
         response.setObservation(service.getObservation());
 
-        // Map Plate
         if (service.getPlate() != null) {
             Plate plate = service.getPlate();
             response.setPlate(new ServiceDeliveryResponse.PlateResponse(
@@ -35,13 +33,10 @@ public class ServiceDeliveryResponseMapper {
                     plate.getPlateType()));
         }
 
-        // Map Dealership
         response.setDealership(dealershipMapper.toResponse(service.getDealership()));
 
-        // Map Messenger
         response.setMessenger(employeeMapper.toResponse(service.getMessenger()));
 
-        // Map Signature
         if (service.getSignature() != null) {
             Signature sig = service.getSignature();
             response.setSignature(new SignatureResponse(
@@ -50,7 +45,6 @@ public class ServiceDeliveryResponseMapper {
                     sig.getUploadDate()));
         }
 
-        // Map Photos
         if (service.getPhotos() != null) {
             response.setPhotos(service.getPhotos().stream()
                     .map(p -> new PhotoResponse(
@@ -61,7 +55,6 @@ public class ServiceDeliveryResponseMapper {
                     .collect(Collectors.toList()));
         }
 
-        // Map History
         if (service.getHistory() != null) {
             response.setHistory(service.getHistory().stream()
                     .map(h -> new StatusHistoryResponse(

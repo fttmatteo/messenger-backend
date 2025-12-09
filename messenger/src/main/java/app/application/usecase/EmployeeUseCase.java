@@ -1,10 +1,8 @@
 package app.application.usecase;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import app.domain.model.Employee;
 import app.domain.services.CreateEmployee;
 import app.domain.services.DeleteEmployee;

@@ -5,7 +5,6 @@ import app.domain.ports.PlatePort;
 import app.infrastructure.persistence.entities.PlateEntity;
 import app.infrastructure.persistence.mapper.PlateMapper;
 import app.infrastructure.persistence.repository.PlateRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.List;

@@ -38,6 +38,8 @@ public class UpdateServiceDelivery {
 
         Status previousStatus = service.getCurrentStatus();
 
+        validateStateTransition(previousStatus, newStatus, user.getRole());
+
         if (newStatus == Status.CANCELED || newStatus == Status.OBSERVED) {
             if (!Role.ADMIN.equals(user.getRole())) {
                 throw new BusinessException("Solo el administrador puede cambiar el estado a " + newStatus);
@@ -91,6 +93,14 @@ public class UpdateServiceDelivery {
             if (observation == null || observation.trim().isEmpty()) {
                 throw new BusinessException("Para el estado " + status + " la observación es obligatoria.");
             }
+        }
+    }
+
+    private void validateStateTransition(Status currentStatus, Status newStatus, Role userRole)
+            throws BusinessException {
+
+        if (currentStatus == newStatus) {
+            throw new BusinessException("El servicio ya se encuentra en estado " + currentStatus);
         }
     }
 }

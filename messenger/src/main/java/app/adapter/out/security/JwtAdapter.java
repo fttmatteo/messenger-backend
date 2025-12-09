@@ -3,12 +3,10 @@ package app.adapter.out.security;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import app.domain.model.auth.AuthCredentials;
 import app.domain.model.auth.TokenResponse;
 import app.domain.ports.AuthenticationPort;

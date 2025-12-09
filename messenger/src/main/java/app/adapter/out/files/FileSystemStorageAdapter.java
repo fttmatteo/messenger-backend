@@ -20,7 +20,6 @@ public class FileSystemStorageAdapter implements StoragePort {
 
     @Override
     public String save(File file, String subDirectory) throws IOException {
-        // Generate unique filename using UUID
         String originalName = file.getName();
         String extension = getExtension(originalName);
         String fileName = UUID.randomUUID().toString() + extension;
@@ -30,7 +29,6 @@ public class FileSystemStorageAdapter implements StoragePort {
 
     @Override
     public String save(File file, String subDirectory, String customFileName) throws IOException {
-        // Use custom filename provided
         String originalName = file.getName();
         String extension = getExtension(originalName);
         String fileName = customFileName + extension;

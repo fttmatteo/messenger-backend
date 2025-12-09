@@ -3,7 +3,7 @@ package app.adapter.in.rest.request;
 public class ServiceDeliveryCreateRequest {
     private String dealershipId;
     private String messengerDocument;
-    private String manualPlateNumber; // NUEVO: Fallback si OCR falla
+    private String manualPlateNumber;
 
     public ServiceDeliveryCreateRequest() {
     }

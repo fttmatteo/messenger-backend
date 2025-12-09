@@ -4,10 +4,8 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import app.domain.model.Photo;
 import app.domain.model.ServiceDelivery;
 import app.domain.model.Signature;
@@ -37,22 +35,26 @@ public class ServiceDeliveryUseCase {
     @Autowired
     private OcrPort ocrPort;
 
+    @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
     public void createServiceFromImage(File imageFile, Long dealershipId, Long messengerDocument) throws Exception {
-        // Primero extraemos el texto para obtener el número de placa
         String extractedText = ocrPort.extractText(imageFile);
-
-        // Generamos nombre: PLACA_FECHA.ext (ej: COZ92E_20231209_143052.jpeg)
         String timestamp = LocalDateTime.now().format(DATE_FORMAT);
-        String fileName = extractedText + "_" + timestamp;
+        String fileName = extractedText + "_ASSIGNED_" + timestamp;
 
-        // Guardamos con nombre personalizado
         String savedPath = storagePort.save(imageFile, "detections", fileName);
 
-        createService.create(extractedText, savedPath, dealershipId, messengerDocument);
+        try {
+            createService.create(extractedText, savedPath, dealershipId, messengerDocument);
+        } catch (Exception e) {
+            try {
+                java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(savedPath));
+            } catch (Exception deleteError) {
+                System.err.println("No se pudo eliminar la imagen: " + deleteError.getMessage());
+            }
+            throw e;
+        }
     }
 
-    // Mantenemos este método para compatibilidad interna o tests, pero agregamos el
-    // que maneja Archivos
     public void updateStatus(Long serviceId, Status newStatus, String observation,
             Signature signature, List<Photo> photos, Long userDocument) throws Exception {
         updateService.updateStatus(serviceId, newStatus, observation, signature, photos, userDocument);
@@ -61,12 +63,21 @@ public class ServiceDeliveryUseCase {
     public void updateStatusWithFiles(Long serviceId, Status newStatus, String observation,
             File signatureFile, List<File> photoFiles, Long userDocument) throws Exception {
 
+        ServiceDelivery service = searchService.findById(serviceId);
+        if (service == null) {
+            throw new Exception("Servicio no encontrado con ID: " + serviceId);
+        }
+        String plateNumber = service.getPlate().getPlateNumber();
+
         String timestamp = LocalDateTime.now().format(DATE_FORMAT);
+
+        List<String> savedPaths = new java.util.ArrayList<>();
 
         Signature signature = null;
         if (signatureFile != null) {
-            String signatureFileName = "signature_" + timestamp;
+            String signatureFileName = "signature_" + plateNumber + "_" + newStatus.name() + "_" + timestamp;
             String path = storagePort.save(signatureFile, "signatures", signatureFileName);
+            savedPaths.add(path);
             signature = new Signature();
             signature.setSignaturePath(path);
         }
@@ -75,9 +86,10 @@ public class ServiceDeliveryUseCase {
         if (photoFiles != null && !photoFiles.isEmpty()) {
             int count = 1;
             for (File f : photoFiles) {
-                // Nombre: evidence_FECHA_N.ext (ej: evidence_20231209_143052_1.jpeg)
-                String evidenceFileName = "evidence_" + timestamp + "_" + count;
+                String evidenceFileName = "evidence_" + plateNumber + "_" + newStatus.name() + "_" + timestamp + "_"
+                        + count;
                 String path = storagePort.save(f, "evidence", evidenceFileName);
+                savedPaths.add(path);
                 Photo p = new Photo();
                 p.setPhotoPath(path);
                 p.setPhotoType(app.domain.model.enums.PhotoType.EVIDENCE);
@@ -86,7 +98,18 @@ public class ServiceDeliveryUseCase {
             }
         }
 
-        updateService.updateStatus(serviceId, newStatus, observation, signature, photos, userDocument);
+        try {
+            updateService.updateStatus(serviceId, newStatus, observation, signature, photos, userDocument);
+        } catch (Exception e) {
+            for (String path : savedPaths) {
+                try {
+                    java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(path));
+                } catch (Exception deleteError) {
+                    System.err.println("No se pudo eliminar archivo: " + deleteError.getMessage());
+                }
+            }
+            throw e;
+        }
     }
 
     public ServiceDelivery findById(Long id) throws Exception {

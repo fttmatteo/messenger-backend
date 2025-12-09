@@ -50,7 +50,6 @@ public class CreateServiceDelivery {
             plate.setPlateNumber(normalizedPlate);
             plate.setPlateType(plateRecognition.determinePlateType(normalizedPlate));
             plate.setUploadDate(LocalDateTime.now());
-            // Guardar la placa nueva antes de asociarla al servicio
             platePort.save(plate);
         }
 
@@ -61,7 +60,6 @@ public class CreateServiceDelivery {
         service.setCurrentStatus(Status.ASSIGNED);
         service.setObservation(null);
 
-        // Guardar la foto de detección
         if (photoPath != null) {
             Photo detectionPhoto = new Photo();
             detectionPhoto.setPhotoPath(photoPath);

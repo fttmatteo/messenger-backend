@@ -9,11 +9,8 @@ import java.util.regex.Pattern;
 @Service
 public class PlateRecognition {
 
-    // Carro: 3 letras + (espacio opcional) + 3 números
     private static final Pattern CAR_PATTERN = Pattern.compile("^[A-Z]{3}\\s*\\d{3}$");
-    // Moto: 3 letras + (espacio opcional) + 2 números + 1 letra
     private static final Pattern MOTO_PATTERN = Pattern.compile("^[A-Z]{3}\\s*\\d{2}[A-Z]$");
-    // Motocarro: 3 números + (espacio opcional) + 3 letras
     private static final Pattern MOTOCARRO_PATTERN = Pattern.compile("^\\d{3}\\s*[A-Z]{3}$");
 
     public PlateType determinePlateType(String plateNumber) throws BusinessException {
@@ -38,11 +35,11 @@ public class PlateRecognition {
     public String formatPlateForStorage(String plateNumber, PlateType type) {
         String clean = plateNumber.replaceAll("\\s+", "").toUpperCase();
         switch (type) {
-            case CAR: // ABC123 -> ABC 123
+            case CAR:
                 return clean.substring(0, 3) + " " + clean.substring(3);
-            case MOTORCYCLE: // ABC12A -> ABC 12A
+            case MOTORCYCLE:
                 return clean.substring(0, 3) + " " + clean.substring(3);
-            case MOTORCAR: // 123ABC -> 123 ABC
+            case MOTORCAR:
                 return clean.substring(0, 3) + " " + clean.substring(3);
             default:
                 return clean;

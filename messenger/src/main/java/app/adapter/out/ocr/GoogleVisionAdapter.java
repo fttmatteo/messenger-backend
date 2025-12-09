@@ -47,24 +47,18 @@ public class GoogleVisionAdapter implements OcrPort {
             System.out.println("Archivo entrada: " + imageFile.getAbsolutePath());
             System.out.println("Credenciales: " + credentialsPath);
 
-            // Lee la imagen como bytes
             ByteString imgBytes = ByteString.readFrom(new FileInputStream(imageFile));
 
-            // Construye la imagen
             Image img = Image.newBuilder().setContent(imgBytes).build();
 
-            // Configura la detección de texto
             Feature feat = Feature.newBuilder()
                     .setType(Feature.Type.TEXT_DETECTION)
                     .build();
 
-            // Crea la solicitud
             AnnotateImageRequest request = AnnotateImageRequest.newBuilder()
                     .addFeatures(feat)
                     .setImage(img)
                     .build();
-
-            // Ejecuta la detección con credenciales explícitas
             try (ImageAnnotatorClient client = createClient()) {
                 BatchAnnotateImagesResponse response = client.batchAnnotateImages(List.of(request));
                 AnnotateImageResponse res = response.getResponses(0);
@@ -76,7 +70,6 @@ public class GoogleVisionAdapter implements OcrPort {
                 String rawText = res.getFullTextAnnotation().getText();
                 System.out.println("Texto OCR detectado: '" + rawText + "'");
 
-                // Limpiar y validar formato de placa colombiana
                 String cleanedPlate = cleanPlateNumber(rawText);
                 boolean isValid = validatePlateFormat(cleanedPlate);
 
