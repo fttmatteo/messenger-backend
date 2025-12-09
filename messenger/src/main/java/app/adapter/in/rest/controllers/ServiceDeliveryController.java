@@ -76,17 +76,30 @@ public class ServiceDeliveryController {
         }
     }
 
+    @Autowired
+    private app.domain.ports.EmployeePort employeePort;
+
     @PutMapping("/{id}/status")
     public ResponseEntity<?> updateStatus(
             @PathVariable Long id,
             @RequestParam("status") String status,
             @RequestParam(value = "observation", required = false) String observation,
             @RequestParam(value = "signature", required = false) MultipartFile signature,
-            @RequestParam(value = "photos", required = false) List<MultipartFile> photos,
-            @RequestParam("userDocument") String userDocument) {
+            @RequestParam(value = "photos", required = false) List<MultipartFile> photos) {
 
         List<File> tempFiles = new ArrayList<>();
         try {
+            org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
+                    .getContext().getAuthentication();
+            String currentUserName = auth.getName();
+            app.domain.model.Employee currentUser = employeePort.findByUserName(currentUserName);
+
+            if (currentUser == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User authentication not found or invalid.");
+            }
+
+            String userDocument = String.valueOf(currentUser.getDocument());
+
             ServiceDeliveryUpdateStatusRequest request = new ServiceDeliveryUpdateStatusRequest(status, observation,
                     userDocument);
             ServiceDeliveryBuilder.ServiceDeliveryUpdateData data = builder.buildUpdateStatusData(request);

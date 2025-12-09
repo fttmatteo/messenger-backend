@@ -15,7 +15,7 @@ function ServiceDetail() {
     observation: '',
     signature: null,
     photos: [],
-    userDocument: '',
+    photos: [],
   });
 
   const loadService = async () => {
@@ -58,7 +58,7 @@ function ServiceDetail() {
     try {
       const formData = new FormData();
       formData.append('status', updateData.status);
-      formData.append('userDocument', updateData.userDocument);
+
 
       if (updateData.observation) {
         formData.append('observation', updateData.observation);
@@ -197,18 +197,6 @@ function ServiceDetail() {
                   <option value="DELIVERED">Delivered</option>
                   <option value="CANCELLED">Cancelled</option>
                 </select>
-              </div>
-
-              <div className="form-group">
-                <label>User Document *</label>
-                <input
-                  type="text"
-                  name="userDocument"
-                  value={updateData.userDocument}
-                  onChange={handleUpdateChange}
-                  required
-                  placeholder="Enter your document number"
-                />
               </div>
 
               <div className="form-group">
