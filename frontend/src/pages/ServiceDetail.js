@@ -100,9 +100,9 @@ function ServiceDetail() {
               <span className="label">Service Photos:</span>
               <div className="photos-grid">
                 {service.photos.map(photo => (
-                  <a key={photo.idPhoto} href={`http://localhost:8080/api/files/${photo.photoPath.split('/').pop()}`} target="_blank" rel="noopener noreferrer">
+                  <a key={photo.idPhoto} href={`http://${window.location.hostname}:8080/api/files/${photo.photoPath.split('/').pop()}`} target="_blank" rel="noopener noreferrer">
                     <img
-                      src={`http://localhost:8080/api/files/${photo.photoPath.split('/').pop()}`}
+                      src={`http://${window.location.hostname}:8080/api/files/${photo.photoPath.split('/').pop()}`}
                       alt="Service photo"
                       className="history-photo-thumbnail"
                     />
@@ -130,9 +130,9 @@ function ServiceDetail() {
                         <p><strong>Evidence Photos:</strong></p>
                         <div className="photos-grid">
                           {history.photos.map(photo => (
-                            <a key={photo.idPhoto} href={`http://localhost:8080/api/files/${photo.photoPath.split('/').pop()}`} target="_blank" rel="noopener noreferrer">
+                            <a key={photo.idPhoto} href={`http://${window.location.hostname}:8080/api/files/${photo.photoPath.split('/').pop()}`} target="_blank" rel="noopener noreferrer">
                               <img
-                                src={`http://localhost:8080/api/files/${photo.photoPath.split('/').pop()}`}
+                                src={`http://${window.location.hostname}:8080/api/files/${photo.photoPath.split('/').pop()}`}
                                 alt="Status evidence"
                                 className="history-photo-thumbnail"
                               />

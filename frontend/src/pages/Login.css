@@ -1,14 +1,17 @@
+/* Mobile-first Login styles */
+
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  padding: 15px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .login-box {
   background: white;
-  padding: 40px;
+  padding: 25px;
   border-radius: 10px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   width: 100%;
@@ -18,20 +21,20 @@
 .login-box h1 {
   text-align: center;
   color: #667eea;
-  margin-bottom: 10px;
-  font-size: 28px;
+  margin-bottom: 8px;
+  font-size: 24px;
 }
 
 .login-box h2 {
   text-align: center;
   color: #333;
-  margin-bottom: 30px;
-  font-size: 20px;
+  margin-bottom: 25px;
+  font-size: 16px;
   font-weight: normal;
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .form-group label {
@@ -39,14 +42,16 @@
   margin-bottom: 8px;
   color: #555;
   font-weight: 500;
+  font-size: 14px;
 }
 
 .form-group input {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   border: 1px solid #ddd;
   border-radius: 5px;
-  font-size: 14px;
+  font-size: 16px;
+  /* Prevents zoom on iOS */
   box-sizing: border-box;
   transition: border-color 0.3s;
 }
@@ -59,7 +64,7 @@
 .error-message {
   background-color: #fee;
   color: #c33;
-  padding: 10px;
+  padding: 12px;
   border-radius: 5px;
   margin-bottom: 15px;
   font-size: 14px;
@@ -67,7 +72,7 @@
 
 button[type="submit"] {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
@@ -87,4 +92,32 @@ button[type="submit"]:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+}
+
+/* ========================================
+   Desktop styles (768px and up)
+   ======================================== */
+@media (min-width: 768px) {
+  .login-box {
+    padding: 40px;
+  }
+
+  .login-box h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
+
+  .login-box h2 {
+    font-size: 20px;
+    margin-bottom: 30px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group input {
+    padding: 12px;
+    font-size: 14px;
+  }
 }

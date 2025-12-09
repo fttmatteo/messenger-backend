@@ -49,7 +49,8 @@ public class SecurityConfig {
                 "http://localhost:3000", // React
                 "http://localhost:4200", // Angular
                 "http://localhost:8080",
-                "http://localhost:5173" // Vite
+                "http://localhost:5173", // Vite
+                "http://192.168.40.25:3000" // Mobile Access (Current Network IP)
         ));
 
         // Métodos HTTP permitidos

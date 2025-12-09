@@ -1,27 +1,33 @@
+/* Mobile-first ServicesList styles */
+
 .services-list {
   max-width: 1200px;
 }
 
 .page-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
 }
 
 .page-header h1 {
   margin: 0;
   color: #333;
-  font-size: 28px;
+  font-size: 22px;
 }
 
 .btn-primary {
-  padding: 12px 24px;
+  padding: 14px 24px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   text-decoration: none;
   border-radius: 5px;
   font-weight: 600;
+  font-size: 16px;
+  text-align: center;
+  border: none;
+  cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -32,30 +38,32 @@
 
 .filter-section {
   background: white;
-  padding: 20px;
+  padding: 15px;
   border-radius: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .filter-section label {
-  margin-right: 10px;
+  display: block;
+  margin-bottom: 8px;
   font-weight: 500;
   color: #555;
 }
 
 .filter-section select {
-  padding: 8px 12px;
+  width: 100%;
+  padding: 12px;
   border: 1px solid #ddd;
   border-radius: 5px;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .loading,
 .error,
 .no-data {
   background: white;
-  padding: 40px;
+  padding: 30px;
   text-align: center;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -65,44 +73,46 @@
   color: #f44336;
 }
 
+/* Mobile: single column grid */
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: 1fr;
+  gap: 15px;
 }
 
 .service-card {
   background: white;
   border-radius: 8px;
-  padding: 20px;
+  padding: 15px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .service-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .service-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 15px;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
   border-bottom: 1px solid #eee;
 }
 
 .service-header h3 {
   margin: 0;
   color: #333;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .plate-header-small {
   font-family: Arial, Helvetica, sans-serif;
-  /* Sans-serif for clean look */
-  font-size: 1.5rem !important;
+  font-size: 1.2rem !important;
   font-weight: 800;
   color: #2962ff !important;
   text-transform: uppercase;
@@ -110,16 +120,16 @@
 }
 
 .status-badge {
-  padding: 5px 12px;
+  padding: 5px 10px;
   color: white;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
 }
 
 .service-details p {
-  margin: 8px 0;
+  margin: 6px 0;
   color: #666;
   font-size: 14px;
 }
@@ -128,10 +138,17 @@
   color: #333;
 }
 
-.view-btn {
-  display: inline-block;
+/* Mobile: stack buttons vertically */
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
 
-  padding: 10px 20px;
+.view-btn {
+  display: block;
+  padding: 12px 20px;
   background-color: transparent;
   color: #666;
   border: 1px solid #ccc;
@@ -139,6 +156,7 @@
   border-radius: 5px;
   font-size: 14px;
   font-weight: 600;
+  text-align: center;
   transition: all 0.3s;
 }
 
@@ -148,23 +166,17 @@
   border-color: #999;
 }
 
-.card-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 15px;
-}
-
 .action-btn {
-  display: inline-block;
-  padding: 10px 20px;
+  display: block;
+  padding: 12px 20px;
   background-color: #e0e0e0;
   color: #333;
   border: 1px solid #ccc;
-  /* Match transparency border somewhat */
   border-radius: 5px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  text-align: center;
   transition: all 0.3s;
 }
 
@@ -174,8 +186,8 @@
 }
 
 .inline-update-form {
-  margin-top: 20px;
-  padding: 20px;
+  margin-top: 15px;
+  padding: 15px;
   background-color: #f8f9fa;
   border-radius: 8px;
   border: 1px solid #e9ecef;
@@ -203,17 +215,17 @@
   margin-bottom: 5px;
   font-weight: 600;
   color: #555;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 16px;
   box-sizing: border-box;
   background-color: white;
 }
@@ -229,4 +241,58 @@
 .full-width {
   width: 100%;
   margin-top: 10px;
+}
+
+/* ========================================
+   Desktop styles (768px and up)
+   ======================================== */
+@media (min-width: 768px) {
+  .page-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+
+  .page-header h1 {
+    font-size: 28px;
+  }
+
+  .filter-section {
+    padding: 20px;
+  }
+
+  .filter-section label {
+    display: inline;
+    margin-right: 10px;
+    margin-bottom: 0;
+  }
+
+  .filter-section select {
+    width: auto;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  .services-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .service-card {
+    padding: 20px;
+  }
+
+  .plate-header-small {
+    font-size: 1.5rem !important;
+  }
+
+  .card-actions {
+    flex-direction: row;
+  }
+
+  .view-btn,
+  .action-btn {
+    display: inline-block;
+  }
 }
