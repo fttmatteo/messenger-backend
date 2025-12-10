@@ -1,5 +1,7 @@
 # 🚀 Messenger Backend API
 
+**🇪🇸 Español** | **[🇺🇸 English](./README_EN.md)**
+
 Sistema de gestión de entregas y mensajería para operaciones de tránsito. Backend REST API con reconocimiento automático de placas vehiculares mediante OCR.
 
 ## 📋 Tabla de Contenidos
