@@ -38,4 +38,4 @@ config/google-vision-credentials.json
 !package*.json
 
 # Google Maps Config
-config/google-maps-config.properties
+config/google-maps.properties

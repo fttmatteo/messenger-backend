@@ -36,4 +36,4 @@ config/google-vision-credentials.json
 !Messenger_API.postman_collection.json
 
 # Google Maps Config
-config/google-maps-config.properties
+config/google-maps.properties
