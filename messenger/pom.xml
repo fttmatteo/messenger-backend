@@ -91,6 +91,31 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 
+		<!-- Google Maps Services (Geocoding, Directions, Distance Matrix) -->
+		<dependency>
+			<groupId>com.google.maps</groupId>
+			<artifactId>google-maps-services</artifactId>
+			<version>2.2.0</version>
+		</dependency>
+
+		<!-- WebSocket para tracking en tiempo real -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
+
+		<!-- Redis para caché de ubicaciones en tiempo real -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+
+		<!-- SLF4J Simple para logging de Google Maps -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 
 	</dependencies>
 

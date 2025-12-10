@@ -13,7 +13,7 @@ public class ServiceDelivery {
     private Status currentStatus;
     private String observation;
     private Signature signature;
-    private List<Photo> photos = new ArrayList<>(); // Inicializamos las listas para evitar NullPointerException
+    private List<Photo> photos = new ArrayList<>();
     private List<StatusHistory> history = new ArrayList<>();
 
     public void addPhoto(Photo photo) {

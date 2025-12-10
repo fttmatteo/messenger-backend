@@ -9,6 +9,8 @@ public class StatusHistory {
     private Status newStatus;
     private LocalDateTime changeDate;
     private Employee changedBy;
+    private Double deliveryLatitude;
+    private Double deliveryLongitude;
 
     public Long getIdStatusHistory() {
         return idStatusHistory;
@@ -58,5 +60,43 @@ public class StatusHistory {
 
     public void setPhotos(java.util.List<Photo> photos) {
         this.photos = photos;
+    }
+
+    public Double getDeliveryLatitude() {
+        return deliveryLatitude;
+    }
+
+    public void setDeliveryLatitude(Double deliveryLatitude) {
+        this.deliveryLatitude = deliveryLatitude;
+    }
+
+    public Double getDeliveryLongitude() {
+        return deliveryLongitude;
+    }
+
+    public void setDeliveryLongitude(Double deliveryLongitude) {
+        this.deliveryLongitude = deliveryLongitude;
+    }
+
+    /**
+     * Obtiene la ubicación de entrega como un objeto Location.
+     * 
+     * @return Location o null si no hay ubicación registrada
+     */
+    public Location getDeliveryLocation() {
+        if (deliveryLatitude == null || deliveryLongitude == null) {
+            return null;
+        }
+        return new Location(deliveryLatitude, deliveryLongitude);
+    }
+
+    /**
+     * Establece la ubicación de entrega desde un objeto Location.
+     */
+    public void setDeliveryLocation(Location location) {
+        if (location != null) {
+            this.deliveryLatitude = location.getLatitude();
+            this.deliveryLongitude = location.getLongitude();
+        }
     }
 }

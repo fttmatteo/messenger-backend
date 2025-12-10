@@ -16,10 +16,13 @@ public class DealershipMapper {
         entity.setAddress(dealership.getAddress());
         entity.setPhone(dealership.getPhone());
         entity.setZone(dealership.getZone());
+        entity.setLatitude(dealership.getLatitude());
+        entity.setLongitude(dealership.getLongitude());
+        entity.setIsGeolocated(dealership.getIsGeolocated());
         return entity;
     }
 
-        public Dealership toDomain(DealershipEntity entity) {
+    public Dealership toDomain(DealershipEntity entity) {
         if (entity == null)
             return null;
         Dealership dealership = new Dealership();
@@ -28,6 +31,9 @@ public class DealershipMapper {
         dealership.setAddress(entity.getAddress());
         dealership.setPhone(entity.getPhone());
         dealership.setZone(entity.getZone());
+        dealership.setLatitude(entity.getLatitude());
+        dealership.setLongitude(entity.getLongitude());
+        dealership.setIsGeolocated(entity.getIsGeolocated());
         return dealership;
     }
 }

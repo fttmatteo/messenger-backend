@@ -21,6 +21,15 @@ public class DealershipEntity {
     @Column(nullable = false, length = 10)
     private String zone;
 
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
+
+    @Column(name = "is_geolocated")
+    private Boolean isGeolocated = false;
+
     public Long getIdDealership() {
         return idDealership;
     }
@@ -61,4 +70,27 @@ public class DealershipEntity {
         this.zone = zone;
     }
 
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public Boolean getIsGeolocated() {
+        return isGeolocated;
+    }
+
+    public void setIsGeolocated(Boolean isGeolocated) {
+        this.isGeolocated = isGeolocated;
+    }
 }

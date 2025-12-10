@@ -12,11 +12,18 @@ public class DealershipResponseMapper {
             return null;
         }
 
-        return new DealershipResponse(
+        DealershipResponse response = new DealershipResponse(
                 dealership.getIdDealership(),
                 dealership.getName(),
                 dealership.getAddress(),
                 dealership.getPhone(),
                 dealership.getZone());
+
+        // Añadir campos de geolocalización
+        response.setLatitude(dealership.getLatitude());
+        response.setLongitude(dealership.getLongitude());
+        response.setIsGeolocated(dealership.getIsGeolocated());
+
+        return response;
     }
 }

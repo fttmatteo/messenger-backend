@@ -6,6 +6,9 @@ public class DealershipResponse {
     private String address;
     private String phone;
     private String zone;
+    private Double latitude;
+    private Double longitude;
+    private Boolean isGeolocated;
 
     public DealershipResponse() {
     }
@@ -56,5 +59,29 @@ public class DealershipResponse {
 
     public void setZone(String zone) {
         this.zone = zone;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public Boolean getIsGeolocated() {
+        return isGeolocated;
+    }
+
+    public void setIsGeolocated(Boolean isGeolocated) {
+        this.isGeolocated = isGeolocated;
     }
 }

@@ -32,6 +32,12 @@ public class StatusHistoryEntity {
     @JoinColumn(name = "service_delivery_id")
     private ServiceDeliveryEntity serviceDelivery;
 
+    @Column(name = "delivery_latitude")
+    private Double deliveryLatitude;
+
+    @Column(name = "delivery_longitude")
+    private Double deliveryLongitude;
+
     public Long getIdStatusHistory() {
         return idStatusHistory;
     }
@@ -89,5 +95,21 @@ public class StatusHistoryEntity {
 
     public void setServiceDelivery(ServiceDeliveryEntity serviceDelivery) {
         this.serviceDelivery = serviceDelivery;
+    }
+
+    public Double getDeliveryLatitude() {
+        return deliveryLatitude;
+    }
+
+    public void setDeliveryLatitude(Double deliveryLatitude) {
+        this.deliveryLatitude = deliveryLatitude;
+    }
+
+    public Double getDeliveryLongitude() {
+        return deliveryLongitude;
+    }
+
+    public void setDeliveryLongitude(Double deliveryLongitude) {
+        this.deliveryLongitude = deliveryLongitude;
     }
 }

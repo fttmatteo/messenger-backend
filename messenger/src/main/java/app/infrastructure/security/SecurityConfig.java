@@ -30,10 +30,13 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll() // WebSocket handshake
                         .requestMatchers("/employees/**").hasRole("ADMIN")
                         .requestMatchers("/dealerships/**").authenticated()
                         .requestMatchers("/services/**").authenticated()
                         .requestMatchers("/api/files/**").permitAll()
+                        .requestMatchers("/api/location/**").authenticated()
+                        .requestMatchers("/api/tracking/**").authenticated()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
