@@ -33,3 +33,4 @@ replay_pid*
 config/google-vision-credentials.json
 *.json
 !package*.json
+!Messenger_API.postman_collection.json

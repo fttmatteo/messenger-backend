@@ -1,0 +1,732 @@
+{
+    "info": {
+        "_postman_id": "messenger-api-collection",
+        "name": "Messenger API - Backend",
+        "description": "Complete API documentation for the Messenger/Delivery Management System Backend.\n\n## Authentication\nAll endpoints except `/auth/login` and `/api/files/**` require JWT authentication.\n\nAdd the token to your requests:\n- Header: `Authorization: Bearer {{token}}`\n\n## Roles\n- **ADMIN**: Full access to all endpoints\n- **MESSENGER**: Limited access (own services only)",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:8080",
+            "type": "string"
+        },
+        {
+            "key": "token",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "🔐 Authentication",
+            "item": [
+                {
+                    "name": "Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set('token', jsonData.token);",
+                                    "    console.log('Token saved to collection variables');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"userName\": \"admin\",\n    \"password\": \"admin123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/login",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "description": "Authenticate user and receive JWT token.\n\n**Response:**\n```json\n{\n    \"token\": \"eyJhbGciOiJIUzI1NiJ9...\",\n    \"role\": \"ADMIN\",\n    \"fullName\": \"Administrator\"\n}\n```"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "👥 Employees",
+            "item": [
+                {
+                    "name": "Create Employee",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"document\": \"1234567890\",\n    \"fullName\": \"Juan Pérez\",\n    \"phone\": \"3001234567\",\n    \"userName\": \"jperez\",\n    \"password\": \"password123\",\n    \"role\": \"MESSENGER\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/employees",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "employees"
+                            ]
+                        },
+                        "description": "Create a new employee. **Requires ADMIN role.**\n\n**Roles:** `ADMIN`, `MESSENGER`"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get All Employees",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/employees",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "employees"
+                            ]
+                        },
+                        "description": "Retrieve all employees. **Requires ADMIN role.**"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Employee by ID",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/employees/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "employees",
+                                "1"
+                            ]
+                        },
+                        "description": "Retrieve a specific employee by ID. **Requires ADMIN role.**"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Employee",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"document\": \"1234567890\",\n    \"fullName\": \"Juan Pérez Updated\",\n    \"phone\": \"3009876543\",\n    \"userName\": \"jperez\",\n    \"password\": \"newpassword123\",\n    \"role\": \"MESSENGER\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/employees/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "employees",
+                                "1"
+                            ]
+                        },
+                        "description": "Update an existing employee. **Requires ADMIN role.**"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Employee",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "url": {
+                            "raw": "{{baseUrl}}/employees/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "employees",
+                                "1"
+                            ]
+                        },
+                        "description": "Delete an employee. **Requires ADMIN role.**"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "🏢 Dealerships",
+            "item": [
+                {
+                    "name": "Create Dealership",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Concesionario Centro\",\n    \"address\": \"Calle 50 #45-20\",\n    \"phone\": \"6041234567\",\n    \"zone\": \"CENTRO\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/dealerships",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "dealerships"
+                            ]
+                        },
+                        "description": "Create a new dealership. **Requires ADMIN role.**"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get All Dealerships",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/dealerships",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "dealerships"
+                            ]
+                        },
+                        "description": "Retrieve all dealerships. **Requires authentication.**"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Dealership by ID",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/dealerships/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "dealerships",
+                                "1"
+                            ]
+                        },
+                        "description": "Retrieve a specific dealership by ID. **Requires authentication.**"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Dealership",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Concesionario Centro Updated\",\n    \"address\": \"Calle 51 #46-21\",\n    \"phone\": \"6049876543\",\n    \"zone\": \"CENTRO\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/dealerships/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "dealerships",
+                                "1"
+                            ]
+                        },
+                        "description": "Update an existing dealership. **Requires ADMIN role.**"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Dealership",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "url": {
+                            "raw": "{{baseUrl}}/dealerships/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "dealerships",
+                                "1"
+                            ]
+                        },
+                        "description": "Delete a dealership. **Requires ADMIN role.**"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "📦 Service Deliveries",
+            "item": [
+                {
+                    "name": "Create Service (with OCR)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "image",
+                                    "type": "file",
+                                    "description": "Image of license plate (required)"
+                                },
+                                {
+                                    "key": "dealershipId",
+                                    "value": "1",
+                                    "type": "text",
+                                    "description": "Dealership ID (required)"
+                                },
+                                {
+                                    "key": "messengerDocument",
+                                    "value": "1234567890",
+                                    "type": "text",
+                                    "description": "Messenger document (required for ADMIN, auto-assigned for MESSENGER)"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/services/create",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "create"
+                            ]
+                        },
+                        "description": "Create a new service delivery using OCR to detect the plate number from image.\n\n**Plate Types Detected:**\n- CAR: `ABC 123`\n- MOTORCYCLE: `ABC 12A`\n- MOTORCAR: `123 ABC`"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Service (Manual Plate)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "image",
+                                    "type": "file",
+                                    "description": "Image of license plate (required)"
+                                },
+                                {
+                                    "key": "dealershipId",
+                                    "value": "1",
+                                    "type": "text",
+                                    "description": "Dealership ID (required)"
+                                },
+                                {
+                                    "key": "messengerDocument",
+                                    "value": "1234567890",
+                                    "type": "text",
+                                    "description": "Messenger document"
+                                },
+                                {
+                                    "key": "manualPlateNumber",
+                                    "value": "ABC123",
+                                    "type": "text",
+                                    "description": "Manual plate number (bypasses OCR)"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/services/create",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "create"
+                            ]
+                        },
+                        "description": "Create a new service delivery with manual plate number input (bypasses OCR)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Service Status",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "status",
+                                    "value": "DELIVERED",
+                                    "type": "text",
+                                    "description": "New status: PENDING, DELIVERED, FAILED, RETURNED, CANCELED, OBSERVED, RESOLVED"
+                                },
+                                {
+                                    "key": "observation",
+                                    "value": "Entregado sin novedad",
+                                    "type": "text",
+                                    "description": "Optional observation"
+                                },
+                                {
+                                    "key": "signature",
+                                    "type": "file",
+                                    "description": "Signature image (required for most statuses)"
+                                },
+                                {
+                                    "key": "photos",
+                                    "type": "file",
+                                    "description": "Evidence photos (can add multiple)"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/services/1/status",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "1",
+                                "status"
+                            ]
+                        },
+                        "description": "Update the status of a service delivery.\n\n**Evidence Requirements:**\n- `DELIVERED`: Signature required\n- `PENDING`, `FAILED`, `RETURNED`: Signature, photos, observation required\n- `CANCELED`, `OBSERVED`: Admin only, no evidence required"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get All Services",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/services",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services"
+                            ]
+                        },
+                        "description": "Retrieve all services.\n\n- **ADMIN**: Gets all services\n- **MESSENGER**: Gets only their assigned services"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Service by ID",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/services/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "1"
+                            ]
+                        },
+                        "description": "Retrieve a specific service by ID."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Services by Messenger",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/services/messenger/1234567890",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "messenger",
+                                "1234567890"
+                            ]
+                        },
+                        "description": "Retrieve all services for a specific messenger (by document number)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Services by Dealership",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/services/dealership/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "dealership",
+                                "1"
+                            ]
+                        },
+                        "description": "Retrieve all services for a specific dealership."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Services by Status",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/services/status/PENDING",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "status",
+                                "PENDING"
+                            ]
+                        },
+                        "description": "Retrieve all services with a specific status.\n\n**Valid statuses:** `ASSIGNED`, `PENDING`, `DELIVERED`, `FAILED`, `RETURNED`, `CANCELED`, `OBSERVED`, `RESOLVED`"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "📁 Files",
+            "item": [
+                {
+                    "name": "Get File",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/files/example.jpg",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "files",
+                                "example.jpg"
+                            ]
+                        },
+                        "description": "Retrieve a file by filename. Searches in `/detections`, `/signatures`, and `/evidence` directories.\n\n**No authentication required.**"
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ]
+}
