@@ -22,10 +22,8 @@ import java.util.stream.Collectors;
 /**
  * Controlador REST para tracking en tiempo real de mensajeros.
  *
- * <p>
  * Proporciona endpoints para actualizar ubicaciones en tiempo real
  * y consultar historial de tracking.
- * </p>
  */
 @RestController
 @RequestMapping("/api/tracking")
@@ -48,7 +46,26 @@ public class TrackingController {
     public ResponseEntity<LiveTrackingResponse> updateLocation(
             @Valid @RequestBody LiveTrackingRequest request) {
 
-        LiveTracking tracking = updateLiveTracking.execute(request);
+        // Mapeo manual de DTO a Dominio aquí en el controlador (Adaptador)
+        LiveTracking domainTracking = new LiveTracking();
+        domainTracking.setMessengerId(request.getMessengerId());
+
+        // Crear Location value object
+        app.domain.model.Location location = new app.domain.model.Location(
+                request.getLatitude(),
+                request.getLongitude(),
+                java.time.LocalDateTime.now(),
+                request.getAccuracy());
+        domainTracking.setCurrentLocation(location);
+
+        domainTracking.setSpeed(request.getSpeed());
+        domainTracking.setHeading(request.getHeading());
+        domainTracking.setDeviceId(request.getDeviceId());
+        if (request.getStatus() != null) {
+            domainTracking.setStatus(request.getStatus());
+        }
+
+        LiveTracking tracking = updateLiveTracking.execute(domainTracking);
         return ResponseEntity.ok(mapToResponse(tracking));
     }
 

@@ -6,9 +6,7 @@ import java.util.List;
 /**
  * Puerto (interfaz) para operaciones de persistencia de placas vehiculares.
  * 
- * <p>
  * Define las operaciones para almacenar y consultar placas detectadas por OCR.
- * </p>
  */
 public interface PlatePort {
     void save(Plate plate);

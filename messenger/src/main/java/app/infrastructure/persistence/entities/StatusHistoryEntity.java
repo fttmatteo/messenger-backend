@@ -4,8 +4,6 @@ import app.domain.model.enums.Status;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-import java.time.LocalDateTime;
-
 /**
  * Entidad JPA que representa la tabla 'status_history'.
  * Registra la auditoría completa de cambios de estado en los servicios.

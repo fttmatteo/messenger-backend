@@ -18,11 +18,8 @@ import java.util.stream.Collectors;
 
 /**
  * Controlador REST para gestionar empleados y mensajeros.
- * 
- * <p>
  * Proporciona operaciones CRUD exclusivas para administradores.
  * Todos los endpoints requieren rol ADMIN.
- * </p>
  */
 @RestController
 @RequestMapping("/employees")

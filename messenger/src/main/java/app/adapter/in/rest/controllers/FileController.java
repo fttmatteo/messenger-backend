@@ -17,11 +17,8 @@ import java.nio.file.Paths;
 
 /**
  * Controlador REST para servir archivos estáticos.
- * 
- * <p>
  * Proporciona endpoints para acceder a archivos almacenados como
  * fotos, firmas y documentos del sistema.
- * </p>
  */
 @RestController
 @RequestMapping("/api/files")

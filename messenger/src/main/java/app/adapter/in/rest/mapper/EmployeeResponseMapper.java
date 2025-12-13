@@ -6,10 +6,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Mapper para convertir entidades Employee a DTOs de respuesta.
- * 
- * <p>
  * Transforma objetos de dominio Employee a EmployeeResponse.
- * </p>
  */
 @Component
 public class EmployeeResponseMapper {

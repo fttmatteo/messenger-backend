@@ -9,24 +9,15 @@ import java.util.List;
  * Modelo de dominio que representa un servicio de entrega de placas
  * vehiculares.
  * 
- * <p>
  * Esta clase encapsula toda la información relacionada con la entrega de una
- * placa
- * a un concesionario, incluyendo:
- * </p>
- * <ul>
- * <li>Información de la placa vehicular</li>
- * <li>Concesionario destino</li>
- * <li>Mensajero asignado</li>
- * <li>Estado actual del servicio (PENDING, DELIVERED, RETURNED, etc.)</li>
- * <li>Evidencias: firma digital y fotografías</li>
- * <li>Historial completo de cambios de estado</li>
- * </ul>
+ * placa a un concesionario, incluyendo:
  * 
- * @see Status
- * @see Plate
- * @see Dealership
- * @see Employee
+ * Información de la placa vehicular
+ * Concesionario destino
+ * Mensajero asignado
+ * Estado actual del servicio (PENDING, DELIVERED, RETURNED, etc.)
+ * Evidencias: firma digital y fotografías
+ * Historial completo de cambios de estado
  */
 public class ServiceDelivery {
     private Long idServiceDelivery;

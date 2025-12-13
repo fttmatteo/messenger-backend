@@ -98,12 +98,10 @@ public class UpdateServiceDelivery {
     private void validateEvidence(Status status, Signature signature, List<Photo> photos, String observation)
             throws BusinessException {
 
-        // CANCELED or OBSERVED: No evidence required
         if (status == Status.CANCELED || status == Status.OBSERVED || status == Status.ASSIGNED) {
             return;
         }
 
-        // DELIVERED: Only signature required
         if (status == Status.DELIVERED) {
             if (signature == null) {
                 throw new BusinessException("Para marcar como ENTREGADO, la firma de recibido es obligatoria.");
@@ -111,7 +109,6 @@ public class UpdateServiceDelivery {
             return;
         }
 
-        // ALL OTHER STATUSES (Pending, Failed, Returned, etc.): All evidence required
         if (signature == null) {
             throw new BusinessException("Para el estado " + status + " la firma es obligatoria.");
         }

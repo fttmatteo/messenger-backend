@@ -8,10 +8,7 @@ import app.domain.model.Dealership;
 
 /**
  * Builder para construir objetos Dealership validados desde DTOs.
- * 
- * <p>
  * Valida y construye instancias de Dealership aplicando reglas de negocio.
- * </p>
  */
 @Component
 public class DealershipBuilder {

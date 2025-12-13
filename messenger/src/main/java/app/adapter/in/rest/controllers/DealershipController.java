@@ -21,11 +21,8 @@ import java.util.stream.Collectors;
 /**
  * Controlador REST para gestionar concesionarios.
  * 
- * <p>
  * Proporciona operaciones CRUD completas y geocodificación mediante Google Maps
- * API.
- * Requiere rol ADMIN para operaciones de modificación.
- * </p>
+ * API. Requiere rol ADMIN para operaciones de modificación.
  */
 @RestController
 @RequestMapping("/dealerships")

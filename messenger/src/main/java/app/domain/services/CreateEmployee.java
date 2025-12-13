@@ -10,14 +10,10 @@ import app.domain.ports.EmployeePort;
 /**
  * Servicio de dominio para crear nuevos empleados/mensajeros.
  * 
- * <p>
  * Gestiona la creación de empleados validando:
- * </p>
- * <ul>
- * <li>Unicidad del número de documento</li>
- * <li>Unicidad del nombre de usuario</li>
- * <li>Encriptación automática de contraseñas con BCrypt</li>
- * </ul>
+ * Unicidad del número de documento
+ * Unicidad del nombre de usuario
+ * Encriptación automática de contraseñas con BCrypt
  */
 @Service
 public class CreateEmployee {

@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
  * 
  * La firma se almacena como imagen en el sistema de archivos y se asocia
  * directamente con el servicio de entrega correspondiente.
- * 
  */
 public class Signature {
     private Long idSignature;

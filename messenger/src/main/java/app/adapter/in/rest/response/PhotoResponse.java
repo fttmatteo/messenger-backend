@@ -6,10 +6,8 @@ import java.time.LocalDateTime;
 /**
  * DTO de respuesta para evidencias fotográficas.
  * 
- * <p>
  * Incluye la ruta de acceso, fecha de carga y tipo de foto (ENTREGA, FALLIDA,
  * etc).
- * </p>
  */
 public class PhotoResponse {
     private Long idPhoto;

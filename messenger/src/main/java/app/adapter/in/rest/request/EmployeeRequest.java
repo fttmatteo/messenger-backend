@@ -3,9 +3,7 @@ package app.adapter.in.rest.request;
 /**
  * DTO para crear o actualizar un empleado.
  * 
- * <p>
  * Contiene datos personales, credenciales de acceso y rol del empleado.
- * </p>
  */
 public class EmployeeRequest {
     private String document;

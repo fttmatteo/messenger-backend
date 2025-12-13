@@ -4,8 +4,6 @@ import app.domain.model.enums.PhotoType;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-import java.time.LocalDateTime;
-
 /**
  * Entidad JPA que representa la tabla 'photos'.
  * Almacena metadatos de las evidencias fotográficas asociadas a servicios.

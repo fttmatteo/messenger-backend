@@ -3,8 +3,6 @@ package app.infrastructure.persistence.entities;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-import java.time.LocalDateTime;
-
 /**
  * Entidad JPA que representa la tabla 'signatures'.
  * Almacena la ruta y fecha de las firmas digitales capturadas.

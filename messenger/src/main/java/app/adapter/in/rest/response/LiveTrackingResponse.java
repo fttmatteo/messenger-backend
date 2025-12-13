@@ -33,7 +33,6 @@ public class LiveTrackingResponse {
         this.heading = heading;
     }
 
-    // Getters y Setters
     public Long getMessengerId() {
         return messengerId;
     }

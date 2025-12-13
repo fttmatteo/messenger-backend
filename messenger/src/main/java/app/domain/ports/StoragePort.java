@@ -6,10 +6,8 @@ import java.io.IOException;
 /**
  * Puerto (interfaz) para operaciones de almacenamiento de archivos.
  * 
- * <p>
  * Abstrae el sistema de almacenamiento (local, S3, etc.) permitiendo guardar,
  * recuperar y gestionar archivos de manera independiente de la implementación.
- * </p>
  */
 public interface StoragePort {
     String save(File file, String subDirectory) throws IOException;

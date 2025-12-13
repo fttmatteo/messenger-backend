@@ -42,7 +42,6 @@ public class TrackingHistoryEntity {
     @Column(name = "speed")
     private Double speed;
 
-    // Getters y Setters
     public Long getHistoryId() {
         return historyId;
     }

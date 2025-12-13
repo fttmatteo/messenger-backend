@@ -2,8 +2,6 @@ package app.infrastructure.persistence.entities;
 
 import jakarta.persistence.*;
 
-import jakarta.persistence.*;
-
 /**
  * Entidad JPA que representa la tabla 'dealerships'.
  * Almacena la información de los concesionarios incluyendo su ubicación

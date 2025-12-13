@@ -5,8 +5,6 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import java.util.List;
-
 /**
  * Entidad JPA que representa la tabla 'service_deliveries'.
  * Entidad central que vincula concesionarios, mensajeros, placas y su

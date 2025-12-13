@@ -5,9 +5,7 @@ import app.domain.model.enums.Role;
 /**
  * DTO de respuesta con la información de un empleado.
  * 
- * <p>
  * Excluye información sensible como la contraseña.
- * </p>
  */
 public class EmployeeResponse {
     private Long idEmployee;

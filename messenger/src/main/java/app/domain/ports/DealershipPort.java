@@ -6,10 +6,8 @@ import java.util.List;
 /**
  * Puerto (interfaz) para operaciones de persistencia de concesionarios.
  * 
- * <p>
  * Define las operaciones necesarias para gestionar concesionarios de vehículos,
  * incluyendo datos de ubicación y contacto.
- * </p>
  */
 public interface DealershipPort {
     void save(Dealership dealership);

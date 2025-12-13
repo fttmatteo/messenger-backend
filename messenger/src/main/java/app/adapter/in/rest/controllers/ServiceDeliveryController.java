@@ -24,21 +24,15 @@ import java.util.stream.Collectors;
 /**
  * Controlador REST para gestionar servicios de entrega.
  * 
- * <p>
  * Proporciona endpoints para:
- * </p>
- * <ul>
- * <li>Crear servicios con detección OCR automática o entrada manual de
- * placas</li>
- * <li>Actualizar estados con evidencias (firmas y fotos)</li>
- * <li>Consultar servicios por diversos criterios</li>
- * </ul>
+ * Crear servicios con detección OCR automática o entrada manual de
+ * placas
+ * Actualizar estados con evidencias (firmas y fotos)
+ * Consultar servicios por diversos criterios
  * 
- * <p>
  * Implementa control de acceso basado en roles (ADMIN puede asignar a cualquier
  * mensajero,
  * MESSENGER solo puede crear servicios asignados a sí mismo).
- * </p>
  */
 @RestController
 @RequestMapping("/services")
@@ -71,12 +65,10 @@ public class ServiceDeliveryController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User authentication not found or invalid.");
             }
 
-            // If user is not ADMIN, force assignment to themselves
             String finalMessengerDocument = messengerDocument;
             if (currentUser.getRole() != app.domain.model.enums.Role.ADMIN) {
                 finalMessengerDocument = String.valueOf(currentUser.getDocument());
             } else {
-                // If ADMIN, messengerDocument is required
                 if (messengerDocument == null || messengerDocument.trim().isEmpty()) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                             .body("Messenger document is required for Admin users.");
@@ -91,7 +83,6 @@ public class ServiceDeliveryController {
 
             imageFile = convertToFile(image);
 
-            // Use manual plate number if provided, otherwise use OCR
             if (manualPlateNumber != null && !manualPlateNumber.isEmpty()) {
                 System.out.println("Using manual plate number: " + manualPlateNumber);
                 serviceDeliveryUseCase.createServiceWithManualPlate(

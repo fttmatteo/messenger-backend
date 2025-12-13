@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
  * Este registro es inmutable una vez creado, proporcionando trazabilidad
  * completa del ciclo de vida de cada entrega.
  */
-
 public class StatusHistory {
     private Long idStatusHistory;
     private Status previousStatus;

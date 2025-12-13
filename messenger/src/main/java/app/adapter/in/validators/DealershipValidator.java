@@ -6,9 +6,7 @@ import app.application.exceptions.InputsException;
 /**
  * Validador para concesionarios.
  * 
- * <p>
  * Aplica reglas de validación para datos de concesionarios.
- * </p>
  */
 @Component
 public class DealershipValidator extends SimpleValidator {

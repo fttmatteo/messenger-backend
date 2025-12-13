@@ -7,10 +7,8 @@ import org.springframework.stereotype.Component;
 /**
  * Mapper para convertir entidades Dealership a DTOs de respuesta.
  * 
- * <p>
  * Transforma objetos de dominio Dealership a DealershipResponse, incluyendo
  * información de geolocalización.
- * </p>
  */
 @Component
 public class DealershipResponseMapper {

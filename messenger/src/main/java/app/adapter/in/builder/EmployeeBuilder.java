@@ -7,10 +7,7 @@ import app.domain.model.Employee;
 
 /**
  * Builder para construir objetos Employee validados desde DTOs.
- * 
- * <p>
  * Valida y construye instancias de Employee aplicando reglas de negocio.
- * </p>
  */
 @Component
 public class EmployeeBuilder {

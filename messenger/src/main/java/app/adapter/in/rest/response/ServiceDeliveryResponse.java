@@ -8,10 +8,8 @@ import java.util.List;
 /**
  * DTO de respuesta detallada de un servicio de entrega.
  * 
- * <p>
  * Agrupa toda la información del servicio incluyendo placa, concesionario,
  * mensajero, estado actual, evidencias y el historial completo de cambios.
- * </p>
  */
 public class ServiceDeliveryResponse {
     private Long idServiceDelivery;
