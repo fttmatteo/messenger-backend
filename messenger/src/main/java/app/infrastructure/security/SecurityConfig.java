@@ -16,6 +16,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Configuración central de seguridad de Spring Security.
+ * Define reglas de autorización, CORS, manejo de sesiones y filtros JWT.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)

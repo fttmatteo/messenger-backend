@@ -6,6 +6,19 @@ import app.domain.model.enums.PlateType;
 
 import java.util.regex.Pattern;
 
+/**
+ * Servicio de dominio para reconocimiento y validación de placas vehiculares.
+ * 
+ * Determina automáticamente el tipo de vehículo basándose en el formato de la
+ * placa:
+ * 
+ * Carro (CAR): Formato ABC 123
+ * Motocicleta (MOTORCYCLE): Formato ABC 12A
+ * Motocarro (MOTORCAR): Formato 123 ABC
+ * 
+ * Utiliza expresiones regulares (regex) para validar y clasificar placas,
+ * normalizando el formato para almacenamiento consistente.
+ */
 @Service
 public class PlateRecognition {
 

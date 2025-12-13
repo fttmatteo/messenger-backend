@@ -7,6 +7,14 @@ import app.adapter.in.rest.request.ServiceDeliveryUpdateStatusRequest;
 import app.adapter.in.validators.ServiceDeliveryValidator;
 import app.domain.model.enums.Status;
 
+/**
+ * Builder para construir objetos de datos de servicio de entrega validados.
+ * 
+ * <p>
+ * Valida y construye objetos para crear y actualizar servicios de entrega,
+ * encapsulando los datos en clases internas inmutables.
+ * </p>
+ */
 @Component
 public class ServiceDeliveryBuilder {
 

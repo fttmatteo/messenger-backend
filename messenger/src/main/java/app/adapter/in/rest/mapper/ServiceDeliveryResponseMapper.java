@@ -7,6 +7,15 @@ import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 
+/**
+ * Mapper para convertir entidades ServiceDelivery a DTOs de respuesta.
+ * 
+ * <p>
+ * Transforma objetos de dominio ServiceDelivery a ServiceDeliveryResponse,
+ * incluyendo mapeo anidado de referencias (placa, concesionario, mensajero,
+ * historial).
+ * </p>
+ */
 @Component
 public class ServiceDeliveryResponseMapper {
 

@@ -4,6 +4,11 @@ import app.domain.model.Dealership;
 import app.infrastructure.persistence.entities.DealershipEntity;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper de persistencia para convertir entre Dealership y DealershipEntity.
+ * Facilita la transformación de datos entre la capa de dominio y la base de
+ * datos.
+ */
 @Component
 public class DealershipMapper {
 

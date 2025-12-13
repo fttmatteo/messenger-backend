@@ -12,6 +12,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
+/**
+ * Adaptador para almacenamiento de archivos en el sistema de archivos local.
+ * Implementa StoragePort para guardar y recuperar evidencias y firmas.
+ */
 @Component
 public class FileSystemStorageAdapter implements StoragePort {
 

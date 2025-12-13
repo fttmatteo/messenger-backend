@@ -4,6 +4,11 @@ import app.domain.model.Plate;
 import app.infrastructure.persistence.entities.PlateEntity;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper de persistencia para convertir entre Plate y PlateEntity.
+ * Facilita la transformación de datos entre la capa de dominio y la base de
+ * datos.
+ */
 @Component
 public class PlateMapper {
 

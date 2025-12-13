@@ -7,6 +7,14 @@ import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Validador para empleados.
+ * 
+ * <p>
+ * Aplica reglas de validación para datos de empleados incluyendo documento,
+ * nombre, teléfono, usuario, contraseña y rol.
+ * </p>
+ */
 @Component
 public class EmployeeValidator extends SimpleValidator {
 

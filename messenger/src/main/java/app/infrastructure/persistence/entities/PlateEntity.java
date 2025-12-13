@@ -4,6 +4,12 @@ import app.domain.model.enums.PlateType;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import java.time.LocalDateTime;
+
+/**
+ * Entidad JPA que representa la tabla 'plates'.
+ * Almacena las placas vehiculares reconocidas y su tipo.
+ */
 @Entity
 @Table(name = "plates")
 public class PlateEntity {

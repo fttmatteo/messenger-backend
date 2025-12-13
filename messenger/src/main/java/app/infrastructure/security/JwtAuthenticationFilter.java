@@ -14,8 +14,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * Filtro de seguridad que intercepta cada petición HTTP.
+ * Valida el token JWT presente en el header Authorization y establece el
+ * contexto de seguridad.
+ */
 @Component
-
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired

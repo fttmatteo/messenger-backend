@@ -1,5 +1,14 @@
 package app.adapter.in.rest.request;
 
+/**
+ * DTO para la creación de un nuevo servicio de entrega.
+ * 
+ * <p>
+ * Contiene los identificadores necesarios para vincular el servicio con un
+ * concesionario
+ * y un mensajero, además de la placa del vehículo.
+ * </p>
+ */
 public class ServiceDeliveryCreateRequest {
     private String dealershipId;
     private String messengerDocument;

@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Adaptador de persistencia para la entidad Employee.
+ * Implementa EmployeePort para operaciones CRUD sobre empleados.
+ */
 @Component
 public class EmployeeAdapter implements EmployeePort {
 

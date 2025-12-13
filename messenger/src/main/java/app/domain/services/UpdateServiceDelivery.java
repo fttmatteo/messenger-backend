@@ -15,6 +15,21 @@ import app.domain.model.enums.Status;
 import app.domain.ports.EmployeePort;
 import app.domain.ports.ServiceDeliveryPort;
 
+/**
+ * Servicio de dominio para actualizar el estado de servicios de entrega.
+ * 
+ * Gestiona las transiciones de estado del ciclo de vida de una entrega:
+ * Validación de transiciones de estado permitidas
+ * Verificación de evidencias requeridas según el nuevo estado
+ * Control de permisos (estados CANCELED y OBSERVED solo para admins)
+ * Registro de firmas digitales, fotos y observaciones
+ * Actualización del historial de cambios de estado
+ * 
+ * Reglas de evidencia:
+ * DELIVERED: Solo firma obligatoria
+ * PENDING/FAILED/RETURNED: Firma, foto y observación obligatorias
+ * CANCELED/OBSERVED: Sin evidencias requeridas (solo admins)
+ */
 @Service
 public class UpdateServiceDelivery {
 

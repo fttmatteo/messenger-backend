@@ -6,6 +6,13 @@ import app.application.exceptions.BusinessException;
 import app.domain.model.Dealership;
 import app.domain.ports.DealershipPort;
 
+/**
+ * Servicio de dominio para crear nuevos concesionarios.
+ * 
+ * <p>
+ * Valida la unicidad del nombre antes de crear el concesionario.
+ * </p>
+ */
 @Service
 public class CreateDealership {
 

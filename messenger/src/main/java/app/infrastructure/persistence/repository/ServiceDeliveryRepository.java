@@ -6,6 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 
+/**
+ * Repositorio JPA para la entidad ServiceDeliveryEntity.
+ * Soporta búsquedas avanzadas por estado, mensajero, placa y concesionario.
+ */
 @Repository
 public interface ServiceDeliveryRepository extends JpaRepository<ServiceDeliveryEntity, Long> {
     List<ServiceDeliveryEntity> findByCurrentStatus(Status currentStatus);

@@ -12,6 +12,19 @@ import app.domain.model.auth.TokenResponse;
 import app.domain.ports.AuthenticationPort;
 import app.domain.ports.EmployeePort;
 
+/**
+ * Servicio de dominio para autenticación de usuarios.
+ * 
+ * Gestiona el proceso completo de autenticación incluyendo:
+ * Validación de credenciales (username y password)
+ * Verificación de existencia del usuario
+ * Comparación de contraseñas con hash BCrypt
+ * Migración automática de contraseñas planas a BCrypt
+ * Generación de tokens JWT para sesiones
+ * 
+ * Incluye lógica de retrocompatibilidad para migrar contraseñas
+ * almacenadas en texto plano a formato BCrypt de manera transparente.
+ */
 @Service
 public class AuthenticationService {
 

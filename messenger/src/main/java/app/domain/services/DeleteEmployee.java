@@ -8,6 +8,12 @@ import app.domain.model.Employee;
 import app.domain.ports.EmployeePort;
 import app.domain.ports.ServiceDeliveryPort;
 
+/**
+ * Servicio de dominio para eliminar empleados.
+ * 
+ * Valida que el empleado no tenga servicios de entrega asociados antes
+ * de permitir su eliminación, manteniendo la integridad referencial.
+ */
 @Service
 public class DeleteEmployee {
 

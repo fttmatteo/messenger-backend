@@ -9,6 +9,14 @@ import app.domain.services.DeleteDealership;
 import app.domain.services.SearchDealership;
 import app.domain.services.UpdateDealership;
 
+/**
+ * Caso de uso de aplicación para gestionar concesionarios.
+ * 
+ * <p>
+ * Orquesta las operaciones CRUD de concesionarios delegando en los servicios
+ * de dominio. Punto de entrada desde controladores REST.
+ * </p>
+ */
 @Service
 public class DealershipUseCase {
 

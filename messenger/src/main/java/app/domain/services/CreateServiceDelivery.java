@@ -16,6 +16,20 @@ import app.domain.ports.EmployeePort;
 import app.domain.ports.PlatePort;
 import app.domain.ports.ServiceDeliveryPort;
 
+/**
+ * Servicio de dominio para crear nuevos servicios de entrega.
+ * 
+ * Orquesta el proceso completo de creación de un servicio de entrega:
+ * Validación de existencia del mensajero asignado
+ * Validación de existencia del concesionario destino
+ * Normalización y registro de la placa vehicular
+ * Determinación automática del tipo de placa (carro, moto, motocarro)
+ * Asociación de foto de detección si está disponible
+ * Inicialización del servicio en estado ASSIGNED
+ * Creación del primer registro en el historial de estados
+ * 
+ * Si la placa no existe previamente, se crea automáticamente en el sistema.
+ */
 @Service
 public class CreateServiceDelivery {
 

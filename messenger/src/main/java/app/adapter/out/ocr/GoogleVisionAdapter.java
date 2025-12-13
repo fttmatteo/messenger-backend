@@ -13,6 +13,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Adaptador para reconocimiento óptico de caracteres (OCR) usando Google Cloud
+ * Vision.
+ * Se encarga de extraer texto de imágenes y validar formatos de placas
+ * detectadas.
+ */
 @Component
 public class GoogleVisionAdapter implements OcrPort {
 

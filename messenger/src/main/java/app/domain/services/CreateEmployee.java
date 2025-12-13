@@ -7,6 +7,18 @@ import app.application.exceptions.BusinessException;
 import app.domain.model.Employee;
 import app.domain.ports.EmployeePort;
 
+/**
+ * Servicio de dominio para crear nuevos empleados/mensajeros.
+ * 
+ * <p>
+ * Gestiona la creación de empleados validando:
+ * </p>
+ * <ul>
+ * <li>Unicidad del número de documento</li>
+ * <li>Unicidad del nombre de usuario</li>
+ * <li>Encriptación automática de contraseñas con BCrypt</li>
+ * </ul>
+ */
 @Service
 public class CreateEmployee {
 

@@ -9,6 +9,14 @@ import app.domain.model.ServiceDelivery;
 import app.domain.model.enums.Status;
 import app.domain.ports.ServiceDeliveryPort;
 
+/**
+ * Servicio de dominio para búsqueda y recuperación de servicios de entrega.
+ * 
+ * Proporciona múltiples criterios de búsqueda:
+ * 
+ * Por ID, estado, mensajero, concesionario o número de placa
+ * Listado completo de servicios
+ */
 @Service
 public class SearchServiceDelivery {
 

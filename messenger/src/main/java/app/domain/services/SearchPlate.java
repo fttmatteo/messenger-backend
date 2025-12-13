@@ -6,6 +6,11 @@ import org.springframework.stereotype.Service;
 import app.domain.model.Plate;
 import app.domain.ports.PlatePort;
 
+/**
+ * Servicio de dominio para búsqueda de placas vehiculares.
+ * 
+ * Proporciona búsqueda por ID y número de placa.
+ */
 @Service
 public class SearchPlate {
 

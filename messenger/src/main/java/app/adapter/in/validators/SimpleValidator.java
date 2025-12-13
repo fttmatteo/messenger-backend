@@ -2,6 +2,13 @@ package app.adapter.in.validators;
 
 import app.application.exceptions.InputsException;
 
+/**
+ * Clase abstracta base para validadores.
+ * 
+ * <p>
+ * Proporciona métodos utilitarios para validación de tipos básicos.
+ * </p>
+ */
 public abstract class SimpleValidator {
 
     public String stringValidator(String element, String value) throws InputsException {

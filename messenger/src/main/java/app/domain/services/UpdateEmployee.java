@@ -7,6 +7,16 @@ import app.application.exceptions.BusinessException;
 import app.domain.model.Employee;
 import app.domain.ports.EmployeePort;
 
+/**
+ * Servicio de dominio para actualizar información de empleados existentes.
+ * 
+ * Permite actualizar datos del empleado validando:
+ * 
+ * Existencia del empleado a actualizar
+ * Unicidad de documento si se modifica
+ * Unicidad de username si se modifica
+ * Re-encriptación de contraseña si se proporciona nueva
+ */
 @Service
 public class UpdateEmployee {
 

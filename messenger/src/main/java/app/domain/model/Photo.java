@@ -3,6 +3,27 @@ package app.domain.model;
 import app.domain.model.enums.PhotoType;
 import java.time.LocalDateTime;
 
+/**
+ * Modelo de dominio que representa una fotografía de evidencia de entrega.
+ * 
+ * <p>
+ * Las fotos se utilizan como evidencia visual del proceso de entrega, pudiendo
+ * ser:
+ * </p>
+ * <ul>
+ * <li><strong>DETECTION:</strong> Foto de la placa vehicular detectada por
+ * OCR</li>
+ * <li><strong>EVIDENCE:</strong> Foto probatoria de la entrega realizada</li>
+ * </ul>
+ * 
+ * <p>
+ * Cada foto se almacena en el sistema de archivos y se referencia mediante su
+ * ruta.
+ * </p>
+ * 
+ * @see PhotoType
+ * @see ServiceDelivery
+ */
 public class Photo {
     private Long idPhoto;
     private String photoPath;

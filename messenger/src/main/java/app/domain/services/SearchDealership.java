@@ -6,6 +6,11 @@ import org.springframework.stereotype.Service;
 import app.domain.model.Dealership;
 import app.domain.ports.DealershipPort;
 
+/**
+ * Servicio de dominio para búsqueda y recuperación de concesionarios.
+ * 
+ * Proporciona búsqueda por ID, nombre y listado completo.
+ */
 @Service
 public class SearchDealership {
 

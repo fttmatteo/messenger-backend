@@ -20,7 +20,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Controller REST para operaciones de tracking de mensajeros.
+ * Controlador REST para tracking en tiempo real de mensajeros.
+ *
+ * <p>
+ * Proporciona endpoints para actualizar ubicaciones en tiempo real
+ * y consultar historial de tracking.
+ * </p>
  */
 @RestController
 @RequestMapping("/api/tracking")

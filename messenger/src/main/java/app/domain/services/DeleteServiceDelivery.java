@@ -7,6 +7,12 @@ import app.domain.model.ServiceDelivery;
 import app.domain.model.enums.Status;
 import app.domain.ports.ServiceDeliveryPort;
 
+/**
+ * Servicio de dominio para eliminar servicios de entrega.
+ * 
+ * Valida que el servicio no esté en estado DELIVERED antes de permitir
+ * su eliminación.
+ */
 @Service
 public class DeleteServiceDelivery {
 

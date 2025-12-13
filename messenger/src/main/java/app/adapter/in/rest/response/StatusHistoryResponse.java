@@ -3,6 +3,14 @@ package app.adapter.in.rest.response;
 import app.domain.model.enums.Status;
 import java.time.LocalDateTime;
 
+/**
+ * DTO de respuesta para un registro en el historial de estados.
+ * 
+ * <p>
+ * Detalla el cambio de estado, quién lo realizó, cuándo, y las evidencias
+ * asociadas.
+ * </p>
+ */
 public class StatusHistoryResponse {
     private Long idStatusHistory;
     private Status previousStatus;

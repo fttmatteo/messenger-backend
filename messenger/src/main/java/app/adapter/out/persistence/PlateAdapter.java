@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Adaptador de persistencia para la entidad Plate.
+ * Implementa PlatePort para buscar y guardar placas vehiculares.
+ */
 @Component
 public class PlateAdapter implements PlatePort {
 

@@ -7,6 +7,12 @@ import app.domain.model.Dealership;
 import app.domain.ports.DealershipPort;
 import app.domain.ports.ServiceDeliveryPort;
 
+/**
+ * Servicio de dominio para eliminar concesionarios.
+ * 
+ * Valida que el concesionario no tenga servicios activos asociados antes
+ * de permitir su eliminación.
+ */
 @Service
 public class DeleteDealership {
 

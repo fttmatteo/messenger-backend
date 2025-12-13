@@ -21,6 +21,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador REST para gestionar servicios de entrega.
+ * 
+ * <p>
+ * Proporciona endpoints para:
+ * </p>
+ * <ul>
+ * <li>Crear servicios con detección OCR automática o entrada manual de
+ * placas</li>
+ * <li>Actualizar estados con evidencias (firmas y fotos)</li>
+ * <li>Consultar servicios por diversos criterios</li>
+ * </ul>
+ * 
+ * <p>
+ * Implementa control de acceso basado en roles (ADMIN puede asignar a cualquier
+ * mensajero,
+ * MESSENGER solo puede crear servicios asignados a sí mismo).
+ * </p>
+ */
 @RestController
 @RequestMapping("/services")
 public class ServiceDeliveryController {

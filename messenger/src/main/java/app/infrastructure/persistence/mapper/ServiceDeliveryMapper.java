@@ -6,6 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.stream.Collectors;
 
+/**
+ * Mapper de persistencia para convertir entre ServiceDelivery y
+ * ServiceDeliveryEntity.
+ * Maneja la conversión compleja incluyendo asociaciones con Placa,
+ * Concesionario y Mensajero.
+ */
 @Component
 public class ServiceDeliveryMapper {
 

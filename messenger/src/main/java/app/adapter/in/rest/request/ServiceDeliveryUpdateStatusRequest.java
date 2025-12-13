@@ -1,5 +1,13 @@
 package app.adapter.in.rest.request;
 
+/**
+ * DTO para actualizar el estado de un servicio de entrega.
+ * 
+ * <p>
+ * Incluye el nuevo estado, observaciones y el documento del usuario que realiza
+ * el cambio.
+ * </p>
+ */
 public class ServiceDeliveryUpdateStatusRequest {
     private String status;
     private String observation;

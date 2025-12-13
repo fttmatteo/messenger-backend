@@ -3,6 +3,23 @@ package app.domain.model;
 import app.domain.model.enums.Status;
 import java.time.LocalDateTime;
 
+/**
+ * Modelo de dominio que representa un registro en el historial de cambios de
+ * estado.
+ * 
+ * Cada vez que un servicio de entrega cambia de estado (ej. de PENDING a
+ * DELIVERED), se crea un registro de historial que documenta:
+ * 
+ * Estado anterior y nuevo estado
+ * Fecha y hora exacta del cambio
+ * Empleado que realizó el cambio
+ * Ubicación geográfica donde se realizó el cambio
+ * Fotografías de evidencia asociadas al cambio
+ * 
+ * Este registro es inmutable una vez creado, proporcionando trazabilidad
+ * completa del ciclo de vida de cada entrega.
+ */
+
 public class StatusHistory {
     private Long idStatusHistory;
     private Status previousStatus;

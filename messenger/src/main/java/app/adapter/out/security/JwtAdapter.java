@@ -18,6 +18,10 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 
+/**
+ * Adaptador de seguridad para generación y validación de tokens JWT.
+ * Implementa AuthenticationPort para manejar credenciales y sesiones.
+ */
 @Component
 public class JwtAdapter implements AuthenticationPort {
 

@@ -13,17 +13,22 @@ import app.domain.ports.LocationPort;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Controller REST para operaciones de geolocalización.
- * Incluye geocodificación, cálculo de rutas y distancias.
+ * Controlador REST para operaciones de ubicación y rutas.
+ *
+ * <p>
+ * Proporciona cálculo de rutas óptimas utilizando Google Maps Directions API.
+ * </p>
  */
 @RestController
-@RequestMapping("/api/location")
+@RequestMapping("/locations")
+@PreAuthorize("isAuthenticated()")
 public class LocationController {
 
     @Autowired

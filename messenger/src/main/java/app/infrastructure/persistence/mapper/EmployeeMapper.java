@@ -4,6 +4,11 @@ import app.domain.model.Employee;
 import app.infrastructure.persistence.entities.EmployeeEntity;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper de persistencia para convertir entre Employee y EmployeeEntity.
+ * Facilita la transformación de datos entre la capa de dominio y la base de
+ * datos.
+ */
 @Component
 public class EmployeeMapper {
 

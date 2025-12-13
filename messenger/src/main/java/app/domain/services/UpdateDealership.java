@@ -6,6 +6,12 @@ import app.application.exceptions.BusinessException;
 import app.domain.model.Dealership;
 import app.domain.ports.DealershipPort;
 
+/**
+ * Servicio de dominio para actualizar información de concesionarios existentes.
+ * 
+ * Valida unicidad del nombre si se modifica y actualiza los datos del
+ * concesionario.
+ */
 @Service
 public class UpdateDealership {
 

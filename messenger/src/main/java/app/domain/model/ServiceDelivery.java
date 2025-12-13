@@ -5,6 +5,29 @@ import app.domain.model.enums.Status;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Modelo de dominio que representa un servicio de entrega de placas
+ * vehiculares.
+ * 
+ * <p>
+ * Esta clase encapsula toda la información relacionada con la entrega de una
+ * placa
+ * a un concesionario, incluyendo:
+ * </p>
+ * <ul>
+ * <li>Información de la placa vehicular</li>
+ * <li>Concesionario destino</li>
+ * <li>Mensajero asignado</li>
+ * <li>Estado actual del servicio (PENDING, DELIVERED, RETURNED, etc.)</li>
+ * <li>Evidencias: firma digital y fotografías</li>
+ * <li>Historial completo de cambios de estado</li>
+ * </ul>
+ * 
+ * @see Status
+ * @see Plate
+ * @see Dealership
+ * @see Employee
+ */
 public class ServiceDelivery {
     private Long idServiceDelivery;
     private Plate plate;
