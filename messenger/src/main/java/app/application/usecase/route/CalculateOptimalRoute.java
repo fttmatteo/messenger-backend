@@ -18,14 +18,10 @@ import java.util.List;
 @Service
 public class CalculateOptimalRoute {
 
-    private final LocationPort locationPort;
-    private final DealershipPort dealershipPort;
-
     @Autowired
-    public CalculateOptimalRoute(LocationPort locationPort, DealershipPort dealershipPort) {
-        this.locationPort = locationPort;
-        this.dealershipPort = dealershipPort;
-    }
+    private LocationPort locationPort;
+    @Autowired
+    private DealershipPort dealershipPort;
 
     /**
      * Calcula la ruta óptima desde una ubicación origen a múltiples concesionarios.

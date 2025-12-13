@@ -14,14 +14,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class GeocodeDealership {
 
-    private final LocationPort locationPort;
-    private final DealershipPort dealershipPort;
-
     @Autowired
-    public GeocodeDealership(LocationPort locationPort, DealershipPort dealershipPort) {
-        this.locationPort = locationPort;
-        this.dealershipPort = dealershipPort;
-    }
+    private LocationPort locationPort;
+    @Autowired
+    private DealershipPort dealershipPort;
 
     /**
      * Geocodifica un concesionario y actualiza sus coordenadas.

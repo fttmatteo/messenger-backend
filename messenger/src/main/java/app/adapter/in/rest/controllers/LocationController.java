@@ -26,19 +26,12 @@ import java.util.List;
 @RequestMapping("/api/location")
 public class LocationController {
 
-    private final GeocodeDealership geocodeDealership;
-    private final CalculateOptimalRoute calculateOptimalRoute;
-    private final LocationPort locationPort;
-
     @Autowired
-    public LocationController(
-            GeocodeDealership geocodeDealership,
-            CalculateOptimalRoute calculateOptimalRoute,
-            LocationPort locationPort) {
-        this.geocodeDealership = geocodeDealership;
-        this.calculateOptimalRoute = calculateOptimalRoute;
-        this.locationPort = locationPort;
-    }
+    private GeocodeDealership geocodeDealership;
+    @Autowired
+    private CalculateOptimalRoute calculateOptimalRoute;
+    @Autowired
+    private LocationPort locationPort;
 
     /**
      * Geocodifica una dirección.

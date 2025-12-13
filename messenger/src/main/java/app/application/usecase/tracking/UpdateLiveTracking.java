@@ -19,12 +19,8 @@ import java.time.LocalDateTime;
 @Service
 public class UpdateLiveTracking {
 
-    private final TrackingPort trackingPort;
-
     @Autowired
-    public UpdateLiveTracking(TrackingPort trackingPort) {
-        this.trackingPort = trackingPort;
-    }
+    private TrackingPort trackingPort;
 
     /**
      * Procesa una actualización de ubicación del mensajero.

@@ -25,16 +25,10 @@ import java.security.Principal;
 @Controller
 public class TrackingWebSocketController {
 
-    private final SimpMessagingTemplate messagingTemplate;
-    private final UpdateLiveTracking updateLiveTracking;
-
     @Autowired
-    public TrackingWebSocketController(
-            SimpMessagingTemplate messagingTemplate,
-            UpdateLiveTracking updateLiveTracking) {
-        this.messagingTemplate = messagingTemplate;
-        this.updateLiveTracking = updateLiveTracking;
-    }
+    private SimpMessagingTemplate messagingTemplate;
+    @Autowired
+    private UpdateLiveTracking updateLiveTracking;
 
     /**
      * Recibe actualizaciones de ubicación de los mensajeros.

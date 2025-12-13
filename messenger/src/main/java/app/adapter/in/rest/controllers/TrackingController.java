@@ -26,19 +26,12 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/tracking")
 public class TrackingController {
 
-    private final UpdateLiveTracking updateLiveTracking;
-    private final GetTrackingHistory getTrackingHistory;
-    private final TrackingPort trackingPort;
-
     @Autowired
-    public TrackingController(
-            UpdateLiveTracking updateLiveTracking,
-            GetTrackingHistory getTrackingHistory,
-            TrackingPort trackingPort) {
-        this.updateLiveTracking = updateLiveTracking;
-        this.getTrackingHistory = getTrackingHistory;
-        this.trackingPort = trackingPort;
-    }
+    private UpdateLiveTracking updateLiveTracking;
+    @Autowired
+    private GetTrackingHistory getTrackingHistory;
+    @Autowired
+    private TrackingPort trackingPort;
 
     /**
      * Actualiza la ubicación de un mensajero.
