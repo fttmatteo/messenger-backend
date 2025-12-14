@@ -6,27 +6,39 @@ import java.time.LocalDateTime;
 
 /**
  * Entidad JPA que representa la tabla 'photos'.
- * Almacena metadatos de las evidencias fotográficas asociadas a servicios.
+ * 
+ * Almacena metadatos de las evidencias fotográficas asociadas a servicios
+ * de entrega. Las fotos pueden ser de detección de placa o evidencias de
+ * estado.
+ * 
+ * Relaciones:
+ * - Una foto pertenece a un ServiceDelivery (relación N:1)
+ * - Una foto puede estar asociada a un StatusHistory específico (relación N:1)
  */
 @Entity
 @Table(name = "photos")
 public class PhotoEntity {
 
+    /** Identificador único de la foto (clave primaria). */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_photo")
     private Long idPhoto;
 
+    /** Ruta del archivo de foto en el sistema de almacenamiento. */
     @Column(name = "photo_path", nullable = false)
     private String photoPath;
 
+    /** Fecha y hora en que la foto fue capturada/subida. */
     @Column(name = "upload_date")
     private LocalDateTime uploadDate;
 
+    /** Tipo de foto (PLATE_DETECTION o EVIDENCE). */
     @Enumerated(EnumType.STRING)
     @Column(name = "photo_type")
     private PhotoType photoType;
 
+    /** Servicio de entrega al que pertenece esta foto. */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "service_delivery_id")
     private ServiceDeliveryEntity serviceDelivery;
@@ -71,6 +83,7 @@ public class PhotoEntity {
         this.serviceDelivery = serviceDelivery;
     }
 
+    /** Historial de estado al que pertenece esta foto (si aplica). */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_history_id")
     private StatusHistoryEntity statusHistory;
