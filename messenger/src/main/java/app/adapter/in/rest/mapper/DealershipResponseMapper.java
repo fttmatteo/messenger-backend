@@ -13,6 +13,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class DealershipResponseMapper {
 
+    /**
+     * Convierte una entidad Dealership a DealershipResponse.
+     *
+     * @param dealership Entidad Dealership de origen.
+     * @return DTO DealershipResponse incluyendo datos de geo-localización, o null
+     *         si la entrada es nula.
+     */
     public DealershipResponse toResponse(Dealership dealership) {
         if (dealership == null) {
             return null;

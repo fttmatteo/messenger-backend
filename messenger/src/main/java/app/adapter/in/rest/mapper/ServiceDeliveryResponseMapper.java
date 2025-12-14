@@ -22,6 +22,17 @@ public class ServiceDeliveryResponseMapper {
     @Autowired
     private DealershipResponseMapper dealershipMapper;
 
+    /**
+     * Convierte una entidad ServiceDelivery a ServiceDeliveryResponse.
+     *
+     * Mapea todos los campos relevantes, incluyendo estado actual, historial,
+     * evidencias (fotos y firma), y entidades relacionadas (placa, mensajero,
+     * concesionario).
+     *
+     * @param service Entidad ServiceDelivery de origen.
+     * @return DTO ServiceDeliveryResponse completamente poblado o null si la
+     *         entrada es nula.
+     */
     public ServiceDeliveryResponse toResponse(ServiceDelivery service) {
         if (service == null) {
             return null;

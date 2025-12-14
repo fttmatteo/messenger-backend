@@ -11,6 +11,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class EmployeeResponseMapper {
 
+    /**
+     * Convierte una entidad Employee a EmployeeResponse.
+     *
+     * @param employee Entidad Employee de origen.
+     * @return DTO EmployeeResponse poblado o null si la entrada es nula.
+     */
     public EmployeeResponse toResponse(Employee employee) {
         if (employee == null) {
             return null;
