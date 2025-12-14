@@ -7,6 +7,13 @@ package app.domain.model.enums;
  * SIGNATURE: Archivo de firma digital
  */
 public enum FileType {
+    /**
+     * Archivo de fotografía o imagen (evidencia, placa, etc).
+     */
     PHOTO,
+
+    /**
+     * Archivo de firma digital capturada en el dispositivo.
+     */
     SIGNATURE
 }

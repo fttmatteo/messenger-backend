@@ -7,6 +7,13 @@ package app.domain.model.enums;
  * EVIDENCE: Foto de evidencia de entrega o visita
  */
 public enum PhotoType {
+    /**
+     * Foto inicial tomada a la placa para el proceso de detección OCR.
+     */
     PLATE_DETECTION,
+
+    /**
+     * Foto de evidencia que respalda una entrega, visita o estado del servicio.
+     */
     EVIDENCE
 }

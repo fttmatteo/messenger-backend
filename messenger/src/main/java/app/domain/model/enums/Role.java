@@ -8,6 +8,15 @@ package app.domain.model.enums;
  * MESSENGER: Mensajero que realiza entregas
  */
 public enum Role {
+    /**
+     * Administrador del sistema.
+     * Tiene acceso completo a todas las funcionalidades, configuración y reportes.
+     */
     ADMIN,
+
+    /**
+     * Mensajero de campo.
+     * Su acceso está limitado a la gestión de sus entregas asignadas.
+     */
     MESSENGER
 }

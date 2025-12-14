@@ -8,7 +8,20 @@ package app.domain.model.enums;
  * MANUAL: Ubicación ingresada manualmente.
  */
 public enum TrackingSource {
+    /**
+     * Ubicación obtenida directamente del sensor GPS del dispositivo.
+     * Alta precisión.
+     */
     GPS,
+
+    /**
+     * Ubicación estimada mediante triangulación de redes (WiFi, Celular).
+     * Precisión media/baja.
+     */
     NETWORK,
+
+    /**
+     * Ubicación ingresada o corregida manualmente por el usuario.
+     */
     MANUAL
 }
