@@ -34,8 +34,6 @@ build/
 
 # Google Cloud Credentials
 config/google-vision-credentials.json
-*.json
-!package*.json
 
 # Google Maps Config
-config/google-maps.properties
+config/google-maps-config.properties

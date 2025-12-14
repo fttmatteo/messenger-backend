@@ -7,10 +7,8 @@ import app.domain.model.enums.Status;
 /**
  * Validador para servicios de entrega.
  * 
- * <p>
  * Aplica reglas de validación y normalización para placas vehiculares y datos
  * de entrega.
- * </p>
  */
 @Component
 public class ServiceDeliveryValidator extends SimpleValidator {

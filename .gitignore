@@ -31,9 +31,6 @@ replay_pid*
 
 # Google Cloud Credentials
 config/google-vision-credentials.json
-*.json
-!package*.json
-!Messenger_API.postman_collection.json
 
 # Google Maps Config
-config/google-maps.properties
+config/google-maps-config.properties

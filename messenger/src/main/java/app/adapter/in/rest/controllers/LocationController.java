@@ -22,9 +22,7 @@ import java.util.List;
 /**
  * Controlador REST para operaciones de ubicación y rutas.
  *
- * <p>
  * Proporciona cálculo de rutas óptimas utilizando Google Maps Directions API.
- * </p>
  */
 @RestController
 @RequestMapping("/locations")

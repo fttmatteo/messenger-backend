@@ -52,18 +52,4 @@ public class RedisConfig {
         return template;
     }
 
-    /**
-     * Template genérico para operaciones de Redis con Strings.
-     */
-    @Bean
-    public RedisTemplate<String, String> stringRedisTemplate(
-            RedisConnectionFactory connectionFactory) {
-
-        RedisTemplate<String, String> template = new RedisTemplate<>();
-        template.setConnectionFactory(connectionFactory);
-        template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new StringRedisSerializer());
-        template.afterPropertiesSet();
-        return template;
-    }
 }

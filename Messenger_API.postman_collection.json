@@ -102,7 +102,7 @@
                                 "employees"
                             ]
                         },
-                        "description": "Create a new employee. **Requires ADMIN role.**\n\n**Roles:** `ADMIN`, `MESSENGER`"
+                        "description": "Create a new employee. **Requires ADMIN role.**"
                     },
                     "response": []
                 },
@@ -254,7 +254,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"name\": \"Concesionario Centro\",\n    \"address\": \"Calle 50 #45-20\",\n    \"phone\": \"6041234567\",\n    \"zone\": \"CENTRO\"\n}"
+                            "raw": "{\n    \"name\": \"Concesionario Centro\",\n    \"address\": \"Calle 50 #45-20, Medellín\",\n    \"phone\": \"6041234567\",\n    \"zone\": \"CENTRO\"\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/dealerships",
@@ -346,7 +346,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"name\": \"Concesionario Centro Updated\",\n    \"address\": \"Calle 51 #46-21\",\n    \"phone\": \"6049876543\",\n    \"zone\": \"CENTRO\"\n}"
+                            "raw": "{\n    \"name\": \"Concesionario Centro Updated\",\n    \"address\": \"Calle 51 #46-21, Medellín\",\n    \"phone\": \"6049876543\",\n    \"zone\": \"CENTRO\"\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/dealerships/1",
@@ -359,6 +359,35 @@
                             ]
                         },
                         "description": "Update an existing dealership. **Requires ADMIN role.**"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Geocode Dealership (Get Coords)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "url": {
+                            "raw": "{{baseUrl}}/dealerships/1/geocode",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "dealerships",
+                                "1",
+                                "geocode"
+                            ]
+                        },
+                        "description": "Calculates and updates the latitude/longitude of a dealership based on its address address using Google Maps API. **Requires ADMIN role.**"
                     },
                     "response": []
                 },
@@ -387,6 +416,340 @@
                             ]
                         },
                         "description": "Delete a dealership. **Requires ADMIN role.**"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "📍 Locations",
+            "item": [
+                {
+                    "name": "Geocode Address",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"address\": \"Parque Berrio, Medellín\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/locations/geocode",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "locations",
+                                "geocode"
+                            ]
+                        },
+                        "description": "Convert an address string to coordinates (latitude/longitude)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Calculate Optimal Route",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"originLatitude\": 6.25184,\n    \"originLongitude\": -75.56359,\n    \"dealershipIds\": [1, 2, 3]\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/locations/route",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "locations",
+                                "route"
+                            ]
+                        },
+                        "description": "Calculate the optimal route visiting multiple dealerships starting from an origin point."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Calculate Distance",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/locations/distance?fromLat=6.2442&fromLng=-75.5812&toLat=6.2530&toLng=-75.5646",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "locations",
+                                "distance"
+                            ],
+                            "query": [
+                                {
+                                    "key": "fromLat",
+                                    "value": "6.2442"
+                                },
+                                {
+                                    "key": "fromLng",
+                                    "value": "-75.5812"
+                                },
+                                {
+                                    "key": "toLat",
+                                    "value": "6.2530"
+                                },
+                                {
+                                    "key": "toLng",
+                                    "value": "-75.5646"
+                                }
+                            ]
+                        },
+                        "description": "Calculate driving distance and estimated duration between two coordinates."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Reverse Geocode",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/locations/reverse?lat=6.25184&lng=-75.56359",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "locations",
+                                "reverse"
+                            ],
+                            "query": [
+                                {
+                                    "key": "lat",
+                                    "value": "6.25184"
+                                },
+                                {
+                                    "key": "lng",
+                                    "value": "-75.56359"
+                                }
+                            ]
+                        },
+                        "description": "Convert coordinates (latitude/longitude) to a human-readable address."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "📡 Tracking",
+            "item": [
+                {
+                    "name": "Update Live Location",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"messengerId\": 1,\n    \"latitude\": 6.217,\n    \"longitude\": -75.567,\n    \"accuracy\": 10.5,\n    \"speed\": 35.0,\n    \"heading\": 90.0,\n    \"status\": \"ONLINE\",\n    \"deviceId\": \"android-device-123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/tracking/update",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "tracking",
+                                "update"
+                            ]
+                        },
+                        "description": "Update the real-time location of a messenger. **Requires MESSENGER or ADMIN role.**"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Last Location",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/tracking/messenger/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "tracking",
+                                "messenger",
+                                "1"
+                            ]
+                        },
+                        "description": "Get the last known location of a specific messenger. **Requires ADMIN role.**"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Active Messengers",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/tracking/active",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "tracking",
+                                "active"
+                            ]
+                        },
+                        "description": "Get all messengers currently online/active with their last location. **Requires ADMIN role.**"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Messenger History",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/tracking/history/1?date=2025-12-14",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "tracking",
+                                "history",
+                                "1"
+                            ],
+                            "query": [
+                                {
+                                    "key": "date",
+                                    "value": "2025-12-14"
+                                }
+                            ]
+                        },
+                        "description": "Get location history for a messenger on a specific date."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Service History",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/tracking/service/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "tracking",
+                                "service",
+                                "1"
+                            ]
+                        },
+                        "description": "Get location history associated with a specific service delivery."
                     },
                     "response": []
                 }
