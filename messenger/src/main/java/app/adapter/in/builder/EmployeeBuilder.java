@@ -6,8 +6,11 @@ import app.adapter.in.validators.EmployeeValidator;
 import app.domain.model.Employee;
 
 /**
- * Builder para construir objetos Employee validados desde DTOs.
- * Valida y construye instancias de Employee aplicando reglas de negocio.
+ * Componente encargado de la construcción de objetos {@link Employee}.
+ *
+ * Aplica validaciones de reglas de negocio a través de
+ * {@link EmployeeValidator}
+ * antes de crear la instancia del modelo de dominio.
  */
 @Component
 public class EmployeeBuilder {
@@ -15,6 +18,21 @@ public class EmployeeBuilder {
     @Autowired
     private EmployeeValidator validator;
 
+    /**
+     * Construye una instancia de Employee con los datos proporcionados.
+     *
+     * Valida cada campo (documento, nombre, teléfono, usuario, contraseña, rol)
+     * antes de asignarlo al objeto.
+     *
+     * @param document Número de documento del empleado.
+     * @param fullName Nombre completo del empleado.
+     * @param phone    Número de teléfono de contacto.
+     * @param userName Nombre de usuario para el sistema.
+     * @param password Contraseña de acceso.
+     * @param role     Rol asignado (ADMIN, MESSENGER).
+     * @return Instancia de {@link Employee} validada.
+     * @throws Exception Si alguna validación de campo falla.
+     */
     public Employee build(String document, String fullName, String phone, String userName, String password, String role)
             throws Exception {
         Employee employee = new Employee();
