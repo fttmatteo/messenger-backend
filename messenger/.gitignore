@@ -40,3 +40,6 @@ config/google-maps-config.properties
 
 # Google Cloud Storage
 config/messenger-storage.json
+
+# JWT Secrets (NO hacer commit)
+config/secrets.properties
