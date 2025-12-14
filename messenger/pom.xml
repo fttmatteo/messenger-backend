@@ -43,6 +43,12 @@
 			<artifactId>google-cloud-vision</artifactId>
 			<version>3.31.0</version>
 		</dependency>
+		<!-- Google Cloud Storage dependency -->
+		<dependency>
+			<groupId>com.google.cloud</groupId>
+			<artifactId>google-cloud-storage</artifactId>
+			<version>2.29.0</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
