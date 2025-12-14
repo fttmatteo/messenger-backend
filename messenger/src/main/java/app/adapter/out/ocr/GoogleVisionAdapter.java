@@ -4,7 +4,6 @@ import app.domain.ports.OcrPort;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.vision.v1.*;
 import com.google.protobuf.ByteString;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -22,17 +21,12 @@ import java.util.List;
 @Component
 public class GoogleVisionAdapter implements OcrPort {
 
-    @Value("${google.cloud.credentials.path:config/google-vision-credentials.json}")
-    private String credentialsPath;
-
     private ImageAnnotatorClient createClient() throws IOException {
-        File credentialsFile = new File(credentialsPath);
-        if (!credentialsFile.exists()) {
-            throw new IOException("Archivo de credenciales no encontrado: " + credentialsPath +
-                    ". Asegúrate de que el archivo existe en: " + credentialsFile.getAbsolutePath());
-        }
+        // Usa Application Default Credentials (ADC).
+        // En local: set env var GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json
+        // En Prod: Usa la identidad del servicio (Workload Identity)
+        GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
 
-        GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(credentialsFile));
         ImageAnnotatorSettings settings = ImageAnnotatorSettings.newBuilder()
                 .setCredentialsProvider(() -> credentials)
                 .build();
@@ -51,7 +45,6 @@ public class GoogleVisionAdapter implements OcrPort {
         try {
             System.out.println("=== INICIO OCR (Google Vision) ===");
             System.out.println("Archivo entrada: " + imageFile.getAbsolutePath());
-            System.out.println("Credenciales: " + credentialsPath);
 
             ByteString imgBytes = ByteString.readFrom(new FileInputStream(imageFile));
 

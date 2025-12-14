@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -43,7 +42,6 @@ public class GoogleCloudStorageAdapter implements StoragePort {
 
     public GoogleCloudStorageAdapter(
             @Value("${google.cloud.storage.bucket-name}") String bucketName,
-            @Value("${google.cloud.storage.credentials-path}") String credentialsPath,
             @Value("${google.cloud.storage.project-id}") String projectId,
             @Value("${google.cloud.storage.signed-url-expiration-hours:24}") int urlExpirationHours)
             throws IOException {
@@ -51,9 +49,8 @@ public class GoogleCloudStorageAdapter implements StoragePort {
         this.bucketName = bucketName;
         this.defaultUrlExpirationHours = urlExpirationHours;
 
-        // Cargar credenciales desde archivo JSON
-        GoogleCredentials credentials = GoogleCredentials.fromStream(
-                new FileInputStream(credentialsPath));
+        // Usa Application Default Credentials (ADC)
+        GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
 
         // Inicializar cliente de Storage
         this.storage = StorageOptions.newBuilder()
