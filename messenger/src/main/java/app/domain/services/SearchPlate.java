@@ -17,6 +17,13 @@ public class SearchPlate {
     @Autowired
     private PlatePort platePort;
 
+    /**
+     * Busca una placa por su ID.
+     * 
+     * @param idPlate ID de la placa.
+     * @return Placa encontrada.
+     * @throws RuntimeException Si la placa no existe.
+     */
     public Plate findById(Long idPlate) {
         Plate plate = platePort.findById(idPlate);
         if (plate == null) {
@@ -25,6 +32,13 @@ public class SearchPlate {
         return plate;
     }
 
+    /**
+     * Busca una placa por su número.
+     * 
+     * @param plateNumber Número de placa.
+     * @return Placa encontrada.
+     * @throws RuntimeException Si la placa no existe.
+     */
     public Plate findByPlateNumber(String plateNumber) {
         Plate plate = platePort.findByPlateNumber(plateNumber);
         if (plate == null) {

@@ -19,6 +19,12 @@ public class DeleteServiceDelivery {
     @Autowired
     private ServiceDeliveryPort serviceDeliveryPort;
 
+    /**
+     * Elimina un servicio de entrega por su ID.
+     * 
+     * @param id ID del servicio a eliminar.
+     * @throws Exception Si el servicio no existe o ya está en estado DELIVERED.
+     */
     public void deleteById(Long id) throws Exception {
         ServiceDelivery service = serviceDeliveryPort.findById(id);
         if (service == null) {

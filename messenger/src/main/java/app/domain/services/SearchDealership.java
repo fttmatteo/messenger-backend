@@ -17,10 +17,22 @@ public class SearchDealership {
     @Autowired
     private DealershipPort dealershipPort;
 
+    /**
+     * Obtiene todos los concesionarios registrados.
+     * 
+     * @return Lista completa de concesionarios.
+     */
     public List<Dealership> findAll() {
         return dealershipPort.findAll();
     }
 
+    /**
+     * Busca un concesionario por su ID.
+     * 
+     * @param id ID del concesionario.
+     * @return Concesionario encontrado.
+     * @throws RuntimeException Si el concesionario no existe.
+     */
     public Dealership findById(Long id) {
         Dealership dealership = dealershipPort.findById(id);
         if (dealership == null) {
@@ -29,6 +41,13 @@ public class SearchDealership {
         return dealership;
     }
 
+    /**
+     * Busca un concesionario por su nombre.
+     * 
+     * @param name Nombre del concesionario.
+     * @return Concesionario encontrado.
+     * @throws RuntimeException Si el concesionario no existe.
+     */
     public Dealership findByName(String name) {
         Dealership dealership = dealershipPort.findByName(name);
         if (dealership == null) {

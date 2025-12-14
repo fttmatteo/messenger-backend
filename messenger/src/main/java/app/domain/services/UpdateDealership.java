@@ -18,6 +18,14 @@ public class UpdateDealership {
     @Autowired
     private DealershipPort dealershipPort;
 
+    /**
+     * Actualiza la información de un concesionario existente.
+     * 
+     * @param id           ID del concesionario a actualizar.
+     * @param incomingData Nuevos datos del concesionario.
+     * @throws Exception Si el concesionario no existe o el nuevo nombre ya está en
+     *                   uso.
+     */
     public void update(Long id, Dealership incomingData) throws Exception {
         Dealership existingDealership = dealershipPort.findById(id);
         if (existingDealership == null) {

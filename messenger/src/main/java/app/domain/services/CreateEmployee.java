@@ -23,6 +23,14 @@ public class CreateEmployee {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    /**
+     * Crea un nuevo empleado en el sistema.
+     * 
+     * Valida unicidad de documento y username, y encripta la contraseña con BCrypt.
+     * 
+     * @param employee Empleado a crear.
+     * @throws Exception Si el documento o username ya están en uso.
+     */
     public void create(Employee employee) throws Exception {
         validateDocumentIsUnique(employee.getDocument());
         validateUserNameIsUnique(employee.getUserName());

@@ -38,6 +38,22 @@ public class UpdateServiceDelivery {
     @Autowired
     private EmployeePort employeePort;
 
+    /**
+     * Actualiza el estado de un servicio de entrega.
+     * 
+     * Valida transiciones de estado, permisos de usuario, y evidencias requeridas
+     * según el nuevo estado.
+     * Registra el cambio en el historial del servicio.
+     * 
+     * @param serviceId    ID del servicio a actualizar.
+     * @param newStatus    Nuevo estado del servicio.
+     * @param observation  Observación del cambio (opcional según estado).
+     * @param signature    Firma digital (obligatoria según estado).
+     * @param photos       Fotos de evidencia (obligatorias según estado).
+     * @param userDocument Documento del usuario que realiza el cambio.
+     * @throws Exception Si la transición no es válida, faltan evidencias, o el
+     *                   usuario no tiene permisos.
+     */
     public void updateStatus(Long serviceId, Status newStatus, String observation,
             Signature signature, List<Photo> photos, Long userDocument) throws Exception {
 

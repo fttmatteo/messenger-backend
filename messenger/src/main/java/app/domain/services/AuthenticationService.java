@@ -37,6 +37,16 @@ public class AuthenticationService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    /**
+     * Autentica un usuario y genera un token JWT.
+     * 
+     * Verifica las credenciales, migra contraseñas planas a BCrypt si es necesario,
+     * y genera un token de sesión.
+     * 
+     * @param credentials Credenciales del usuario (username y password).
+     * @return TokenResponse con el token JWT y rol del usuario.
+     * @throws Exception Si el usuario no existe o la contraseña es incorrecta.
+     */
     public TokenResponse authenticate(AuthCredentials credentials) throws Exception {
         Employee employee = employeePort.findByUserName(credentials.getUserName());
         if (employee == null) {

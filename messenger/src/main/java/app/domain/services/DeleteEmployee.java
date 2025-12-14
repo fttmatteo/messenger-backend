@@ -22,6 +22,12 @@ public class DeleteEmployee {
     @Autowired
     private ServiceDeliveryPort serviceDeliveryPort;
 
+    /**
+     * Elimina un empleado por su número de documento.
+     * 
+     * @param document Número de documento del empleado.
+     * @throws Exception Si el empleado no existe o tiene servicios asociados.
+     */
     public void deleteByDocument(Long document) throws Exception {
         Employee employee = employeePort.findByDocument(document);
         if (employee == null) {
@@ -37,6 +43,12 @@ public class DeleteEmployee {
         employeePort.deleteByDocument(document);
     }
 
+    /**
+     * Elimina un empleado por su ID.
+     * 
+     * @param id ID del empleado.
+     * @throws Exception Si el empleado no existe o tiene servicios asociados.
+     */
     public void deleteById(Long id) throws Exception {
         Employee employee = employeePort.findById(id);
         if (employee == null) {

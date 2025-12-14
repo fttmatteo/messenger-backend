@@ -45,6 +45,21 @@ public class CreateServiceDelivery {
     @Autowired
     private PlateRecognition plateRecognition;
 
+    /**
+     * Crea un nuevo servicio de entrega.
+     * 
+     * Valida mensajero y concesionario, determina tipo de placa, crea la placa si
+     * no existe,
+     * e inicializa el servicio en estado ASSIGNED con su primer registro de
+     * historial.
+     * 
+     * @param plateNumber       Número de placa vehicular.
+     * @param photoPath         Ruta de la foto de detección de placa (opcional).
+     * @param dealershipId      ID del concesionario destino.
+     * @param messengerDocument Documento del mensajero asignado.
+     * @throws Exception Si el mensajero o concesionario no existen, o si el formato
+     *                   de placa es inválido.
+     */
     public void create(String plateNumber, String photoPath, Long dealershipId, Long messengerDocument)
             throws Exception {
         Employee messenger = employeePort.findByDocument(messengerDocument);

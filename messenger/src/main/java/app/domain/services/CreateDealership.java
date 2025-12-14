@@ -17,6 +17,12 @@ public class CreateDealership {
     @Autowired
     private DealershipPort dealershipPort;
 
+    /**
+     * Crea un nuevo concesionario en el sistema.
+     * 
+     * @param dealership Concesionario a crear.
+     * @throws Exception Si ya existe un concesionario con el mismo nombre.
+     */
     public void create(Dealership dealership) throws Exception {
         Dealership existing = dealershipPort.findByName(dealership.getName());
         if (existing != null) {

@@ -25,6 +25,17 @@ public class UpdateEmployee {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    /**
+     * Actualiza la información de un empleado existente.
+     * 
+     * Valida unicidad de documento y username si se modifican, y re-encripta la
+     * contraseña si se proporciona.
+     * 
+     * @param id           ID del empleado a actualizar.
+     * @param incomingData Nuevos datos del empleado.
+     * @throws Exception Si el empleado no existe, o el documento/username ya están
+     *                   en uso.
+     */
     public void update(Long id, Employee incomingData) throws Exception {
         Employee existingEmployee = employeePort.findById(id);
         if (existingEmployee == null) {
