@@ -16,7 +16,7 @@
 	<url/>
 	<licenses>
 		<license/>
-	</licenses>
+	</licenses> 
 	<developers>
 		<developer/>
 	</developers>
@@ -130,6 +130,17 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<!-- Configuración para tests con Mockito -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>
+						-XX:+EnableDynamicAgentLoading
+						-Djdk.instrument.traceUsage
+					</argLine>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
