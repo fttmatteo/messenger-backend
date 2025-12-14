@@ -16,6 +16,21 @@ import app.domain.ports.EmployeePort;
 import app.domain.ports.PlatePort;
 import app.domain.ports.ServiceDeliveryPort;
 
+/**
+ * Servicio de dominio para crear nuevos servicios de entrega.
+ * 
+ * Orquesta el proceso completo de creación de un servicio de entrega:
+ * 
+ * Validación de existencia del mensajero asignado
+ * Validación de existencia del concesionario destino
+ * Normalización y registro de la placa vehicular
+ * Determinación automática del tipo de placa (carro, moto, motocarro)
+ * Asociación de foto de detección si está disponible
+ * Inicialización del servicio en estado ASSIGNED
+ * Creación del primer registro en el historial de estados
+ * 
+ * Si la placa no existe previamente, se crea automáticamente en el sistema.
+ */
 @Service
 public class CreateServiceDelivery {
 
@@ -30,6 +45,21 @@ public class CreateServiceDelivery {
     @Autowired
     private PlateRecognition plateRecognition;
 
+    /**
+     * Crea un nuevo servicio de entrega.
+     * 
+     * Valida mensajero y concesionario, determina tipo de placa, crea la placa si
+     * no existe,
+     * e inicializa el servicio en estado ASSIGNED con su primer registro de
+     * historial.
+     * 
+     * @param plateNumber       Número de placa vehicular.
+     * @param photoPath         Ruta de la foto de detección de placa (opcional).
+     * @param dealershipId      ID del concesionario destino.
+     * @param messengerDocument Documento del mensajero asignado.
+     * @throws Exception Si el mensajero o concesionario no existen, o si el formato
+     *                   de placa es inválido.
+     */
     public void create(String plateNumber, String photoPath, Long dealershipId, Long messengerDocument)
             throws Exception {
         Employee messenger = employeePort.findByDocument(messengerDocument);

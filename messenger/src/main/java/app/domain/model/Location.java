@@ -89,7 +89,6 @@ public class Location {
                 longitude >= -180 && longitude <= 180;
     }
 
-    // Getters (inmutables, sin setters)
     public Double getLatitude() {
         return latitude;
     }

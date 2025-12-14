@@ -25,14 +25,10 @@ import java.util.List;
 @Component
 public class GoogleMapsAdapter implements LocationPort {
 
-    private final GeoApiContext context;
-    private final GoogleMapsMapper mapper;
-
     @Autowired
-    public GoogleMapsAdapter(GeoApiContext context, GoogleMapsMapper mapper) {
-        this.context = context;
-        this.mapper = mapper;
-    }
+    private GeoApiContext context;
+    @Autowired
+    private GoogleMapsMapper mapper;
 
     @Override
     public Location geocodeAddress(String address) {

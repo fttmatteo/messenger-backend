@@ -17,6 +17,19 @@ import app.domain.services.DeleteServiceDelivery;
 import app.domain.services.SearchServiceDelivery;
 import app.domain.services.UpdateServiceDelivery;
 
+/**
+ * Caso de uso de aplicación para gestionar servicios de entrega.
+ * 
+ * Orquesta operaciones complejas de servicios de entrega incluyendo:
+ * Creación con detección OCR automática de placas
+ * Creación con entrada manual de placas
+ * Actualización de estados con gestión de archivos (firmas y fotos)
+ * Consultas por múltiples criterios
+ * Manejo transaccional con rollback automático en caso de error
+ * 
+ * Gestiona el almacenamiento de archivos y limpieza automática si falla la
+ * operación.
+ */
 @Service
 public class ServiceDeliveryUseCase {
 

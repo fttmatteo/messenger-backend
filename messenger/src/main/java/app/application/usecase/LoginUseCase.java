@@ -6,6 +6,12 @@ import app.domain.model.auth.AuthCredentials;
 import app.domain.model.auth.TokenResponse;
 import app.domain.services.AuthenticationService;
 
+/**
+ * Caso de uso para autenticación de usuarios.
+ * 
+ * Procesa solicitudes de login delegando al servicio de autenticación del
+ * dominio.
+ */
 @Component
 public class LoginUseCase {
     @Autowired

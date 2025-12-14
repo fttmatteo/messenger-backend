@@ -1,0 +1,77 @@
+{
+    "properties": [
+        {
+            "name": "jwt.secret",
+            "type": "java.lang.String",
+            "description": "Clave secreta para firmar tokens JWT. Debe ser una cadena Base64 segura."
+        },
+        {
+            "name": "jwt.expiration",
+            "type": "java.lang.Long",
+            "description": "Tiempo de expiración del token JWT en milisegundos (default: 1800000 = 30 minutos)."
+        },
+        {
+            "name": "app.storage.path",
+            "type": "java.lang.String",
+            "description": "Ruta local donde se guardan archivos (deprecated - ahora se usa Google Cloud Storage).",
+            "deprecation": {
+                "reason": "Reemplazado por Google Cloud Storage",
+                "replacement": "google.cloud.storage.bucket-name"
+            }
+        },
+        {
+            "name": "google.cloud.credentials.path",
+            "type": "java.lang.String",
+            "description": "Ruta al archivo de credenciales JSON de Google Cloud Vision API."
+        },
+        {
+            "name": "google.maps.config.path",
+            "type": "java.lang.String",
+            "description": "Ruta al archivo de configuración de Google Maps API."
+        },
+        {
+            "name": "google.cloud.storage.bucket-name",
+            "type": "java.lang.String",
+            "description": "Nombre del bucket de Google Cloud Storage (debe ser único globalmente)."
+        },
+        {
+            "name": "google.cloud.storage.credentials-path",
+            "type": "java.lang.String",
+            "description": "Ruta al archivo de credenciales JSON del Service Account de GCS."
+        },
+        {
+            "name": "google.cloud.storage.project-id",
+            "type": "java.lang.String",
+            "description": "ID del proyecto de Google Cloud."
+        },
+        {
+            "name": "google.cloud.storage.signed-url-expiration-hours",
+            "type": "java.lang.Integer",
+            "description": "Duración en horas de las URLs firmadas de GCS (default: 24).",
+            "defaultValue": 24
+        },
+        {
+            "name": "tracking.update.interval",
+            "type": "java.lang.Long",
+            "description": "Intervalo de actualización de ubicación en milisegundos (default: 30000 = 30 segundos).",
+            "defaultValue": 30000
+        },
+        {
+            "name": "tracking.max.distance.validation",
+            "type": "java.lang.Integer",
+            "description": "Distancia máxima en metros para validar ubicación (default: 200m).",
+            "defaultValue": 200
+        },
+        {
+            "name": "tracking.history.retention.days",
+            "type": "java.lang.Integer",
+            "description": "Días de retención del historial de tracking (default: 30 días).",
+            "defaultValue": 30
+        },
+        {
+            "name": "websocket.allowed.origins",
+            "type": "java.lang.String",
+            "description": "Orígenes permitidos para conexiones WebSocket (separados por comas)."
+        }
+    ]
+}

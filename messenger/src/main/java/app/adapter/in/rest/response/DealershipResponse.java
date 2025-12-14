@@ -1,5 +1,10 @@
 package app.adapter.in.rest.response;
 
+/**
+ * DTO de respuesta con la información de un concesionario.
+ * 
+ * Incluye detalles de contacto y ubicación geocodificada.
+ */
 public class DealershipResponse {
     private Long idDealership;
     private String name;

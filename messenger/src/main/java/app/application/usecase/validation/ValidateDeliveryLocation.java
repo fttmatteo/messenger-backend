@@ -15,15 +15,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class ValidateDeliveryLocation {
 
-    private final DealershipPort dealershipPort;
+    @Autowired
+    private DealershipPort dealershipPort;
 
     @Value("${tracking.max.distance.validation:200}")
     private Double maxDistanceMeters;
-
-    @Autowired
-    public ValidateDeliveryLocation(DealershipPort dealershipPort) {
-        this.dealershipPort = dealershipPort;
-    }
 
     /**
      * Valida que la ubicación de entrega esté dentro del radio permitido del

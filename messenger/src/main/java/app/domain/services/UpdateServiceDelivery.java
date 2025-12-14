@@ -15,6 +15,21 @@ import app.domain.model.enums.Status;
 import app.domain.ports.EmployeePort;
 import app.domain.ports.ServiceDeliveryPort;
 
+/**
+ * Servicio de dominio para actualizar el estado de servicios de entrega.
+ * 
+ * Gestiona las transiciones de estado del ciclo de vida de una entrega:
+ * Validación de transiciones de estado permitidas
+ * Verificación de evidencias requeridas según el nuevo estado
+ * Control de permisos (estados CANCELED y OBSERVED solo para admins)
+ * Registro de firmas digitales, fotos y observaciones
+ * Actualización del historial de cambios de estado
+ * 
+ * Reglas de evidencia:
+ * DELIVERED: Solo firma obligatoria
+ * PENDING/FAILED/RETURNED: Firma, foto y observación obligatorias
+ * CANCELED/OBSERVED: Sin evidencias requeridas (solo admins)
+ */
 @Service
 public class UpdateServiceDelivery {
 
@@ -23,6 +38,22 @@ public class UpdateServiceDelivery {
     @Autowired
     private EmployeePort employeePort;
 
+    /**
+     * Actualiza el estado de un servicio de entrega.
+     * 
+     * Valida transiciones de estado, permisos de usuario, y evidencias requeridas
+     * según el nuevo estado.
+     * Registra el cambio en el historial del servicio.
+     * 
+     * @param serviceId    ID del servicio a actualizar.
+     * @param newStatus    Nuevo estado del servicio.
+     * @param observation  Observación del cambio (opcional según estado).
+     * @param signature    Firma digital (obligatoria según estado).
+     * @param photos       Fotos de evidencia (obligatorias según estado).
+     * @param userDocument Documento del usuario que realiza el cambio.
+     * @throws Exception Si la transición no es válida, faltan evidencias, o el
+     *                   usuario no tiene permisos.
+     */
     public void updateStatus(Long serviceId, Status newStatus, String observation,
             Signature signature, List<Photo> photos, Long userDocument) throws Exception {
 
@@ -83,12 +114,10 @@ public class UpdateServiceDelivery {
     private void validateEvidence(Status status, Signature signature, List<Photo> photos, String observation)
             throws BusinessException {
 
-        // CANCELED or OBSERVED: No evidence required
         if (status == Status.CANCELED || status == Status.OBSERVED || status == Status.ASSIGNED) {
             return;
         }
 
-        // DELIVERED: Only signature required
         if (status == Status.DELIVERED) {
             if (signature == null) {
                 throw new BusinessException("Para marcar como ENTREGADO, la firma de recibido es obligatoria.");
@@ -96,7 +125,6 @@ public class UpdateServiceDelivery {
             return;
         }
 
-        // ALL OTHER STATUSES (Pending, Failed, Returned, etc.): All evidence required
         if (signature == null) {
             throw new BusinessException("Para el estado " + status + " la firma es obligatoria.");
         }

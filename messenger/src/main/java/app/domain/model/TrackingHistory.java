@@ -26,7 +26,6 @@ public class TrackingHistory {
         this.source = source;
     }
 
-    // Getters y Setters
     public Long getHistoryId() {
         return historyId;
     }

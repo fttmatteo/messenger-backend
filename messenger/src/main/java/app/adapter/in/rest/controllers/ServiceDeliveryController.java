@@ -21,6 +21,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador REST para gestionar servicios de entrega.
+ *
+ * Proporciona endpoints para:
+ * - Crear servicios con detección OCR automática o entrada manual de placas.
+ * - Actualizar estados con evidencias (firmas y fotos).
+ * - Consultar servicios por diversos criterios (ID, mensajero, concesionario,
+ * estado).
+ *
+ * Implementa control de acceso basado en roles:
+ * - ADMIN puede asignar servicios a cualquier mensajero.
+ * - MESSENGER solo puede gestionar sus propios servicios asignados.
+ */
 @RestController
 @RequestMapping("/services")
 public class ServiceDeliveryController {
@@ -34,6 +47,20 @@ public class ServiceDeliveryController {
     @Autowired
     private app.domain.ports.EmployeePort employeePort;
 
+    /**
+     * Crea un nuevo servicio de entrega.
+     *
+     * Permite la creación mediante detección automática de placa (OCR) desde una
+     * imagen
+     * o mediante ingreso manual. Asigna el servicio a un mensajero específico.
+     *
+     * @param image             Archivo de imagen para OCR (requerido).
+     * @param dealershipId      ID del concesionario origen.
+     * @param messengerDocument Documento del mensajero asignado (requerido para
+     *                          ADMIN).
+     * @param manualPlateNumber Placa ingresada manualmente (opcional, omite OCR).
+     * @return ResponseEntity con mensaje de éxito o error.
+     */
     @PostMapping("/create")
     public ResponseEntity<?> createService(
             @RequestParam("image") MultipartFile image,
@@ -52,12 +79,10 @@ public class ServiceDeliveryController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User authentication not found or invalid.");
             }
 
-            // If user is not ADMIN, force assignment to themselves
             String finalMessengerDocument = messengerDocument;
             if (currentUser.getRole() != app.domain.model.enums.Role.ADMIN) {
                 finalMessengerDocument = String.valueOf(currentUser.getDocument());
             } else {
-                // If ADMIN, messengerDocument is required
                 if (messengerDocument == null || messengerDocument.trim().isEmpty()) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                             .body("Messenger document is required for Admin users.");
@@ -72,7 +97,6 @@ public class ServiceDeliveryController {
 
             imageFile = convertToFile(image);
 
-            // Use manual plate number if provided, otherwise use OCR
             if (manualPlateNumber != null && !manualPlateNumber.isEmpty()) {
                 System.out.println("Using manual plate number: " + manualPlateNumber);
                 serviceDeliveryUseCase.createServiceWithManualPlate(
@@ -100,6 +124,20 @@ public class ServiceDeliveryController {
         }
     }
 
+    /**
+     * Actualiza el estado de un servicio de entrega existente.
+     *
+     * Permite adjuntar evidencias obligatorias según el nuevo estado (firmas,
+     * fotos).
+     *
+     * @param id          ID del servicio a actualizar.
+     * @param status      Nuevo estado del servicio.
+     * @param observation Observaciones adicionales sobre el cambio de estado.
+     * @param signature   Archivo de imagen con la firma de conformidad (opcional
+     *                    según estado).
+     * @param photos      Lista de fotos de evidencia (opcional según estado).
+     * @return ResponseEntity con mensaje de éxito o error.
+     */
     @PutMapping("/{id}/status")
     public ResponseEntity<?> updateStatus(
             @PathVariable Long id,
@@ -160,6 +198,12 @@ public class ServiceDeliveryController {
         }
     }
 
+    /**
+     * Busca un servicio de entrega por su ID.
+     *
+     * @param id ID del servicio.
+     * @return Datos del servicio encontrado o 404 si no existe.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable Long id) {
         try {
@@ -173,6 +217,14 @@ public class ServiceDeliveryController {
         }
     }
 
+    /**
+     * Obtiene todos los servicios asociados al usuario actual.
+     *
+     * Si es ADMIN, lista todos los servicios.
+     * Si es MESSENGER, lista solo los servicios asignados a él.
+     *
+     * @return Lista de servicios correspondientes.
+     */
     @GetMapping
     public ResponseEntity<List<ServiceDeliveryResponse>> findAll() {
         org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
@@ -194,6 +246,12 @@ public class ServiceDeliveryController {
         return ResponseEntity.ok(responses);
     }
 
+    /**
+     * Busca servicios asignados a un mensajero específico.
+     *
+     * @param messengerId Documento del mensajero.
+     * @return Lista de servicios asignados al mensajero.
+     */
     @GetMapping("/messenger/{messengerId}")
     public ResponseEntity<List<ServiceDeliveryResponse>> findByMessenger(@PathVariable Long messengerId) {
         List<ServiceDeliveryResponse> responses = serviceDeliveryUseCase.findByMessenger(messengerId).stream()
@@ -202,6 +260,12 @@ public class ServiceDeliveryController {
         return ResponseEntity.ok(responses);
     }
 
+    /**
+     * Busca servicios asociados a un concesionario específico.
+     *
+     * @param dealershipId ID del concesionario.
+     * @return Lista de servicios del concesionario.
+     */
     @GetMapping("/dealership/{dealershipId}")
     public ResponseEntity<List<ServiceDeliveryResponse>> findByDealership(@PathVariable Long dealershipId) {
         List<ServiceDeliveryResponse> responses = serviceDeliveryUseCase.findByDealership(dealershipId).stream()
@@ -210,6 +274,12 @@ public class ServiceDeliveryController {
         return ResponseEntity.ok(responses);
     }
 
+    /**
+     * Busca servicios que se encuentren en un estado específico.
+     *
+     * @param status Estado por el cual filtrar (PENDING, DELIVERED, etc).
+     * @return Lista de servicios con el estado especificado.
+     */
     @GetMapping("/status/{status}")
     public ResponseEntity<List<ServiceDeliveryResponse>> findByStatus(@PathVariable Status status) {
         List<ServiceDeliveryResponse> responses = serviceDeliveryUseCase.findByStatus(status).stream()

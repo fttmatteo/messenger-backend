@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Adaptador de persistencia para la entidad Dealership.
+ * Implementa DealershipPort utilizando repositorios JPA y Mappers.
+ */
 @Component
 public class DealershipAdapter implements DealershipPort {
 

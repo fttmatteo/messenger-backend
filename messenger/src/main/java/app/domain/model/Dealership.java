@@ -1,5 +1,16 @@
 package app.domain.model;
 
+/**
+ * Modelo de dominio que representa un concesionario de vehículos.
+ * 
+ * Almacena la información completa de un concesionario incluyendo datos de
+ * contacto y ubicación geográfica. Soporta geocodificación mediante Google Maps
+ * API para convertir direcciones en coordenadas precisas.
+ * 
+ * La geocodificación permite calcular rutas y validar distancias de entrega,
+ * asegurando que los mensajeros se encuentren en el radio correcto al momento
+ * de completar una entrega.
+ */
 public class Dealership {
     private Long idDealership;
     private String name;

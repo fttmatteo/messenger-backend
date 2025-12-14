@@ -67,7 +67,6 @@ public class Route {
         return 2 + (waypoints != null ? waypoints.size() : 0);
     }
 
-    // Getters (inmutables)
     public Location getOrigin() {
         return origin;
     }

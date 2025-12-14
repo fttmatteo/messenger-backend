@@ -12,6 +12,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Adaptador de persistencia para la entidad ServiceDelivery.
+ * Implementa ServiceDeliveryPort para gestionar el ciclo de vida de los
+ * servicios de entrega.
+ */
 @Component
 public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
 

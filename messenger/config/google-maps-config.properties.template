@@ -1,0 +1,35 @@
+# ============================================
+# GOOGLE MAPS API CONFIGURATION
+# ============================================
+# Este archivo contiene la API Key de Google Maps Platform
+# NO hacer commit de este archivo con la clave real
+
+# Google Maps API Key
+# Obtén tu clave en: https://console.cloud.google.com/apis/credentials
+google.maps.api.key=REEMPLAZA_CON_TU_API_KEY_DE_GOOGLE_MAPS
+
+# INSTRUCCIONES:
+# 
+# 1. Ve a Google Cloud Console: https://console.cloud.google.com
+# 2. Selecciona tu proyecto o crea uno nuevo
+# 3. Habilita las siguientes APIs:
+#    - Geocoding API
+#    - Directions API  
+#    - Distance Matrix API
+#    - Geolocation API
+# 4. Ve a "APIs & Services" → "Credentials"
+# 5. Clic en "CREATE CREDENTIALS" → "API key"
+# 6. Copia la clave generada
+# 7. OPCIONAL pero RECOMENDADO: Configura restricciones
+#    - Application restrictions: IP addresses o HTTP referrers
+#    - API restrictions: Selecciona solo las APIs necesarias
+# 8. Pega tu clave real en la línea 7
+# 9. NUNCA hagas commit de este archivo con la clave real
+
+# Ejemplo de clave (NO VÁLIDA):
+# google.maps.api.key=AIzaSyC1234567890abcdefghijklmnopqrstuvwxyz
+
+# IMPORTANTE:
+# - Mantén este archivo en .gitignore
+# - En producción, usa una clave diferente
+# - Configura restricciones de IP para mayor seguridad

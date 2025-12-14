@@ -18,6 +18,12 @@ import app.domain.model.Dealership;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador REST para gestionar concesionarios.
+ * 
+ * Proporciona operaciones CRUD completas y geocodificación mediante Google Maps
+ * API. Requiere rol ADMIN para operaciones de modificación.
+ */
 @RestController
 @RequestMapping("/dealerships")
 public class DealershipController {
@@ -31,6 +37,12 @@ public class DealershipController {
     @Autowired
     private GeocodeDealership geocodeDealership;
 
+    /**
+     * Crea un nuevo concesionario.
+     *
+     * @param request Datos del concesionario a crear.
+     * @return ResponseEntity con mensaje de éxito o error.
+     */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> create(@RequestBody DealershipRequest request) {
@@ -45,6 +57,11 @@ public class DealershipController {
         }
     }
 
+    /**
+     * Obtiene todos los concesionarios registrados.
+     *
+     * @return Lista de concesionarios.
+     */
     @GetMapping
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<DealershipResponse>> findAll() {
@@ -54,6 +71,12 @@ public class DealershipController {
         return ResponseEntity.ok(responses);
     }
 
+    /**
+     * Busca un concesionario por su ID.
+     *
+     * @param id ID del concesionario.
+     * @return Datos del concesionario encontrado o 404 si no existe.
+     */
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> findById(@PathVariable Long id) {
@@ -68,6 +91,13 @@ public class DealershipController {
         }
     }
 
+    /**
+     * Actualiza los datos de un concesionario existente.
+     *
+     * @param id      ID del concesionario a actualizar.
+     * @param request Nuevos datos del concesionario.
+     * @return ResponseEntity con mensaje de éxito o error.
+     */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody DealershipRequest request) {
@@ -82,6 +112,12 @@ public class DealershipController {
         }
     }
 
+    /**
+     * Elimina un concesionario por su ID.
+     *
+     * @param id ID del concesionario a eliminar.
+     * @return ResponseEntity con mensaje de éxito o error.
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> delete(@PathVariable Long id) {
@@ -96,7 +132,10 @@ public class DealershipController {
     /**
      * Geocodifica un concesionario existente usando Google Maps Geocoding API.
      * Actualiza las coordenadas (lat/lng) del concesionario.
-     * POST /dealerships/{id}/geocode
+     *
+     * @param id ID del concesionario a geocodificar.
+     * @return ResponseEntity con los datos del concesionario actualizado o mensaje
+     *         de error.
      */
     @PostMapping("/{id}/geocode")
     @PreAuthorize("hasRole('ADMIN')")

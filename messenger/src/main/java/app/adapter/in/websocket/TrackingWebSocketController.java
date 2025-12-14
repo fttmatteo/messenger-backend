@@ -25,16 +25,10 @@ import java.security.Principal;
 @Controller
 public class TrackingWebSocketController {
 
-    private final SimpMessagingTemplate messagingTemplate;
-    private final UpdateLiveTracking updateLiveTracking;
-
     @Autowired
-    public TrackingWebSocketController(
-            SimpMessagingTemplate messagingTemplate,
-            UpdateLiveTracking updateLiveTracking) {
-        this.messagingTemplate = messagingTemplate;
-        this.updateLiveTracking = updateLiveTracking;
-    }
+    private SimpMessagingTemplate messagingTemplate;
+    @Autowired
+    private UpdateLiveTracking updateLiveTracking;
 
     /**
      * Recibe actualizaciones de ubicación de los mensajeros.
@@ -44,8 +38,27 @@ public class TrackingWebSocketController {
      */
     @MessageMapping("/tracking/update")
     public void receiveLocationUpdate(LiveTrackingRequest request, Principal principal) {
+        // Mapeo manual de DTO a Dominio aquí en el controlador (Adaptador)
+        LiveTracking domainTracking = new LiveTracking();
+        domainTracking.setMessengerId(request.getMessengerId());
+
+        // Crear Location value object
+        app.domain.model.Location location = new app.domain.model.Location(
+                request.getLatitude(),
+                request.getLongitude(),
+                java.time.LocalDateTime.now(),
+                request.getAccuracy());
+        domainTracking.setCurrentLocation(location);
+
+        domainTracking.setSpeed(request.getSpeed());
+        domainTracking.setHeading(request.getHeading());
+        domainTracking.setDeviceId(request.getDeviceId());
+        if (request.getStatus() != null) {
+            domainTracking.setStatus(request.getStatus());
+        }
+
         // Procesar y guardar la ubicación
-        LiveTracking tracking = updateLiveTracking.execute(request);
+        LiveTracking tracking = updateLiveTracking.execute(domainTracking);
 
         // Broadcast a admins suscritos a este mensajero específico
         LiveTrackingResponse response = mapToResponse(tracking);

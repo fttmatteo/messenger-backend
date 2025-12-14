@@ -15,6 +15,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Controlador REST para servir archivos estáticos.
+ *
+ * Proporciona endpoints para acceder a archivos almacenados como
+ * fotos, firmas y documentos del sistema de forma pública.
+ */
 @RestController
 @RequestMapping("/api/files")
 public class FileController {
@@ -24,6 +30,17 @@ public class FileController {
 
     private final String[] subDirectories = { "detections", "signatures", "evidence" };
 
+    /**
+     * Recupera un archivo almacenado por su nombre.
+     *
+     * Busca el archivo en los subdirectorios configurados (detections, signatures,
+     * evidence)
+     * y lo devuelve como un recurso descargable o visualizable.
+     *
+     * @param filename Nombre del archivo a recuperar.
+     * @return ResponseEntity con el recurso del archivo y su tipo de contenido,
+     *         o 404 si no se encuentra.
+     */
     @GetMapping("/{filename:.+}")
     public ResponseEntity<Resource> getFile(@PathVariable String filename) {
         try {

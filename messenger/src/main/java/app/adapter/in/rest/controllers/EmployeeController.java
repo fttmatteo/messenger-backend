@@ -16,6 +16,12 @@ import app.domain.model.Employee;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador REST para gestionar empleados y mensajeros.
+ * 
+ * Proporciona operaciones CRUD exclusivas para administradores.
+ * Todos los endpoints requieren rol ADMIN.
+ */
 @RestController
 @RequestMapping("/employees")
 @PreAuthorize("hasRole('ADMIN')")
@@ -28,6 +34,15 @@ public class EmployeeController {
     @Autowired
     private EmployeeResponseMapper responseMapper;
 
+    /**
+     * Crea un nuevo empleado en el sistema.
+     *
+     * Utiliza el Builder para validar y construir el objeto Empleado antes de
+     * persistirlo.
+     *
+     * @param request Datos del empleado a crear.
+     * @return ResponseEntity con mensaje de éxito o error.
+     */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> create(@RequestBody EmployeeRequest request) {
@@ -47,6 +62,11 @@ public class EmployeeController {
         }
     }
 
+    /**
+     * Obtiene todos los empleados registrados.
+     *
+     * @return Lista de empleados mapeados al formato de respuesta.
+     */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<EmployeeResponse>> findAll() {
@@ -56,6 +76,12 @@ public class EmployeeController {
         return ResponseEntity.ok(responses);
     }
 
+    /**
+     * Busca un empleado por su ID.
+     *
+     * @param id ID del empleado.
+     * @return Datos del empleado encontrado o 404 si no existe.
+     */
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> findById(@PathVariable Long id) {
@@ -70,6 +96,13 @@ public class EmployeeController {
         }
     }
 
+    /**
+     * Actualiza los datos de un empleado existente.
+     *
+     * @param id      ID del empleado a actualizar.
+     * @param request Nuevos datos del empleado.
+     * @return ResponseEntity con mensaje de éxito o error.
+     */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody EmployeeRequest request) {
@@ -90,6 +123,12 @@ public class EmployeeController {
         }
     }
 
+    /**
+     * Elimina un empleado por su ID.
+     *
+     * @param id ID del empleado a eliminar.
+     * @return ResponseEntity con mensaje de éxito o error.
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> delete(@PathVariable Long id) {

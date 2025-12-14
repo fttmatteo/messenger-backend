@@ -7,6 +7,16 @@ import app.application.exceptions.BusinessException;
 import app.domain.model.Employee;
 import app.domain.ports.EmployeePort;
 
+/**
+ * Servicio de dominio para actualizar información de empleados existentes.
+ * 
+ * Permite actualizar datos del empleado validando:
+ * 
+ * Existencia del empleado a actualizar
+ * Unicidad de documento si se modifica
+ * Unicidad de username si se modifica
+ * Re-encriptación de contraseña si se proporciona nueva
+ */
 @Service
 public class UpdateEmployee {
 
@@ -15,6 +25,17 @@ public class UpdateEmployee {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    /**
+     * Actualiza la información de un empleado existente.
+     * 
+     * Valida unicidad de documento y username si se modifican, y re-encripta la
+     * contraseña si se proporciona.
+     * 
+     * @param id           ID del empleado a actualizar.
+     * @param incomingData Nuevos datos del empleado.
+     * @throws Exception Si el empleado no existe, o el documento/username ya están
+     *                   en uso.
+     */
     public void update(Long id, Employee incomingData) throws Exception {
         Employee existingEmployee = employeePort.findById(id);
         if (existingEmployee == null) {

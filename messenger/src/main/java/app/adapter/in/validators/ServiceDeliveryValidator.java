@@ -4,6 +4,12 @@ import org.springframework.stereotype.Component;
 import app.application.exceptions.InputsException;
 import app.domain.model.enums.Status;
 
+/**
+ * Validador para servicios de entrega.
+ * 
+ * Aplica reglas de validación y normalización para placas vehiculares y datos
+ * de entrega.
+ */
 @Component
 public class ServiceDeliveryValidator extends SimpleValidator {
 

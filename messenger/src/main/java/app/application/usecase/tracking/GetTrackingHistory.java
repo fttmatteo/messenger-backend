@@ -14,12 +14,8 @@ import java.util.List;
 @Service
 public class GetTrackingHistory {
 
-    private final TrackingPort trackingPort;
-
     @Autowired
-    public GetTrackingHistory(TrackingPort trackingPort) {
-        this.trackingPort = trackingPort;
-    }
+    private TrackingPort trackingPort;
 
     /**
      * Obtiene el historial de ubicaciones de un mensajero en una fecha específica.

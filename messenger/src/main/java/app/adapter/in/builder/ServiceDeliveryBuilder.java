@@ -7,12 +7,27 @@ import app.adapter.in.rest.request.ServiceDeliveryUpdateStatusRequest;
 import app.adapter.in.validators.ServiceDeliveryValidator;
 import app.domain.model.enums.Status;
 
+/**
+ * Componente encargado de la construcción de objetos de datos para Servicios de
+ * Entrega.
+ *
+ * Se utiliza para validar y preparar los datos necesarios para la creación
+ * y actualización de estados de servicios, encapsulando las reglas de
+ * validación.
+ */
 @Component
 public class ServiceDeliveryBuilder {
 
     @Autowired
     private ServiceDeliveryValidator validator;
 
+    /**
+     * Construye y valida los datos necesarios para crear un servicio.
+     *
+     * @param request DTO con los datos de entrada para la creación.
+     * @return Objeto inmutable ServiceDeliveryCreateData con datos validados.
+     * @throws Exception Si falla alguna validación (IDs, documentos, etc).
+     */
     public ServiceDeliveryCreateData buildCreateData(ServiceDeliveryCreateRequest request) throws Exception {
         Long dealershipId = validator.idValidator(request.getDealershipId());
         Long messengerDocument = validator.documentValidator(request.getMessengerDocument());
@@ -20,6 +35,15 @@ public class ServiceDeliveryBuilder {
         return new ServiceDeliveryCreateData(dealershipId, messengerDocument);
     }
 
+    /**
+     * Construye y valida los datos necesarios para actualizar el estado de un
+     * servicio.
+     *
+     * @param request DTO con los datos de entrada para la actualización.
+     * @return Objeto inmutable ServiceDeliveryUpdateData con datos validados.
+     * @throws Exception Si falla alguna validación (estado, observación,
+     *                   documento).
+     */
     public ServiceDeliveryUpdateData buildUpdateStatusData(ServiceDeliveryUpdateStatusRequest request)
             throws Exception {
         Status status = validator.statusValidator(request.getStatus());
@@ -29,6 +53,10 @@ public class ServiceDeliveryBuilder {
         return new ServiceDeliveryUpdateData(status, observation, userDocument);
     }
 
+    /**
+     * Clase interna inmutable que contiene los datos validados para crear un
+     * servicio.
+     */
     public static class ServiceDeliveryCreateData {
         private final Long dealershipId;
         private final Long messengerDocument;
@@ -47,6 +75,10 @@ public class ServiceDeliveryBuilder {
         }
     }
 
+    /**
+     * Clase interna inmutable que contiene los datos validados para actualizar un
+     * servicio.
+     */
     public static class ServiceDeliveryUpdateData {
         private final Status status;
         private final String observation;

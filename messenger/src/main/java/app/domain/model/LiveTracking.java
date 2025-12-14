@@ -63,7 +63,6 @@ public class LiveTracking {
         return "Noroeste";
     }
 
-    // Getters y Setters
     public Long getTrackingId() {
         return trackingId;
     }

@@ -12,6 +12,19 @@ import app.domain.model.auth.TokenResponse;
 import app.domain.ports.AuthenticationPort;
 import app.domain.ports.EmployeePort;
 
+/**
+ * Servicio de dominio para autenticación de usuarios.
+ * 
+ * Gestiona el proceso completo de autenticación incluyendo:
+ * Validación de credenciales (username y password)
+ * Verificación de existencia del usuario
+ * Comparación de contraseñas con hash BCrypt
+ * Migración automática de contraseñas planas a BCrypt
+ * Generación de tokens JWT para sesiones
+ * 
+ * Incluye lógica de retrocompatibilidad para migrar contraseñas
+ * almacenadas en texto plano a formato BCrypt de manera transparente.
+ */
 @Service
 public class AuthenticationService {
 
@@ -24,6 +37,16 @@ public class AuthenticationService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    /**
+     * Autentica un usuario y genera un token JWT.
+     * 
+     * Verifica las credenciales, migra contraseñas planas a BCrypt si es necesario,
+     * y genera un token de sesión.
+     * 
+     * @param credentials Credenciales del usuario (username y password).
+     * @return TokenResponse con el token JWT y rol del usuario.
+     * @throws Exception Si el usuario no existe o la contraseña es incorrecta.
+     */
     public TokenResponse authenticate(AuthCredentials credentials) throws Exception {
         Employee employee = employeePort.findByUserName(credentials.getUserName());
         if (employee == null) {

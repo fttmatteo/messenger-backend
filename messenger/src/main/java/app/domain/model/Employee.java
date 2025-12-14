@@ -2,6 +2,17 @@ package app.domain.model;
 
 import app.domain.model.enums.Role;
 
+/**
+ * Modelo de dominio que representa un empleado del sistema de mensajería.
+ * 
+ * Un empleado puede ser un mensajero encargado de realizar entregas o
+ * un administrador del sistema. La clase almacena información personal,
+ * credenciales de acceso y rol asignado.
+ * 
+ * Roles disponibles:
+ * MESSENGER: Mensajero que realiza entregas
+ * ADMIN: Administrador del sistema
+ */
 public class Employee {
     private Long idEmployee;
     private Long document;

@@ -4,9 +4,22 @@ import app.adapter.in.rest.response.DealershipResponse;
 import app.domain.model.Dealership;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper para convertir entidades Dealership a DTOs de respuesta.
+ * 
+ * Transforma objetos de dominio Dealership a DealershipResponse, incluyendo
+ * información de geolocalización.
+ */
 @Component
 public class DealershipResponseMapper {
 
+    /**
+     * Convierte una entidad Dealership a DealershipResponse.
+     *
+     * @param dealership Entidad Dealership de origen.
+     * @return DTO DealershipResponse incluyendo datos de geo-localización, o null
+     *         si la entrada es nula.
+     */
     public DealershipResponse toResponse(Dealership dealership) {
         if (dealership == null) {
             return null;

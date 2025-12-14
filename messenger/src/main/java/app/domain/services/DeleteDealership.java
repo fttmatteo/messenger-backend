@@ -7,6 +7,12 @@ import app.domain.model.Dealership;
 import app.domain.ports.DealershipPort;
 import app.domain.ports.ServiceDeliveryPort;
 
+/**
+ * Servicio de dominio para eliminar concesionarios.
+ * 
+ * Valida que el concesionario no tenga servicios activos asociados antes
+ * de permitir su eliminación.
+ */
 @Service
 public class DeleteDealership {
 
@@ -15,6 +21,12 @@ public class DeleteDealership {
     @Autowired
     private ServiceDeliveryPort serviceDeliveryPort;
 
+    /**
+     * Elimina un concesionario por su ID.
+     * 
+     * @param id ID del concesionario a eliminar.
+     * @throws Exception Si el concesionario no existe o tiene servicios activos.
+     */
     public void deleteById(Long id) throws Exception {
         Dealership existing = dealershipPort.findById(id);
         if (existing == null) {
@@ -28,6 +40,12 @@ public class DeleteDealership {
         dealershipPort.deleteById(id);
     }
 
+    /**
+     * Elimina un concesionario por su nombre.
+     * 
+     * @param name Nombre del concesionario a eliminar.
+     * @throws Exception Si el concesionario no existe o tiene servicios activos.
+     */
     public void deleteByName(String name) throws Exception {
         Dealership existing = dealershipPort.findByName(name);
         if (existing == null) {

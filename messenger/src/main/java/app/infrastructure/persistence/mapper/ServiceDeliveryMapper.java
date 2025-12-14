@@ -6,6 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.stream.Collectors;
 
+/**
+ * Mapper de persistencia para convertir entre ServiceDelivery y
+ * ServiceDeliveryEntity.
+ * Maneja la conversión compleja incluyendo asociaciones con Placa,
+ * Concesionario y Mensajero.
+ */
 @Component
 public class ServiceDeliveryMapper {
 
@@ -16,6 +22,25 @@ public class ServiceDeliveryMapper {
     @Autowired
     private EmployeeMapper employeeMapper;
 
+    /**
+     * Convierte un modelo de dominio ServiceDelivery a su entidad JPA
+     * correspondiente.
+     * 
+     * Realiza una conversión compleja que incluye:
+     * - Mapeo de la placa del vehículo (usando PlateMapper)
+     * - Mapeo del concesionario (usando DealershipMapper)
+     * - Mapeo del mensajero asignado (usando EmployeeMapper)
+     * - Conversión de firma digital si existe
+     * - Conversión de lista de fotos de evidencia
+     * - Conversión de historial de cambios de estado con sus fotos asociadas
+     * 
+     * Todas las relaciones bidireccionales se configuran correctamente para
+     * mantener la integridad referencial en JPA.
+     * 
+     * @param serviceDelivery El modelo de dominio a convertir (puede ser null)
+     * @return La entidad JPA correspondiente con todas sus relaciones, o null si el
+     *         parámetro es null
+     */
     public ServiceDeliveryEntity toEntity(ServiceDelivery serviceDelivery) {
         if (serviceDelivery == null)
             return null;
@@ -79,6 +104,27 @@ public class ServiceDeliveryMapper {
         return entity;
     }
 
+    /**
+     * Convierte una entidad JPA ServiceDeliveryEntity a modelo de dominio.
+     * 
+     * Reconstruye el objeto de dominio completo desde la base de datos, incluyendo:
+     * - Datos de la placa del vehículo
+     * - Información del concesionario de destino
+     * - Datos del mensajero asignado
+     * - Firma digital del responsable en concesionario
+     * - Fotos de evidencia de la entrega
+     * - Historial completo de cambios de estado
+     * - Fotos asociadas a cada cambio de estado
+     * 
+     * Utiliza los mappers especializados (PlateMapper, DealershipMapper,
+     * EmployeeMapper)
+     * para convertir cada entidad relacionada a su correspondiente modelo de
+     * dominio.
+     * 
+     * @param entity La entidad JPA a convertir (puede ser null)
+     * @return El modelo de dominio completo con todas sus relaciones, o null si la
+     *         entidad es null
+     */
     public ServiceDelivery toDomain(ServiceDeliveryEntity entity) {
         if (entity == null)
             return null;

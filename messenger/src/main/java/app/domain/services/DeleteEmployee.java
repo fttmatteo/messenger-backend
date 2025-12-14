@@ -8,6 +8,12 @@ import app.domain.model.Employee;
 import app.domain.ports.EmployeePort;
 import app.domain.ports.ServiceDeliveryPort;
 
+/**
+ * Servicio de dominio para eliminar empleados.
+ * 
+ * Valida que el empleado no tenga servicios de entrega asociados antes
+ * de permitir su eliminación, manteniendo la integridad referencial.
+ */
 @Service
 public class DeleteEmployee {
 
@@ -16,6 +22,12 @@ public class DeleteEmployee {
     @Autowired
     private ServiceDeliveryPort serviceDeliveryPort;
 
+    /**
+     * Elimina un empleado por su número de documento.
+     * 
+     * @param document Número de documento del empleado.
+     * @throws Exception Si el empleado no existe o tiene servicios asociados.
+     */
     public void deleteByDocument(Long document) throws Exception {
         Employee employee = employeePort.findByDocument(document);
         if (employee == null) {
@@ -31,6 +43,12 @@ public class DeleteEmployee {
         employeePort.deleteByDocument(document);
     }
 
+    /**
+     * Elimina un empleado por su ID.
+     * 
+     * @param id ID del empleado.
+     * @throws Exception Si el empleado no existe o tiene servicios asociados.
+     */
     public void deleteById(Long id) throws Exception {
         Employee employee = employeePort.findById(id);
         if (employee == null) {

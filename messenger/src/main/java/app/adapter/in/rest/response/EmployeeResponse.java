@@ -2,6 +2,11 @@ package app.adapter.in.rest.response;
 
 import app.domain.model.enums.Role;
 
+/**
+ * DTO de respuesta con la información de un empleado.
+ * 
+ * Excluye información sensible como la contraseña.
+ */
 public class EmployeeResponse {
     private Long idEmployee;
     private Long document;

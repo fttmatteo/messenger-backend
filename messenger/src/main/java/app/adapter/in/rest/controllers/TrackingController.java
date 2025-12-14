@@ -3,6 +3,7 @@ package app.adapter.in.rest.controllers;
 import app.adapter.in.rest.request.LiveTrackingRequest;
 import app.adapter.in.rest.response.LiveTrackingResponse;
 import app.adapter.in.rest.response.TrackingHistoryResponse;
+import app.adapter.in.rest.mapper.TrackingResponseMapper;
 import app.application.usecase.tracking.GetTrackingHistory;
 import app.application.usecase.tracking.UpdateLiveTracking;
 import app.domain.model.LiveTracking;
@@ -20,44 +21,72 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Controller REST para operaciones de tracking de mensajeros.
+ * Controlador REST para tracking en tiempo real de mensajeros.
+ *
+ * Proporciona endpoints para actualizar ubicaciones en tiempo real
+ * y consultar historial de tracking.
  */
 @RestController
 @RequestMapping("/api/tracking")
 public class TrackingController {
 
-    private final UpdateLiveTracking updateLiveTracking;
-    private final GetTrackingHistory getTrackingHistory;
-    private final TrackingPort trackingPort;
-
     @Autowired
-    public TrackingController(
-            UpdateLiveTracking updateLiveTracking,
-            GetTrackingHistory getTrackingHistory,
-            TrackingPort trackingPort) {
-        this.updateLiveTracking = updateLiveTracking;
-        this.getTrackingHistory = getTrackingHistory;
-        this.trackingPort = trackingPort;
-    }
+    private UpdateLiveTracking updateLiveTracking;
+    @Autowired
+    private GetTrackingHistory getTrackingHistory;
+    @Autowired
+    private TrackingPort trackingPort;
+    @Autowired
+    private TrackingResponseMapper responseMapper;
 
     /**
-     * Actualiza la ubicación de un mensajero.
-     * POST /api/tracking/update
-     * Solo mensajeros pueden actualizar su ubicación.
+     * Actualiza la ubicación en tiempo real de un mensajero.
+     *
+     * Solo los propios mensajeros o administradores pueden realizar esta acción.
+     * La ubicación se utiliza para el seguimiento en vivo y se archiva en el
+     * histórico.
+     *
+     * @param request Objeto con los datos de telemetría (latitud, longitud,
+     *                velocidad, etc).
+     * @return ResponseEntity con la confirmación de la actualización y datos
+     *         procesados.
      */
     @PostMapping("/update")
     @PreAuthorize("hasAnyRole('MESSENGER', 'ADMIN')")
     public ResponseEntity<LiveTrackingResponse> updateLocation(
             @Valid @RequestBody LiveTrackingRequest request) {
 
-        LiveTracking tracking = updateLiveTracking.execute(request);
-        return ResponseEntity.ok(mapToResponse(tracking));
+        // Mapeo manual de DTO a Dominio aquí en el controlador (Adaptador)
+        LiveTracking domainTracking = new LiveTracking();
+        domainTracking.setMessengerId(request.getMessengerId());
+
+        // Crear Location value object
+        app.domain.model.Location location = new app.domain.model.Location(
+                request.getLatitude(),
+                request.getLongitude(),
+                java.time.LocalDateTime.now(),
+                request.getAccuracy());
+        domainTracking.setCurrentLocation(location);
+
+        domainTracking.setSpeed(request.getSpeed());
+        domainTracking.setHeading(request.getHeading());
+        domainTracking.setDeviceId(request.getDeviceId());
+        if (request.getStatus() != null) {
+            domainTracking.setStatus(request.getStatus());
+        }
+
+        LiveTracking tracking = updateLiveTracking.execute(domainTracking);
+        return ResponseEntity.ok(responseMapper.toResponse(tracking));
     }
 
     /**
-     * Obtiene la última ubicación de un mensajero.
-     * GET /api/tracking/messenger/{messengerId}
-     * Solo admins pueden ver ubicaciones de otros mensajeros.
+     * Obtiene la última ubicación reportada de un mensajero específico.
+     *
+     * Uso exclusivo para administradores.
+     *
+     * @param messengerId ID del mensajero.
+     * @return ResponseEntity con la última ubicación conocida o 404 si no hay
+     *         datos.
      */
     @GetMapping("/messenger/{messengerId}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -70,13 +99,15 @@ public class TrackingController {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(mapToResponse(tracking));
+        return ResponseEntity.ok(responseMapper.toResponse(tracking));
     }
 
     /**
-     * Obtiene todos los mensajeros activos con su ubicación actual.
-     * GET /api/tracking/active
-     * Solo admins pueden ver esta información.
+     * Obtiene la lista de todos los mensajeros activos con su ubicación actual.
+     *
+     * Permite a los administradores visualizar toda la flota en tiempo real.
+     *
+     * @return Lista de tracking en vivo de mensajeros activos.
      */
     @GetMapping("/active")
     @PreAuthorize("hasRole('ADMIN')")
@@ -84,15 +115,18 @@ public class TrackingController {
         List<LiveTracking> activeMessengers = trackingPort.getAllActiveMessengers();
 
         List<LiveTrackingResponse> response = activeMessengers.stream()
-                .map(this::mapToResponse)
+                .map(responseMapper::toResponse)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(response);
     }
 
     /**
-     * Obtiene el historial de ubicaciones de un mensajero para una fecha.
-     * GET /api/tracking/history/{messengerId}?date=2025-12-10
+     * Consulta el historial de recorrido de un mensajero en una fecha específica.
+     *
+     * @param messengerId ID del mensajero.
+     * @param date        Fecha de consulta (Formato ISO DATE, ej: 2025-12-10).
+     * @return Lista de puntos históricos registrados.
      */
     @GetMapping("/history/{messengerId}")
     @PreAuthorize("hasAnyRole('MESSENGER', 'ADMIN')")
@@ -103,15 +137,18 @@ public class TrackingController {
         List<TrackingHistory> history = getTrackingHistory.byMessengerAndDate(messengerId, date);
 
         List<TrackingHistoryResponse> response = history.stream()
-                .map(this::mapToHistoryResponse)
+                .map(responseMapper::toHistoryResponse)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(response);
     }
 
     /**
-     * Obtiene el historial de ubicaciones de un servicio de entrega.
-     * GET /api/tracking/service/{serviceId}
+     * Consulta el historial de recorrido asociado a un servicio de entrega
+     * específico.
+     *
+     * @param serviceId ID del servicio de entrega.
+     * @return Lista de puntos históricos registrados durante el servicio.
      */
     @GetMapping("/service/{serviceId}")
     @PreAuthorize("hasAnyRole('MESSENGER', 'ADMIN')")
@@ -121,34 +158,9 @@ public class TrackingController {
         List<TrackingHistory> history = getTrackingHistory.byService(serviceId);
 
         List<TrackingHistoryResponse> response = history.stream()
-                .map(this::mapToHistoryResponse)
+                .map(responseMapper::toHistoryResponse)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(response);
-    }
-
-    private LiveTrackingResponse mapToResponse(LiveTracking tracking) {
-        return new LiveTrackingResponse(
-                tracking.getMessengerId(),
-                tracking.getMessengerName(),
-                tracking.getCurrentLocation() != null ? tracking.getCurrentLocation().getLatitude() : null,
-                tracking.getCurrentLocation() != null ? tracking.getCurrentLocation().getLongitude() : null,
-                tracking.getLastUpdate(),
-                tracking.getStatus(),
-                tracking.getSpeed(),
-                tracking.getHeading());
-    }
-
-    private TrackingHistoryResponse mapToHistoryResponse(TrackingHistory history) {
-        TrackingHistoryResponse response = new TrackingHistoryResponse();
-        response.setHistoryId(history.getHistoryId());
-        response.setMessengerId(history.getMessengerId());
-        response.setLatitude(history.getLocation() != null ? history.getLocation().getLatitude() : null);
-        response.setLongitude(history.getLocation() != null ? history.getLocation().getLongitude() : null);
-        response.setRecordedAt(history.getRecordedAt());
-        response.setServiceDeliveryId(history.getServiceDeliveryId());
-        response.setSource(history.getSource() != null ? history.getSource().name() : null);
-        response.setSpeed(history.getSpeed());
-        return response;
     }
 }

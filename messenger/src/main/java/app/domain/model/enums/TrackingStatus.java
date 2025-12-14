@@ -2,20 +2,26 @@ package app.domain.model.enums;
 
 /**
  * Estado del tracking en tiempo real de un mensajero.
+ * 
+ * ACTIVE: Mensajero activamente en ruta, enviando ubicaciones.
+ * INACTIVE: Mensajero en pausa (almuerzo, descanso).
+ * OFFLINE: Mensajero sin conexión o app cerrada.
  */
 public enum TrackingStatus {
     /**
-     * Mensajero activamente en ruta, enviando ubicaciones.
+     * El mensajero está en ruta y transmitiendo activamente su ubicación.
      */
     ACTIVE,
 
     /**
-     * Mensajero en pausa (almuerzo, descanso).
+     * El mensajero está pausado temporalmente (ej: hora de almuerzo, descanso),
+     * pero sigue conectado.
      */
     INACTIVE,
 
     /**
-     * Mensajero sin conexión o app cerrada.
+     * El mensajero se ha desconectado o cerrado la sesión.
+     * No se reciben actualizaciones de ubicación.
      */
     OFFLINE
 }

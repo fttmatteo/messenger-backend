@@ -9,6 +9,13 @@ import app.domain.services.DeleteEmployee;
 import app.domain.services.SearchEmployee;
 import app.domain.services.UpdateEmployee;
 
+/**
+ * Caso de uso de aplicación para gestionar empleados.
+ * 
+ * Orquesta las operaciones CRUD de empleados delegando en los servicios de
+ * dominio
+ * correspondientes. Sirve como punto de entrada desde la capa de adaptadores.
+ */
 @Service
 public class EmployeeUseCase {
 

@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * Adaptador que implementa TrackingPort usando Redis + JPA.
@@ -31,19 +30,12 @@ public class TrackingAdapter implements TrackingPort {
     private static final String TRACKING_KEY_PREFIX = "tracking:messenger:";
     private static final long TRACKING_TTL_MINUTES = 5; // Expira después de 5 minutos sin actualizar
 
-    private final RedisTemplate<String, LiveTracking> redisTemplate;
-    private final TrackingHistoryRepository historyRepository;
-    private final TrackingMapper mapper;
-
     @Autowired
-    public TrackingAdapter(
-            RedisTemplate<String, LiveTracking> redisTemplate,
-            TrackingHistoryRepository historyRepository,
-            TrackingMapper mapper) {
-        this.redisTemplate = redisTemplate;
-        this.historyRepository = historyRepository;
-        this.mapper = mapper;
-    }
+    private RedisTemplate<String, LiveTracking> redisTemplate;
+    @Autowired
+    private TrackingHistoryRepository historyRepository;
+    @Autowired
+    private TrackingMapper mapper;
 
     @Override
     public void saveLiveLocation(LiveTracking tracking) {

@@ -6,6 +6,19 @@ import app.domain.model.enums.PlateType;
 
 import java.util.regex.Pattern;
 
+/**
+ * Servicio de dominio para reconocimiento y validación de placas vehiculares.
+ * 
+ * Determina automáticamente el tipo de vehículo basándose en el formato de la
+ * placa:
+ * 
+ * Carro (CAR): Formato ABC 123
+ * Motocicleta (MOTORCYCLE): Formato ABC 12A
+ * Motocarro (MOTORCAR): Formato 123 ABC
+ * 
+ * Utiliza expresiones regulares (regex) para validar y clasificar placas,
+ * normalizando el formato para almacenamiento consistente.
+ */
 @Service
 public class PlateRecognition {
 
@@ -13,6 +26,14 @@ public class PlateRecognition {
     private static final Pattern MOTO_PATTERN = Pattern.compile("^[A-Z]{3}\\s*\\d{2}[A-Z]$");
     private static final Pattern MOTOCARRO_PATTERN = Pattern.compile("^\\d{3}\\s*[A-Z]{3}$");
 
+    /**
+     * Determina el tipo de vehículo basándose en el formato de la placa.
+     * 
+     * @param plateNumber Número de placa a analizar.
+     * @return Tipo de placa (CAR, MOTORCYCLE, MOTORCAR).
+     * @throws BusinessException Si el formato no coincide con ningún patrón
+     *                           conocido.
+     */
     public PlateType determinePlateType(String plateNumber) throws BusinessException {
         if (plateNumber == null || plateNumber.trim().isEmpty()) {
             throw new BusinessException("El número de placa no puede estar vacío.");
@@ -32,6 +53,13 @@ public class PlateRecognition {
         }
     }
 
+    /**
+     * Formatea una placa para almacenamiento consistente.
+     * 
+     * @param plateNumber Número de placa sin formato.
+     * @param type        Tipo de placa.
+     * @return Placa formateada con espacio (ej: "ABC 123").
+     */
     public String formatPlateForStorage(String plateNumber, PlateType type) {
         String clean = plateNumber.replaceAll("\\s+", "").toUpperCase();
         switch (type) {

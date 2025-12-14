@@ -13,56 +13,53 @@ import app.domain.ports.LocationPort;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Controller REST para operaciones de geolocalización.
- * Incluye geocodificación, cálculo de rutas y distancias.
+ * Controlador REST para operaciones de ubicación y rutas.
+ *
+ * Proporciona cálculo de rutas óptimas utilizando Google Maps Directions API,
+ * así como servicios de geocodificación y cálculo de distancias.
  */
 @RestController
-@RequestMapping("/api/location")
+@RequestMapping("/locations")
+@PreAuthorize("isAuthenticated()")
 public class LocationController {
 
-    private final GeocodeDealership geocodeDealership;
-    private final CalculateOptimalRoute calculateOptimalRoute;
-    private final LocationPort locationPort;
-
     @Autowired
-    public LocationController(
-            GeocodeDealership geocodeDealership,
-            CalculateOptimalRoute calculateOptimalRoute,
-            LocationPort locationPort) {
-        this.geocodeDealership = geocodeDealership;
-        this.calculateOptimalRoute = calculateOptimalRoute;
-        this.locationPort = locationPort;
-    }
+    private GeocodeDealership geocodeDealership;
+    @Autowired
+    private CalculateOptimalRoute calculateOptimalRoute;
+    @Autowired
+    private LocationPort locationPort;
+    @Autowired
+    private app.adapter.in.rest.mapper.LocationResponseMapper responseMapper;
 
     /**
-     * Geocodifica una dirección.
-     * POST /api/location/geocode
+     * Geocodifica una dirección física a coordenadas.
+     *
+     * @param request Objeto con la dirección a geocodificar.
+     * @return ResponseEntity con las coordenadas (lat/lng) y dirección formateada.
      */
     @PostMapping("/geocode")
     public ResponseEntity<LocationResponse> geocodeAddress(
             @Valid @RequestBody GeocodeRequest request) {
 
         Location location = geocodeDealership.geocodeAddress(request.getAddress());
-
         String formattedAddress = locationPort.reverseGeocode(location);
 
-        LocationResponse response = new LocationResponse(
-                location.getLatitude(),
-                location.getLongitude(),
-                formattedAddress);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responseMapper.toLocationResponse(location, formattedAddress));
     }
 
     /**
-     * Calcula una ruta optimizada.
-     * POST /api/location/route
+     * Calcula una ruta optimizada entre un punto de origen y múltiples destinos.
+     *
+     * Utiliza algoritmos de optimización para determinar el mejor orden de visita.
+     *
+     * @param request Datos de la ruta (origen y lista de IDs de concesionarios).
+     * @return ResponseEntity con los detalles de la ruta calculada (distancia,
+     *         duración, polilínea).
      */
     @PostMapping("/route")
     public ResponseEntity<RouteResponse> calculateRoute(
@@ -73,12 +70,18 @@ public class LocationController {
                 request.getOriginLongitude(),
                 request.getDealershipIds());
 
-        return ResponseEntity.ok(mapToRouteResponse(route));
+        return ResponseEntity.ok(responseMapper.toRouteResponse(route));
     }
 
     /**
-     * Calcula la distancia entre dos puntos.
-     * GET /api/location/distance?fromLat=...&fromLng=...&toLat=...&toLng=...
+     * Calcula la distancia y duración estimada entre dos puntos geográficos.
+     *
+     * @param fromLat Latitud del punto de partida.
+     * @param fromLng Longitud del punto de partida.
+     * @param toLat   Latitud del punto de destino.
+     * @param toLng   Longitud del punto de destino.
+     * @return ResponseEntity con la distancia en metros y duración estimada en
+     *         segundos.
      */
     @GetMapping("/distance")
     public ResponseEntity<DistanceResponse> calculateDistance(
@@ -101,8 +104,13 @@ public class LocationController {
     }
 
     /**
-     * Convierte coordenadas en una dirección.
-     * GET /api/location/reverse?lat=...&lng=...
+     * Convierte coordenadas geográficas en una dirección legible (Reverse
+     * Geocoding).
+     *
+     * @param lat Latitud de la ubicación.
+     * @param lng Longitud de la ubicación.
+     * @return ResponseEntity con la dirección formateada correspondiente a las
+     *         coordenadas.
      */
     @GetMapping("/reverse")
     public ResponseEntity<LocationResponse> reverseGeocode(
@@ -112,43 +120,6 @@ public class LocationController {
         Location location = new Location(lat, lng);
         String formattedAddress = locationPort.reverseGeocode(location);
 
-        return ResponseEntity.ok(new LocationResponse(lat, lng, formattedAddress));
-    }
-
-    private RouteResponse mapToRouteResponse(Route route) {
-        RouteResponse response = new RouteResponse();
-
-        if (route.getOrigin() != null) {
-            response.setOrigin(new LocationResponse(
-                    route.getOrigin().getLatitude(),
-                    route.getOrigin().getLongitude(),
-                    null));
-        }
-
-        if (route.getDestination() != null) {
-            response.setDestination(new LocationResponse(
-                    route.getDestination().getLatitude(),
-                    route.getDestination().getLongitude(),
-                    null));
-        }
-
-        if (route.getWaypoints() != null && !route.getWaypoints().isEmpty()) {
-            List<LocationResponse> waypoints = new ArrayList<>();
-            for (Location wp : route.getWaypoints()) {
-                waypoints.add(new LocationResponse(
-                        wp.getLatitude(),
-                        wp.getLongitude(),
-                        null));
-            }
-            response.setWaypoints(waypoints);
-        }
-
-        response.setDistanceMeters(route.getDistanceMeters());
-        response.setDistanceKilometers(route.getDistanceKilometers());
-        response.setDurationSeconds(route.getDurationSeconds());
-        response.setDurationFormatted(route.getDurationFormatted());
-        response.setPolyline(route.getPolyline());
-
-        return response;
+        return ResponseEntity.ok(responseMapper.toLocationResponse(location, formattedAddress));
     }
 }
