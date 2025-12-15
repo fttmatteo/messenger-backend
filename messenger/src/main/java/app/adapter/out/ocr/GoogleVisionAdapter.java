@@ -21,6 +21,19 @@ import java.util.List;
 @Component
 public class GoogleVisionAdapter implements OcrPort {
 
+    /**
+     * Crea un cliente de Google Vision API con autenticación mediante Application
+     * Default Credentials.
+     * 
+     * Este método configura el cliente para usar las credenciales predeterminadas
+     * de la aplicación:
+     * - En desarrollo: Lee la variable GOOGLE_APPLICATION_CREDENTIALS
+     * - En producción: Usa la identidad del servicio (Workload Identity)
+     * 
+     * @return Cliente configurado de ImageAnnotatorClient
+     * @throws IOException si hay error al cargar las credenciales o crear el
+     *                     cliente
+     */
     private ImageAnnotatorClient createClient() throws IOException {
         // Usa Application Default Credentials (ADC).
         // En local: set env var GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json
@@ -34,11 +47,21 @@ public class GoogleVisionAdapter implements OcrPort {
     }
 
     /**
-     * Extrae texto de una imagen usando Google Vision API
-     * Implementación de OcrPort
+     * Extrae y procesa el texto de una imagen de placa vehicular usando Google
+     * Vision API.
      * 
-     * @param imageFile Archivo de imagen
-     * @return Texto extraído y procesado (placa colombiana)
+     * Este método implementa el flujo completo de OCR para placas:
+     * 1. Lee la imagen desde el archivo
+     * 2. Envía la imagen a Google Vision API para detección de texto
+     * 3. Limpia y normaliza el texto detectado
+     * 4. Aplica correcciones inteligentes para caracteres ambiguos
+     * 5. Valida el formato de placa colombiana
+     * 
+     * Incluye logging detallado del proceso para debugging.
+     * 
+     * @param imageFile Archivo de imagen que contiene la placa vehicular
+     * @return Texto de la placa procesado y validado (formato colombiano)
+     * @throws RuntimeException si hay error en la API o al procesar la imagen
      */
     @Override
     public String extractText(File imageFile) {
@@ -85,10 +108,18 @@ public class GoogleVisionAdapter implements OcrPort {
     }
 
     /**
-     * Extrae texto de una imagen desde bytes
+     * Extrae y procesa texto de una imagen desde un array de bytes.
      * 
-     * @param imageBytes Bytes de la imagen
-     * @return Texto extraído
+     * Variante del método extractText que trabaja directamente con bytes en
+     * memoria,
+     * útil para procesar imágenes que ya están cargadas o que vienen de una
+     * petición HTTP.
+     * 
+     * Realiza el mismo proceso de limpieza y normalización que extractText.
+     * 
+     * @param imageBytes Array de bytes que representa la imagen
+     * @return Texto de la placa procesado y limpio
+     * @throws IOException si hay error en la API o al procesar los bytes
      */
     public String extractTextFromBytes(byte[] imageBytes) throws IOException {
         ByteString imgBytes = ByteString.copyFrom(imageBytes);
@@ -117,10 +148,18 @@ public class GoogleVisionAdapter implements OcrPort {
     }
 
     /**
-     * Detecta etiquetas/objetos en una imagen
+     * Detecta etiquetas y objetos en una imagen usando Google Vision API.
      * 
-     * @param imagePath Ruta a la imagen
-     * @return Lista de etiquetas detectadas con su confianza
+     * Utiliza la funcionalidad de Label Detection de Google Vision para identificar
+     * objetos, escenas y conceptos en la imagen. Retorna hasta 10 etiquetas con su
+     * nivel de confianza.
+     * 
+     * Esta funcionalidad es opcional y puede usarse para validación adicional
+     * (ej. verificar que la imagen contiene un vehículo).
+     * 
+     * @param imagePath Ruta al archivo de imagen
+     * @return Lista de etiquetas detectadas con su porcentaje de confianza
+     * @throws IOException si hay error al leer la imagen o en la API
      */
     public List<String> detectLabels(String imagePath) throws IOException {
         List<String> labels = new ArrayList<>();
@@ -153,6 +192,22 @@ public class GoogleVisionAdapter implements OcrPort {
         return labels;
     }
 
+    /**
+     * Limpia y normaliza el texto detectado de una placa vehicular.
+     * 
+     * Proceso de limpieza:
+     * 1. Toma solo la primera línea del texto detectado
+     * 2. Convierte a mayúsculas y elimina caracteres no alfanuméricos
+     * 3. Busca patrones de placa válidos en el texto limpio
+     * 4. Si no encuentra patrón, aplica correcciones inteligentes según formato:
+     * - Motos (ABC12D): Corrige posiciones 4-5 a números
+     * - Carros (ABC123): Corrige posiciones 4-6 a números
+     * - Antiguas (123ABC): Corrige posiciones 1-3 a números
+     * 5. Retorna la placa encontrada o los primeros 6 caracteres
+     * 
+     * @param rawPlate Texto crudo detectado por OCR
+     * @return Placa limpia y normalizada
+     */
     private String cleanPlateNumber(String rawPlate) {
         if (rawPlate == null || rawPlate.isEmpty()) {
             return "";
@@ -191,11 +246,23 @@ public class GoogleVisionAdapter implements OcrPort {
     }
 
     /**
-     * Aplica correcciones O↔0 e I↔1 basadas en si la posición espera número o letra
+     * Aplica correcciones inteligentes de caracteres ambiguos según el formato
+     * esperado.
+     * 
+     * Corrige caracteres que pueden confundirse en OCR:
+     * - O ↔ 0: Corrige según si la posición espera letra o número
+     * - I ↔ 1: Corrige según si la posición espera letra o número
+     * 
+     * Ejemplos:
+     * - "ABC1O3" con patrón [false,false,false,true,true,true] → "ABC103" (O→0 en
+     * pos 5)
+     * - "AB01OD" con patrón [false,false,false,true,true,false] → "ABC1OD" (0→C,
+     * 1→I)
      * 
      * @param text     Texto a corregir
-     * @param isNumber Array indicando qué posiciones esperan números (true) o
-     *                 letras (false)
+     * @param isNumber Array booleano indicando qué posiciones esperan números
+     *                 (true) o letras (false)
+     * @return Texto corregido según el patrón esperado
      */
     private String applySmartCorrection(String text, boolean[] isNumber) {
         if (text.length() < isNumber.length) {
@@ -228,6 +295,17 @@ public class GoogleVisionAdapter implements OcrPort {
         return corrected.toString();
     }
 
+    /**
+     * Busca y extrae patrones de placa válidos dentro de un texto.
+     * 
+     * Busca en orden de prioridad:
+     * 1. Placa de carro: ABC123 (3 letras + 3 números)
+     * 2. Placa de moto: ABC12D (3 letras + 2 números + 1 letra)
+     * 3. Placa antigua: 123ABC (3 números + 3 letras)
+     * 
+     * @param text Texto donde buscar el patrón de placa
+     * @return Primera placa válida encontrada, o null si no se encuentra ninguna
+     */
     private String findPlatePattern(String text) {
         java.util.regex.Pattern carPattern = java.util.regex.Pattern.compile("[A-Z]{3}[0-9]{3}");
         java.util.regex.Matcher carMatcher = carPattern.matcher(text);
@@ -250,6 +328,18 @@ public class GoogleVisionAdapter implements OcrPort {
         return null;
     }
 
+    /**
+     * Valida que una placa cumpla con los formatos colombianos oficiales.
+     * 
+     * Formatos válidos:
+     * - ABC123: Carros (3 letras mayúsculas + 3 dígitos)
+     * - ABC12D: Motos (3 letras mayúsculas + 2 dígitos + 1 letra mayúscula)
+     * - 123ABC: Placas antiguas (3 dígitos + 3 letras mayúsculas)
+     * 
+     * @param plate Texto de placa a validar
+     * @return true si la placa cumple con algún formato válido, false en caso
+     *         contrario
+     */
     private boolean validatePlateFormat(String plate) {
         if (plate == null || plate.length() < 5 || plate.length() > 6) {
             return false;

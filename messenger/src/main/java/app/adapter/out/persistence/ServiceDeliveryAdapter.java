@@ -13,9 +13,36 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Adaptador de persistencia para la entidad ServiceDelivery.
- * Implementa ServiceDeliveryPort para gestionar el ciclo de vida de los
- * servicios de entrega.
+ * Adaptador de salida para persistencia de servicios de entrega.
+ * 
+ * Este adaptador implementa ServiceDeliveryPort y actúa como puente entre la
+ * capa de dominio
+ * y la capa de infraestructura (JPA), manejando la conversión entre objetos de
+ * dominio
+ * (ServiceDelivery) y entidades de persistencia (ServiceDeliveryEntity).
+ * 
+ * Responsabilidades:
+ * - Convertir objetos de dominio a entidades JPA y viceversa usando
+ * ServiceDeliveryMapper
+ * - Delegar operaciones de persistencia al ServiceDeliveryRepository
+ * - Mantener la independencia del dominio respecto a detalles de persistencia
+ * 
+ * Operaciones soportadas:
+ * - save: Guardar o actualizar un servicio de entrega
+ * - findById: Buscar por ID
+ * - findByStatus: Buscar por estado actual (PENDING, DELIVERED, etc.)
+ * - findByMessengerDocument: Buscar servicios asignados a un mensajero
+ * - findByPlateNumber: Buscar servicios asociados a una placa
+ * - findByDealershipId: Buscar servicios de un concesionario
+ * - findAll: Obtener todos los servicios
+ * - deleteById: Eliminar un servicio
+ * 
+ * Este adaptador es central para el sistema ya que los servicios de entrega
+ * son la entidad principal del negocio.
+ * 
+ * @see app.domain.ports.ServiceDeliveryPort
+ * @see app.infrastructure.persistence.repository.ServiceDeliveryRepository
+ * @see app.infrastructure.persistence.mapper.ServiceDeliveryMapper
  */
 @Component
 public class ServiceDeliveryAdapter implements ServiceDeliveryPort {

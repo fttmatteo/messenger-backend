@@ -12,8 +12,32 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Adaptador de persistencia para la entidad Employee.
- * Implementa EmployeePort para operaciones CRUD sobre empleados.
+ * Adaptador de salida para persistencia de empleados.
+ * 
+ * Este adaptador implementa EmployeePort y actúa como puente entre la capa de
+ * dominio
+ * y la capa de infraestructura (JPA), manejando la conversión entre objetos de
+ * dominio
+ * (Employee) y entidades de persistencia (EmployeeEntity).
+ * 
+ * Responsabilidades:
+ * - Convertir objetos de dominio a entidades JPA y viceversa usando
+ * EmployeeMapper
+ * - Delegar operaciones de persistencia al EmployeeRepository
+ * - Mantener la independencia del dominio respecto a detalles de persistencia
+ * 
+ * Operaciones soportadas:
+ * - save: Guardar o actualizar un empleado
+ * - findById: Buscar por ID
+ * - findByDocument: Buscar por documento de identidad
+ * - findByUserName: Buscar por nombre de usuario (para autenticación)
+ * - findAll: Obtener todos los empleados
+ * - deleteById: Eliminar por ID
+ * - deleteByDocument: Eliminar por documento
+ * 
+ * @see app.domain.ports.EmployeePort
+ * @see app.infrastructure.persistence.repository.EmployeeRepository
+ * @see app.infrastructure.persistence.mapper.EmployeeMapper
  */
 @Component
 public class EmployeeAdapter implements EmployeePort {
