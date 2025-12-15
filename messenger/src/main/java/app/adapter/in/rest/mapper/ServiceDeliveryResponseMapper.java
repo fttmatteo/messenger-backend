@@ -21,6 +21,8 @@ public class ServiceDeliveryResponseMapper {
     private EmployeeResponseMapper employeeMapper;
     @Autowired
     private DealershipResponseMapper dealershipMapper;
+    @Autowired
+    private app.adapter.out.storage.GoogleCloudStorageAdapter storageAdapter;
 
     /**
      * Convierte una entidad ServiceDelivery a ServiceDeliveryResponse.
@@ -58,9 +60,10 @@ public class ServiceDeliveryResponseMapper {
 
         if (service.getSignature() != null) {
             Signature sig = service.getSignature();
+            String signedUrl = storageAdapter.regenerateSignedUrl(sig.getSignaturePath());
             response.setSignature(new SignatureResponse(
                     sig.getIdSignature(),
-                    sig.getSignaturePath(),
+                    signedUrl,
                     sig.getUploadDate()));
         }
 
@@ -68,7 +71,7 @@ public class ServiceDeliveryResponseMapper {
             response.setPhotos(service.getPhotos().stream()
                     .map(p -> new PhotoResponse(
                             p.getIdPhoto(),
-                            p.getPhotoPath(),
+                            storageAdapter.regenerateSignedUrl(p.getPhotoPath()),
                             p.getUploadDate(),
                             p.getPhotoType()))
                     .collect(Collectors.toList()));
@@ -88,7 +91,7 @@ public class ServiceDeliveryResponseMapper {
                             historyResponse.setPhotos(h.getPhotos().stream()
                                     .map(p -> new PhotoResponse(
                                             p.getIdPhoto(),
-                                            p.getPhotoPath(),
+                                            storageAdapter.regenerateSignedUrl(p.getPhotoPath()),
                                             p.getUploadDate(),
                                             p.getPhotoType()))
                                     .collect(Collectors.toList()));

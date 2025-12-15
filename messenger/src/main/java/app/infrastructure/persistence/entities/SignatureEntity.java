@@ -22,7 +22,7 @@ public class SignatureEntity {
     private Long idSignature;
 
     /** Ruta del archivo de firma en el sistema de almacenamiento. */
-    @Column(name = "signature_path", nullable = false)
+    @Column(name = "signature_path", nullable = false, length = 2048)
     private String signaturePath;
 
     /** Fecha y hora en que la firma fue capturada. */
