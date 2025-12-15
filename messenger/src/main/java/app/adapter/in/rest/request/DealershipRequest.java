@@ -1,10 +1,22 @@
 package app.adapter.in.rest.request;
 
 /**
- * DTO para crear o actualizar un concesionario.
+ * DTO (Data Transfer Object) para las peticiones de creación y actualización de
+ * concesionarios.
  * 
- * Contiene la información básica del concesionario: nombre, dirección, teléfono
- * y zona.
+ * Este objeto encapsula la información básica necesaria para registrar o
+ * modificar
+ * un concesionario en el sistema, incluyendo datos de identificación, ubicación
+ * y contacto.
+ * 
+ * Campos incluidos:
+ * - name: Nombre comercial del concesionario
+ * - address: Dirección física completa
+ * - phone: Número de teléfono de contacto
+ * - zone: Zona geográfica o administrativa de operación
+ * 
+ * @see app.adapter.in.rest.controllers.DealershipController
+ * @see app.domain.model.Dealership
  */
 public class DealershipRequest {
     private String name;
