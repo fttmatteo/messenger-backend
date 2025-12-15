@@ -5,9 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -17,8 +14,8 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class GoogleMapsConfig {
 
-    @Value("${google.maps.config.path}")
-    private String configPath;
+    @Value("${google.maps.api-key}")
+    private String apiKey;
 
     /**
      * Crea el contexto de Google Maps API con la API Key configurada.
@@ -26,7 +23,9 @@ public class GoogleMapsConfig {
      */
     @Bean
     public GeoApiContext geoApiContext() {
-        String apiKey = loadApiKey();
+        if (apiKey == null || apiKey.isEmpty() || apiKey.equals("TU_API_KEY_AQUI")) {
+            throw new RuntimeException("Google Maps API Key no configurada (google.maps.api-key).");
+        }
 
         return new GeoApiContext.Builder()
                 .apiKey(apiKey)
@@ -35,24 +34,5 @@ public class GoogleMapsConfig {
                 .writeTimeout(10, TimeUnit.SECONDS)
                 .maxRetries(3)
                 .build();
-    }
-
-    private String loadApiKey() {
-        try {
-            Properties props = new Properties();
-            props.load(new FileInputStream(configPath));
-            String apiKey = props.getProperty("google.maps.api.key");
-
-            if (apiKey == null || apiKey.isEmpty() || apiKey.equals("TU_API_KEY_AQUI")) {
-                throw new RuntimeException(
-                        "Google Maps API Key no configurada. " +
-                                "Por favor, edita el archivo: " + configPath);
-            }
-
-            return apiKey;
-        } catch (IOException e) {
-            throw new RuntimeException(
-                    "No se pudo cargar el archivo de configuración de Google Maps: " + configPath, e);
-        }
     }
 }

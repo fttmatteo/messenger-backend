@@ -26,7 +26,7 @@ public class PhotoEntity {
     private Long idPhoto;
 
     /** Ruta del archivo de foto en el sistema de almacenamiento. */
-    @Column(name = "photo_path", nullable = false)
+    @Column(name = "photo_path", nullable = false, length = 2048)
     private String photoPath;
 
     /** Fecha y hora en que la foto fue capturada/subida. */

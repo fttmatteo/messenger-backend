@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -43,7 +42,6 @@ public class GoogleCloudStorageAdapter implements StoragePort {
 
     public GoogleCloudStorageAdapter(
             @Value("${google.cloud.storage.bucket-name}") String bucketName,
-            @Value("${google.cloud.storage.credentials-path}") String credentialsPath,
             @Value("${google.cloud.storage.project-id}") String projectId,
             @Value("${google.cloud.storage.signed-url-expiration-hours:24}") int urlExpirationHours)
             throws IOException {
@@ -51,9 +49,8 @@ public class GoogleCloudStorageAdapter implements StoragePort {
         this.bucketName = bucketName;
         this.defaultUrlExpirationHours = urlExpirationHours;
 
-        // Cargar credenciales desde archivo JSON
-        GoogleCredentials credentials = GoogleCredentials.fromStream(
-                new FileInputStream(credentialsPath));
+        // Usa Application Default Credentials (ADC)
+        GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
 
         // Inicializar cliente de Storage
         this.storage = StorageOptions.newBuilder()
@@ -82,15 +79,18 @@ public class GoogleCloudStorageAdapter implements StoragePort {
     }
 
     /**
-     * Sube un archivo a Google Cloud Storage y retorna una URL firmada temporal.
+     * Sube un archivo a Google Cloud Storage y retorna la ruta del objeto (Object
+     * Name).
      * 
-     * El archivo se almacena de forma PRIVADA en el bucket. La URL firmada generada
-     * permite acceso temporal sin necesidad de autenticación adicional.
+     * El archivo se almacena de forma PRIVADA en el bucket.
+     * Retorna el path relativo (ej: "photos/uuid.jpg") que se debe guardar en BD.
+     * La URL firmada se generará posteriormente bajo demanda usando
+     * regenerateSignedUrl.
      * 
      * @param file         Archivo a subir
      * @param subDirectory Subdirectorio en el bucket (ej: "photos", "signatures")
      * @param fileName     Nombre del archivo con extensión
-     * @return URL firmada temporal para acceder al archivo
+     * @return Ruta del objeto en el bucket (Object Name)
      * @throws IOException Si ocurre un error al subir
      */
     private String uploadToGCS(File file, String subDirectory, String fileName) throws IOException {
@@ -111,10 +111,11 @@ public class GoogleCloudStorageAdapter implements StoragePort {
 
         // Subir archivo
         byte[] fileBytes = Files.readAllBytes(file.toPath());
-        Blob blob = storage.create(blobInfo, fileBytes);
+        storage.create(blobInfo, fileBytes);
 
-        // Generar y retornar URL firmada
-        return generateSignedUrl(blob, defaultUrlExpirationHours);
+        // Retornamos el PATH relativo (ej: photos/abc.jpg)
+        // La URL firmada se generará solo al consultar (GET)
+        return objectName;
     }
 
     /**

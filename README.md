@@ -33,8 +33,10 @@ graph TB
         subgraph "Output Adapters"
             PERSIST[JPA Persistence]
             OCR[Google Vision OCR]
-            FILES[File Storage]
+            STORAGE[Google Cloud Storage]
             SEC[JWT Security]
+            MAPS[Google Maps]
+            TRACKING[Location Tracking]
         end
     end
     
@@ -53,8 +55,10 @@ graph TB
     UC --> PORTS
     PORTS --> PERSIST
     PORTS --> OCR
-    PORTS --> FILES
+    PORTS --> STORAGE
     PORTS --> SEC
+    PORTS --> MAPS
+    PORTS --> TRACKING
     UC --> SVC
     SVC --> MOD
 ```
@@ -68,8 +72,12 @@ graph TB
 | **Framework** | Spring Boot 4.0.0 |
 | **Lenguaje** | Java 21 |
 | **Base de Datos** | MySQL 8.0+ |
+| **Cache/Streaming** | Redis |
 | **Seguridad** | JWT + BCrypt |
 | **OCR** | Google Cloud Vision API |
+| **Almacenamiento** | Google Cloud Storage |
+| **Mapas** | Google Maps Platform |
+| **Tiempo Real** | WebSocket + Redis |
 | **Build** | Maven 3.9+ |
 | **Validación** | Spring Validation |
 
@@ -91,10 +99,12 @@ messenger/
 │   │   │   │   └── response/            # DTOs de salida
 │   │   │   └── validators/              # Validadores de entrada
 │   │   └── out/                         # Adaptadores de salida
-│   │       ├── files/                   # Almacenamiento de archivos
+│   │       ├── maps/                    # Google Maps Integration
 │   │       ├── ocr/                     # Google Vision OCR
 │   │       ├── persistence/             # JPA Adapters
-│   │       └── security/                # JWT Adapter
+│   │       ├── security/                # JWT Adapter
+│   │       ├── storage/                 # Google Cloud Storage
+│   │       └── tracking/                # Location Tracking
 │   ├── application/
 │   │   ├── exceptions/                  # BusinessException, InputsException
 │   │   └── usecase/                     # 4 Use Cases
@@ -159,6 +169,25 @@ messenger/
 | Método | Endpoint | Descripción | Auth |
 |--------|----------|-------------|------|
 | `GET` | `/api/files/{filename}` | Obtener archivo | 🔓 Público |
+
+### Ubicaciones y Rutas (`/locations`)
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `POST` | `/locations/geocode` | Convertir dirección a coordenadas |
+| `POST` | `/locations/route` | Calcular ruta optimizada para múltiples destinos |
+| `GET` | `/locations/distance` | Calcular distancia entre dos puntos |
+| `GET` | `/locations/reverse` | Convertir coordenadas a dirección (reverse geocoding) |
+
+### Tracking en Tiempo Real (`/api/tracking`)
+
+| Método | Endpoint | Descripción | Auth |
+|--------|----------|-------------|------|
+| `POST` | `/api/tracking/update` | Actualizar ubicación del mensajero | MESSENGER/ADMIN |
+| `GET` | `/api/tracking/messenger/{id}` | Obtener última ubicación de mensajero | ADMIN |
+| `GET` | `/api/tracking/active` | Listar todos los mensajeros activos | ADMIN |
+| `GET` | `/api/tracking/history/{id}` | Historial de tracking por fecha | MESSENGER/ADMIN |
+| `GET` | `/api/tracking/service/{id}` | Historial de tracking por servicio | MESSENGER/ADMIN |
 
 ---
 
@@ -244,6 +273,25 @@ erDiagram
 
 ---
 
+## 📡 Tracking en Tiempo Real
+
+El sistema implementa tracking GPS en vivo usando **Redis** + **WebSocket** para monitoreo de mensajeros.
+
+### Características:
+- 🔴 **Ubicación en vivo**: Actualización cada 30 segundos
+- 📍 **Validación de entrega**: Radio máximo de 200 metros del concesionario
+- 📊 **Historial completo**: Retención de 30 días de trayectorias
+- ⚡ **Baja latencia**: Redis para caché de ubicaciones activas
+- 🌐 **WebSocket**: Notificaciones push en tiempo real
+
+### Integración Google Maps:
+- **Geocoding**: Conversión dirección ↔ coordenadas
+- **Directions API**: Cálculo de rutas optimizadas
+- **Distance Matrix**: Estimación de tiempos de llegada
+- **Reverse Geocoding**: Obtener dirección desde coordenadas
+
+---
+
 ## 🔄 Flujo de Estados
 
 ```mermaid
@@ -298,8 +346,10 @@ Orígenes permitidos (desarrollo):
 ### Prerrequisitos
 - Java 21+
 - MySQL 8.0+
+- Redis 6.0+
 - Maven 3.9+
-- Credenciales de Google Cloud Vision API
+- Credenciales de Google Cloud (Vision + Storage)
+- API Key de Google Maps Platform
 
 ### 1. Clonar repositorio
 ```bash
@@ -312,31 +362,82 @@ cd messenger-backend/messenger
 CREATE DATABASE messenger;
 ```
 
-### 3. Configurar `application.properties`
+### 3. Configurar Redis
+Redis se utiliza para el tracking en tiempo real de mensajeros.
+
+**macOS (Homebrew):**
+```bash
+brew install redis
+brew services start redis
+```
+
+**Linux (Ubuntu/Debian):**
+```bash
+sudo apt update
+sudo apt install redis-server
+sudo systemctl start redis-server
+```
+
+**Verificar instalación:**
+```bash
+redis-cli ping
+# Debe responder: PONG
+```
+
+### 4. Configurar `application.properties`
 ```properties
 # Base de Datos
 spring.datasource.url=jdbc:mysql://localhost:3306/messenger
 spring.datasource.username=root
 spring.datasource.password=<tu-password>
 
-# Almacenamiento de archivos
-app.storage.path=/ruta/a/uploads
+# Google Cloud Storage
+google.cloud.storage.bucket-name=<tu-bucket-name>
+google.cloud.storage.project-id=<tu-project-id>
+google.cloud.storage.signed-url-expiration-hours=24
 
 # Google Cloud Vision
-google.cloud.credentials.path=config/google-vision-credentials.json
+google.cloud.vision.project-id=<tu-project-id>
+
+# Google Maps Platform
+google.maps.api.key=<tu-api-key>
+
+# Redis (tracking en tiempo real)
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
+
+# WebSocket (notificaciones en tiempo real)
+websocket.allowed.origins=http://localhost:3000,http://localhost:5173,http://localhost:4200
+
+# Configuración de Tracking
+tracking.update.interval=30000
+tracking.max.distance.validation=200
+tracking.history.retention.days=30
 
 # JWT
 jwt.secret=<tu-clave-secreta-base64>
 jwt.expiration=1800000
 ```
 
-### 4. Configurar Google Cloud Vision
-Coloca tu archivo de credenciales en:
-```
-messenger/config/google-vision-credentials.json
+### 5. Configurar Google Cloud (Vision + Storage)
+
+#### Opción recomendada: Application Default Credentials (ADC)
+```bash
+# Configura ADC con tu cuenta de Google Cloud
+gcloud auth application-default login
+
+# O establece la variable de entorno
+export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
 ```
 
-### 5. Ejecutar
+#### Características de Google Cloud Storage:
+- **URLs firmadas temporales**: Acceso seguro sin bucket público
+- **Expiración automática**: Las URLs expiran después de 24 horas (configurable)
+- **Almacenamiento privado**: Máxima seguridad para evidencias legales
+- **Escalabilidad infinita**: No consume espacio del servidor
+- **CDN global**: Entrega rápida desde cualquier ubicación
+
+### 6. Ejecutar
 ```bash
 ./mvnw spring-boot:run
 ```

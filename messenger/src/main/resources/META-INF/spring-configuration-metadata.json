@@ -20,24 +20,14 @@
             }
         },
         {
-            "name": "google.cloud.credentials.path",
+            "name": "google.maps.api-key",
             "type": "java.lang.String",
-            "description": "Ruta al archivo de credenciales JSON de Google Cloud Vision API."
-        },
-        {
-            "name": "google.maps.config.path",
-            "type": "java.lang.String",
-            "description": "Ruta al archivo de configuración de Google Maps API."
+            "description": "API Key de Google Maps Platform."
         },
         {
             "name": "google.cloud.storage.bucket-name",
             "type": "java.lang.String",
             "description": "Nombre del bucket de Google Cloud Storage (debe ser único globalmente)."
-        },
-        {
-            "name": "google.cloud.storage.credentials-path",
-            "type": "java.lang.String",
-            "description": "Ruta al archivo de credenciales JSON del Service Account de GCS."
         },
         {
             "name": "google.cloud.storage.project-id",

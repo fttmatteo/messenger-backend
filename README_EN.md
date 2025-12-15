@@ -33,8 +33,10 @@ graph TB
         subgraph "Output Adapters"
             PERSIST[JPA Persistence]
             OCR[Google Vision OCR]
-            FILES[File Storage]
+            STORAGE[Google Cloud Storage]
             SEC[JWT Security]
+            MAPS[Google Maps]
+            TRACKING[Location Tracking]
         end
     end
     
@@ -53,8 +55,10 @@ graph TB
     UC --> PORTS
     PORTS --> PERSIST
     PORTS --> OCR
-    PORTS --> FILES
+    PORTS --> STORAGE
     PORTS --> SEC
+    PORTS --> MAPS
+    PORTS --> TRACKING
     UC --> SVC
     SVC --> MOD
 ```
@@ -68,8 +72,12 @@ graph TB
 | **Framework** | Spring Boot 4.0.0 |
 | **Language** | Java 21 |
 | **Database** | MySQL 8.0+ |
+| **Cache/Streaming** | Redis |
 | **Security** | JWT + BCrypt |
 | **OCR** | Google Cloud Vision API |
+| **Storage** | Google Cloud Storage |
+| **Maps** | Google Maps Platform |
+| **Real-time** | WebSocket + Redis |
 | **Build** | Maven 3.9+ |
 | **Validation** | Spring Validation |
 
@@ -91,10 +99,12 @@ messenger/
 │   │   │   │   └── response/            # Output DTOs
 │   │   │   └── validators/              # Input validators
 │   │   └── out/                         # Output adapters
-│   │       ├── files/                   # File storage
+│   │       ├── maps/                    # Google Maps Integration
 │   │       ├── ocr/                     # Google Vision OCR
 │   │       ├── persistence/             # JPA Adapters
-│   │       └── security/                # JWT Adapter
+│   │       ├── security/                # JWT Adapter
+│   │       ├── storage/                 # Google Cloud Storage
+│   │       └── tracking/                # Location Tracking
 │   ├── application/
 │   │   ├── exceptions/                  # BusinessException, InputsException
 │   │   └── usecase/                     # 4 Use Cases
@@ -159,6 +169,25 @@ messenger/
 | Method | Endpoint | Description | Auth |
 |--------|----------|-------------|------|
 | `GET` | `/api/files/{filename}` | Get file | 🔓 Public |
+
+### Locations and Routes (`/locations`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/locations/geocode` | Convert address to coordinates |
+| `POST` | `/locations/route` | Calculate optimal route for multiple destinations |
+| `GET` | `/locations/distance` | Calculate distance between two points |
+| `GET` | `/locations/reverse` | Convert coordinates to address (reverse geocoding) |
+
+### Real-time Tracking (`/api/tracking`)
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| `POST` | `/api/tracking/update` | Update messenger location | MESSENGER/ADMIN |
+| `GET` | `/api/tracking/messenger/{id}` | Get last messenger location | ADMIN |
+| `GET` | `/api/tracking/active` | List all active messengers | ADMIN |
+| `GET` | `/api/tracking/history/{id}` | Tracking history by date | MESSENGER/ADMIN |
+| `GET` | `/api/tracking/service/{id}` | Tracking history by service | MESSENGER/ADMIN |
 
 ---
 
@@ -244,6 +273,25 @@ erDiagram
 
 ---
 
+## 📡 Real-time Tracking
+
+The system implements live GPS tracking using **Redis** + **WebSocket** for messenger monitoring.
+
+### Features:
+- 🔴 **Live location**: Updates every 30 seconds
+- 📍 **Delivery validation**: Maximum radius of 200 meters from dealership
+- 📊 **Complete history**: 30-day retention of trajectories
+- ⚡ **Low latency**: Redis for active location cache
+- 🌐 **WebSocket**: Real-time push notifications
+
+### Google Maps Integration:
+- **Geocoding**: Address ↔ coordinates conversion
+- **Directions API**: Optimized route calculation
+- **Distance Matrix**: Estimated arrival times
+- **Reverse Geocoding**: Get address from coordinates
+
+---
+
 ## 🔄 Status Flow
 
 ```mermaid
@@ -298,8 +346,10 @@ Allowed origins (development):
 ### Prerequisites
 - Java 21+
 - MySQL 8.0+
+- Redis 6.0+
 - Maven 3.9+
-- Google Cloud Vision API credentials
+- Google Cloud credentials (Vision + Storage)
+- Google Maps Platform API Key
 
 ### 1. Clone repository
 ```bash
@@ -312,31 +362,82 @@ cd messenger-backend/messenger
 CREATE DATABASE messenger;
 ```
 
-### 3. Configure `application.properties`
+### 3. Configure Redis
+Redis is used for real-time messenger tracking.
+
+**macOS (Homebrew):**
+```bash
+brew install redis
+brew services start redis
+```
+
+**Linux (Ubuntu/Debian):**
+```bash
+sudo apt update
+sudo apt install redis-server
+sudo systemctl start redis-server
+```
+
+**Verify installation:**
+```bash
+redis-cli ping
+# Should respond: PONG
+```
+
+### 4. Configure `application.properties`
 ```properties
 # Database
 spring.datasource.url=jdbc:mysql://localhost:3306/messenger
 spring.datasource.username=root
 spring.datasource.password=<your-password>
 
-# File storage
-app.storage.path=/path/to/uploads
+# Google Cloud Storage
+google.cloud.storage.bucket-name=<your-bucket-name>
+google.cloud.storage.project-id=<your-project-id>
+google.cloud.storage.signed-url-expiration-hours=24
 
 # Google Cloud Vision
-google.cloud.credentials.path=config/google-vision-credentials.json
+google.cloud.vision.project-id=<your-project-id>
+
+# Google Maps Platform
+google.maps.api.key=<your-api-key>
+
+# Redis (real-time tracking)
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
+
+# WebSocket (real-time notifications)
+websocket.allowed.origins=http://localhost:3000,http://localhost:5173,http://localhost:4200
+
+# Tracking Configuration
+tracking.update.interval=30000
+tracking.max.distance.validation=200
+tracking.history.retention.days=30
 
 # JWT
 jwt.secret=<your-secret-key-base64>
 jwt.expiration=1800000
 ```
 
-### 4. Configure Google Cloud Vision
-Place your credentials file at:
-```
-messenger/config/google-vision-credentials.json
+### 5. Configure Google Cloud (Vision + Storage)
+
+#### Recommended option: Application Default Credentials (ADC)
+```bash
+# Configure ADC with your Google Cloud account
+gcloud auth application-default login
+
+# Or set the environment variable
+export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
 ```
 
-### 5. Run
+#### Google Cloud Storage Features:
+- **Temporary Signed URLs**: Secure access without public bucket
+- **Automatic Expiration**: URLs expire after 24 hours (configurable)
+- **Private Storage**: Maximum security for legal evidence
+- **Infinite Scalability**: Does not consume server space
+- **Global CDN**: Fast delivery from any location
+
+### 6. Run
 ```bash
 ./mvnw spring-boot:run
 ```
