@@ -12,8 +12,13 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 
 /**
- * Caso de uso para actualizar la ubicación en tiempo real de un mensajero.
- * Guarda en Redis para tracking en vivo y en la BD para historial.
+ * Caso de uso para procesar y almacenar actualizaciones de ubicación en tiempo
+ * real.
+ * 
+ * Gestiona el flujo de datos de rastreo entrantes, asegurando que se almacenen
+ * tanto en la caché de tiempo real (para monitoreo en vivo) como en el
+ * historial
+ * persistente (para auditoría futura).
  */
 @Service
 public class UpdateLiveTracking {
@@ -22,10 +27,15 @@ public class UpdateLiveTracking {
     private TrackingPort trackingPort;
 
     /**
-     * Procesa una actualización de ubicación del mensajero.
+     * Ejecuta la actualización de rastreo para un mensajero.
      * 
-     * @param incomingTracking Datos de ubicación recibidos (modelo de dominio)
-     * @return LiveTracking con los datos procesados
+     * Normaliza los datos (establece fecha y estado por defecto si faltan),
+     * actualiza la ubicación en tiempo real y guarda un registro en el historial
+     * permanente.
+     * 
+     * @param incomingTracking Objeto con los datos de ubicación recibidos del
+     *                         dispositivo.
+     * @return El objeto LiveTracking procesado y enriquecido con datos por defecto.
      */
     public LiveTracking execute(LiveTracking incomingTracking) {
         // Asegurar que la fecha de actualización es la actual si no viene seteada

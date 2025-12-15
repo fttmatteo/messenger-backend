@@ -9,7 +9,11 @@ import org.springframework.stereotype.Service;
 
 /**
  * Caso de uso para geocodificar la dirección de un concesionario.
- * Usa Google Geocoding API para obtener las coordenadas.
+ * 
+ * Utiliza la API de Google Geocoding a través del puerto de localización para
+ * convertir la dirección física de un concesionario en coordenadas geográficas
+ * (latitud y longitud), permitiendo su visualización en mapas y cálculos de
+ * ruta.
  */
 @Service
 public class GeocodeDealership {
@@ -20,10 +24,15 @@ public class GeocodeDealership {
     private DealershipPort dealershipPort;
 
     /**
-     * Geocodifica un concesionario y actualiza sus coordenadas.
+     * Ejecuta el proceso de geocodificación para un concesionario específico.
      * 
-     * @param dealershipId ID del concesionario a geocodificar
-     * @return Dealership actualizado con coordenadas
+     * Recupera el concesionario, obtiene las coordenadas de su dirección,
+     * actualiza la entidad con la nueva ubicación y marca el indicador de
+     * geolocalización.
+     * Finalmente, persiste los cambios en la base de datos.
+     * 
+     * @param dealershipId ID del concesionario a procesar.
+     * @return El objeto Dealership actualizado con las nuevas coordenadas.
      */
     public Dealership execute(Long dealershipId) {
         // Obtener el concesionario
@@ -45,11 +54,13 @@ public class GeocodeDealership {
     }
 
     /**
-     * Geocodifica una dirección sin guardar.
-     * Útil para preview o validación.
+     * Geocodifica una dirección arbitraria sin persistir resultados.
      * 
-     * @param address Dirección a geocodificar
-     * @return Location con las coordenadas
+     * Útil para validar direcciones antes de guardarlas o para mostrar
+     * vistas previas de ubicación en la interfaz de usuario.
+     * 
+     * @param address La dirección en texto plano a geocodificar.
+     * @return Un objeto Location con las coordenadas obtenidas.
      */
     public Location geocodeAddress(String address) {
         return locationPort.geocodeAddress(address);

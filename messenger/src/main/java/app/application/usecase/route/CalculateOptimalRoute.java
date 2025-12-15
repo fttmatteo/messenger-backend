@@ -13,7 +13,12 @@ import java.util.List;
 
 /**
  * Caso de uso para calcular rutas óptimas de entrega.
- * Usa Google Directions API con optimización de waypoints.
+ * 
+ * Utiliza algoritmos de optimización (como el problema del viajante o servicios
+ * externos)
+ * para determinar el orden más eficiente de visita a múltiples concesionarios
+ * desde
+ * un punto de origen, minimizando tiempo y distancia.
  */
 @Service
 public class CalculateOptimalRoute {
@@ -24,12 +29,21 @@ public class CalculateOptimalRoute {
     private DealershipPort dealershipPort;
 
     /**
-     * Calcula la ruta óptima desde una ubicación origen a múltiples concesionarios.
+     * Calcula una ruta optimizada que visita múltiples concesionarios.
      * 
-     * @param originLat     Latitud del origen
-     * @param originLng     Longitud del origen
-     * @param dealershipIds Lista de IDs de concesionarios a visitar
-     * @return Ruta optimizada
+     * Obtiene las ubicaciones de los concesionarios seleccionados y solicita
+     * al servicio de mapas una ruta que pase por todos ellos de la manera más
+     * eficiente.
+     * 
+     * @param originLat     Latitud del punto de partida (ej. ubicación actual del
+     *                      mensajero).
+     * @param originLng     Longitud del punto de partida.
+     * @param dealershipIds Lista de identificadores de los concesionarios a
+     *                      visitar.
+     * @return Un objeto Route que contiene la geometría de la ruta y el orden de
+     *         paradas.
+     * @throws IllegalArgumentException Si no se encuentran concesionarios
+     *                                  geocodificados válidos.
      */
     public Route execute(Double originLat, Double originLng, List<Long> dealershipIds) {
         Location origin = new Location(originLat, originLng);
@@ -52,14 +66,25 @@ public class CalculateOptimalRoute {
     }
 
     /**
-     * Calcula la ruta simple entre dos ubicaciones.
+     * Calcula una ruta directa simple entre dos puntos.
+     * 
+     * No realiza optimización de múltiples paradas, solo la ruta más rápida o corta
+     * entre A y B.
+     * 
+     * @param origin      Ubicación de inicio.
+     * @param destination Ubicación de destino.
+     * @return Objeto Route con los detalles del trayecto.
      */
     public Route calculateSimpleRoute(Location origin, Location destination) {
         return locationPort.calculateRoute(origin, destination);
     }
 
     /**
-     * Calcula la distancia entre dos ubicaciones.
+     * Calcula la distancia en metros entre dos ubicaciones geográficas.
+     * 
+     * @param from Ubicación de origen.
+     * @param to   Ubicación de destino.
+     * @return La distancia en metros.
      */
     public Double calculateDistance(Location from, Location to) {
         return locationPort.calculateDistance(from, to);
