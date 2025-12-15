@@ -30,53 +30,122 @@
 		<java.version>21</java.version>
 	</properties>
 	<dependencies>
+		<!-- 
+			Spring Boot Starter Data JPA:
+			Proporciona soporte para Java Persistence API (JPA) usando Hibernate.
+			Permite la interacción con la base de datos mediante repositorios y entidades.
+		-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
+
+		<!-- 
+			Spring Boot Starter Web:
+			Construye aplicaciones web, incluyendo RESTful.
+			Usa Tomcat como contenedor embebido por defecto.
+		-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+
+		<!-- 
+			Google Cloud Vision:
+			Cliente para la API de Google Cloud Vision.
+			Se usa para OCR (Reconocimiento Óptico de Caracteres) en la detección de placas.
+		-->
 		<dependency>
 			<groupId>com.google.cloud</groupId>
 			<artifactId>google-cloud-vision</artifactId>
 			<version>3.31.0</version>
 		</dependency>
-		<!-- Google Cloud Storage dependency -->
+
+		<!-- 
+			Google Cloud Storage:
+			Cliente para Google Cloud Storage.
+			Permite subir y gestionar archivos (fotos, firmas) en la nube.
+		-->
 		<dependency>
 			<groupId>com.google.cloud</groupId>
 			<artifactId>google-cloud-storage</artifactId>
 			<version>2.29.0</version>
 		</dependency>
+
+		<!-- 
+			Spring Boot Starter Validation:
+			Proporciona soporte para validación de beans con Hibernate Validator.
+			Se usa para validar datos de entrada (DTOs) con anotaciones como @NotNull, @Size.
+		-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
+
+		<!-- 
+			Spring Security Crypto:
+			Ofrece utilidades de criptografía.
+			Se usa principalmente para el hashing de contraseñas (BCrypt).
+		-->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-crypto</artifactId>
 		</dependency>
+
+		<!-- 
+			Lombok:
+			Biblioteca para reducir código boilerplate.
+			Genera getters, setters, constructores, etc. automáticamente mediante anotaciones.
+		-->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+
+		<!-- 
+			H2 Database:
+			Base de datos en memoria muy rápida.
+			Útil para desarrollo y pruebas rápidas sin configurar un servidor de BD externo.
+			Scope: runtime (solo necesaria al ejecutar).
+		-->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+
+		<!-- 
+			MySQL Connector:
+			Driver JDBC para conectar con bases de datos MySQL.
+			Necesario para la persistencia en producción/desarrollo con BD real.
+			Scope: runtime.
+		-->
 		<dependency>
 			<groupId>com.mysql</groupId>
-				<artifactId>mysql-connector-j</artifactId>
-				<scope>runtime</scope>
-			</dependency>
+			<artifactId>mysql-connector-j</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- 
+			Spring Boot Starter Test:
+			Librerías para testing (JUnit, Mockito, Spring Test).
+			Incluye todo lo necesario para pruebas unitarias y de integración.
+		-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- 
+			JJWT (Java JWT):
+			Conjunto de librerías para trabajar con JSON Web Tokens (JWT).
+			- api: Interfaces de la API.
+			- impl: Implementación interna.
+			- jackson: Serializador JSON para los tokens.
+			Se usan para la autenticación y autorización segura basada en tokens.
+		-->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
@@ -92,31 +161,53 @@
 			<artifactId>jjwt-jackson</artifactId>
 			<version>0.11.5</version>
 		</dependency>
+
+		<!-- 
+			Spring Boot Starter Security:
+			Proporciona características de autenticación y control de acceso.
+			Protege endpoints y gestiona sesiones/tokens.
+		-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 
-		<!-- Google Maps Services (Geocoding, Directions, Distance Matrix) -->
+		<!-- 
+			Google Maps Services:
+			Cliente Java para las APIs de Google Maps.
+			Permite geocodificación, cálculo de rutas, matriz de distancias y zonas horarias.
+		-->
 		<dependency>
 			<groupId>com.google.maps</groupId>
 			<artifactId>google-maps-services</artifactId>
 			<version>2.2.0</version>
 		</dependency>
 
-		<!-- WebSocket para tracking en tiempo real -->
+		<!-- 
+			Spring Boot Starter WebSocket:
+			Habilita la comunicación bidireccional en tiempo real usando WebSockets.
+			Esencial para el tracking en vivo de los mensajeros.
+		-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-websocket</artifactId>
 		</dependency>
 
-		<!-- Redis para caché de ubicaciones en tiempo real -->
+		<!-- 
+			Spring Boot Starter Data Redis:
+			Soporte para Redis (base de datos key-value en memoria).
+			Se usa para caché de alto rendimiento, especialmente para almacenar ubicaciones en tiempo real.
+		-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency>
 
-		<!-- SLF4J Simple para logging de Google Maps -->
+		<!-- 
+			SLF4J Simple:
+			Implementación simple de logging.
+			Necesaria en runtime para ver logs detallados de la librería de Google Maps.
+		-->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
@@ -131,7 +222,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-			<!-- Configuración para tests con Mockito -->
+			<!-- Configuración para evitar problemas con Mockito y agentes dinámicos en Java 21+ -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>

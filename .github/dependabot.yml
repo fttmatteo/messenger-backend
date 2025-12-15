@@ -1,0 +1,16 @@
+version: 2
+updates:
+  # Mantener las GitHub Actions actualizadas
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  # Mantener dependencias de Java (Maven) actualizadas
+  # IMPORTANTE: Apunta a la carpeta /messenger donde está tu pom.xml
+  - package-ecosystem: "maven"
+    directory: "/messenger" 
+    schedule:
+      interval: "weekly"
+    # Opcional: Límite de PRs abiertos para no saturarte
+    open-pull-requests-limit: 10
