@@ -9,8 +9,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
- * Caso de uso para validar que la entrega se realiza cerca del concesionario.
- * Previene entregas falsas que se registran desde ubicaciones lejanas.
+ * Caso de uso para validar la ubicación geográfica de una entrega.
+ * 
+ * Asegura la integridad del proceso de entrega verificando que el mensajero
+ * se encuentre físicamente dentro de un radio permitido del concesionario
+ * destino
+ * al momento de realizar ciertas acciones.
  */
 @Service
 public class ValidateDeliveryLocation {
@@ -22,13 +26,16 @@ public class ValidateDeliveryLocation {
     private Double maxDistanceMeters;
 
     /**
-     * Valida que la ubicación de entrega esté dentro del radio permitido del
+     * Ejecuta la validación de proximidad entre la ubicación de entrega y el
      * concesionario.
      * 
-     * @param deliveryLocation Ubicación donde se está realizando la entrega
-     * @param dealershipId     ID del concesionario destino
-     * @return true si la ubicación es válida
-     * @throws GeolocationException si la ubicación está muy lejos
+     * @param deliveryLocation Coordenadas donde se reporta la entrega.
+     * @param dealershipId     ID del concesionario donde se debe realizar la
+     *                         entrega.
+     * @return true si la validación es exitosa o si el concesionario no tiene
+     *         ubicación registrada.
+     * @throws GeolocationException Si la distancia excede el máximo permitido
+     *                              configurado.
      */
     public boolean execute(Location deliveryLocation, Long dealershipId) {
         // Obtener el concesionario
@@ -59,7 +66,16 @@ public class ValidateDeliveryLocation {
     }
 
     /**
-     * Verifica si la ubicación está dentro del radio sin lanzar excepción.
+     * Verifica si la ubicación está dentro del radio permitido sin interrumpir el
+     * flujo.
+     * 
+     * Envuelve la ejecución principal en un bloque try-catch para retornar un
+     * booleano
+     * en lugar de lanzar una excepción en caso de error de validación.
+     * 
+     * @param deliveryLocation Coordenadas de la entrega.
+     * @param dealershipId     ID del concesionario.
+     * @return true si está dentro del rango, false si está fuera.
      */
     public boolean isWithinRange(Location deliveryLocation, Long dealershipId) {
         try {

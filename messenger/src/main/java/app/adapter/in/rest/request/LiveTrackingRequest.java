@@ -3,7 +3,30 @@ package app.adapter.in.rest.request;
 import app.domain.model.enums.TrackingStatus;
 
 /**
- * DTO para recibir actualizaciones de ubicación del mensajero.
+ * DTO (Data Transfer Object) para recibir actualizaciones de ubicación en
+ * tiempo real del mensajero.
+ * 
+ * Este objeto encapsula toda la información de geolocalización y estado del
+ * mensajero,
+ * permitiendo el seguimiento en tiempo real durante la ejecución de servicios
+ * de entrega.
+ * 
+ * Información capturada:
+ * - messengerId: Identificador único del mensajero
+ * - latitude/longitude: Coordenadas geográficas actuales
+ * - accuracy: Precisión de la ubicación en metros
+ * - speed: Velocidad actual en m/s
+ * - heading: Dirección del movimiento (0-360°, 0=Norte)
+ * - status: Estado del rastreo (ACTIVE, INACTIVE, etc.)
+ * - deviceId: Identificador único del dispositivo móvil
+ * 
+ * Los datos se almacenan en el historial de rastreo y se transmiten en tiempo
+ * real
+ * a través de WebSockets a los clientes suscritos.
+ * 
+ * @see app.adapter.in.rest.controllers.TrackingController
+ * @see app.adapter.in.websocket.TrackingWebSocketController
+ * @see app.domain.model.LiveTracking
  */
 public class LiveTrackingRequest {
     private Long messengerId;

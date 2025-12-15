@@ -8,13 +8,42 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 /**
- * Configuración de WebSocket con STOMP para tracking en tiempo real.
+ * Configuración de WebSocket con protocolo STOMP para comunicación en tiempo
+ * real.
  * 
- * Arquitectura de mensajes:
- * - /app/tracking/update → Mensajeros envían ubicaciones
- * - /topic/tracking/{messengerId} → Admins se suscriben para recibir
- * actualizaciones
- * - /topic/tracking/all → Admins reciben todas las actualizaciones (broadcast)
+ * Esta clase configura la infraestructura de WebSocket del sistema, habilitando
+ * la comunicación bidireccional en tiempo real entre clientes (mensajeros y
+ * administradores)
+ * y el servidor para el rastreo de ubicaciones.
+ * 
+ * Configuración del Message Broker:
+ * - Broker simple habilitado para /topic (broadcast) y /queue (mensajes punto a
+ * punto)
+ * - Prefijo de aplicación: /app (para mensajes del cliente al servidor)
+ * - Prefijo de usuario: /user (para mensajes dirigidos a usuarios específicos)
+ * 
+ * Endpoints STOMP configurados:
+ * - /ws/tracking: Endpoint principal de conexión WebSocket
+ * - Con SockJS: Proporciona fallback para navegadores sin soporte WebSocket
+ * nativo
+ * - Sin SockJS: Para clientes nativos (apps móviles) que soportan WebSocket
+ * directamente
+ * 
+ * Arquitectura de canales:
+ * - /app/tracking/update: Mensajeros envían ubicaciones
+ * - /topic/tracking/{messengerId}: Admins reciben actualizaciones de un
+ * mensajero específico
+ * - /topic/tracking/all: Admins reciben actualizaciones de todos los mensajeros
+ * (broadcast)
+ * 
+ * Seguridad:
+ * - Los orígenes permitidos se configuran mediante la propiedad
+ * websocket.allowed.origins
+ * - Soporta múltiples orígenes separados por comas
+ * 
+ * @see TrackingWebSocketController
+ * @see org.springframework.messaging.simp.config.MessageBrokerRegistry
+ * @see org.springframework.web.socket.config.annotation.StompEndpointRegistry
  */
 @Configuration
 @EnableWebSocketMessageBroker

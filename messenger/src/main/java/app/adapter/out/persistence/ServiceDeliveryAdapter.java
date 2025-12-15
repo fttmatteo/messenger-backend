@@ -13,9 +13,36 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Adaptador de persistencia para la entidad ServiceDelivery.
- * Implementa ServiceDeliveryPort para gestionar el ciclo de vida de los
- * servicios de entrega.
+ * Adaptador de salida para persistencia de servicios de entrega.
+ * 
+ * Este adaptador implementa ServiceDeliveryPort y actúa como puente entre la
+ * capa de dominio
+ * y la capa de infraestructura (JPA), manejando la conversión entre objetos de
+ * dominio
+ * (ServiceDelivery) y entidades de persistencia (ServiceDeliveryEntity).
+ * 
+ * Responsabilidades:
+ * - Convertir objetos de dominio a entidades JPA y viceversa usando
+ * ServiceDeliveryMapper
+ * - Delegar operaciones de persistencia al ServiceDeliveryRepository
+ * - Mantener la independencia del dominio respecto a detalles de persistencia
+ * 
+ * Operaciones soportadas:
+ * - save: Guardar o actualizar un servicio de entrega
+ * - findById: Buscar por ID
+ * - findByStatus: Buscar por estado actual (PENDING, DELIVERED, etc.)
+ * - findByMessengerDocument: Buscar servicios asignados a un mensajero
+ * - findByPlateNumber: Buscar servicios asociados a una placa
+ * - findByDealershipId: Buscar servicios de un concesionario
+ * - findAll: Obtener todos los servicios
+ * - deleteById: Eliminar un servicio
+ * 
+ * Este adaptador es central para el sistema ya que los servicios de entrega
+ * son la entidad principal del negocio.
+ * 
+ * @see app.domain.ports.ServiceDeliveryPort
+ * @see app.infrastructure.persistence.repository.ServiceDeliveryRepository
+ * @see app.infrastructure.persistence.mapper.ServiceDeliveryMapper
  */
 @Component
 public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
@@ -25,6 +52,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     @Autowired
     private ServiceDeliveryMapper mapper;
 
+    /** Guarda o actualiza un servicio de entrega. Actualiza el ID generado. */
     @Override
     public void save(ServiceDelivery serviceDelivery) {
         ServiceDeliveryEntity entity = mapper.toEntity(serviceDelivery);
@@ -32,11 +60,13 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
         serviceDelivery.setIdServiceDelivery(savedEntity.getIdServiceDelivery());
     }
 
+    /** Elimina un servicio de entrega por ID. */
     @Override
     public void deleteById(Long idServiceDelivery) {
         repository.deleteById(idServiceDelivery);
     }
 
+    /** Busca un servicio de entrega por ID. */
     @Override
     public ServiceDelivery findById(Long idServiceDelivery) {
         Optional<ServiceDeliveryEntity> entity = repository.findById(idServiceDelivery);
@@ -46,6 +76,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
         return null;
     }
 
+    /** Obtiene todos los servicios de entrega. */
     @Override
     public List<ServiceDelivery> findAll() {
         return repository.findAll().stream()
@@ -53,6 +84,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
                 .collect(Collectors.toList());
     }
 
+    /** Busca servicios por estado (PENDING, DELIVERED, etc.). */
     @Override
     public List<ServiceDelivery> findByStatus(Status status) {
         return repository.findByCurrentStatus(status).stream()
@@ -60,6 +92,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
                 .collect(Collectors.toList());
     }
 
+    /** Busca servicios asignados a un mensajero específico. */
     @Override
     public List<ServiceDelivery> findByMessengerDocument(Long messengerDocument) {
         return repository.findByMessenger_Document(messengerDocument).stream()
@@ -67,6 +100,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
                 .collect(Collectors.toList());
     }
 
+    /** Busca servicios asociados a una placa vehicular. */
     @Override
     public List<ServiceDelivery> findByPlateNumber(String plateNumber) {
         return repository.findByPlate_PlateNumber(plateNumber).stream()
@@ -74,6 +108,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
                 .collect(Collectors.toList());
     }
 
+    /** Busca servicios de un concesionario específico. */
     @Override
     public List<ServiceDelivery> findByDealershipId(Long dealershipId) {
         return repository.findByDealership_IdDealership(dealershipId).stream()

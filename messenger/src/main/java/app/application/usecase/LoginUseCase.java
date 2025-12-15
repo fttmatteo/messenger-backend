@@ -17,6 +17,14 @@ public class LoginUseCase {
     @Autowired
     private AuthenticationService authenticationService;
 
+    /**
+     * Procesa la solicitud de inicio de sesión.
+     * 
+     * @param credentials Las credenciales de autenticación (usuario y contraseña).
+     * @return La respuesta con el token de acceso si las credenciales son válidas.
+     * @throws Exception Si las credenciales son inválidas o hay un error de
+     *                   autenticación.
+     */
     public TokenResponse login(AuthCredentials credentials) throws Exception {
         return authenticationService.authenticate(credentials);
     }

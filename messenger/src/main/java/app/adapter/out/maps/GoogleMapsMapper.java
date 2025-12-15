@@ -13,13 +13,45 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Mapper para convertir respuestas de Google Maps API a objetos de dominio.
+ * Mapper para convertir entre objetos de Google Maps API y objetos del dominio.
+ * 
+ * Esta clase actúa como traductor entre las estructuras de datos específicas
+ * de la Google Maps Java Client Library y los objetos de dominio del sistema,
+ * manteniendo la separación de responsabilidades y la independencia del
+ * dominio.
+ * 
+ * Conversiones implementadas:
+ * - GeocodingResult -> Location: Convierte resultados de geocodificación
+ * - DirectionsResult -> Route: Convierte resultados de rutas con waypoints
+ * - Location -> LatLng: Convierte ubicaciones de dominio a formato Google Maps
+ * - List<Location> -> String[]: Convierte waypoints para Directions API
+ * - LatLng -> Location: Convierte coordenadas Google Maps a dominio
+ * 
+ * Responsabilidades:
+ * - Extraer información relevante de respuestas complejas de Google Maps
+ * - Calcular totales (distancia, duración) agregando datos de múltiples
+ * segmentos
+ * - Preservar información importante como polylines para visualización
+ * - Manejar casos nulos de forma segura
+ * 
+ * @see GoogleMapsAdapter
+ * @see app.domain.model.Location
+ * @see app.domain.model.Route
  */
 @Component
 public class GoogleMapsMapper {
 
     /**
-     * Convierte un resultado de geocodificación a un objeto Location.
+     * Convierte un resultado de geocodificación de Google Maps a un objeto Location
+     * del dominio.
+     * 
+     * Extrae las coordenadas geográficas (latitud y longitud) del resultado de
+     * geocodificación
+     * y crea un objeto Location con timestamp actual.
+     * 
+     * @param result Resultado de la geocodificación de Google Maps
+     * @return Objeto Location con las coordenadas, o null si el resultado es
+     *         inválido
      */
     public Location toLocation(GeocodingResult result) {
         if (result == null || result.geometry == null || result.geometry.location == null) {
@@ -31,7 +63,19 @@ public class GoogleMapsMapper {
     }
 
     /**
-     * Convierte un resultado de Directions API a un objeto Route.
+     * Convierte un resultado de Directions API a un objeto Route del dominio.
+     * 
+     * Procesa la respuesta completa de Google Maps Directions API, extrayendo:
+     * - Ubicación de origen (primer punto de la primera etapa)
+     * - Ubicación de destino (último punto de la última etapa)
+     * - Waypoints intermedios (puntos finales de cada etapa excepto la última)
+     * - Distancia total (suma de todas las etapas en metros)
+     * - Duración total (suma de todas las etapas en segundos)
+     * - Polyline codificada (para dibujar la ruta en mapas)
+     * 
+     * @param result Resultado de Directions API con información de la ruta
+     * @return Objeto Route con toda la información procesada, o null si el
+     *         resultado es inválido
      */
     public Route toRoute(DirectionsResult result) {
         if (result == null || result.routes == null || result.routes.length == 0) {
@@ -71,7 +115,13 @@ public class GoogleMapsMapper {
     }
 
     /**
-     * Convierte un Location a LatLng de Google Maps.
+     * Convierte un objeto Location del dominio a LatLng de Google Maps.
+     * 
+     * Esta conversión es necesaria para usar objetos de dominio en las llamadas
+     * a las APIs de Google Maps.
+     * 
+     * @param location Objeto Location del dominio
+     * @return Objeto LatLng de Google Maps, o null si location es null
      */
     public LatLng toLatLng(Location location) {
         if (location == null) {
@@ -81,8 +131,15 @@ public class GoogleMapsMapper {
     }
 
     /**
-     * Convierte una lista de Location a un array de strings "lat,lng".
-     * Usado para waypoints en Directions API.
+     * Convierte una lista de Location a un array de strings en formato "lat,lng".
+     * 
+     * Este formato es requerido por la Directions API de Google Maps para
+     * especificar
+     * waypoints (puntos intermedios) en el cálculo de rutas.
+     * 
+     * @param locations Lista de ubicaciones a convertir
+     * @return Array de strings con formato "latitud,longitud", o array vacío si la
+     *         lista es null/vacía
      */
     public String[] toWaypointStrings(List<Location> locations) {
         if (locations == null || locations.isEmpty()) {
@@ -95,7 +152,14 @@ public class GoogleMapsMapper {
     }
 
     /**
-     * Convierte un LatLng a Location.
+     * Convierte un LatLng de Google Maps a un objeto Location del dominio.
+     * 
+     * Método privado utilizado internamente para convertir coordenadas de Google
+     * Maps
+     * a objetos de dominio durante el procesamiento de rutas.
+     * 
+     * @param latLng Objeto LatLng de Google Maps
+     * @return Objeto Location del dominio, o null si latLng es null
      */
     private Location latLngToLocation(LatLng latLng) {
         if (latLng == null) {

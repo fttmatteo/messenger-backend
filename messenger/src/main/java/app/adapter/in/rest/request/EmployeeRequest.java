@@ -1,9 +1,26 @@
 package app.adapter.in.rest.request;
 
 /**
- * DTO para crear o actualizar un empleado.
+ * DTO (Data Transfer Object) para las peticiones de creación y actualización de
+ * empleados.
  * 
- * Contiene datos personales, credenciales de acceso y rol del empleado.
+ * Este objeto encapsula toda la información necesaria para registrar o
+ * modificar
+ * un empleado en el sistema, incluyendo datos personales, credenciales de
+ * autenticación
+ * y asignación de roles.
+ * 
+ * Campos incluidos:
+ * - document: Documento de identidad único (Cédula, DNI, etc.)
+ * - fullName: Nombre completo del empleado
+ * - phone: Número de teléfono de contacto
+ * - userName: Nombre de usuario para autenticación
+ * - password: Contraseña (se almacenará encriptada)
+ * - role: Rol del empleado (ADMIN, MESSENGER, etc.)
+ * 
+ * @see app.adapter.in.rest.controllers.EmployeeController
+ * @see app.domain.model.Employee
+ * @see app.domain.model.enums.Role
  */
 public class EmployeeRequest {
     private String document;

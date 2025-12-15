@@ -1,11 +1,25 @@
 package app.adapter.in.rest.request;
 
 /**
- * DTO para la creación de un nuevo servicio de entrega.
+ * DTO (Data Transfer Object) para la creación de nuevos servicios de entrega.
  * 
- * Contiene los identificadores necesarios para vincular el servicio con un
- * concesionario
- * y un mensajero, además de la placa del vehículo.
+ * Este objeto encapsula la información mínima necesaria para iniciar un
+ * servicio
+ * de entrega, estableciendo la relación entre un concesionario y un mensajero.
+ * 
+ * Campos incluidos:
+ * - dealershipId: ID del concesionario que solicita el servicio
+ * - messengerDocument: Documento del mensajero asignado (opcional en creación
+ * inicial)
+ * - manualPlateNumber: Número de placa del vehículo (si se ingresa manualmente)
+ * 
+ * El servicio se crea inicialmente en estado PENDING y puede incluir detección
+ * automática
+ * de placa mediante OCR si se proporciona una imagen.
+ * 
+ * @see app.adapter.in.rest.controllers.ServiceDeliveryController
+ * @see app.domain.model.ServiceDelivery
+ * @see app.domain.model.enums.ServiceStatus
  */
 public class ServiceDeliveryCreateRequest {
     private String dealershipId;

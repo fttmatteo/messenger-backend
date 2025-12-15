@@ -13,14 +13,36 @@ import org.springframework.stereotype.Controller;
 import java.security.Principal;
 
 /**
- * Controlador WebSocket para tracking en tiempo real.
+ * Controlador WebSocket para rastreo de mensajeros en tiempo real.
  * 
- * Flujo:
- * 1. Mensajero conecta a /ws/tracking
- * 2. Mensajero envía ubicación a /app/tracking/update
- * 3. Servidor procesa y guarda la ubicación
- * 4. Servidor hace broadcast a /topic/tracking/{messengerId}
- * 5. Admins suscritos reciben la actualización
+ * Este controlador maneja la comunicación bidireccional en tiempo real entre
+ * los mensajeros (que envían su ubicación) y los administradores (que
+ * monitorean
+ * las ubicaciones). Utiliza el protocolo STOMP sobre WebSocket.
+ * 
+ * Arquitectura de comunicación:
+ * 
+ * Flujo de actualización de ubicación:
+ * 1. Mensajero se conecta al endpoint /ws/tracking
+ * 2. Mensajero envía su ubicación a /app/tracking/update
+ * 3. Servidor procesa, valida y persiste la ubicación
+ * 4. Servidor hace broadcast a dos canales:
+ * - /topic/tracking/{messengerId} (para seguimiento específico)
+ * - /topic/tracking/all (para vista general de todos los mensajeros)
+ * 5. Administradores suscritos reciben la actualización en tiempo real
+ * 
+ * Endpoints disponibles:
+ * - /app/tracking/update: Recibe actualizaciones de ubicación de mensajeros
+ * - /app/tracking/subscribe/all: Suscripción a todas las actualizaciones
+ * 
+ * Canales de broadcast:
+ * - /topic/tracking/{messengerId}: Actualizaciones de un mensajero específico
+ * - /topic/tracking/all: Actualizaciones de todos los mensajeros
+ * 
+ * @see app.adapter.in.websocket.config.WebSocketConfig
+ * @see app.application.usecase.tracking.UpdateLiveTracking
+ * @see app.adapter.in.rest.request.LiveTrackingRequest
+ * @see app.adapter.in.rest.response.LiveTrackingResponse
  */
 @Controller
 public class TrackingWebSocketController {
@@ -31,10 +53,23 @@ public class TrackingWebSocketController {
     private UpdateLiveTracking updateLiveTracking;
 
     /**
-     * Recibe actualizaciones de ubicación de los mensajeros.
+     * Recibe y procesa actualizaciones de ubicación de los mensajeros en tiempo
+     * real.
      * 
-     * @param request   Datos de ubicación del mensajero
-     * @param principal Usuario autenticado (mensajero)
+     * Este método es invocado cuando un mensajero envía su ubicación actual.
+     * Realiza las siguientes operaciones:
+     * 1. Mapea el DTO de entrada al modelo de dominio
+     * 2. Ejecuta el caso de uso para actualizar y persistir la ubicación
+     * 3. Hace broadcast de la actualización a dos canales:
+     * - Canal específico del mensajero (/topic/tracking/{messengerId})
+     * - Canal general de todos los mensajeros (/topic/tracking/all)
+     * 
+     * Los administradores suscritos a estos canales recibirán la actualización
+     * inmediatamente para visualización en tiempo real en mapas.
+     * 
+     * @param request   Datos de ubicación del mensajero (latitud, longitud,
+     *                  velocidad, etc.)
+     * @param principal Usuario autenticado (mensajero que envía la ubicación)
      */
     @MessageMapping("/tracking/update")
     public void receiveLocationUpdate(LiveTrackingRequest request, Principal principal) {
@@ -71,8 +106,18 @@ public class TrackingWebSocketController {
     }
 
     /**
-     * Endpoint para que los admins se suscriban a actualizaciones de todos los
-     * mensajeros.
+     * Endpoint de suscripción para que los administradores reciban actualizaciones
+     * de todos los mensajeros.
+     * 
+     * Los clientes que se conecten a este endpoint serán automáticamente suscritos
+     * al canal /topic/tracking/all y recibirán todas las actualizaciones de
+     * ubicación
+     * de todos los mensajeros activos en el sistema.
+     * 
+     * Este endpoint es útil para dashboards de administración que necesitan
+     * mostrar la ubicación de todos los mensajeros simultáneamente en un mapa.
+     * 
+     * @return Mensaje de confirmación de suscripción
      */
     @MessageMapping("/tracking/subscribe/all")
     @SendTo("/topic/tracking/all")

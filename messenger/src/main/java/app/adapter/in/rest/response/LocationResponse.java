@@ -1,7 +1,20 @@
 package app.adapter.in.rest.response;
 
 /**
- * DTO de respuesta para geocodificación.
+ * DTO (Data Transfer Object) de respuesta para ubicaciones geocodificadas.
+ * 
+ * Este objeto representa una ubicación geográfica con sus coordenadas y
+ * dirección formateada,
+ * resultado de procesos de geocodificación o geocodificación inversa.
+ * 
+ * Campos incluidos:
+ * - latitude: Latitud de la ubicación
+ * - longitude: Longitud de la ubicación
+ * - formattedAddress: Dirección en formato legible proporcionada por Google
+ * Maps
+ * 
+ * @see app.adapter.in.rest.controllers.MapsController
+ * @see app.adapter.out.maps.GoogleMapsAdapter
  */
 public class LocationResponse {
     private Double latitude;

@@ -20,9 +20,42 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * Adaptador que implementa TrackingPort usando Redis + JPA.
- * - Redis: Ubicaciones en tiempo real con TTL automático
- * - JPA: Historial de ubicaciones para reportes
+ * Adaptador de salida para rastreo de mensajeros en tiempo real e histórico.
+ * 
+ * Este adaptador implementa TrackingPort usando una arquitectura híbrida que
+ * combina
+ * Redis para datos en tiempo real y JPA para persistencia histórica,
+ * optimizando
+ * rendimiento y almacenamiento.
+ * 
+ * Arquitectura de almacenamiento:
+ * - Redis: Ubicaciones en tiempo real con TTL automático (5 minutos)
+ * - Ventajas: Acceso ultra-rápido, expiración automática, bajo overhead
+ * - Uso: Tracking activo de mensajeros en servicio
+ * 
+ * - JPA/PostgreSQL: Historial de ubicaciones para reportes y auditoría
+ * - Ventajas: Persistencia permanente, consultas complejas, integridad
+ * referencial
+ * - Uso: Análisis de rutas, reportes, evidencia de entregas
+ * 
+ * Funcionalidades implementadas:
+ * - saveLiveLocation: Guarda ubicación actual en Redis con TTL
+ * - getLastLocation: Obtiene última ubicación conocida de un mensajero
+ * - getAllActiveMessengers: Lista todos los mensajeros activos (con ubicación
+ * reciente)
+ * - saveTrackingHistory: Persiste punto de tracking en historial
+ * - getHistoryByMessenger: Obtiene historial de un mensajero en una fecha
+ * - getHistoryByService: Obtiene historial asociado a un servicio específico
+ * 
+ * Configuración de Redis:
+ * - Prefijo de keys: "tracking:messenger:{messengerId}"
+ * - TTL: 5 minutos (configurable)
+ * - Serialización: JSON para objetos LiveTracking
+ * 
+ * @see app.domain.ports.TrackingPort
+ * @see app.infrastructure.persistence.repository.TrackingHistoryRepository
+ * @see TrackingMapper
+ * @see app.adapter.out.tracking.config.RedisConfig
  */
 @Component
 public class TrackingAdapter implements TrackingPort {
@@ -37,6 +70,15 @@ public class TrackingAdapter implements TrackingPort {
     @Autowired
     private TrackingMapper mapper;
 
+    /**
+     * Guarda la ubicación actual de un mensajero en Redis con TTL.
+     * 
+     * La ubicación se almacena con expiración automática de 5 minutos.
+     * Si el mensajero no envía actualizaciones, su ubicación desaparece
+     * automáticamente.
+     * 
+     * @param tracking Datos de ubicación en tiempo real del mensajero
+     */
     @Override
     public void saveLiveLocation(LiveTracking tracking) {
         if (tracking == null || tracking.getMessengerId() == null) {
@@ -50,6 +92,12 @@ public class TrackingAdapter implements TrackingPort {
         redisTemplate.opsForValue().set(key, tracking, TRACKING_TTL_MINUTES, TimeUnit.MINUTES);
     }
 
+    /**
+     * Obtiene la última ubicación conocida de un mensajero desde Redis.
+     * 
+     * @param messengerId ID del mensajero
+     * @return Última ubicación si existe y no ha expirado, null en caso contrario
+     */
     @Override
     public LiveTracking getLastLocation(Long messengerId) {
         if (messengerId == null) {
@@ -60,6 +108,15 @@ public class TrackingAdapter implements TrackingPort {
         return redisTemplate.opsForValue().get(key);
     }
 
+    /**
+     * Obtiene lista de todos los mensajeros activos con ubicación reciente.
+     * 
+     * Un mensajero se considera activo si:
+     * - Tiene una ubicación en Redis (no ha expirado el TTL)
+     * - Su estado es ACTIVE
+     * 
+     * @return Lista de ubicaciones de mensajeros activos
+     */
     @Override
     public List<LiveTracking> getAllActiveMessengers() {
         Set<String> keys = redisTemplate.keys(TRACKING_KEY_PREFIX + "*");
@@ -79,6 +136,15 @@ public class TrackingAdapter implements TrackingPort {
         return activeMessengers;
     }
 
+    /**
+     * Persiste un punto de tracking en el historial (base de datos).
+     * 
+     * Usado para mantener registro permanente de rutas y ubicaciones
+     * para reportes, análisis y evidencia de entregas.
+     * 
+     * @param history Punto de tracking a guardar
+     * @return Historial guardado con ID generado
+     */
     @Override
     public TrackingHistory saveTrackingHistory(TrackingHistory history) {
         if (history == null) {
@@ -90,6 +156,16 @@ public class TrackingAdapter implements TrackingPort {
         return mapper.toDomain(saved);
     }
 
+    /**
+     * Obtiene el historial de ubicaciones de un mensajero en una fecha específica.
+     * 
+     * Útil para generar reportes de rutas diarias, análisis de desempeño
+     * y verificación de entregas.
+     * 
+     * @param messengerId ID del mensajero
+     * @param date        Fecha a consultar
+     * @return Lista de puntos de tracking del día ordenados por tiempo
+     */
     @Override
     public List<TrackingHistory> getHistoryByMessenger(Long messengerId, LocalDate date) {
         if (messengerId == null || date == null) {
@@ -107,6 +183,16 @@ public class TrackingAdapter implements TrackingPort {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Obtiene el historial de ubicaciones asociado a un servicio de entrega.
+     * 
+     * Permite rastrear la ruta completa del mensajero durante una entrega
+     * específica,
+     * útil para evidencia y resolución de disputas.
+     * 
+     * @param serviceDeliveryId ID del servicio de entrega
+     * @return Lista de puntos de tracking del servicio
+     */
     @Override
     public List<TrackingHistory> getHistoryByService(Long serviceDeliveryId) {
         if (serviceDeliveryId == null) {

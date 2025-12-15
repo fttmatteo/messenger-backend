@@ -10,16 +10,22 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Adaptador para almacenamiento de archivos en Google Cloud Storage con URLs
- * firmadas.
+ * Adaptador de salida para almacenamiento de archivos en Google Cloud Storage.
  * 
- * Implementa StoragePort para guardar y recuperar evidencias y firmas en la
- * nube
+ * Este adaptador implementa StoragePort y proporciona almacenamiento seguro en
+ * la nube
+ * para evidencias fotográficas, firmas digitales y otros archivos del sistema,
  * utilizando URLs firmadas temporales para máxima seguridad.
+ * 
+ * Características principales:
+ * - Almacenamiento privado con URLs firmadas temporales
+ * - Generación automática de nombres únicos (UUID)
+ * - Detección automática de content-type
+ * - Soporte para subdirectorios organizados
+ * - URLs con expiración configurable
  * 
  * Ventajas de URLs firmadas:
  * - Acceso temporal controlado (URLs expiran automáticamente)
@@ -28,10 +34,25 @@ import java.util.concurrent.TimeUnit;
  * - Ideal para evidencias legales y datos sensibles
  * 
  * Ventajas sobre almacenamiento local:
- * - Escalabilidad infinita
- * - CDN global para entrega rápida
- * - Backups automáticos
- * - No consume espacio del servidor
+ * - Escalabilidad infinita sin límites de disco
+ * - CDN global para entrega rápida desde cualquier ubicación
+ * - Backups automáticos y redundancia
+ * - No consume espacio del servidor de aplicación
+ * - Alta disponibilidad (99.95% SLA)
+ * 
+ * Configuración requerida:
+ * - google.cloud.storage.bucket-name: Nombre del bucket de GCS
+ * - google.cloud.storage.project-id: ID del proyecto de Google Cloud
+ * - google.cloud.storage.signed-url-expiration-hours: Duración de URLs
+ * (default: 24h)
+ * 
+ * Autenticación:
+ * - Usa Application Default Credentials (ADC)
+ * - Local: Variable GOOGLE_APPLICATION_CREDENTIALS
+ * - Producción: Service Account del entorno
+ * 
+ * @see app.domain.ports.StoragePort
+ * @see com.google.cloud.storage.Storage
  */
 @Component
 public class GoogleCloudStorageAdapter implements StoragePort {
@@ -60,15 +81,18 @@ public class GoogleCloudStorageAdapter implements StoragePort {
                 .getService();
     }
 
-    @Override
-    public String save(File file, String subDirectory) throws IOException {
-        String originalName = file.getName();
-        String extension = getExtension(originalName);
-        String fileName = UUID.randomUUID().toString() + extension;
-
-        return uploadToGCS(file, subDirectory, fileName);
-    }
-
+    /**
+     * Guarda un archivo en Google Cloud Storage con nombre personalizado.
+     * 
+     * Usa el nombre proporcionado (añadiendo la extensión del archivo original)
+     * y sube el archivo al subdirectorio especificado.
+     * 
+     * @param file           Archivo a guardar
+     * @param subDirectory   Subdirectorio en el bucket
+     * @param customFileName Nombre personalizado (sin extensión)
+     * @return Path del objeto en GCS (ej: "signatures/custom-name.png")
+     * @throws IOException si hay error al subir el archivo
+     */
     @Override
     public String save(File file, String subDirectory, String customFileName) throws IOException {
         String originalName = file.getName();
@@ -217,7 +241,10 @@ public class GoogleCloudStorageAdapter implements StoragePort {
     }
 
     /**
-     * Extrae la extensión del nombre de archivo.
+     * Extrae la extensión de un nombre de archivo.
+     * 
+     * @param fileName Nombre del archivo
+     * @return Extensión con punto (ej: ".jpg") o cadena vacía si no tiene
      */
     private String getExtension(String fileName) {
         int i = fileName.lastIndexOf('.');

@@ -9,6 +9,11 @@ package app.application.exceptions;
  * Intentar realizar transiciones de estado inválidas
  */
 public class BusinessException extends Exception {
+	/**
+	 * Construye una nueva excepción con el mensaje de error especificado.
+	 * 
+	 * @param message El mensaje detallado del error de negocio.
+	 */
 	public BusinessException(String message) {
 		super(message);
 	}
