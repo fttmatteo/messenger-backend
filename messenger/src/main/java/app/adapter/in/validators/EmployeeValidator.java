@@ -8,10 +8,30 @@ import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
 
 /**
- * Validador para empleados.
+ * Validador de datos de entrada para empleados.
  * 
- * Aplica reglas de validación para datos de empleados incluyendo documento,
- * nombre, teléfono, usuario, contraseña y rol.
+ * Esta clase extiende SimpleValidator y proporciona métodos especializados
+ * para validar los datos de empleados, incluyendo reglas de seguridad para
+ * contraseñas
+ * y validación de roles del sistema.
+ * 
+ * Validaciones implementadas:
+ * - documentValidator: Valida documento de identidad (máximo 10 dígitos)
+ * - fullNameValidator: Valida que el nombre completo no esté vacío
+ * - phoneValidator: Valida formato de teléfono (10 dígitos)
+ * - userNameValidator: Valida nombre de usuario (alfanumérico, máximo 15
+ * caracteres)
+ * - passwordValidator: Valida contraseña segura (mínimo 8 caracteres,
+ * mayúscula, número, carácter especial)
+ * - roleValidator: Valida y convierte el rol a enum (ADMIN, MESSENGER)
+ * 
+ * Todas las validaciones lanzan InputsException con mensajes descriptivos en
+ * caso de error.
+ * 
+ * @see SimpleValidator
+ * @see app.application.exceptions.InputsException
+ * @see app.domain.model.enums.Role
+ * @see app.adapter.in.rest.controllers.EmployeeController
  */
 @Component
 public class EmployeeValidator extends SimpleValidator {

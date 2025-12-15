@@ -4,9 +4,24 @@ import org.springframework.stereotype.Component;
 import app.application.exceptions.InputsException;
 
 /**
- * Validador para concesionarios.
+ * Validador de datos de entrada para concesionarios.
  * 
- * Aplica reglas de validación para datos de concesionarios.
+ * Esta clase extiende SimpleValidator y proporciona métodos especializados
+ * para validar los datos de concesionarios antes de procesarlos en la capa de
+ * aplicación.
+ * 
+ * Validaciones implementadas:
+ * - nameValidator: Valida que el nombre no esté vacío
+ * - addressValidator: Valida que la dirección no esté vacía
+ * - phoneValidator: Valida formato de teléfono (10 dígitos)
+ * - zoneValidator: Valida que la zona sea "centro", "sur" o "norte"
+ * 
+ * Todas las validaciones lanzan InputsException con mensajes descriptivos en
+ * caso de error.
+ * 
+ * @see SimpleValidator
+ * @see app.application.exceptions.InputsException
+ * @see app.adapter.in.rest.controllers.DealershipController
  */
 @Component
 public class DealershipValidator extends SimpleValidator {

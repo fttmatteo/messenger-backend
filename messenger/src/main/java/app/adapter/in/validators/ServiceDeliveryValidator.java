@@ -5,10 +5,32 @@ import app.application.exceptions.InputsException;
 import app.domain.model.enums.Status;
 
 /**
- * Validador para servicios de entrega.
+ * Validador de datos de entrada para servicios de entrega.
  * 
- * Aplica reglas de validación y normalización para placas vehiculares y datos
- * de entrega.
+ * Esta clase extiende SimpleValidator y proporciona métodos especializados
+ * para validar y normalizar datos de servicios de entrega, con énfasis especial
+ * en la validación y normalización de placas vehiculares colombianas.
+ * 
+ * Validaciones implementadas:
+ * - idValidator: Valida identificadores numéricos
+ * - documentValidator: Valida documentos de usuario
+ * - statusValidator: Valida y convierte estados de servicio a enum
+ * - observationValidator: Normaliza observaciones (trim)
+ * - plateNumberValidator: Valida y normaliza placas vehiculares con múltiples
+ * formatos
+ * 
+ * Normalización de placas:
+ * - Convierte a mayúsculas y elimina espacios
+ * - Reemplaza caracteres ambiguos (O->0, I->1)
+ * - Valida formatos: ABC123 (carros), ABC12D (motos), 123ABC (placas antiguas)
+ * 
+ * Todas las validaciones lanzan InputsException con mensajes descriptivos en
+ * caso de error.
+ * 
+ * @see SimpleValidator
+ * @see app.application.exceptions.InputsException
+ * @see app.domain.model.enums.Status
+ * @see app.adapter.in.rest.controllers.ServiceDeliveryController
  */
 @Component
 public class ServiceDeliveryValidator extends SimpleValidator {
