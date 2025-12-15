@@ -52,6 +52,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     @Autowired
     private ServiceDeliveryMapper mapper;
 
+    /** Guarda o actualiza un servicio de entrega. Actualiza el ID generado. */
     @Override
     public void save(ServiceDelivery serviceDelivery) {
         ServiceDeliveryEntity entity = mapper.toEntity(serviceDelivery);
@@ -59,11 +60,13 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
         serviceDelivery.setIdServiceDelivery(savedEntity.getIdServiceDelivery());
     }
 
+    /** Elimina un servicio de entrega por ID. */
     @Override
     public void deleteById(Long idServiceDelivery) {
         repository.deleteById(idServiceDelivery);
     }
 
+    /** Busca un servicio de entrega por ID. */
     @Override
     public ServiceDelivery findById(Long idServiceDelivery) {
         Optional<ServiceDeliveryEntity> entity = repository.findById(idServiceDelivery);
@@ -73,6 +76,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
         return null;
     }
 
+    /** Obtiene todos los servicios de entrega. */
     @Override
     public List<ServiceDelivery> findAll() {
         return repository.findAll().stream()
@@ -80,6 +84,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
                 .collect(Collectors.toList());
     }
 
+    /** Busca servicios por estado (PENDING, DELIVERED, etc.). */
     @Override
     public List<ServiceDelivery> findByStatus(Status status) {
         return repository.findByCurrentStatus(status).stream()
@@ -87,6 +92,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
                 .collect(Collectors.toList());
     }
 
+    /** Busca servicios asignados a un mensajero específico. */
     @Override
     public List<ServiceDelivery> findByMessengerDocument(Long messengerDocument) {
         return repository.findByMessenger_Document(messengerDocument).stream()
@@ -94,6 +100,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
                 .collect(Collectors.toList());
     }
 
+    /** Busca servicios asociados a una placa vehicular. */
     @Override
     public List<ServiceDelivery> findByPlateNumber(String plateNumber) {
         return repository.findByPlate_PlateNumber(plateNumber).stream()
@@ -101,6 +108,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
                 .collect(Collectors.toList());
     }
 
+    /** Busca servicios de un concesionario específico. */
     @Override
     public List<ServiceDelivery> findByDealershipId(Long dealershipId) {
         return repository.findByDealership_IdDealership(dealershipId).stream()

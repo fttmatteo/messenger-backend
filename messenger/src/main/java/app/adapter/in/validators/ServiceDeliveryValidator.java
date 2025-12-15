@@ -35,14 +35,17 @@ import app.domain.model.enums.Status;
 @Component
 public class ServiceDeliveryValidator extends SimpleValidator {
 
+    /** Valida un identificador numérico. */
     public Long idValidator(String value) throws InputsException {
         return longValidator("ID", value);
     }
 
+    /** Valida un documento de usuario. */
     public Long documentValidator(String value) throws InputsException {
         return longValidator("documento de usuario", value);
     }
 
+    /** Valida y convierte el estado del servicio a enum. */
     public Status statusValidator(String value) throws InputsException {
         stringValidator("estado", value);
         try {
@@ -53,6 +56,7 @@ public class ServiceDeliveryValidator extends SimpleValidator {
         }
     }
 
+    /** Normaliza observaciones eliminando espacios en blanco. */
     public String observationValidator(String value) throws InputsException {
         if (value != null && !value.trim().isEmpty()) {
             return value.trim();
@@ -60,6 +64,9 @@ public class ServiceDeliveryValidator extends SimpleValidator {
         return value;
     }
 
+    /**
+     * Valida y normaliza placas vehiculares colombianas (ABC123, ABC12D, 123ABC).
+     */
     public String plateNumberValidator(String value) throws InputsException {
         if (value == null || value.trim().isEmpty()) {
             throw new InputsException("El número de placa no puede estar vacío.");

@@ -28,6 +28,7 @@ import app.application.exceptions.InputsException;
  */
 public abstract class SimpleValidator {
 
+    /** Valida que un String no sea nulo ni vacío. */
     public String stringValidator(String element, String value) throws InputsException {
         if (value == null || value.trim().isEmpty()) {
             throw new InputsException(element + " no puede tener un valor vacío o nulo");
@@ -35,6 +36,7 @@ public abstract class SimpleValidator {
         return value;
     }
 
+    /** Valida y convierte un String a Integer. */
     public int integerValidator(String element, String value) throws InputsException {
         stringValidator(element, value);
         try {
@@ -44,6 +46,7 @@ public abstract class SimpleValidator {
         }
     }
 
+    /** Valida y convierte un String a Long. */
     public long longValidator(String element, String value) throws InputsException {
         stringValidator(element, value);
         try {
@@ -53,6 +56,7 @@ public abstract class SimpleValidator {
         }
     }
 
+    /** Valida y convierte un String a Double. */
     public double doubleValidator(String element, String value) throws InputsException {
         stringValidator(element, value);
         try {

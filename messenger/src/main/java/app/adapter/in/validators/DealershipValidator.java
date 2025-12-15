@@ -26,14 +26,17 @@ import app.application.exceptions.InputsException;
 @Component
 public class DealershipValidator extends SimpleValidator {
 
+    /** Valida que el nombre del concesionario no esté vacío. */
     public String nameValidator(String value) throws InputsException {
         return stringValidator("nombre del concesionario", value);
     }
 
+    /** Valida que la dirección no esté vacía. */
     public String addressValidator(String value) throws InputsException {
         return stringValidator("dirección", value);
     }
 
+    /** Valida que el teléfono tenga exactamente 10 dígitos. */
     public String phoneValidator(String value) throws InputsException {
         stringValidator("teléfono", value);
         if (!value.matches("\\d{10}")) {
@@ -42,6 +45,7 @@ public class DealershipValidator extends SimpleValidator {
         return value;
     }
 
+    /** Valida que la zona sea "centro", "sur" o "norte" (case-insensitive). */
     public String zoneValidator(String value) throws InputsException {
         stringValidator("zona", value);
         if (!value.equalsIgnoreCase("centro") && !value.equalsIgnoreCase("sur") && !value.equalsIgnoreCase("norte")) {
