@@ -29,11 +29,3 @@ replay_pid*
 # McOS
 **/.DS_Store
 
-# Google Cloud Credentials
-config/google-vision-credentials.json
-
-# Google Maps Config
-config/google-maps-config.properties
-
-# Google Cloud Storage
-config/messenger-storage.json

@@ -31,15 +31,3 @@ build/
 
 ### VS Code ###
 .vscode/
-
-# Google Cloud Credentials
-config/google-vision-credentials.json
-
-# Google Maps Config
-config/google-maps-config.properties
-
-# Google Cloud Storage
-config/messenger-storage.json
-
-# JWT Secrets (NO hacer commit)
-config/secrets.properties
