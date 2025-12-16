@@ -25,8 +25,8 @@ services:
       - DB_HOST=messenger-db
       - DB_PORT=3306
       - DB_NAME=messenger_db
-      - DB_USERNAME=root
-      - DB_PASSWORD=rootpassword
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
       - REDIS_HOST=messenger-redis
       - REDIS_PORT=6379
       # Variables que DEBES proveer en un archivo .env local para seguridad
@@ -46,7 +46,7 @@ services:
     image: mysql:8.0
     container_name: messenger-db
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: messenger_db
     ports:
       - "3306:3306"
@@ -57,7 +57,7 @@ services:
       - messenger-network
     # Healthcheck para asegurar que la DB esté lista antes que la App intente conectar
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       timeout: 20s
       retries: 10
 
@@ -77,6 +77,7 @@ services:
 # ============================================
 volumes:
   mysql_data:
+
 
 networks:
   messenger-network:

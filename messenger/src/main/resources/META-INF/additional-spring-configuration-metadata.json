@@ -14,6 +14,11 @@
             "name": "spring.flyway.baseline-on-migrate",
             "type": "java.lang.Boolean",
             "description": "Whether to automatically baseline a database when migrating."
+        },
+        {
+            "name": "cors.allowed-origins",
+            "type": "java.lang.String",
+            "description": "Comma-separated list of allowed origins for CORS."
         }
     ]
 }
