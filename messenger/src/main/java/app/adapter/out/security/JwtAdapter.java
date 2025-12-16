@@ -10,11 +10,14 @@ import org.springframework.stereotype.Component;
 import app.domain.model.auth.AuthCredentials;
 import app.domain.model.auth.TokenResponse;
 import app.domain.ports.AuthenticationPort;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 
@@ -107,17 +110,20 @@ public class JwtAdapter implements AuthenticationPort {
         try {
             this.getClaims(token);
             return true;
-        } catch (ExpiredJwtException e) {
-            logger.warn("Token expired for user: {}", e.getClaims().getSubject());
-            return false;
         } catch (SignatureException e) {
-            logger.error("Invalid JWT signature");
+            logger.error("Firma JWT inválida");
             return false;
-        } catch (JwtException e) {
-            logger.error("Invalid JWT token: {}", e.getMessage());
+        } catch (MalformedJwtException e) {
+            logger.error("Token JWT inválido: {}", e.getMessage());
             return false;
-        } catch (Exception e) {
-            logger.error("Unexpected error validating token", e);
+        } catch (ExpiredJwtException e) {
+            logger.warn("Token expirado para usuario: {}", e.getClaims().getSubject());
+            return false;
+        } catch (UnsupportedJwtException e) {
+            logger.error("Token JWT no soportado");
+            return false;
+        } catch (IllegalArgumentException e) {
+            logger.error("Error inesperado al validar el token", e);
             return false;
         }
     }

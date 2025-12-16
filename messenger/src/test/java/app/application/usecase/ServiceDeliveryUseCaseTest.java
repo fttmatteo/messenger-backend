@@ -95,7 +95,7 @@ class ServiceDeliveryUseCaseTest {
         @Test
         @DisplayName("Debe propagar excepción si OCR falla")
         void shouldPropagateExceptionIfOcrFails() throws Exception {
-            when(ocrPort.extractText(mockImageFile)).thenThrow(new RuntimeException("OCR error"));
+            when(ocrPort.extractText(mockImageFile)).thenThrow(new RuntimeException("Error en OCR"));
 
             assertThrows(RuntimeException.class,
                     () -> serviceDeliveryUseCase.createServiceFromImage(mockImageFile, 1L, 123456L));

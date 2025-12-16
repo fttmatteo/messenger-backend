@@ -83,7 +83,7 @@ public class ServiceDeliveryController {
         Employee currentUser = employeePort.findByUserName(currentUserName);
 
         if (currentUser == null) {
-            throw new UnauthorizedException("User authentication not found or invalid.");
+            throw new UnauthorizedException("Autenticación de usuario no encontrada o inválida.");
         }
 
         String finalMessengerDocument = messengerDocument;
@@ -91,7 +91,7 @@ public class ServiceDeliveryController {
             finalMessengerDocument = String.valueOf(currentUser.getDocument());
         } else {
             if (messengerDocument == null || messengerDocument.trim().isEmpty()) {
-                throw new InputsException("Messenger document is required for Admin users.");
+                throw new InputsException("El documento del mensajero es requerido para usuarios Admin.");
             }
         }
 
@@ -148,7 +148,7 @@ public class ServiceDeliveryController {
             Employee currentUser = employeePort.findByUserName(currentUserName);
 
             if (currentUser == null) {
-                throw new UnauthorizedException("User authentication not found or invalid.");
+                throw new UnauthorizedException("Autenticación de usuario no encontrada o inválida.");
             }
 
             String userDocument = String.valueOf(currentUser.getDocument());
