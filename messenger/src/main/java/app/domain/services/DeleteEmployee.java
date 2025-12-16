@@ -1,5 +1,7 @@
 package app.domain.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,8 @@ import app.domain.ports.ServiceDeliveryPort;
 @Service
 public class DeleteEmployee {
 
+    private static final Logger logger = LoggerFactory.getLogger(DeleteEmployee.class);
+
     @Autowired
     private EmployeePort employeePort;
     @Autowired
@@ -29,6 +33,7 @@ public class DeleteEmployee {
      * @throws Exception Si el empleado no existe o tiene servicios asociados.
      */
     public void deleteByDocument(Long document) throws Exception {
+        logger.warn("Solicitud de eliminación de empleado por documento: {}", document);
         Employee employee = employeePort.findByDocument(document);
         if (employee == null) {
             throw new BusinessException("El empleado con documento " + document + " no existe.");
@@ -41,6 +46,7 @@ public class DeleteEmployee {
         }
 
         employeePort.deleteByDocument(document);
+        logger.info("Empleado eliminado por documento: {} ({})", document, employee.getFullName());
     }
 
     /**
@@ -50,6 +56,7 @@ public class DeleteEmployee {
      * @throws Exception Si el empleado no existe o tiene servicios asociados.
      */
     public void deleteById(Long id) throws Exception {
+        logger.warn("Solicitud de eliminación de empleado por ID: {}", id);
         Employee employee = employeePort.findById(id);
         if (employee == null) {
             throw new BusinessException("El empleado con ID " + id + " no existe.");
@@ -62,5 +69,6 @@ public class DeleteEmployee {
         }
 
         employeePort.deleteById(id);
+        logger.info("Empleado eliminado: ID {} ({})", id, employee.getFullName());
     }
 }

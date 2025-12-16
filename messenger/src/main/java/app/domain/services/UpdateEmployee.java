@@ -1,5 +1,7 @@
 package app.domain.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,8 @@ import app.domain.ports.EmployeePort;
 @Service
 public class UpdateEmployee {
 
+    private static final Logger logger = LoggerFactory.getLogger(UpdateEmployee.class);
+
     @Autowired
     private EmployeePort employeePort;
     @Autowired
@@ -37,6 +41,7 @@ public class UpdateEmployee {
      *                   en uso.
      */
     public void update(Long id, Employee incomingData) throws Exception {
+        logger.debug("Actualizando empleado ID: {}", id);
         Employee existingEmployee = employeePort.findById(id);
         if (existingEmployee == null) {
             throw new BusinessException("El empleado con ID " + id + " no existe.");
@@ -66,8 +71,10 @@ public class UpdateEmployee {
         if (incomingData.getPassword() != null && !incomingData.getPassword().trim().isEmpty()) {
             String encoded = passwordEncoder.encode(incomingData.getPassword());
             existingEmployee.setPassword(encoded);
+            logger.debug("Contraseña actualizada para empleado ID: {}", id);
         }
 
         employeePort.save(existingEmployee);
+        logger.info("Empleado actualizado: ID {} -> {}", id, existingEmployee.getUserName());
     }
 }

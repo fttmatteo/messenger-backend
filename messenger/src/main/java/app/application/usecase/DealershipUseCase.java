@@ -1,6 +1,8 @@
 package app.application.usecase;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import app.domain.model.Dealership;
@@ -18,6 +20,8 @@ import app.domain.services.UpdateDealership;
 @Service
 public class DealershipUseCase {
 
+    private static final Logger logger = LoggerFactory.getLogger(DealershipUseCase.class);
+
     @Autowired
     private CreateDealership createDealership;
     @Autowired
@@ -34,6 +38,7 @@ public class DealershipUseCase {
      * @throws Exception Si ocurre un error durante el proceso de creación.
      */
     public void create(Dealership dealership) throws Exception {
+        logger.debug("UseCase: creando concesionario {}", dealership.getName());
         createDealership.create(dealership);
     }
 
@@ -46,6 +51,7 @@ public class DealershipUseCase {
      *                   actualización.
      */
     public void update(Long id, Dealership dealership) throws Exception {
+        logger.debug("UseCase: actualizando concesionario ID {}", id);
         updateDealership.update(id, dealership);
     }
 
@@ -87,6 +93,7 @@ public class DealershipUseCase {
      * @throws Exception Si el concesionario no existe o no se puede eliminar.
      */
     public void deleteById(Long id) throws Exception {
+        logger.debug("UseCase: eliminando concesionario ID {}", id);
         deleteDealership.deleteById(id);
     }
 

@@ -1,5 +1,7 @@
 package app.domain.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import app.application.exceptions.BusinessException;
@@ -15,6 +17,8 @@ import app.domain.ports.DealershipPort;
 @Service
 public class UpdateDealership {
 
+    private static final Logger logger = LoggerFactory.getLogger(UpdateDealership.class);
+
     @Autowired
     private DealershipPort dealershipPort;
 
@@ -27,6 +31,7 @@ public class UpdateDealership {
      *                   uso.
      */
     public void update(Long id, Dealership incomingData) throws Exception {
+        logger.debug("Actualizando concesionario ID: {}", id);
         Dealership existingDealership = dealershipPort.findById(id);
         if (existingDealership == null) {
             throw new BusinessException("El concesionario con ID " + id + " no existe.");
@@ -45,5 +50,6 @@ public class UpdateDealership {
         existingDealership.setZone(incomingData.getZone());
 
         dealershipPort.save(existingDealership);
+        logger.info("Concesionario actualizado: ID {} -> {}", id, existingDealership.getName());
     }
 }

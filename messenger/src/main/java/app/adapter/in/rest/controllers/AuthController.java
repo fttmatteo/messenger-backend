@@ -1,6 +1,8 @@
 package app.adapter.in.rest.controllers;
 
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +21,8 @@ import app.domain.model.auth.TokenResponse;
 @RequestMapping("/auth")
 public class AuthController {
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     @Autowired
     private LoginUseCase loginUseCase;
 
@@ -33,7 +37,9 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(@Valid @RequestBody AuthCredentials credentials) throws Exception {
+        logger.info("Intento de login para usuario: {}", credentials.getUserName());
         TokenResponse response = loginUseCase.login(credentials);
+        logger.info("Login exitoso para usuario: {} con rol: {}", credentials.getUserName(), response.getRole());
         return ResponseEntity.ok(response);
     }
 }

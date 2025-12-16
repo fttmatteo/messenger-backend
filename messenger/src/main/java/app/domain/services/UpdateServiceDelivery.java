@@ -3,6 +3,8 @@ package app.domain.services;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import app.application.exceptions.BusinessException;
@@ -34,6 +36,8 @@ import app.domain.ports.ServiceDeliveryPort;
 @Service
 public class UpdateServiceDelivery {
 
+    private static final Logger logger = LoggerFactory.getLogger(UpdateServiceDelivery.class);
+
     @Autowired
     private ServiceDeliveryPort serviceDeliveryPort;
     @Autowired
@@ -58,6 +62,8 @@ public class UpdateServiceDelivery {
     public void updateStatus(Long serviceId, Status newStatus, String observation,
             Signature signature, List<Photo> photos, Long userDocument) throws Exception {
 
+        logger.info("Actualizando estado servicio ID: {} -> {}", serviceId, newStatus);
+
         ServiceDelivery service = serviceDeliveryPort.findById(serviceId);
         if (service == null) {
             throw new BusinessException("El servicio con ID " + serviceId + " no existe.");
@@ -69,6 +75,7 @@ public class UpdateServiceDelivery {
         }
 
         Status previousStatus = service.getCurrentStatus();
+        logger.debug("Cambio de estado: {} -> {} por usuario: {}", previousStatus, newStatus, user.getUserName());
 
         validateStateTransition(previousStatus, newStatus, user.getRole());
 
@@ -110,6 +117,8 @@ public class UpdateServiceDelivery {
         service.addHistory(history);
 
         serviceDeliveryPort.save(service);
+        logger.info("Estado actualizado: servicio {} de {} a {} por {}",
+                serviceId, previousStatus, newStatus, user.getUserName());
     }
 
     private void validateEvidence(Status status, Signature signature, List<Photo> photos, String observation)

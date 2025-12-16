@@ -1,5 +1,7 @@
 package app.application.usecase;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import app.domain.model.auth.AuthCredentials;
@@ -14,6 +16,9 @@ import app.domain.services.AuthenticationService;
  */
 @Component
 public class LoginUseCase {
+
+    private static final Logger logger = LoggerFactory.getLogger(LoginUseCase.class);
+
     @Autowired
     private AuthenticationService authenticationService;
 
@@ -26,6 +31,9 @@ public class LoginUseCase {
      *                   autenticación.
      */
     public TokenResponse login(AuthCredentials credentials) throws Exception {
-        return authenticationService.authenticate(credentials);
+        logger.debug("Procesando solicitud de login para: {}", credentials.getUserName());
+        TokenResponse response = authenticationService.authenticate(credentials);
+        logger.info("Login procesado exitosamente para: {}", credentials.getUserName());
+        return response;
     }
 }

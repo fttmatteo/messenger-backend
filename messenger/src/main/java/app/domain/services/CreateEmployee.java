@@ -1,5 +1,7 @@
 package app.domain.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,8 @@ import app.domain.ports.EmployeePort;
 @Service
 public class CreateEmployee {
 
+    private static final Logger logger = LoggerFactory.getLogger(CreateEmployee.class);
+
     @Autowired
     private EmployeePort employeePort;
     @Autowired
@@ -32,6 +36,7 @@ public class CreateEmployee {
      * @throws Exception Si el documento o username ya están en uso.
      */
     public void create(Employee employee) throws Exception {
+        logger.debug("Creando empleado: {}", employee.getUserName());
         validateDocumentIsUnique(employee.getDocument());
         validateUserNameIsUnique(employee.getUserName());
 
@@ -41,6 +46,7 @@ public class CreateEmployee {
         }
 
         employeePort.save(employee);
+        logger.info("Empleado creado exitosamente: {} (doc: {})", employee.getUserName(), employee.getDocument());
     }
 
     private void validateDocumentIsUnique(Long document) throws Exception {

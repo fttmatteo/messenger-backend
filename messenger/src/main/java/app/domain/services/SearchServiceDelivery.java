@@ -1,6 +1,8 @@
 package app.domain.services;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,8 @@ import app.domain.ports.ServiceDeliveryPort;
 @Service
 public class SearchServiceDelivery {
 
+    private static final Logger logger = LoggerFactory.getLogger(SearchServiceDelivery.class);
+
     @Autowired
     private ServiceDeliveryPort serviceDeliveryPort;
 
@@ -29,7 +33,10 @@ public class SearchServiceDelivery {
      * @return Lista completa de servicios.
      */
     public List<ServiceDelivery> findAll() {
-        return serviceDeliveryPort.findAll();
+        logger.debug("Buscando todos los servicios de entrega");
+        List<ServiceDelivery> services = serviceDeliveryPort.findAll();
+        logger.debug("Servicios encontrados: {}", services.size());
+        return services;
     }
 
     /**

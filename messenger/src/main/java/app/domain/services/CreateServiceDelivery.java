@@ -1,6 +1,8 @@
 package app.domain.services;
 
 import java.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import app.application.exceptions.BusinessException;
@@ -34,6 +36,8 @@ import app.domain.ports.ServiceDeliveryPort;
 @Service
 public class CreateServiceDelivery {
 
+    private static final Logger logger = LoggerFactory.getLogger(CreateServiceDelivery.class);
+
     @Autowired
     private ServiceDeliveryPort serviceDeliveryPort;
     @Autowired
@@ -62,6 +66,9 @@ public class CreateServiceDelivery {
      */
     public void create(String plateNumber, String photoPath, Long dealershipId, Long messengerDocument)
             throws Exception {
+        logger.info("Creando servicio de entrega: placa={}, concesionario={}, mensajero={}",
+                plateNumber, dealershipId, messengerDocument);
+
         Employee messenger = employeePort.findByDocument(messengerDocument);
         if (messenger == null) {
             throw new BusinessException("El mensajero no existe.");
@@ -81,6 +88,7 @@ public class CreateServiceDelivery {
             plate.setPlateType(plateRecognition.determinePlateType(normalizedPlate));
             plate.setUploadDate(LocalDateTime.now());
             platePort.save(plate);
+            logger.debug("Nueva placa registrada: {} ({})", normalizedPlate, plate.getPlateType());
         }
 
         ServiceDelivery service = new ServiceDelivery();
@@ -107,5 +115,7 @@ public class CreateServiceDelivery {
         service.addHistory(history);
 
         serviceDeliveryPort.save(service);
+        logger.info("Servicio creado exitosamente: placa={}, concesionario={}, mensajero={}",
+                normalizedPlate, dealership.getName(), messenger.getFullName());
     }
 }

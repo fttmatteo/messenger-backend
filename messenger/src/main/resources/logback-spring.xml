@@ -61,40 +61,141 @@
         </rollingPolicy>
     </appender>
 
-    <!-- Logger específico para GlobalExceptionHandler -->
+    <!-- Appender para servicios externos (Google APIs, etc.) -->
+    <appender name="EXTERNAL_SERVICES" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${APP_NAME}-external.log</file>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${APP_NAME}-external-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>15</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Appender para tracking y ubicaciones -->
+    <appender name="TRACKING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${APP_NAME}-tracking.log</file>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${APP_NAME}-tracking-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Appender para seguridad (autenticación, JWT) -->
+    <appender name="SECURITY" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${APP_NAME}-security.log</file>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${APP_NAME}-security-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>90</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- ===================================== -->
+    <!-- LOGGERS ESPECÍFICOS POR COMPONENTE   -->
+    <!-- ===================================== -->
+
+    <!-- Logger para manejo global de excepciones -->
     <logger name="app.infrastructure.config.GlobalExceptionHandler" level="ERROR" additivity="false">
-        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ERROR_FILE"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <!-- Logger para servicios externos (Google Maps, Vision, Cloud Storage) -->
+    <logger name="app.adapter.out.maps" level="INFO" additivity="false">
+        <appender-ref ref="EXTERNAL_SERVICES"/>
+        <appender-ref ref="ERROR_FILE"/>
+    </logger>
+
+    <logger name="app.adapter.out.ocr" level="INFO" additivity="false">
+        <appender-ref ref="EXTERNAL_SERVICES"/>
+        <appender-ref ref="ERROR_FILE"/>
+    </logger>
+
+    <logger name="app.adapter.out.storage" level="INFO" additivity="false">
+        <appender-ref ref="EXTERNAL_SERVICES"/>
+        <appender-ref ref="ERROR_FILE"/>
+    </logger>
+
+    <!-- Logger para tracking de mensajeros -->
+    <logger name="app.adapter.out.tracking" level="INFO" additivity="false">
+        <appender-ref ref="TRACKING"/>
+        <appender-ref ref="ERROR_FILE"/>
+    </logger>
+
+    <!-- Logger para seguridad y autenticación -->
+    <logger name="app.adapter.out.security" level="INFO" additivity="false">
+        <appender-ref ref="SECURITY"/>
+        <appender-ref ref="ERROR_FILE"/>
+    </logger>
+
+    <logger name="app.infrastructure.security" level="INFO" additivity="false">
+        <appender-ref ref="SECURITY"/>
+        <appender-ref ref="ERROR_FILE"/>
+    </logger>
+
+    <!-- Logger para casos de uso críticos -->
+    <logger name="app.application.usecase.ServiceDeliveryUseCase" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="ERROR_FILE"/>
     </logger>
 
-    <!-- Logger para el paquete de la aplicación -->
-    <logger name="app" level="INFO" additivity="false">
-        <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="FILE"/>
-    </logger>
-
-    <!-- Reducir verbosidad de Spring Framework -->
+    <!-- Reducir verbosidad de frameworks -->
     <logger name="org.springframework" level="WARN"/>
     <logger name="org.hibernate" level="WARN"/>
-    
-    <!-- Perfil de desarrollo -->
+    <logger name="com.zaxxer.hikari" level="WARN"/>
+    <logger name="org.springframework.web" level="INFO"/>
+
+    <!-- ===================================== -->
+    <!-- PERFILES DE CONFIGURACIÓN            -->
+    <!-- ===================================== -->
+
+    <!-- Perfil de desarrollo (dev) -->
     <springProfile name="dev">
-        <root level="DEBUG">
+        <!-- Nivel DEBUG para ver todos los detalles -->
+        <logger name="app" level="DEBUG" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
+        </logger>
+
+        <!-- Mostrar queries SQL en desarrollo -->
+        <logger name="org.hibernate.SQL" level="DEBUG"/>
+        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
+
+        <root level="INFO">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE"/>
         </root>
     </springProfile>
 
-    <!-- Perfil de producción -->
+    <!-- Perfil de producción (prod) -->
     <springProfile name="prod">
-        <root level="INFO">
+        <!-- Nivel INFO para reducir ruido en producción -->
+        <logger name="app" level="INFO" additivity="false">
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </logger>
+
+        <!-- NO mostrar logs de Hibernate en producción -->
+        <logger name="org.hibernate.SQL" level="WARN"/>
+
+        <!-- Solo archivos, no consola -->
+        <root level="WARN">
             <appender-ref ref="FILE"/>
             <appender-ref ref="ERROR_FILE"/>
         </root>
     </springProfile>
 
-    <!-- Configuración por defecto -->
+    <!-- Configuración por defecto (cuando no hay perfil activo) -->
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>

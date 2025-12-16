@@ -1,5 +1,7 @@
 package app.adapter.in.rest.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -23,6 +25,8 @@ import java.nio.file.Paths;
 @RequestMapping("/api/files")
 public class FileController {
 
+    private static final Logger logger = LoggerFactory.getLogger(FileController.class);
+
     @Value("${app.storage.path:uploads}")
     private String storageLocation;
 
@@ -45,6 +49,7 @@ public class FileController {
      */
     @GetMapping("/{filename:.+}")
     public ResponseEntity<Resource> getFile(@PathVariable String filename) throws Exception {
+        logger.debug("Solicitando archivo: {}", filename);
         Path rootLocation = Paths.get(storageLocation);
 
         for (String subDir : subDirectories) {
@@ -56,7 +61,7 @@ public class FileController {
                     if (contentType == null) {
                         contentType = "application/octet-stream";
                     }
-
+                    logger.info("Archivo entregado: {} ({})", filename, contentType);
                     return ResponseEntity.ok()
                             .contentType(MediaType.parseMediaType(contentType))
                             .body(resource);
@@ -64,6 +69,7 @@ public class FileController {
             }
         }
 
+        logger.warn("Archivo no encontrado: {}", filename);
         throw new app.application.exceptions.ResourceNotFoundException("Archivo " + filename + " no encontrado");
     }
 }

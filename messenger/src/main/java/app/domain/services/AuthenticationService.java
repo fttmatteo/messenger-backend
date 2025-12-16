@@ -2,6 +2,8 @@ package app.domain.services;
 
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ import app.domain.ports.EmployeePort;
 @Service
 public class AuthenticationService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
     private static final Pattern BCRYPT_PATTERN = Pattern.compile("\\A\\$2[ayb]\\$\\d\\d\\$[./A-Za-z0-9]{53}\\z");
 
     @Autowired
@@ -48,8 +51,10 @@ public class AuthenticationService {
      * @throws Exception Si el usuario no existe o la contraseña es incorrecta.
      */
     public TokenResponse authenticate(AuthCredentials credentials) throws Exception {
+        logger.debug("Autenticando usuario: {}", credentials.getUserName());
         Employee employee = employeePort.findByUserName(credentials.getUserName());
         if (employee == null) {
+            logger.warn("Usuario no encontrado: {}", credentials.getUserName());
             throw new BusinessException("Usuario no encontrado");
         }
         if (!passwordEncoder.matches(credentials.getPassword(), employee.getPassword())) {
@@ -58,10 +63,13 @@ public class AuthenticationService {
                 String encoded = passwordEncoder.encode(credentials.getPassword());
                 employee.setPassword(encoded);
                 employeePort.save(employee);
+                logger.info("Contraseña migrada a BCrypt para usuario: {}", credentials.getUserName());
             } else {
+                logger.warn("Contraseña incorrecta para usuario: {}", credentials.getUserName());
                 throw new BusinessException("Contrasena incorrecta");
             }
         }
+        logger.info("Usuario autenticado exitosamente: {} (rol: {})", credentials.getUserName(), employee.getRole());
         return authenticationPort.authenticate(credentials, String.valueOf(employee.getRole()));
     }
 

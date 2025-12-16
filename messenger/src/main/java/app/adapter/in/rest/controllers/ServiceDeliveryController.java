@@ -1,5 +1,7 @@
 package app.adapter.in.rest.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +48,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/services")
 public class ServiceDeliveryController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ServiceDeliveryController.class);
+
     @Autowired
     private ServiceDeliveryUseCase serviceDeliveryUseCase;
     @Autowired
@@ -81,6 +85,8 @@ public class ServiceDeliveryController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String currentUserName = auth.getName();
         Employee currentUser = employeePort.findByUserName(currentUserName);
+
+        logger.info("Creando servicio - usuario: {}, concesionario: {}", currentUserName, dealershipId);
 
         if (currentUser == null) {
             throw new UnauthorizedException("Autenticación de usuario no encontrada o inválida.");

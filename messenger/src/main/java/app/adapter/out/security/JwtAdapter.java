@@ -72,7 +72,7 @@ public class JwtAdapter implements AuthenticationPort {
             @Value("${jwt.expiration:1800000}") long expiration) {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationTime = expiration;
-        logger.info("JwtAdapter initialized with expiration time: {} ms", expiration);
+        logger.info("JwtAdapter inicializado con tiempo de expiración: {} ms", expiration);
     }
 
     /**

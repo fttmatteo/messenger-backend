@@ -1,6 +1,8 @@
 package app.adapter.in.rest.controllers;
 
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,8 @@ import java.util.stream.Collectors;
 @PreAuthorize("hasRole('ADMIN')")
 public class EmployeeController {
 
+    private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
+
     @Autowired
     private EmployeeUseCase employeeUseCase;
     @Autowired
@@ -49,6 +53,7 @@ public class EmployeeController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> create(@Valid @RequestBody EmployeeRequest request) throws Exception {
+        logger.info("Creando empleado: {}", request.getUserName());
         Employee employee = builder.build(request.getDocument(),
                 request.getFullName(),
                 request.getPhone(),
@@ -56,6 +61,7 @@ public class EmployeeController {
                 request.getPassword(),
                 request.getRole());
         employeeUseCase.create(employee);
+        logger.info("Empleado creado exitosamente: {} (doc: {})", request.getUserName(), request.getDocument());
         return ResponseEntity.status(HttpStatus.CREATED).body("Empleado creado exitosamente");
     }
 
@@ -104,6 +110,7 @@ public class EmployeeController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> update(@PathVariable Long id, @Valid @RequestBody EmployeeRequest request)
             throws Exception {
+        logger.info("Actualizando empleado ID: {}", id);
         Employee employee = builder.build(
                 request.getDocument(),
                 request.getFullName(),
@@ -112,6 +119,7 @@ public class EmployeeController {
                 request.getPassword(),
                 request.getRole());
         employeeUseCase.update(id, employee);
+        logger.info("Empleado actualizado: ID {} -> {}", id, request.getUserName());
         return ResponseEntity.ok("Empleado actualizado exitosamente");
     }
 
@@ -124,7 +132,9 @@ public class EmployeeController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> delete(@PathVariable Long id) throws Exception {
+        logger.warn("Eliminando empleado ID: {}", id);
         employeeUseCase.deleteById(id);
+        logger.info("Empleado eliminado: ID {}", id);
         return ResponseEntity.ok("Empleado eliminado exitosamente");
     }
 }

@@ -1,6 +1,8 @@
 package app.adapter.in.rest.controllers;
 
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/dealerships")
 public class DealershipController {
 
+    private static final Logger logger = LoggerFactory.getLogger(DealershipController.class);
+
     @Autowired
     private DealershipUseCase dealershipUseCase;
     @Autowired
@@ -45,8 +49,10 @@ public class DealershipController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> create(@Valid @RequestBody DealershipRequest request) throws Exception {
+        logger.info("Creando concesionario: {}", request.getName());
         Dealership dealership = builder.build(request);
         dealershipUseCase.create(dealership);
+        logger.info("Concesionario creado exitosamente: {}", request.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body("Concesionario creado exitosamente");
     }
 
@@ -88,8 +94,10 @@ public class DealershipController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> update(@PathVariable Long id, @Valid @RequestBody DealershipRequest request)
             throws Exception {
+        logger.info("Actualizando concesionario ID: {}", id);
         Dealership dealership = builder.build(request);
         dealershipUseCase.update(id, dealership);
+        logger.info("Concesionario actualizado: ID {} -> {}", id, request.getName());
         return ResponseEntity.ok("Concesionario actualizado exitosamente");
     }
 
@@ -102,7 +110,9 @@ public class DealershipController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> delete(@PathVariable Long id) throws Exception {
+        logger.warn("Eliminando concesionario ID: {}", id);
         dealershipUseCase.deleteById(id);
+        logger.info("Concesionario eliminado: ID {}", id);
         return ResponseEntity.ok("Concesionario eliminado exitosamente");
     }
 
@@ -118,7 +128,10 @@ public class DealershipController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DealershipResponse> geocodeDealership(@PathVariable Long id)
             throws GeolocationException, Exception {
+        logger.info("Geocodificando concesionario ID: {}", id);
         Dealership dealership = geocodeDealership.execute(id);
+        logger.info("Concesionario geocodificado: {} -> ({}, {})", dealership.getName(), dealership.getLatitude(),
+                dealership.getLongitude());
         return ResponseEntity.ok(responseMapper.toResponse(dealership));
     }
 }
