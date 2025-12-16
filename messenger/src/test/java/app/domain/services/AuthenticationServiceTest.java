@@ -1,0 +1,189 @@
+package app.domain.services;
+
+import app.application.exceptions.BusinessException;
+import app.domain.model.Employee;
+import app.domain.model.auth.AuthCredentials;
+import app.domain.model.auth.TokenResponse;
+import app.domain.model.enums.Role;
+import app.domain.ports.AuthenticationPort;
+import app.domain.ports.EmployeePort;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+/**
+ * Tests unitarios para AuthenticationService.
+ * 
+ * Verifica la autenticación, validación de credenciales,
+ * y migración de contraseñas planas a BCrypt.
+ */
+@ExtendWith(MockitoExtension.class)
+@DisplayName("AuthenticationService Unit Tests")
+class AuthenticationServiceTest {
+
+    @Mock
+    private AuthenticationPort authenticationPort;
+
+    @Mock
+    private EmployeePort employeePort;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @InjectMocks
+    private AuthenticationService authenticationService;
+
+    private Employee sampleEmployee;
+    private AuthCredentials validCredentials;
+    private TokenResponse expectedToken;
+
+    @BeforeEach
+    void setUp() {
+        sampleEmployee = new Employee();
+        sampleEmployee.setDocument(123456789L);
+        sampleEmployee.setUserName("testuser");
+        sampleEmployee.setPassword("$2a$10$encodedPasswordHash123456789012345678901234567890123");
+        sampleEmployee.setRole(Role.MESSENGER);
+
+        validCredentials = new AuthCredentials();
+        validCredentials.setUserName("testuser");
+        validCredentials.setPassword("correctPassword");
+
+        expectedToken = new TokenResponse();
+        expectedToken.setToken("jwt.token.here");
+        expectedToken.setRole("MESSENGER");
+    }
+
+    @Nested
+    @DisplayName("Autenticación Exitosa")
+    class SuccessfulAuthenticationTests {
+
+        @Test
+        @DisplayName("Debe autenticar con credenciales válidas")
+        void shouldAuthenticateWithValidCredentials() throws Exception {
+            when(employeePort.findByUserName("testuser")).thenReturn(sampleEmployee);
+            when(passwordEncoder.matches("correctPassword", sampleEmployee.getPassword())).thenReturn(true);
+            when(authenticationPort.authenticate(eq(validCredentials), eq("MESSENGER")))
+                    .thenReturn(expectedToken);
+
+            TokenResponse result = authenticationService.authenticate(validCredentials);
+
+            assertNotNull(result);
+            assertEquals("jwt.token.here", result.getToken());
+            assertEquals("MESSENGER", result.getRole());
+        }
+
+        @Test
+        @DisplayName("Debe incluir rol correcto en token")
+        void shouldIncludeCorrectRoleInToken() throws Exception {
+            sampleEmployee.setRole(Role.ADMIN);
+            TokenResponse adminToken = new TokenResponse();
+            adminToken.setToken("token");
+            adminToken.setRole("ADMIN");
+
+            when(employeePort.findByUserName("testuser")).thenReturn(sampleEmployee);
+            when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+            when(authenticationPort.authenticate(any(), eq("ADMIN")))
+                    .thenReturn(adminToken);
+
+            TokenResponse result = authenticationService.authenticate(validCredentials);
+
+            assertEquals("ADMIN", result.getRole());
+        }
+    }
+
+    @Nested
+    @DisplayName("Autenticación Fallida")
+    class FailedAuthenticationTests {
+
+        @Test
+        @DisplayName("Debe lanzar excepción si usuario no existe")
+        void shouldThrowExceptionIfUserNotFound() {
+            when(employeePort.findByUserName("unknownuser")).thenReturn(null);
+
+            AuthCredentials credentials = new AuthCredentials();
+            credentials.setUserName("unknownuser");
+            credentials.setPassword("anypassword");
+
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> authenticationService.authenticate(credentials));
+
+            assertTrue(exception.getMessage().contains("Usuario no encontrado"));
+        }
+
+        @Test
+        @DisplayName("Debe lanzar excepción si contraseña incorrecta")
+        void shouldThrowExceptionIfPasswordIncorrect() {
+            when(employeePort.findByUserName("testuser")).thenReturn(sampleEmployee);
+            when(passwordEncoder.matches("wrongPassword", sampleEmployee.getPassword())).thenReturn(false);
+
+            AuthCredentials credentials = new AuthCredentials();
+            credentials.setUserName("testuser");
+            credentials.setPassword("wrongPassword");
+
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> authenticationService.authenticate(credentials));
+
+            assertTrue(exception.getMessage().contains("incorrecta"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Migración de Contraseñas")
+    class PasswordMigrationTests {
+
+        @Test
+        @DisplayName("Debe migrar contraseña plana a BCrypt")
+        void shouldMigratePlainPasswordToBcrypt() throws Exception {
+            // Contraseña en texto plano (no BCrypt)
+            sampleEmployee.setPassword("plainTextPassword");
+
+            when(employeePort.findByUserName("testuser")).thenReturn(sampleEmployee);
+            // Primera llamada: no coincide con hash (porque está en plano)
+            when(passwordEncoder.matches("plainTextPassword", "plainTextPassword")).thenReturn(false);
+            // Encoding del password
+            when(passwordEncoder.encode("plainTextPassword")).thenReturn("$2a$10$newEncodedHash");
+            when(authenticationPort.authenticate(any(), anyString())).thenReturn(expectedToken);
+
+            AuthCredentials credentials = new AuthCredentials();
+            credentials.setUserName("testuser");
+            credentials.setPassword("plainTextPassword");
+
+            TokenResponse result = authenticationService.authenticate(credentials);
+
+            // Verifica que se guardó el empleado con el password codificado
+            verify(employeePort).save(argThat(emp -> emp.getPassword().equals("$2a$10$newEncodedHash")));
+            assertNotNull(result);
+        }
+    }
+
+    @Nested
+    @DisplayName("Validaciones de Entrada")
+    class InputValidationTests {
+
+        @Test
+        @DisplayName("Debe manejar username case-sensitive")
+        void shouldHandleUsernameCaseSensitive() {
+            when(employeePort.findByUserName("TestUser")).thenReturn(null);
+
+            AuthCredentials credentials = new AuthCredentials();
+            credentials.setUserName("TestUser");
+            credentials.setPassword("password");
+
+            assertThrows(BusinessException.class,
+                    () -> authenticationService.authenticate(credentials));
+
+            verify(employeePort).findByUserName("TestUser");
+        }
+    }
+}
