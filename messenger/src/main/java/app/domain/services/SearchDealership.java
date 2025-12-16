@@ -31,12 +31,15 @@ public class SearchDealership {
      * 
      * @param id ID del concesionario.
      * @return Concesionario encontrado.
-     * @throws RuntimeException Si el concesionario no existe.
+     * @throws app.application.exceptions.ResourceNotFoundException Si el
+     *                                                              concesionario no
+     *                                                              existe.
      */
     public Dealership findById(Long id) {
         Dealership dealership = dealershipPort.findById(id);
         if (dealership == null) {
-            throw new RuntimeException("El concesionario con ID " + id + " no existe.");
+            throw new app.application.exceptions.ResourceNotFoundException(
+                    "El concesionario con ID " + id + " no existe.");
         }
         return dealership;
     }

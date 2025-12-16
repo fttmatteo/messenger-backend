@@ -16,7 +16,6 @@ import app.application.usecase.ServiceDeliveryUseCase;
 import app.domain.model.ServiceDelivery;
 import app.domain.model.enums.Status;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,6 +45,8 @@ public class ServiceDeliveryController {
     private ServiceDeliveryResponseMapper responseMapper;
     @Autowired
     private app.domain.ports.EmployeePort employeePort;
+    @Autowired
+    private app.infrastructure.helper.FileHelper fileHelper;
 
     /**
      * Crea un nuevo servicio de entrega.
@@ -95,7 +96,7 @@ public class ServiceDeliveryController {
 
             ServiceDeliveryBuilder.ServiceDeliveryCreateData data = builder.buildCreateData(request);
 
-            imageFile = convertToFile(image);
+            imageFile = fileHelper.convertToFile(image);
 
             if (manualPlateNumber != null && !manualPlateNumber.isEmpty()) {
                 System.out.println("Using manual plate number: " + manualPlateNumber);
@@ -165,7 +166,7 @@ public class ServiceDeliveryController {
 
             File signatureFile = null;
             if (signature != null && !signature.isEmpty()) {
-                signatureFile = convertToFile(signature);
+                signatureFile = fileHelper.convertToFile(signature);
                 tempFiles.add(signatureFile);
             }
 
@@ -173,7 +174,7 @@ public class ServiceDeliveryController {
             if (photos != null && !photos.isEmpty()) {
                 for (MultipartFile mf : photos) {
                     if (!mf.isEmpty()) {
-                        File f = convertToFile(mf);
+                        File f = fileHelper.convertToFile(mf);
                         photoFiles.add(f);
                         tempFiles.add(f);
                     }
@@ -205,16 +206,12 @@ public class ServiceDeliveryController {
      * @return Datos del servicio encontrado o 404 si no existe.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@PathVariable Long id) {
-        try {
-            ServiceDelivery service = serviceDeliveryUseCase.findById(id);
-            if (service == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-            return ResponseEntity.ok(responseMapper.toResponse(service));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    public ResponseEntity<ServiceDeliveryResponse> findById(@PathVariable Long id) throws Exception {
+        ServiceDelivery service = serviceDeliveryUseCase.findById(id);
+        if (service == null) {
+            throw new app.application.exceptions.ResourceNotFoundException("Servicio con ID " + id + " no encontrado");
         }
+        return ResponseEntity.ok(responseMapper.toResponse(service));
     }
 
     /**
@@ -288,62 +285,4 @@ public class ServiceDeliveryController {
         return ResponseEntity.ok(responses);
     }
 
-    private File convertToFile(MultipartFile multipartFile) throws IOException {
-        String originalName = multipartFile.getOriginalFilename();
-        String extension = "";
-
-        if (originalName != null && originalName.contains(".")) {
-            extension = originalName.substring(originalName.lastIndexOf("."));
-        }
-
-        if (extension.isEmpty()) {
-            String contentType = multipartFile.getContentType();
-            if (contentType != null) {
-                switch (contentType) {
-                    case "image/jpeg":
-                    case "image/jpg":
-                        extension = ".jpeg";
-                        break;
-                    case "image/png":
-                        extension = ".png";
-                        break;
-                    case "application/pdf":
-                        extension = ".pdf";
-                        break;
-                }
-            }
-        }
-
-        if (extension.isEmpty() || ".bin".equals(extension)) {
-            try (java.io.InputStream is = multipartFile.getInputStream()) {
-                byte[] header = new byte[8];
-                int read = is.read(header);
-                if (read >= 4) {
-                    if (header[0] == (byte) 0x89 && header[1] == (byte) 0x50 &&
-                            header[2] == (byte) 0x4E && header[3] == (byte) 0x47) {
-                        extension = ".png";
-                    } else if (header[0] == (byte) 0xFF && header[1] == (byte) 0xD8 && header[2] == (byte) 0xFF) {
-                        extension = ".jpeg";
-                    } else if (header[0] == (byte) 0x25 && header[1] == (byte) 0x50 &&
-                            header[2] == (byte) 0x44 && header[3] == (byte) 0x46) {
-                        extension = ".pdf";
-                    }
-                }
-            } catch (Exception e) {
-                System.err.println("Error detecting extension from bytes: " + e.getMessage());
-            }
-        }
-
-        if (extension.isEmpty()) {
-            extension = ".tmp";
-        }
-
-        System.out.println("DEBUG: Incoming file: " + originalName);
-        System.out.println("DEBUG: Content-Type: " + multipartFile.getContentType());
-        System.out.println("DEBUG: Final Extension: " + extension);
-
-        File tempFile = File.createTempFile("upload-", extension);
-        multipartFile.transferTo(tempFile);
-        return tempFile;
-    }
 }

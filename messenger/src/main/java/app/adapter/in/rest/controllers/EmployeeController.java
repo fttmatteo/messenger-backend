@@ -41,25 +41,21 @@ public class EmployeeController {
      * persistirlo.
      *
      * @param request Datos del empleado a crear.
-     * @return ResponseEntity con mensaje de éxito o error.
+     * @return ResponseEntity con mensaje de éxito.
+     * @throws InputsException   Si los datos de entrada son inválidos.
+     * @throws BusinessException Si hay un error de lógica de negocio.
      */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> create(@RequestBody EmployeeRequest request) {
-        try {
-            Employee employee = builder.build(request.getDocument(),
-                    request.getFullName(),
-                    request.getPhone(),
-                    request.getUserName(),
-                    request.getPassword(),
-                    request.getRole());
-            employeeUseCase.create(employee);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Empleado creado exitosamente");
-        } catch (InputsException | BusinessException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    public ResponseEntity<String> create(@RequestBody EmployeeRequest request) throws Exception {
+        Employee employee = builder.build(request.getDocument(),
+                request.getFullName(),
+                request.getPhone(),
+                request.getUserName(),
+                request.getPassword(),
+                request.getRole());
+        employeeUseCase.create(employee);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Empleado creado exitosamente");
     }
 
     /**
@@ -80,20 +76,18 @@ public class EmployeeController {
      * Busca un empleado por su ID.
      *
      * @param id ID del empleado.
-     * @return Datos del empleado encontrado o 404 si no existe.
+     * @return Datos del empleado encontrado.
+     * @throws app.application.exceptions.ResourceNotFoundException Si el empleado
+     *                                                              no existe.
      */
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> findById(@PathVariable Long id) {
-        try {
-            Employee employee = employeeUseCase.findById(id);
-            if (employee == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Empleado no encontrado");
-            }
-            return ResponseEntity.ok(responseMapper.toResponse(employee));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    public ResponseEntity<EmployeeResponse> findById(@PathVariable Long id) {
+        Employee employee = employeeUseCase.findById(id);
+        if (employee == null) {
+            throw new app.application.exceptions.ResourceNotFoundException("Empleado con ID " + id + " no encontrado");
         }
+        return ResponseEntity.ok(responseMapper.toResponse(employee));
     }
 
     /**
@@ -101,42 +95,34 @@ public class EmployeeController {
      *
      * @param id      ID del empleado a actualizar.
      * @param request Nuevos datos del empleado.
-     * @return ResponseEntity con mensaje de éxito o error.
+     * @return ResponseEntity con mensaje de éxito.
+     * @throws InputsException   Si los datos de entrada son inválidos.
+     * @throws BusinessException Si hay un error de lógica de negocio.
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody EmployeeRequest request) {
-        try {
-            Employee employee = builder.build(
-                    request.getDocument(),
-                    request.getFullName(),
-                    request.getPhone(),
-                    request.getUserName(),
-                    request.getPassword(),
-                    request.getRole());
-            employeeUseCase.update(id, employee);
-            return ResponseEntity.ok("Empleado actualizado exitosamente");
-        } catch (InputsException | BusinessException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    public ResponseEntity<String> update(@PathVariable Long id, @RequestBody EmployeeRequest request) throws Exception {
+        Employee employee = builder.build(
+                request.getDocument(),
+                request.getFullName(),
+                request.getPhone(),
+                request.getUserName(),
+                request.getPassword(),
+                request.getRole());
+        employeeUseCase.update(id, employee);
+        return ResponseEntity.ok("Empleado actualizado exitosamente");
     }
 
     /**
      * Elimina un empleado por su ID.
      *
      * @param id ID del empleado a eliminar.
-     * @return ResponseEntity con mensaje de éxito o error.
+     * @return ResponseEntity con mensaje de éxito.
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        try {
-            employeeUseCase.deleteById(id);
-            return ResponseEntity.ok("Empleado eliminado exitosamente");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    public ResponseEntity<String> delete(@PathVariable Long id) throws Exception {
+        employeeUseCase.deleteById(id);
+        return ResponseEntity.ok("Empleado eliminado exitosamente");
     }
 }
