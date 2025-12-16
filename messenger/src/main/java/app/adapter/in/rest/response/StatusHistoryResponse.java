@@ -1,7 +1,9 @@
 package app.adapter.in.rest.response;
 
 import app.domain.model.enums.Status;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * DTO (Data Transfer Object) de respuesta para registros del historial de
@@ -34,7 +36,7 @@ public class StatusHistoryResponse {
     private Status newStatus;
     private LocalDateTime changeDate;
     private EmployeeResponse changedBy;
-    private java.util.List<PhotoResponse> photos;
+    private List<PhotoResponse> photos;
 
     public StatusHistoryResponse() {
     }
@@ -88,11 +90,11 @@ public class StatusHistoryResponse {
         this.changedBy = changedBy;
     }
 
-    public java.util.List<PhotoResponse> getPhotos() {
+    public List<PhotoResponse> getPhotos() {
         return photos;
     }
 
-    public void setPhotos(java.util.List<PhotoResponse> photos) {
+    public void setPhotos(List<PhotoResponse> photos) {
         this.photos = photos;
     }
 }

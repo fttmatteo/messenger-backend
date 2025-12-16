@@ -6,6 +6,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utilidades para manejo de archivos MultipartFile.
@@ -181,5 +183,43 @@ public class FileHelper {
          * @throws Exception Si hay error durante el procesamiento
          */
         T execute(File tempFile) throws Exception;
+    }
+
+    /**
+     * Elimina una lista de archivos temporales de forma segura.
+     * Ignora errores y archivos nulos.
+     * 
+     * @param files Lista de archivos a eliminar
+     */
+    public void cleanupTempFiles(List<File> files) {
+        if (files == null)
+            return;
+        for (File f : files) {
+            if (f != null && f.exists()) {
+                f.delete();
+            }
+        }
+    }
+
+    /**
+     * Convierte una lista de MultipartFile a archivos temporales.
+     * Los archivos deben ser eliminados manualmente con cleanupTempFiles().
+     * 
+     * @param multipartFiles Lista de archivos a convertir
+     * @return Lista de archivos temporales
+     * @throws IOException Si hay error al convertir algún archivo
+     */
+    public List<File> convertToFiles(
+            List<MultipartFile> multipartFiles) throws IOException {
+        List<File> files = new ArrayList<>();
+        if (multipartFiles == null)
+            return files;
+
+        for (MultipartFile mf : multipartFiles) {
+            if (mf != null && !mf.isEmpty()) {
+                files.add(convertToFile(mf));
+            }
+        }
+        return files;
     }
 }

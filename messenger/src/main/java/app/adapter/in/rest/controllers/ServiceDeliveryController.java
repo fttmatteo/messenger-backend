@@ -3,18 +3,27 @@ package app.adapter.in.rest.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import app.adapter.in.builder.ServiceDeliveryBuilder;
 import app.adapter.in.rest.mapper.ServiceDeliveryResponseMapper;
 import app.adapter.in.rest.request.ServiceDeliveryCreateRequest;
 import app.adapter.in.rest.request.ServiceDeliveryUpdateStatusRequest;
 import app.adapter.in.rest.response.ServiceDeliveryResponse;
-import app.application.exceptions.BusinessException;
 import app.application.exceptions.InputsException;
+import app.application.exceptions.ResourceNotFoundException;
+import app.application.exceptions.UnauthorizedException;
 import app.application.usecase.ServiceDeliveryUseCase;
+import app.domain.model.Employee;
 import app.domain.model.ServiceDelivery;
+import app.domain.model.enums.Role;
 import app.domain.model.enums.Status;
+import app.domain.ports.EmployeePort;
+import app.infrastructure.helper.FileHelper;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,9 +53,9 @@ public class ServiceDeliveryController {
     @Autowired
     private ServiceDeliveryResponseMapper responseMapper;
     @Autowired
-    private app.domain.ports.EmployeePort employeePort;
+    private EmployeePort employeePort;
     @Autowired
-    private app.infrastructure.helper.FileHelper fileHelper;
+    private FileHelper fileHelper;
 
     /**
      * Crea un nuevo servicio de entrega.
@@ -67,37 +76,33 @@ public class ServiceDeliveryController {
             @RequestParam("image") MultipartFile image,
             @RequestParam("dealershipId") String dealershipId,
             @RequestParam(value = "messengerDocument", required = false) String messengerDocument,
-            @RequestParam(value = "manualPlateNumber", required = false) String manualPlateNumber) {
+            @RequestParam(value = "manualPlateNumber", required = false) String manualPlateNumber) throws Exception {
 
-        File imageFile = null;
-        try {
-            org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
-                    .getContext().getAuthentication();
-            String currentUserName = auth.getName();
-            app.domain.model.Employee currentUser = employeePort.findByUserName(currentUserName);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserName = auth.getName();
+        Employee currentUser = employeePort.findByUserName(currentUserName);
 
-            if (currentUser == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User authentication not found or invalid.");
+        if (currentUser == null) {
+            throw new UnauthorizedException("User authentication not found or invalid.");
+        }
+
+        String finalMessengerDocument = messengerDocument;
+        if (currentUser.getRole() != Role.ADMIN) {
+            finalMessengerDocument = String.valueOf(currentUser.getDocument());
+        } else {
+            if (messengerDocument == null || messengerDocument.trim().isEmpty()) {
+                throw new InputsException("Messenger document is required for Admin users.");
             }
+        }
 
-            String finalMessengerDocument = messengerDocument;
-            if (currentUser.getRole() != app.domain.model.enums.Role.ADMIN) {
-                finalMessengerDocument = String.valueOf(currentUser.getDocument());
-            } else {
-                if (messengerDocument == null || messengerDocument.trim().isEmpty()) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                            .body("Messenger document is required for Admin users.");
-                }
-            }
+        ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest(dealershipId,
+                finalMessengerDocument);
+        request.setManualPlateNumber(manualPlateNumber);
 
-            ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest(dealershipId,
-                    finalMessengerDocument);
-            request.setManualPlateNumber(manualPlateNumber);
+        ServiceDeliveryBuilder.ServiceDeliveryCreateData data = builder.buildCreateData(request);
 
-            ServiceDeliveryBuilder.ServiceDeliveryCreateData data = builder.buildCreateData(request);
-
-            imageFile = fileHelper.convertToFile(image);
-
+        // Usa withTempFile para cleanup automático del archivo temporal
+        return fileHelper.withTempFile(image, imageFile -> {
             if (manualPlateNumber != null && !manualPlateNumber.isEmpty()) {
                 serviceDeliveryUseCase.createServiceWithManualPlate(
                         imageFile,
@@ -110,17 +115,8 @@ public class ServiceDeliveryController {
                         data.getDealershipId(),
                         data.getMessengerDocument());
             }
-
             return ResponseEntity.status(HttpStatus.CREATED).body("Servicio creado exitosamente.");
-        } catch (InputsException | BusinessException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno: " + e.getMessage());
-        } finally {
-            if (imageFile != null && imageFile.exists()) {
-                imageFile.delete();
-            }
-        }
+        });
     }
 
     /**
@@ -143,17 +139,16 @@ public class ServiceDeliveryController {
             @RequestParam("status") String status,
             @RequestParam(value = "observation", required = false) String observation,
             @RequestParam(value = "signature", required = false) MultipartFile signature,
-            @RequestParam(value = "photos", required = false) List<MultipartFile> photos) {
+            @RequestParam(value = "photos", required = false) List<MultipartFile> photos) throws Exception {
 
         List<File> tempFiles = new ArrayList<>();
         try {
-            org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
-                    .getContext().getAuthentication();
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String currentUserName = auth.getName();
-            app.domain.model.Employee currentUser = employeePort.findByUserName(currentUserName);
+            Employee currentUser = employeePort.findByUserName(currentUserName);
 
             if (currentUser == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User authentication not found or invalid.");
+                throw new UnauthorizedException("User authentication not found or invalid.");
             }
 
             String userDocument = String.valueOf(currentUser.getDocument());
@@ -168,32 +163,15 @@ public class ServiceDeliveryController {
                 tempFiles.add(signatureFile);
             }
 
-            List<File> photoFiles = new ArrayList<>();
-            if (photos != null && !photos.isEmpty()) {
-                for (MultipartFile mf : photos) {
-                    if (!mf.isEmpty()) {
-                        File f = fileHelper.convertToFile(mf);
-                        photoFiles.add(f);
-                        tempFiles.add(f);
-                    }
-                }
-            }
+            List<File> photoFiles = fileHelper.convertToFiles(photos);
+            tempFiles.addAll(photoFiles);
 
             serviceDeliveryUseCase.updateStatusWithFiles(id, data.getStatus(), data.getObservation(),
                     signatureFile, photoFiles, data.getUserDocument());
 
             return ResponseEntity.ok("Estado actualizado exitosamente.");
-
-        } catch (InputsException | BusinessException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno: " + e.getMessage());
         } finally {
-            for (File f : tempFiles) {
-                if (f.exists()) {
-                    f.delete();
-                }
-            }
+            fileHelper.cleanupTempFiles(tempFiles);
         }
     }
 
@@ -207,7 +185,7 @@ public class ServiceDeliveryController {
     public ResponseEntity<ServiceDeliveryResponse> findById(@PathVariable Long id) throws Exception {
         ServiceDelivery service = serviceDeliveryUseCase.findById(id);
         if (service == null) {
-            throw new app.application.exceptions.ResourceNotFoundException("Servicio con ID " + id + " no encontrado");
+            throw new ResourceNotFoundException("Servicio con ID " + id + " no encontrado");
         }
         return ResponseEntity.ok(responseMapper.toResponse(service));
     }
@@ -222,14 +200,13 @@ public class ServiceDeliveryController {
      */
     @GetMapping
     public ResponseEntity<List<ServiceDeliveryResponse>> findAll() {
-        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
-                .getContext().getAuthentication();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String currentUserName = auth.getName();
-        app.domain.model.Employee currentUser = employeePort.findByUserName(currentUserName);
+        Employee currentUser = employeePort.findByUserName(currentUserName);
 
         List<ServiceDelivery> services;
 
-        if (currentUser != null && currentUser.getRole() == app.domain.model.enums.Role.MESSENGER) {
+        if (currentUser != null && currentUser.getRole() == Role.MESSENGER) {
             services = serviceDeliveryUseCase.findByMessenger(currentUser.getDocument());
         } else {
             services = serviceDeliveryUseCase.findAll();

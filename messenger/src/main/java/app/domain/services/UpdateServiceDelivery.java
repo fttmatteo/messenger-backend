@@ -1,6 +1,7 @@
 package app.domain.services;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -103,7 +104,7 @@ public class UpdateServiceDelivery {
         history.setChangedBy(user);
 
         if (photos != null && !photos.isEmpty()) {
-            history.setPhotos(new java.util.ArrayList<>(photos));
+            history.setPhotos(new ArrayList<>(photos));
         }
 
         service.addHistory(history);

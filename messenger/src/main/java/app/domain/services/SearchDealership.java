@@ -3,6 +3,8 @@ package app.domain.services;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import app.application.exceptions.ResourceNotFoundException;
 import app.domain.model.Dealership;
 import app.domain.ports.DealershipPort;
 
@@ -38,7 +40,7 @@ public class SearchDealership {
     public Dealership findById(Long id) {
         Dealership dealership = dealershipPort.findById(id);
         if (dealership == null) {
-            throw new app.application.exceptions.ResourceNotFoundException(
+            throw new ResourceNotFoundException(
                     "El concesionario con ID " + id + " no existe.");
         }
         return dealership;
