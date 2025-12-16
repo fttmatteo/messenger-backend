@@ -1,13 +1,16 @@
 package app.domain.model.auth;
 
 /**
- * Modelo de respuesta que contiene el token JWT generado tras autenticación
- * exitosa.
+ * Modelo de respuesta de autenticación (DTO).
  * 
- * Incluye el token de acceso y el rol del usuario autenticado.
+ * Contiene:
+ * - Access Token: JWT de corta duración para autenticar peticiones.
+ * - Refresh Token: JWT de larga duración para renovar la sesión.
+ * - Role: Rol del usuario autenticado.
  */
 public class TokenResponse {
     private String token;
+    private String refreshToken;
     private String role;
 
     /**
@@ -44,5 +47,23 @@ public class TokenResponse {
      */
     public void setRole(String role) {
         this.role = role;
+    }
+
+    /**
+     * Obtiene el token de refresco.
+     * 
+     * @return Refresh token para renovar el session.
+     */
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    /**
+     * Establece el token de refresco.
+     * 
+     * @param refreshToken Nuevo refresh token.
+     */
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }

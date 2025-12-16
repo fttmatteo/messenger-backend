@@ -7,7 +7,7 @@ import app.domain.model.auth.TokenResponse;
  * Puerto (interfaz) para servicios de autenticación y gestión de tokens JWT.
  * 
  * Define las operaciones para autenticar usuarios, generar tokens de acceso,
- * validar tokens y extraer información de los mismos.
+ * validar tokens, manejar refresh tokens y extraer información de los mismos.
  */
 public interface AuthenticationPort {
     /**
@@ -42,4 +42,20 @@ public interface AuthenticationPort {
      * @return Rol del usuario (ADMIN, MESSENGER).
      */
     String extractRole(String token);
+
+    /**
+     * Genera un refresh token JWT.
+     * 
+     * @param credentials Credenciales (solo se usa el username).
+     * @return Refresh token generado.
+     */
+    String generateRefreshToken(AuthCredentials credentials);
+
+    /**
+     * Valida un refresh token.
+     * 
+     * @param token Refresh token a validar.
+     * @return true si es válido, false en caso contrario.
+     */
+    boolean validateRefreshToken(String token);
 }
