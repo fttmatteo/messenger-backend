@@ -10,6 +10,8 @@ import app.domain.model.LiveTracking;
 import app.domain.model.TrackingHistory;
 import app.domain.ports.TrackingPort;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/tracking")
 public class TrackingController {
+
+    private static final Logger logger = LoggerFactory.getLogger(TrackingController.class);
 
     @Autowired
     private UpdateLiveTracking updateLiveTracking;
@@ -55,6 +59,8 @@ public class TrackingController {
     @PreAuthorize("hasAnyRole('MESSENGER', 'ADMIN')")
     public ResponseEntity<LiveTrackingResponse> updateLocation(
             @Valid @RequestBody LiveTrackingRequest request) {
+        logger.debug("Actualizando ubicación mensajero {}: ({}, {})",
+                request.getMessengerId(), request.getLatitude(), request.getLongitude());
 
         // Mapeo manual de DTO a Dominio aquí en el controlador (Adaptador)
         LiveTracking domainTracking = new LiveTracking();
@@ -112,7 +118,9 @@ public class TrackingController {
     @GetMapping("/active")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<LiveTrackingResponse>> getAllActive() {
+        logger.debug("Consultando mensajeros activos");
         List<LiveTracking> activeMessengers = trackingPort.getAllActiveMessengers();
+        logger.info("Mensajeros activos encontrados: {}", activeMessengers.size());
 
         List<LiveTrackingResponse> response = activeMessengers.stream()
                 .map(responseMapper::toResponse)

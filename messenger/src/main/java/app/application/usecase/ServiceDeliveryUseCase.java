@@ -1,11 +1,19 @@
 package app.application.usecase;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import app.domain.model.Photo;
 import app.domain.model.ServiceDelivery;
 import app.domain.model.Signature;
@@ -33,6 +41,7 @@ import app.domain.services.UpdateServiceDelivery;
 @Service
 public class ServiceDeliveryUseCase {
 
+    private static final Logger logger = LoggerFactory.getLogger(ServiceDeliveryUseCase.class);
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
     @Autowired
@@ -63,7 +72,7 @@ public class ServiceDeliveryUseCase {
      * @throws Exception Si falla el OCR, el almacenamiento o la creación del
      *                   servicio.
      */
-    @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void createServiceFromImage(File imageFile, Long dealershipId, Long messengerDocument) throws Exception {
         String extractedText = ocrPort.extractText(imageFile);
         String timestamp = LocalDateTime.now().format(DATE_FORMAT);
@@ -75,9 +84,9 @@ public class ServiceDeliveryUseCase {
             createService.create(extractedText, savedPath, dealershipId, messengerDocument);
         } catch (Exception e) {
             try {
-                java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(savedPath));
+                Files.deleteIfExists(Paths.get(savedPath));
             } catch (Exception deleteError) {
-                System.err.println("No se pudo eliminar la imagen: " + deleteError.getMessage());
+                logger.warn("No se pudo eliminar la imagen: {}", deleteError.getMessage());
             }
             throw e;
         }
@@ -96,7 +105,7 @@ public class ServiceDeliveryUseCase {
      * @param messengerDocument El documento del mensajero.
      * @throws Exception Si falla el almacenamiento o la creación.
      */
-    @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void createServiceWithManualPlate(File imageFile, String manualPlateNumber, Long dealershipId,
             Long messengerDocument) throws Exception {
         String timestamp = LocalDateTime.now().format(DATE_FORMAT);
@@ -108,9 +117,9 @@ public class ServiceDeliveryUseCase {
             createService.create(manualPlateNumber, savedPath, dealershipId, messengerDocument);
         } catch (Exception e) {
             try {
-                java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(savedPath));
+                Files.deleteIfExists(Paths.get(savedPath));
             } catch (Exception deleteError) {
-                System.err.println("No se pudo eliminar la imagen: " + deleteError.getMessage());
+                logger.warn("No se pudo eliminar la imagen: {}", deleteError.getMessage());
             }
             throw e;
         }
@@ -161,7 +170,7 @@ public class ServiceDeliveryUseCase {
 
         String timestamp = LocalDateTime.now().format(DATE_FORMAT);
 
-        List<String> savedPaths = new java.util.ArrayList<>();
+        List<String> savedPaths = new ArrayList<>();
 
         Signature signature = null;
         if (signatureFile != null) {
@@ -172,7 +181,7 @@ public class ServiceDeliveryUseCase {
             signature.setSignaturePath(path);
         }
 
-        List<Photo> photos = new java.util.ArrayList<>();
+        List<Photo> photos = new ArrayList<>();
         if (photoFiles != null && !photoFiles.isEmpty()) {
             int count = 1;
             for (File f : photoFiles) {
@@ -193,9 +202,9 @@ public class ServiceDeliveryUseCase {
         } catch (Exception e) {
             for (String path : savedPaths) {
                 try {
-                    java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(path));
+                    Files.deleteIfExists(Paths.get(path));
                 } catch (Exception deleteError) {
-                    System.err.println("No se pudo eliminar archivo: " + deleteError.getMessage());
+                    logger.warn("No se pudo eliminar archivo: {}", deleteError.getMessage());
                 }
             }
             throw e;

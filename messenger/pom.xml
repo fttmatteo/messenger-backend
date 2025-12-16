@@ -214,6 +214,17 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- 
+			Spring Boot Starter Actuator:
+			Proporciona endpoints para monitorear y gestionar la aplicación.
+			Incluye health checks, métricas, info del entorno, etc.
+			Esencial para entornos productivos.
+		-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>

@@ -1,22 +1,32 @@
 package app.adapter.in.rest.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import app.adapter.in.builder.ServiceDeliveryBuilder;
 import app.adapter.in.rest.mapper.ServiceDeliveryResponseMapper;
 import app.adapter.in.rest.request.ServiceDeliveryCreateRequest;
 import app.adapter.in.rest.request.ServiceDeliveryUpdateStatusRequest;
 import app.adapter.in.rest.response.ServiceDeliveryResponse;
-import app.application.exceptions.BusinessException;
 import app.application.exceptions.InputsException;
+import app.application.exceptions.ResourceNotFoundException;
+import app.application.exceptions.UnauthorizedException;
 import app.application.usecase.ServiceDeliveryUseCase;
+import app.domain.model.Employee;
 import app.domain.model.ServiceDelivery;
+import app.domain.model.enums.Role;
 import app.domain.model.enums.Status;
+import app.domain.ports.EmployeePort;
+import app.infrastructure.helper.FileHelper;
+
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,6 +48,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/services")
 public class ServiceDeliveryController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ServiceDeliveryController.class);
+
     @Autowired
     private ServiceDeliveryUseCase serviceDeliveryUseCase;
     @Autowired
@@ -45,7 +57,9 @@ public class ServiceDeliveryController {
     @Autowired
     private ServiceDeliveryResponseMapper responseMapper;
     @Autowired
-    private app.domain.ports.EmployeePort employeePort;
+    private EmployeePort employeePort;
+    @Autowired
+    private FileHelper fileHelper;
 
     /**
      * Crea un nuevo servicio de entrega.
@@ -66,62 +80,49 @@ public class ServiceDeliveryController {
             @RequestParam("image") MultipartFile image,
             @RequestParam("dealershipId") String dealershipId,
             @RequestParam(value = "messengerDocument", required = false) String messengerDocument,
-            @RequestParam(value = "manualPlateNumber", required = false) String manualPlateNumber) {
+            @RequestParam(value = "manualPlateNumber", required = false) String manualPlateNumber) throws Exception {
 
-        File imageFile = null;
-        try {
-            org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
-                    .getContext().getAuthentication();
-            String currentUserName = auth.getName();
-            app.domain.model.Employee currentUser = employeePort.findByUserName(currentUserName);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserName = auth.getName();
+        Employee currentUser = employeePort.findByUserName(currentUserName);
 
-            if (currentUser == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User authentication not found or invalid.");
+        logger.info("Creando servicio - usuario: {}, concesionario: {}", currentUserName, dealershipId);
+
+        if (currentUser == null) {
+            throw new UnauthorizedException("Autenticación de usuario no encontrada o inválida.");
+        }
+
+        String finalMessengerDocument = messengerDocument;
+        if (currentUser.getRole() != Role.ADMIN) {
+            finalMessengerDocument = String.valueOf(currentUser.getDocument());
+        } else {
+            if (messengerDocument == null || messengerDocument.trim().isEmpty()) {
+                throw new InputsException("El documento del mensajero es requerido para usuarios Admin.");
             }
+        }
 
-            String finalMessengerDocument = messengerDocument;
-            if (currentUser.getRole() != app.domain.model.enums.Role.ADMIN) {
-                finalMessengerDocument = String.valueOf(currentUser.getDocument());
-            } else {
-                if (messengerDocument == null || messengerDocument.trim().isEmpty()) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                            .body("Messenger document is required for Admin users.");
-                }
-            }
+        ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest(dealershipId,
+                finalMessengerDocument);
+        request.setManualPlateNumber(manualPlateNumber);
 
-            ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest(dealershipId,
-                    finalMessengerDocument);
-            request.setManualPlateNumber(manualPlateNumber);
+        ServiceDeliveryBuilder.ServiceDeliveryCreateData data = builder.buildCreateData(request);
 
-            ServiceDeliveryBuilder.ServiceDeliveryCreateData data = builder.buildCreateData(request);
-
-            imageFile = convertToFile(image);
-
+        // Usa withTempFile para cleanup automático del archivo temporal
+        return fileHelper.withTempFile(image, imageFile -> {
             if (manualPlateNumber != null && !manualPlateNumber.isEmpty()) {
-                System.out.println("Using manual plate number: " + manualPlateNumber);
                 serviceDeliveryUseCase.createServiceWithManualPlate(
                         imageFile,
                         manualPlateNumber,
                         data.getDealershipId(),
                         data.getMessengerDocument());
             } else {
-                System.out.println("Using OCR to detect plate number");
                 serviceDeliveryUseCase.createServiceFromImage(
                         imageFile,
                         data.getDealershipId(),
                         data.getMessengerDocument());
             }
-
             return ResponseEntity.status(HttpStatus.CREATED).body("Servicio creado exitosamente.");
-        } catch (InputsException | BusinessException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno: " + e.getMessage());
-        } finally {
-            if (imageFile != null && imageFile.exists()) {
-                imageFile.delete();
-            }
-        }
+        });
     }
 
     /**
@@ -144,17 +145,16 @@ public class ServiceDeliveryController {
             @RequestParam("status") String status,
             @RequestParam(value = "observation", required = false) String observation,
             @RequestParam(value = "signature", required = false) MultipartFile signature,
-            @RequestParam(value = "photos", required = false) List<MultipartFile> photos) {
+            @RequestParam(value = "photos", required = false) List<MultipartFile> photos) throws Exception {
 
         List<File> tempFiles = new ArrayList<>();
         try {
-            org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
-                    .getContext().getAuthentication();
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String currentUserName = auth.getName();
-            app.domain.model.Employee currentUser = employeePort.findByUserName(currentUserName);
+            Employee currentUser = employeePort.findByUserName(currentUserName);
 
             if (currentUser == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User authentication not found or invalid.");
+                throw new UnauthorizedException("Autenticación de usuario no encontrada o inválida.");
             }
 
             String userDocument = String.valueOf(currentUser.getDocument());
@@ -165,36 +165,19 @@ public class ServiceDeliveryController {
 
             File signatureFile = null;
             if (signature != null && !signature.isEmpty()) {
-                signatureFile = convertToFile(signature);
+                signatureFile = fileHelper.convertToFile(signature);
                 tempFiles.add(signatureFile);
             }
 
-            List<File> photoFiles = new ArrayList<>();
-            if (photos != null && !photos.isEmpty()) {
-                for (MultipartFile mf : photos) {
-                    if (!mf.isEmpty()) {
-                        File f = convertToFile(mf);
-                        photoFiles.add(f);
-                        tempFiles.add(f);
-                    }
-                }
-            }
+            List<File> photoFiles = fileHelper.convertToFiles(photos);
+            tempFiles.addAll(photoFiles);
 
             serviceDeliveryUseCase.updateStatusWithFiles(id, data.getStatus(), data.getObservation(),
                     signatureFile, photoFiles, data.getUserDocument());
 
             return ResponseEntity.ok("Estado actualizado exitosamente.");
-
-        } catch (InputsException | BusinessException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno: " + e.getMessage());
         } finally {
-            for (File f : tempFiles) {
-                if (f.exists()) {
-                    f.delete();
-                }
-            }
+            fileHelper.cleanupTempFiles(tempFiles);
         }
     }
 
@@ -205,16 +188,12 @@ public class ServiceDeliveryController {
      * @return Datos del servicio encontrado o 404 si no existe.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@PathVariable Long id) {
-        try {
-            ServiceDelivery service = serviceDeliveryUseCase.findById(id);
-            if (service == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-            return ResponseEntity.ok(responseMapper.toResponse(service));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    public ResponseEntity<ServiceDeliveryResponse> findById(@PathVariable Long id) throws Exception {
+        ServiceDelivery service = serviceDeliveryUseCase.findById(id);
+        if (service == null) {
+            throw new ResourceNotFoundException("Servicio con ID " + id + " no encontrado");
         }
+        return ResponseEntity.ok(responseMapper.toResponse(service));
     }
 
     /**
@@ -227,14 +206,13 @@ public class ServiceDeliveryController {
      */
     @GetMapping
     public ResponseEntity<List<ServiceDeliveryResponse>> findAll() {
-        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
-                .getContext().getAuthentication();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String currentUserName = auth.getName();
-        app.domain.model.Employee currentUser = employeePort.findByUserName(currentUserName);
+        Employee currentUser = employeePort.findByUserName(currentUserName);
 
         List<ServiceDelivery> services;
 
-        if (currentUser != null && currentUser.getRole() == app.domain.model.enums.Role.MESSENGER) {
+        if (currentUser != null && currentUser.getRole() == Role.MESSENGER) {
             services = serviceDeliveryUseCase.findByMessenger(currentUser.getDocument());
         } else {
             services = serviceDeliveryUseCase.findAll();
@@ -288,62 +266,4 @@ public class ServiceDeliveryController {
         return ResponseEntity.ok(responses);
     }
 
-    private File convertToFile(MultipartFile multipartFile) throws IOException {
-        String originalName = multipartFile.getOriginalFilename();
-        String extension = "";
-
-        if (originalName != null && originalName.contains(".")) {
-            extension = originalName.substring(originalName.lastIndexOf("."));
-        }
-
-        if (extension.isEmpty()) {
-            String contentType = multipartFile.getContentType();
-            if (contentType != null) {
-                switch (contentType) {
-                    case "image/jpeg":
-                    case "image/jpg":
-                        extension = ".jpeg";
-                        break;
-                    case "image/png":
-                        extension = ".png";
-                        break;
-                    case "application/pdf":
-                        extension = ".pdf";
-                        break;
-                }
-            }
-        }
-
-        if (extension.isEmpty() || ".bin".equals(extension)) {
-            try (java.io.InputStream is = multipartFile.getInputStream()) {
-                byte[] header = new byte[8];
-                int read = is.read(header);
-                if (read >= 4) {
-                    if (header[0] == (byte) 0x89 && header[1] == (byte) 0x50 &&
-                            header[2] == (byte) 0x4E && header[3] == (byte) 0x47) {
-                        extension = ".png";
-                    } else if (header[0] == (byte) 0xFF && header[1] == (byte) 0xD8 && header[2] == (byte) 0xFF) {
-                        extension = ".jpeg";
-                    } else if (header[0] == (byte) 0x25 && header[1] == (byte) 0x50 &&
-                            header[2] == (byte) 0x44 && header[3] == (byte) 0x46) {
-                        extension = ".pdf";
-                    }
-                }
-            } catch (Exception e) {
-                System.err.println("Error detecting extension from bytes: " + e.getMessage());
-            }
-        }
-
-        if (extension.isEmpty()) {
-            extension = ".tmp";
-        }
-
-        System.out.println("DEBUG: Incoming file: " + originalName);
-        System.out.println("DEBUG: Content-Type: " + multipartFile.getContentType());
-        System.out.println("DEBUG: Final Extension: " + extension);
-
-        File tempFile = File.createTempFile("upload-", extension);
-        multipartFile.transferTo(tempFile);
-        return tempFile;
-    }
 }

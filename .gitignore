@@ -3,6 +3,7 @@
 
 # Log file
 *.log
+logs/
 
 # BlueJ files
 *.ctxt
@@ -29,3 +30,30 @@ replay_pid*
 # McOS
 **/.DS_Store
 
+# ============================================
+# Archivos Sensibles - NUNCA subir
+# ============================================
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+**/service-account*.json
+**/credentials*.json
+
+# ============================================
+# Archivos de Desarrollo
+# ============================================
+uploads/
+test-uploads/
+target/
+
+# ============================================
+# IDE
+# ============================================
+.idea/
+*.iml
+*.iws
+.project
+.classpath
+.settings/

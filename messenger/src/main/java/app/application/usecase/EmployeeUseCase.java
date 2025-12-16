@@ -1,6 +1,8 @@
 package app.application.usecase;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import app.domain.model.Employee;
@@ -19,6 +21,8 @@ import app.domain.services.UpdateEmployee;
 @Service
 public class EmployeeUseCase {
 
+    private static final Logger logger = LoggerFactory.getLogger(EmployeeUseCase.class);
+
     @Autowired
     private CreateEmployee createEmployee;
     @Autowired
@@ -35,6 +39,7 @@ public class EmployeeUseCase {
      * @throws Exception Si ocurre un error durante la creación.
      */
     public void create(Employee employee) throws Exception {
+        logger.debug("UseCase: creando empleado {}", employee.getUserName());
         createEmployee.create(employee);
     }
 
@@ -47,6 +52,7 @@ public class EmployeeUseCase {
      *                   actualización.
      */
     public void update(Long id, Employee employee) throws Exception {
+        logger.debug("UseCase: actualizando empleado ID {}", id);
         updateEmployee.update(id, employee);
     }
 
@@ -98,6 +104,7 @@ public class EmployeeUseCase {
      * @throws Exception Si el empleado no existe o no se puede eliminar.
      */
     public void deleteById(Long id) throws Exception {
+        logger.debug("UseCase: eliminando empleado ID {}", id);
         deleteEmployee.deleteById(id);
     }
 

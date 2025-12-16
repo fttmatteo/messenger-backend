@@ -1,14 +1,14 @@
 package app.adapter.in.rest.controllers;
 
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import app.application.exceptions.BusinessException;
-import app.application.exceptions.InputsException;
 import app.application.usecase.LoginUseCase;
 import app.domain.model.auth.AuthCredentials;
 import app.domain.model.auth.TokenResponse;
@@ -21,6 +21,8 @@ import app.domain.model.auth.TokenResponse;
 @RequestMapping("/auth")
 public class AuthController {
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     @Autowired
     private LoginUseCase loginUseCase;
 
@@ -29,20 +31,15 @@ public class AuthController {
      *
      * @param credentials Objeto que contiene el nombre de usuario y contraseña.
      * @return ResponseEntity con la respuesta del token (TokenResponse) si es
-     *         exitoso,
-     *         o mensajes de error en caso de fallo (400, 401, 500).
+     *         exitoso.
+     * @throws Exception Si las credenciales son inválidas o hay un error de
+     *                   autenticación.
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthCredentials credentials) {
-        try {
-            TokenResponse response = loginUseCase.login(credentials);
-            return ResponseEntity.ok(response);
-        } catch (InputsException ie) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ie.getMessage());
-        } catch (BusinessException be) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(be.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    public ResponseEntity<TokenResponse> login(@Valid @RequestBody AuthCredentials credentials) throws Exception {
+        logger.info("Intento de login para usuario: {}", credentials.getUserName());
+        TokenResponse response = loginUseCase.login(credentials);
+        logger.info("Login exitoso para usuario: {} con rol: {}", credentials.getUserName(), response.getRole());
+        return ResponseEntity.ok(response);
     }
 }

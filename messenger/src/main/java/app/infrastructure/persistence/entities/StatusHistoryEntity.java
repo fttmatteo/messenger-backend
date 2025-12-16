@@ -2,7 +2,10 @@ package app.infrastructure.persistence.entities;
 
 import app.domain.model.enums.Status;
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Entidad JPA que representa la tabla 'status_history'.
@@ -102,13 +105,13 @@ public class StatusHistoryEntity {
 
     /** Fotos de evidencia asociadas a este cambio de estado específico. */
     @OneToMany(mappedBy = "statusHistory", cascade = CascadeType.ALL, orphanRemoval = true)
-    private java.util.List<PhotoEntity> photos = new java.util.ArrayList<>();
+    private List<PhotoEntity> photos = new ArrayList<>();
 
-    public java.util.List<PhotoEntity> getPhotos() {
+    public List<PhotoEntity> getPhotos() {
         return photos;
     }
 
-    public void setPhotos(java.util.List<PhotoEntity> photos) {
+    public void setPhotos(List<PhotoEntity> photos) {
         this.photos = photos;
     }
 

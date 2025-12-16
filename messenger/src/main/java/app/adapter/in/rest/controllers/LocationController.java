@@ -11,6 +11,8 @@ import app.domain.model.Location;
 import app.domain.model.Route;
 import app.domain.ports.LocationPort;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,6 +28,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/locations")
 @PreAuthorize("isAuthenticated()")
 public class LocationController {
+
+    private static final Logger logger = LoggerFactory.getLogger(LocationController.class);
 
     @Autowired
     private GeocodeDealership geocodeDealership;
@@ -45,10 +49,10 @@ public class LocationController {
     @PostMapping("/geocode")
     public ResponseEntity<LocationResponse> geocodeAddress(
             @Valid @RequestBody GeocodeRequest request) {
-
+        logger.info("Geocodificando dirección: {}", request.getAddress());
         Location location = geocodeDealership.geocodeAddress(request.getAddress());
         String formattedAddress = locationPort.reverseGeocode(location);
-
+        logger.debug("Geocoding resultado: ({}, {})", location.getLatitude(), location.getLongitude());
         return ResponseEntity.ok(responseMapper.toLocationResponse(location, formattedAddress));
     }
 
@@ -64,12 +68,12 @@ public class LocationController {
     @PostMapping("/route")
     public ResponseEntity<RouteResponse> calculateRoute(
             @Valid @RequestBody RouteRequest request) {
-
+        logger.info("Calculando ruta óptima para {} concesionarios", request.getDealershipIds().size());
         Route route = calculateOptimalRoute.execute(
                 request.getOriginLatitude(),
                 request.getOriginLongitude(),
                 request.getDealershipIds());
-
+        logger.info("Ruta calculada: {} metros, {} segundos", route.getDistanceMeters(), route.getDurationSeconds());
         return ResponseEntity.ok(responseMapper.toRouteResponse(route));
     }
 

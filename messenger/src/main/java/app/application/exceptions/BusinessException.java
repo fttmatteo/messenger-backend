@@ -8,7 +8,7 @@ package app.application.exceptions;
  * Validaciones de unicidad
  * Intentar realizar transiciones de estado inválidas
  */
-public class BusinessException extends Exception {
+public class BusinessException extends RuntimeException {
 	/**
 	 * Construye una nueva excepción con el mensaje de error especificado.
 	 * 

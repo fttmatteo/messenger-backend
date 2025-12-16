@@ -1,5 +1,8 @@
 package app.adapter.in.rest.controllers;
 
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,9 +12,7 @@ import app.adapter.in.builder.DealershipBuilder;
 import app.adapter.in.rest.mapper.DealershipResponseMapper;
 import app.adapter.in.rest.request.DealershipRequest;
 import app.adapter.in.rest.response.DealershipResponse;
-import app.application.exceptions.BusinessException;
 import app.application.exceptions.GeolocationException;
-import app.application.exceptions.InputsException;
 import app.application.usecase.DealershipUseCase;
 import app.application.usecase.location.GeocodeDealership;
 import app.domain.model.Dealership;
@@ -27,6 +28,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/dealerships")
 public class DealershipController {
+
+    private static final Logger logger = LoggerFactory.getLogger(DealershipController.class);
 
     @Autowired
     private DealershipUseCase dealershipUseCase;
@@ -45,16 +48,12 @@ public class DealershipController {
      */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> create(@RequestBody DealershipRequest request) {
-        try {
-            Dealership dealership = builder.build(request);
-            dealershipUseCase.create(dealership);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Concesionario creado exitosamente");
-        } catch (InputsException | BusinessException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    public ResponseEntity<String> create(@Valid @RequestBody DealershipRequest request) throws Exception {
+        logger.info("Creando concesionario: {}", request.getName());
+        Dealership dealership = builder.build(request);
+        dealershipUseCase.create(dealership);
+        logger.info("Concesionario creado exitosamente: {}", request.getName());
+        return ResponseEntity.status(HttpStatus.CREATED).body("Concesionario creado exitosamente");
     }
 
     /**
@@ -79,16 +78,9 @@ public class DealershipController {
      */
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> findById(@PathVariable Long id) {
-        try {
-            Dealership dealership = dealershipUseCase.findById(id);
-            if (dealership == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Concesionario no encontrado");
-            }
-            return ResponseEntity.ok(responseMapper.toResponse(dealership));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    public ResponseEntity<DealershipResponse> findById(@PathVariable Long id) throws Exception {
+        Dealership dealership = dealershipUseCase.findById(id);
+        return ResponseEntity.ok(responseMapper.toResponse(dealership));
     }
 
     /**
@@ -100,16 +92,13 @@ public class DealershipController {
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody DealershipRequest request) {
-        try {
-            Dealership dealership = builder.build(request);
-            dealershipUseCase.update(id, dealership);
-            return ResponseEntity.ok("Concesionario actualizado exitosamente");
-        } catch (InputsException | BusinessException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    public ResponseEntity<String> update(@PathVariable Long id, @Valid @RequestBody DealershipRequest request)
+            throws Exception {
+        logger.info("Actualizando concesionario ID: {}", id);
+        Dealership dealership = builder.build(request);
+        dealershipUseCase.update(id, dealership);
+        logger.info("Concesionario actualizado: ID {} -> {}", id, request.getName());
+        return ResponseEntity.ok("Concesionario actualizado exitosamente");
     }
 
     /**
@@ -120,13 +109,11 @@ public class DealershipController {
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        try {
-            dealershipUseCase.deleteById(id);
-            return ResponseEntity.ok("Concesionario eliminado exitosamente");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    public ResponseEntity<String> delete(@PathVariable Long id) throws Exception {
+        logger.warn("Eliminando concesionario ID: {}", id);
+        dealershipUseCase.deleteById(id);
+        logger.info("Concesionario eliminado: ID {}", id);
+        return ResponseEntity.ok("Concesionario eliminado exitosamente");
     }
 
     /**
@@ -139,14 +126,12 @@ public class DealershipController {
      */
     @PostMapping("/{id}/geocode")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> geocodeDealership(@PathVariable Long id) {
-        try {
-            Dealership dealership = geocodeDealership.execute(id);
-            return ResponseEntity.ok(responseMapper.toResponse(dealership));
-        } catch (GeolocationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    public ResponseEntity<DealershipResponse> geocodeDealership(@PathVariable Long id)
+            throws GeolocationException, Exception {
+        logger.info("Geocodificando concesionario ID: {}", id);
+        Dealership dealership = geocodeDealership.execute(id);
+        logger.info("Concesionario geocodificado: {} -> ({}, {})", dealership.getName(), dealership.getLatitude(),
+                dealership.getLongitude());
+        return ResponseEntity.ok(responseMapper.toResponse(dealership));
     }
 }

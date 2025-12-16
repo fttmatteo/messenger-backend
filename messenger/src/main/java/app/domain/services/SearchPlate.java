@@ -1,5 +1,7 @@
 package app.domain.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,8 @@ import app.domain.ports.PlatePort;
  */
 @Service
 public class SearchPlate {
+
+    private static final Logger logger = LoggerFactory.getLogger(SearchPlate.class);
 
     @Autowired
     private PlatePort platePort;
@@ -40,6 +44,7 @@ public class SearchPlate {
      * @throws RuntimeException Si la placa no existe.
      */
     public Plate findByPlateNumber(String plateNumber) {
+        logger.debug("Buscando placa: {}", plateNumber);
         Plate plate = platePort.findByPlateNumber(plateNumber);
         if (plate == null) {
             throw new RuntimeException("El placa con número " + plateNumber + " no existe.");

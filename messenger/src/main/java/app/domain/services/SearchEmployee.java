@@ -1,6 +1,8 @@
 package app.domain.services;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import app.domain.model.Employee;
@@ -18,6 +20,8 @@ import app.domain.ports.EmployeePort;
 @Service
 public class SearchEmployee {
 
+    private static final Logger logger = LoggerFactory.getLogger(SearchEmployee.class);
+
     @Autowired
     private EmployeePort employeePort;
 
@@ -27,7 +31,10 @@ public class SearchEmployee {
      * @return Lista completa de empleados.
      */
     public List<Employee> findAll() {
-        return employeePort.findAll();
+        logger.debug("Buscando todos los empleados");
+        List<Employee> employees = employeePort.findAll();
+        logger.debug("Empleados encontrados: {}", employees.size());
+        return employees;
     }
 
     /**
