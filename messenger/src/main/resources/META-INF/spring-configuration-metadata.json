@@ -28,6 +28,26 @@
             "defaultValue": "mock"
         },
         {
+            "name": "spring.flyway.enabled",
+            "type": "java.lang.Boolean",
+            "description": "Whether to enable flyway."
+        },
+        {
+            "name": "spring.flyway.locations",
+            "type": "java.util.List<java.lang.String>",
+            "description": "Locations of migrations scripts."
+        },
+        {
+            "name": "spring.flyway.baseline-on-migrate",
+            "type": "java.lang.Boolean",
+            "description": "Whether to automatically baseline a database when migrating."
+        },
+        {
+            "name": "cors.allowed-origins",
+            "type": "java.lang.String",
+            "description": "Comma-separated list of allowed origins for CORS."
+        },
+        {
             "name": "google.maps.api-key",
             "type": "java.lang.String",
             "description": "API Key de Google Maps Platform."
