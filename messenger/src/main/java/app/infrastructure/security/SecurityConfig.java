@@ -90,6 +90,8 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // Documentación
+                                                                                                              // API
                         .requestMatchers("/ws/**").permitAll() // WebSocket handshake
                         .requestMatchers("/employees/**").hasRole("ADMIN")
                         .requestMatchers("/dealerships/**").authenticated()

@@ -12,19 +12,18 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DB_HOST: ${{ secrets.DB_HOST }}
-      DB_PORT: ${{ secrets.DB_PORT }} # Optional, defaults to 3306 if not set
-      DB_USERNAME: ${{ secrets.DB_USERNAME }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      REDIS_HOST: ${{ secrets.REDIS_HOST }}
-      REDIS_PORT: ${{ secrets.REDIS_PORT }}
-      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
-      GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
-      GCS_BUCKET_NAME: ${{ secrets.GCS_BUCKET_NAME }}
-      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-      # This file path is standard for Google Libraries
-      GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/google-credentials.json
+      DB_HOST: '${{ secrets.DB_HOST }}'
+      DB_PORT: '${{ secrets.DB_PORT }}' # Optional, defaults to 3306 if not set
+      DB_USERNAME: '${{ secrets.DB_USERNAME }}'
+      DB_PASSWORD: '${{ secrets.DB_PASSWORD }}'
+      JWT_SECRET: '${{ secrets.JWT_SECRET }}'
+      REDIS_HOST: '${{ secrets.REDIS_HOST }}'
+      REDIS_PORT: '${{ secrets.REDIS_PORT }}'
+      REDIS_PASSWORD: '${{ secrets.REDIS_PASSWORD }}'
+      GOOGLE_MAPS_API_KEY: '${{ secrets.GOOGLE_MAPS_API_KEY }}'
+      GCS_BUCKET_NAME: '${{ secrets.GCS_BUCKET_NAME }}'
+      GCP_PROJECT_ID: '${{ secrets.GCP_PROJECT_ID }}'
+      GOOGLE_APPLICATION_CREDENTIALS: '${{ github.workspace }}/google-credentials.json'
 
     steps:
     - uses: actions/checkout@v4
