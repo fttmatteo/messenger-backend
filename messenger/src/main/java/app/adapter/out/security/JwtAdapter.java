@@ -1,8 +1,8 @@
 package app.adapter.out.security;
 
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.Date;
+import javax.crypto.SecretKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +16,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
@@ -34,13 +33,15 @@ import io.jsonwebtoken.security.SignatureException;
  * Responsabilidades:
  * - Generar tokens JWT firmados con información de usuario y rol
  * - Validar la autenticidad y vigencia de tokens
+ * - Generar y validar Refresh Tokens para renovación de sesiones
  * - Extraer información (username, role) de tokens válidos
  * - Manejar errores de tokens expirados o inválidos
  * 
  * Configuración:
  * - jwt.secret: Clave secreta para firmar tokens (debe ser segura y privada)
- * - jwt.expiration: Tiempo de expiración en milisegundos (default: 1800000ms =
- * 30 min)
+ * - jwt.expiration: Tiempo de expiración del Access Token (default: 30 min)
+ * - refreshExpirationTime: Tiempo de expiración del Refresh Token (calculado
+ * como 24x el access token)
  * 
  * Algoritmo de firma: HS256 (HMAC con SHA-256)
  * 
@@ -64,15 +65,19 @@ public class JwtAdapter implements AuthenticationPort {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtAdapter.class);
 
-    private final Key secretKey;
+    private final SecretKey secretKey;
     private final long expirationTime;
+    private final long refreshExpirationTime;
 
     public JwtAdapter(
             @Value("${jwt.secret}") String secret,
             @Value("${jwt.expiration:1800000}") long expiration) {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationTime = expiration;
-        logger.info("JwtAdapter inicializado con tiempo de expiración: {} ms", expiration);
+        this.refreshExpirationTime = expiration * 24; // 24 times the access token expiration (e.g., 1 day if access is
+                                                      // 1h)
+        logger.info("JwtAdapter inicializado con tiempo de expiración: {} ms y refresh: {} ms", expiration,
+                refreshExpirationTime);
     }
 
     /**
@@ -171,14 +176,32 @@ public class JwtAdapter implements AuthenticationPort {
         Date expiration = new Date(now.getTime() + expirationTime);
 
         String token = Jwts.builder()
-                .setSubject(userName)
+                .subject(userName) // setSubject -> subject
                 .claim("role", role)
-                .setIssuedAt(now)
-                .setExpiration(expiration)
-                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .issuedAt(now) // setIssuedAt -> issuedAt
+                .expiration(expiration) // setExpiration -> expiration
+                .signWith(secretKey) // Removed SignatureAlgorithm arg
                 .compact();
 
         return token;
+    }
+
+    @Override
+    public String generateRefreshToken(AuthCredentials credentials) {
+        Date now = new Date();
+        Date expiration = new Date(now.getTime() + refreshExpirationTime);
+
+        return Jwts.builder()
+                .subject(credentials.getUserName())
+                .issuedAt(now)
+                .expiration(expiration)
+                .signWith(secretKey)
+                .compact();
+    }
+
+    @Override
+    public boolean validateRefreshToken(String token) {
+        return validateToken(token);
     }
 
     /**
@@ -192,11 +215,10 @@ public class JwtAdapter implements AuthenticationPort {
      * @throws JwtException si el token es inválido
      */
     private Claims getClaims(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(secretKey)
+        return Jwts.parser()
+                .verifyWith(secretKey)
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
-        return claims;
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }

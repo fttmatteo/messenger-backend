@@ -1,5 +1,6 @@
 package app.infrastructure.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -57,12 +58,35 @@ public class SecurityConfig {
      * @return SecurityFilterChain configurado
      * @throws Exception Si hay error en la configuración
      */
+    @Autowired
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    /**
+     * Configura la cadena de filtros de seguridad de Spring Security.
+     * 
+     * Establece:
+     * - CORS: Permite peticiones desde orígenes específicos
+     * - CSRF: Deshabilitado (no necesario con JWT stateless)
+     * - Exception Handling: Usa JwtAuthenticationEntryPoint para errores 401
+     * - Session Management: STATELESS (sin sesiones de servidor)
+     * - Authorization Rules: Define qué rutas requieren autenticación/roles
+     * - JWT Filter: Añade filtro personalizado antes de
+     * UsernamePasswordAuthenticationFilter
+     * 
+     * @param http Objeto HttpSecurity para configurar la seguridad
+     * @return SecurityFilterChain configurado
+     * @throws Exception Si hay error en la configuración
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
@@ -74,7 +98,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/location/**").authenticated()
                         .requestMatchers("/api/tracking/**").authenticated()
                         .anyRequest().authenticated())
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -132,24 +156,6 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
 
         return source;
-    }
-
-    /**
-     * Bean del filtro de autenticación JWT.
-     * 
-     * Este filtro se ejecuta en cada petición HTTP antes del filtro estándar
-     * de Spring Security (UsernamePasswordAuthenticationFilter).
-     * 
-     * Responsabilidades:
-     * - Extraer token JWT del header Authorization
-     * - Validar el token
-     * - Establecer contexto de seguridad si el token es válido
-     * 
-     * @return Instancia del filtro JWT
-     */
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter();
     }
 
     /**

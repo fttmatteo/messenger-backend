@@ -23,6 +23,7 @@ import app.domain.ports.EmployeePort;
  * Comparación de contraseñas con hash BCrypt
  * Migración automática de contraseñas planas a BCrypt
  * Generación de tokens JWT para sesiones
+ * Gestión de Refresh Tokens para renovación de acceso
  * 
  * Incluye lógica de retrocompatibilidad para migrar contraseñas
  * almacenadas en texto plano a formato BCrypt de manera transparente.
@@ -70,7 +71,10 @@ public class AuthenticationService {
             }
         }
         logger.info("Usuario autenticado exitosamente: {} (rol: {})", credentials.getUserName(), employee.getRole());
-        return authenticationPort.authenticate(credentials, String.valueOf(employee.getRole()));
+        TokenResponse response = authenticationPort.authenticate(credentials, String.valueOf(employee.getRole()));
+        String refreshToken = authenticationPort.generateRefreshToken(credentials);
+        response.setRefreshToken(refreshToken);
+        return response;
     }
 
     private boolean isPasswordEncoded(String storedPassword) {
@@ -81,5 +85,38 @@ public class AuthenticationService {
                 ? storedPassword.substring("{bcrypt}".length())
                 : storedPassword;
         return BCRYPT_PATTERN.matcher(normalized).matches();
+    }
+
+    /**
+     * Renueva el token de acceso usando un refresh token.
+     * 
+     * @param refreshToken Token de refresco.
+     * @return Nueva respuesta con tokens actualizados.
+     * @throws Exception Si el token es inválido.
+     */
+    public TokenResponse refreshToken(String refreshToken) throws Exception {
+        if (!authenticationPort.validateRefreshToken(refreshToken)) {
+            throw new BusinessException("Refresh token inválido o expirado");
+        }
+        String username = authenticationPort.extractUsername(refreshToken);
+        Employee employee = employeePort.findByUserName(username);
+        if (employee == null) {
+            throw new BusinessException("Usuario no encontrado");
+        }
+
+        AuthCredentials credentials = new AuthCredentials();
+        credentials.setUserName(username);
+
+        logger.info("Refrescando token para usuario: {}", username);
+        // Generamos nuevos tokens
+        TokenResponse response = authenticationPort.authenticate(credentials, String.valueOf(employee.getRole()));
+        // Opcional: Rotación de refresh token (generar uno nuevo también)
+        // Por ahora mantenemos el mismo refresh token o generamos uno nuevo según
+        // política.
+        // Vamos a generar uno nuevo para mayor seguridad (Refresh Token Rotation).
+        String newRefreshToken = authenticationPort.generateRefreshToken(credentials);
+        response.setRefreshToken(newRefreshToken);
+
+        return response;
     }
 }
