@@ -1,5 +1,6 @@
 package app.adapter.in.rest.controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,7 @@ public class DealershipController {
      */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> create(@RequestBody DealershipRequest request) throws Exception {
+    public ResponseEntity<String> create(@Valid @RequestBody DealershipRequest request) throws Exception {
         Dealership dealership = builder.build(request);
         dealershipUseCase.create(dealership);
         return ResponseEntity.status(HttpStatus.CREATED).body("Concesionario creado exitosamente");
@@ -85,7 +86,7 @@ public class DealershipController {
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> update(@PathVariable Long id, @RequestBody DealershipRequest request)
+    public ResponseEntity<String> update(@PathVariable Long id, @Valid @RequestBody DealershipRequest request)
             throws Exception {
         Dealership dealership = builder.build(request);
         dealershipUseCase.update(id, dealership);

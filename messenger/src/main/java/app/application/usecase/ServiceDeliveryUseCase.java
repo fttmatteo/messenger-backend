@@ -4,6 +4,8 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import app.domain.model.Photo;
@@ -33,6 +35,7 @@ import app.domain.services.UpdateServiceDelivery;
 @Service
 public class ServiceDeliveryUseCase {
 
+    private static final Logger logger = LoggerFactory.getLogger(ServiceDeliveryUseCase.class);
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
     @Autowired
@@ -77,7 +80,7 @@ public class ServiceDeliveryUseCase {
             try {
                 java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(savedPath));
             } catch (Exception deleteError) {
-                System.err.println("No se pudo eliminar la imagen: " + deleteError.getMessage());
+                logger.warn("No se pudo eliminar la imagen: {}", deleteError.getMessage());
             }
             throw e;
         }
@@ -110,7 +113,7 @@ public class ServiceDeliveryUseCase {
             try {
                 java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(savedPath));
             } catch (Exception deleteError) {
-                System.err.println("No se pudo eliminar la imagen: " + deleteError.getMessage());
+                logger.warn("No se pudo eliminar la imagen: {}", deleteError.getMessage());
             }
             throw e;
         }
@@ -195,7 +198,7 @@ public class ServiceDeliveryUseCase {
                 try {
                     java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(path));
                 } catch (Exception deleteError) {
-                    System.err.println("No se pudo eliminar archivo: " + deleteError.getMessage());
+                    logger.warn("No se pudo eliminar archivo: {}", deleteError.getMessage());
                 }
             }
             throw e;

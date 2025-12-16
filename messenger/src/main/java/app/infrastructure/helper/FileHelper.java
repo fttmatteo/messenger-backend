@@ -118,10 +118,68 @@ public class FileHelper {
                 }
             }
         } catch (IOException e) {
-            // Si falla la detección, retornar cadena vacía
-            System.err.println("Error detecting extension from bytes: " + e.getMessage());
+            // Silently fail - will use empty extension and fallback to .tmp
         }
 
         return "";
+    }
+
+    /**
+     * Ejecuta una operación con un archivo temporal creado desde MultipartFile.
+     * Garantiza que el archivo temporal se elimine automáticamente después de su
+     * uso.
+     * 
+     * Este método sigue el patrón try-with-resources para garantizar limpieza
+     * automática.
+     * Es útil para operaciones que necesitan un archivo temporal y quieren asegurar
+     * que nunca queden archivos huérfanos en el sistema.
+     * 
+     * Ejemplo de uso:
+     * 
+     * <pre>
+     * String result = fileHelper.withTempFile(multipartFile, tempFile -> {
+     *     // Usar tempFile aquí
+     *     return someService.process(tempFile);
+     * });
+     * // tempFile se elimina automáticamente aquí
+     * </pre>
+     * 
+     * @param <T>           Tipo del resultado de la operación
+     * @param multipartFile Archivo multipart a convertir
+     * @param operation     Función que procesa el archivo temporal y retorna un
+     *                      resultado
+     * @return El resultado de la operación
+     * @throws IOException Si hay error al crear o procesar el archivo
+     */
+    public <T> T withTempFile(MultipartFile multipartFile, FileOperation<T> operation) throws IOException {
+        File tempFile = convertToFile(multipartFile);
+        try {
+            return operation.execute(tempFile);
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException("Error processing temporary file", e);
+        } finally {
+            if (tempFile != null && tempFile.exists()) {
+                tempFile.delete();
+            }
+        }
+    }
+
+    /**
+     * Interfaz funcional para operaciones que procesan un archivo temporal.
+     * 
+     * @param <T> Tipo del resultado de la operación
+     */
+    @FunctionalInterface
+    public interface FileOperation<T> {
+        /**
+         * Ejecuta la operación con el archivo temporal.
+         * 
+         * @param tempFile Archivo temporal a procesar
+         * @return Resultado de la operación
+         * @throws Exception Si hay error durante el procesamiento
+         */
+        T execute(File tempFile) throws Exception;
     }
 }

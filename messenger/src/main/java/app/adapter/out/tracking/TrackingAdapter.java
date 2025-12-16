@@ -6,6 +6,8 @@ import app.domain.model.enums.TrackingStatus;
 import app.domain.ports.TrackingPort;
 import app.infrastructure.persistence.entities.TrackingHistoryEntity;
 import app.infrastructure.persistence.repository.TrackingHistoryRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -60,6 +62,7 @@ import java.util.stream.Collectors;
 @Component
 public class TrackingAdapter implements TrackingPort {
 
+    private static final Logger logger = LoggerFactory.getLogger(TrackingAdapter.class);
     private static final String TRACKING_KEY_PREFIX = "tracking:messenger:";
     private static final long TRACKING_TTL_MINUTES = 5; // Expira después de 5 minutos sin actualizar
 
@@ -82,11 +85,17 @@ public class TrackingAdapter implements TrackingPort {
     @Override
     public void saveLiveLocation(LiveTracking tracking) {
         if (tracking == null || tracking.getMessengerId() == null) {
+            logger.warn("Intento de guardar tracking nulo o sin messengerId");
             return;
         }
 
         String key = TRACKING_KEY_PREFIX + tracking.getMessengerId();
         tracking.setLastUpdate(LocalDateTime.now());
+
+        logger.debug("Guardando ubicación en vivo para mensajero {}: ({}, {})",
+                tracking.getMessengerId(),
+                tracking.getCurrentLocation().getLatitude(),
+                tracking.getCurrentLocation().getLongitude());
 
         // Guardar en Redis con TTL
         redisTemplate.opsForValue().set(key, tracking, TRACKING_TTL_MINUTES, TimeUnit.MINUTES);
@@ -122,8 +131,11 @@ public class TrackingAdapter implements TrackingPort {
         Set<String> keys = redisTemplate.keys(TRACKING_KEY_PREFIX + "*");
 
         if (keys == null || keys.isEmpty()) {
+            logger.debug("No hay mensajeros activos en Redis");
             return new ArrayList<>();
         }
+
+        logger.debug("Obteniendo {} mensajeros activos de Redis", keys.size());
 
         List<LiveTracking> activeMessengers = new ArrayList<>();
         for (String key : keys) {
@@ -150,6 +162,9 @@ public class TrackingAdapter implements TrackingPort {
         if (history == null) {
             return null;
         }
+
+        logger.debug("Guardando punto de historial para mensajero {} en servicio {}",
+                history.getMessengerId(), history.getServiceDeliveryId());
 
         TrackingHistoryEntity entity = mapper.toEntity(history);
         TrackingHistoryEntity saved = historyRepository.save(entity);

@@ -2,6 +2,8 @@ package app.infrastructure.security;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -34,6 +36,8 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+
     @Autowired
     private AuthenticationPort authenticationPort;
 
@@ -60,6 +64,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String token = this.extractToken(request);
         if (token != null) {
+            logger.debug("Token JWT detectado en request: {}", request.getRequestURI());
             this.processToken(token);
         }
         filterChain.doFilter(request, response);
@@ -111,6 +116,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String username = authenticationPort.extractUsername(token);
             String role = authenticationPort.extractRole(token);
             if (role == null || role.trim().isEmpty()) {
+                logger.warn("Token válido pero sin role para usuario: {}", username);
                 return;
             }
             String normalized = role.trim();
@@ -126,6 +132,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     null,
                     authorities);
             SecurityContextHolder.getContext().setAuthentication(auth);
+            logger.debug("Usuario autenticado: {} con role: {}", username, normalized);
+        } else {
+            logger.warn("Token JWT inválido o expirado");
         }
     }
 }

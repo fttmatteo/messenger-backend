@@ -1,5 +1,6 @@
 package app.adapter.in.rest.controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,7 +32,7 @@ public class AuthController {
      *                   autenticación.
      */
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(@RequestBody AuthCredentials credentials) throws Exception {
+    public ResponseEntity<TokenResponse> login(@Valid @RequestBody AuthCredentials credentials) throws Exception {
         TokenResponse response = loginUseCase.login(credentials);
         return ResponseEntity.ok(response);
     }

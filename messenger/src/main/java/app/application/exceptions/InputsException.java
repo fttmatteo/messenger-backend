@@ -5,7 +5,7 @@ package app.application.exceptions;
  * Se lanza cuando los datos recibidos no cumplen con el formato o requisitos
  * esperados.
  */
-public class InputsException extends Exception {
+public class InputsException extends RuntimeException {
 	/**
 	 * Construye una nueva excepción con el mensaje de validación especificado.
 	 * 

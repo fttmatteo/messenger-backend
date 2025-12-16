@@ -3,6 +3,8 @@ package app.adapter.out.storage;
 import app.domain.ports.StoragePort;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -57,6 +59,8 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class GoogleCloudStorageAdapter implements StoragePort {
 
+    private static final Logger logger = LoggerFactory.getLogger(GoogleCloudStorageAdapter.class);
+
     private final Storage storage;
     private final String bucketName;
     private final int defaultUrlExpirationHours;
@@ -79,6 +83,9 @@ public class GoogleCloudStorageAdapter implements StoragePort {
                 .setCredentials(credentials)
                 .build()
                 .getService();
+
+        logger.info("GoogleCloudStorageAdapter inicializado - Bucket: {}, URL expiration: {}h", bucketName,
+                urlExpirationHours);
     }
 
     /**
@@ -121,6 +128,8 @@ public class GoogleCloudStorageAdapter implements StoragePort {
         // Construir el path completo en GCS
         String objectName = subDirectory + "/" + fileName;
 
+        logger.debug("Subiendo archivo a GCS: {}", objectName);
+
         // Detectar content type basado en extensión
         String contentType = Files.probeContentType(file.toPath());
         if (contentType == null) {
@@ -136,6 +145,8 @@ public class GoogleCloudStorageAdapter implements StoragePort {
         // Subir archivo
         byte[] fileBytes = Files.readAllBytes(file.toPath());
         storage.create(blobInfo, fileBytes);
+
+        logger.info("Archivo subido exitosamente a GCS: {} ({})", objectName, contentType);
 
         // Retornamos el PATH relativo (ej: photos/abc.jpg)
         // La URL firmada se generará solo al consultar (GET)
@@ -173,10 +184,13 @@ public class GoogleCloudStorageAdapter implements StoragePort {
      * @return Nueva URL firmada temporal
      */
     public String regenerateSignedUrl(String objectName, int expirationHours) {
+        logger.debug("Generando URL firmada para: {} (expira en {}h)", objectName, expirationHours);
+
         BlobId blobId = BlobId.of(bucketName, objectName);
         Blob blob = storage.get(blobId);
 
         if (blob == null) {
+            logger.error("Objeto no encontrado en GCS: {}", objectName);
             throw new IllegalArgumentException("Objeto no encontrado: " + objectName);
         }
 
@@ -210,8 +224,15 @@ public class GoogleCloudStorageAdapter implements StoragePort {
      * @return true si se eliminó exitosamente
      */
     public boolean delete(String objectName) {
+        logger.debug("Eliminando archivo de GCS: {}", objectName);
         BlobId blobId = BlobId.of(bucketName, objectName);
-        return storage.delete(blobId);
+        boolean deleted = storage.delete(blobId);
+        if (deleted) {
+            logger.info("Archivo eliminado de GCS: {}", objectName);
+        } else {
+            logger.warn("No se pudo eliminar el archivo de GCS (no existe): {}", objectName);
+        }
+        return deleted;
     }
 
     /**

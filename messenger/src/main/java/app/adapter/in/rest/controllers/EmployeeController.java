@@ -1,5 +1,6 @@
 package app.adapter.in.rest.controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +48,7 @@ public class EmployeeController {
      */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> create(@RequestBody EmployeeRequest request) throws Exception {
+    public ResponseEntity<String> create(@Valid @RequestBody EmployeeRequest request) throws Exception {
         Employee employee = builder.build(request.getDocument(),
                 request.getFullName(),
                 request.getPhone(),
@@ -101,7 +102,8 @@ public class EmployeeController {
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> update(@PathVariable Long id, @RequestBody EmployeeRequest request) throws Exception {
+    public ResponseEntity<String> update(@PathVariable Long id, @Valid @RequestBody EmployeeRequest request)
+            throws Exception {
         Employee employee = builder.build(
                 request.getDocument(),
                 request.getFullName(),

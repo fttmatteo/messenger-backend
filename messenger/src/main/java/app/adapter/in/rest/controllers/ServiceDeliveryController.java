@@ -99,14 +99,12 @@ public class ServiceDeliveryController {
             imageFile = fileHelper.convertToFile(image);
 
             if (manualPlateNumber != null && !manualPlateNumber.isEmpty()) {
-                System.out.println("Using manual plate number: " + manualPlateNumber);
                 serviceDeliveryUseCase.createServiceWithManualPlate(
                         imageFile,
                         manualPlateNumber,
                         data.getDealershipId(),
                         data.getMessengerDocument());
             } else {
-                System.out.println("Using OCR to detect plate number");
                 serviceDeliveryUseCase.createServiceFromImage(
                         imageFile,
                         data.getDealershipId(),
