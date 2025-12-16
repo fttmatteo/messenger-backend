@@ -11,13 +11,21 @@
             "description": "Tiempo de expiración del token JWT en milisegundos (default: 1800000 = 30 minutos)."
         },
         {
+            "name": "app.storage.type",
+            "type": "java.lang.String",
+            "description": "Tipo de almacenamiento de archivos. Valores: 'local' (para dev/test), 'gcs' (para prod/dev cloud).",
+            "defaultValue": "local"
+        },
+        {
             "name": "app.storage.path",
             "type": "java.lang.String",
-            "description": "Ruta local donde se guardan archivos (deprecated - ahora se usa Google Cloud Storage).",
-            "deprecation": {
-                "reason": "Reemplazado por Google Cloud Storage",
-                "replacement": "google.cloud.storage.bucket-name"
-            }
+            "description": "Ruta local donde se guardan archivos cuando app.storage.type=local."
+        },
+        {
+            "name": "app.ocr.mode",
+            "type": "java.lang.String",
+            "description": "Modo de operación del OCR. Valores: 'mock' (acepta todo), 'google-vision' (usa API real).",
+            "defaultValue": "mock"
         },
         {
             "name": "google.maps.api-key",
@@ -27,7 +35,7 @@
         {
             "name": "google.cloud.storage.bucket-name",
             "type": "java.lang.String",
-            "description": "Nombre del bucket de Google Cloud Storage (debe ser único globalmente)."
+            "description": "Nombre del bucket de Google Cloud Storage (requerido si app.storage.type=gcs)."
         },
         {
             "name": "google.cloud.storage.project-id",
@@ -62,6 +70,60 @@
             "name": "websocket.allowed.origins",
             "type": "java.lang.String",
             "description": "Orígenes permitidos para conexiones WebSocket (separados por comas)."
+        },
+        {
+            "name": "spring.h2.console.enabled",
+            "type": "java.lang.Boolean",
+            "description": "Habilita la consola de H2. Requerido como workaround para Spring Boot 4.x o configuración manual."
+        }
+    ],
+    "hints": [
+        {
+            "name": "app.storage.type",
+            "values": [
+                {
+                    "value": "local",
+                    "description": "Almacenamiento en sistema de archivos local (para desarrollo/test)."
+                },
+                {
+                    "value": "gcs",
+                    "description": "Google Cloud Storage (para producción/dev cloud)."
+                }
+            ]
+        },
+        {
+            "name": "app.ocr.mode",
+            "values": [
+                {
+                    "value": "mock",
+                    "description": "Simulación de OCR (acepta cualquier imagen)."
+                },
+                {
+                    "value": "google-vision",
+                    "description": "Usa Google Cloud Vision API real."
+                }
+            ]
+        },
+        {
+            "name": "spring.profiles.active",
+            "values": [
+                {
+                    "value": "local",
+                    "description": "Perfil de desarrollo local offline."
+                },
+                {
+                    "value": "dev",
+                    "description": "Perfil de desarrollo conectado con APIs."
+                },
+                {
+                    "value": "prod",
+                    "description": "Perfil de producción optimizado."
+                },
+                {
+                    "value": "test",
+                    "description": "Perfil para testing automatizado."
+                }
+            ]
         }
     ]
 }
