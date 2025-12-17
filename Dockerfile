@@ -7,11 +7,11 @@ WORKDIR /app
 
 # Copiar primero el pom.xml para aprovechar la caché de capas de Docker
 # Si no cambias dependencias, Docker reusará esta capa sin descargar todo de nuevo.
-COPY pom.xml .
+COPY messenger/pom.xml .
 RUN mvn dependency:go-offline
 
 # Copiar el código fuente y compilar
-COPY src ./src
+COPY messenger/src ./src
 # -DskipTests para acelerar el build en contenedor (los tests corren en CI)
 RUN mvn clean package -DskipTests
 
