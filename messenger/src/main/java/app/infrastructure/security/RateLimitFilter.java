@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Seguridad:
  * - Usa buckets separados para auth y API general
  * - Cache en memoria (ConcurrentHashMap) para alto rendimiento
- * - Limpieza automática de IPs inactivas (TODO: implementar con TTL)
+ * - Limpieza automática de IPs inactivas (implementar con TTL)
  * 
  * @see io.github.bucket4j.Bucket
  */
