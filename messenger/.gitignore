@@ -31,3 +31,26 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Logs ###
+logs/
+*.log
+
+### Uploads (runtime) ###
+uploads/
+test-uploads/
+
+### Environment ###
+.env
+.env.local
+.env.prod
+
+### Certificates ###
+*.pem
+*.key
+*.crt
+certbot/
+
+### Google Cloud ###
+*-credentials.json
+google-credentials.json
