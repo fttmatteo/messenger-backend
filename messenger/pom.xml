@@ -250,6 +250,18 @@
 			<version>2.3.0</version>
 		</dependency>
 
+		<!-- 
+			Bucket4j:
+			Librería de Rate Limiting basada en el algoritmo Token Bucket.
+			Protege contra ataques de fuerza bruta y DDoS.
+			Se usa para limitar requests por IP/usuario en endpoints críticos.
+		-->
+		<dependency>
+			<groupId>com.bucket4j</groupId>
+			<artifactId>bucket4j-core</artifactId>
+			<version>8.10.1</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

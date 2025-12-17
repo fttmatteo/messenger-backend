@@ -64,6 +64,9 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    @Autowired
+    private RateLimitFilter rateLimitFilter;
+
     /**
      * Configura la cadena de filtros de seguridad de Spring Security.
      * 
@@ -100,6 +103,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/location/**").authenticated()
                         .requestMatchers("/api/tracking/**").authenticated()
                         .anyRequest().authenticated())
+                // Rate Limit Filter: Se ejecuta PRIMERO para bloquear abusos antes de procesar
+                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
+                // JWT Filter: Valida tokens después de pasar rate limiting
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -119,12 +125,15 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
+        // ========== SEGURIDAD: CORS obligatorio en producción ==========
         // Orígenes permitidos (desde configuración)
-        if (corsAllowedOrigins != null && !corsAllowedOrigins.trim().isEmpty()) {
-            configuration.setAllowedOrigins(Arrays.asList(corsAllowedOrigins.split(",")));
-        } else {
-            configuration.setAllowedOrigins(List.of("*")); // Fallback (no recomendado prod)
+        if (corsAllowedOrigins == null || corsAllowedOrigins.trim().isEmpty()) {
+            // En lugar de permitir todos los orígenes (inseguro), lanzar error
+            throw new IllegalStateException(
+                    "SEGURIDAD: La propiedad 'cors.allowed-origins' no está configurada. " +
+                            "Configure los orígenes permitidos en application.properties o como variable de entorno.");
         }
+        configuration.setAllowedOrigins(Arrays.asList(corsAllowedOrigins.split(",")));
 
         // Métodos HTTP permitidos
         configuration.setAllowedMethods(Arrays.asList(
