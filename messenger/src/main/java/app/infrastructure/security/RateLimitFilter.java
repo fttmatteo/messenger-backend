@@ -1,8 +1,6 @@
 package app.infrastructure.security;
 
-import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
-import io.github.bucket4j.Refill;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -108,10 +106,10 @@ public class RateLimitFilter extends OncePerRequestFilter {
      * Límite: 10 requests por minuto (protección contra brute force).
      */
     private Bucket createAuthBucket(String ip) {
-        Bandwidth limit = Bandwidth.classic(
-                AUTH_REQUESTS_PER_MINUTE,
-                Refill.greedy(AUTH_REQUESTS_PER_MINUTE, Duration.ofMinutes(1)));
-        return Bucket.builder().addLimit(limit).build();
+        return Bucket.builder()
+                .addLimit(limit -> limit.capacity(AUTH_REQUESTS_PER_MINUTE)
+                        .refillGreedy(AUTH_REQUESTS_PER_MINUTE, Duration.ofMinutes(1)))
+                .build();
     }
 
     /**
@@ -119,10 +117,10 @@ public class RateLimitFilter extends OncePerRequestFilter {
      * Límite: 100 requests por minuto.
      */
     private Bucket createGeneralBucket(String ip) {
-        Bandwidth limit = Bandwidth.classic(
-                GENERAL_REQUESTS_PER_MINUTE,
-                Refill.greedy(GENERAL_REQUESTS_PER_MINUTE, Duration.ofMinutes(1)));
-        return Bucket.builder().addLimit(limit).build();
+        return Bucket.builder()
+                .addLimit(limit -> limit.capacity(GENERAL_REQUESTS_PER_MINUTE)
+                        .refillGreedy(GENERAL_REQUESTS_PER_MINUTE, Duration.ofMinutes(1)))
+                .build();
     }
 
     /**
