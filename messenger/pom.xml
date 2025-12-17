@@ -282,6 +282,27 @@
 					</argLine>
 				</configuration>
 			</plugin>
+			<!-- 
+				OWASP Dependency Check:
+				Escanea dependencias buscando vulnerabilidades de seguridad conocidas (CVEs).
+				Ejecutar: mvn dependency-check:check
+				Genera reporte en: target/dependency-check-report.html
+			-->
+			<plugin>
+				<groupId>org.owasp</groupId>
+				<artifactId>dependency-check-maven</artifactId>
+				<version>10.0.3</version>
+				<configuration>
+					<failBuildOnCVSS>7</failBuildOnCVSS>
+					<formats>
+						<format>HTML</format>
+						<format>JSON</format>
+					</formats>
+					<suppressionFiles>
+						<suppressionFile>dependency-check-suppressions.xml</suppressionFile>
+					</suppressionFiles>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
