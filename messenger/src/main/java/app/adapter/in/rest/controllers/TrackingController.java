@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  * y consultar historial de tracking.
  */
 @RestController
-@RequestMapping("/api/tracking")
+@RequestMapping("/tracking")
 public class TrackingController {
 
     private static final Logger logger = LoggerFactory.getLogger(TrackingController.class);

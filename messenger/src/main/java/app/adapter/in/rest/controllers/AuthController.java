@@ -26,6 +26,9 @@ public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired
+    private RefreshTokenUseCase refreshTokenUseCase;
+
+    @Autowired
     private LoginUseCase loginUseCase;
 
     /**
@@ -44,9 +47,6 @@ public class AuthController {
         logger.info("Login exitoso para usuario: {} con rol: {}", credentials.getUserName(), response.getRole());
         return ResponseEntity.ok(response);
     }
-
-    @Autowired
-    private RefreshTokenUseCase refreshTokenUseCase;
 
     /**
      * Refresca el token de acceso utilizando un refresh token válido.

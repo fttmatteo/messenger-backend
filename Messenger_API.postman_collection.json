@@ -15,11 +15,16 @@
             "key": "token",
             "value": "",
             "type": "string"
+        },
+        {
+            "key": "refreshToken",
+            "value": "",
+            "type": "string"
         }
     ],
     "item": [
         {
-            "name": "🔐 Authentication",
+            "name": "\ud83d\udd10 Authentication",
             "item": [
                 {
                     "name": "Login",
@@ -31,7 +36,12 @@
                                     "if (pm.response.code === 200) {",
                                     "    var jsonData = pm.response.json();",
                                     "    pm.collectionVariables.set('token', jsonData.token);",
-                                    "    console.log('Token saved to collection variables');",
+                                    "    if (jsonData.refreshToken) {",
+                                    "        pm.collectionVariables.set('refreshToken', jsonData.refreshToken);",
+                                    "        console.log('Access token and refresh token saved to collection variables');",
+                                    "    } else {",
+                                    "        console.log('Access token saved to collection variables');",
+                                    "    }",
                                     "}"
                                 ],
                                 "type": "text/javascript"
@@ -60,14 +70,62 @@
                                 "login"
                             ]
                         },
-                        "description": "Authenticate user and receive JWT token.\n\n**Response:**\n```json\n{\n    \"token\": \"eyJhbGciOiJIUzI1NiJ9...\",\n    \"role\": \"ADMIN\",\n    \"fullName\": \"Administrator\"\n}\n```"
+                        "description": "Authenticate user and receive JWT tokens.\n\n**Response:**\n```json\n{\n    \"token\": \"eyJhbGciOiJIUzI1NiJ9...\",\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiJ9...\",\n    \"role\": \"ADMIN\"\n}\n```\n\n**Token Expiration:**\n- Access Token: 30 min (prod) / 2 hours (dev)\n- Refresh Token: 7 days"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Refresh Token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set('token', jsonData.token);",
+                                    "    if (jsonData.refreshToken) {",
+                                    "        pm.collectionVariables.set('refreshToken', jsonData.refreshToken);",
+                                    "        console.log('Access token and refresh token renewed');",
+                                    "    } else {",
+                                    "        console.log('Access token renewed');",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"refreshToken\": \"{{refreshToken}}\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/refresh",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "refresh"
+                            ]
+                        },
+                        "description": "Refresh the access token using a valid refresh token.\n\n**Request:**\n```json\n{\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiJ9...\"\n}\n```\n\n**Response:**\n```json\n{\n    \"token\": \"eyJhbGciOiJIUzI1NiJ9...\",\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiJ9...\",\n    \"role\": \"ADMIN\"\n}\n```\n\n**Note:** The refresh token is automatically saved from the login response and used here."
                     },
                     "response": []
                 }
             ]
         },
         {
-            "name": "👥 Employees",
+            "name": "\ud83d\udc65 Employees",
             "item": [
                 {
                     "name": "Create Employee",
@@ -91,7 +149,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"document\": \"1234567890\",\n    \"fullName\": \"Juan Pérez\",\n    \"phone\": \"3001234567\",\n    \"userName\": \"jperez\",\n    \"password\": \"password123\",\n    \"role\": \"MESSENGER\"\n}"
+                            "raw": "{\n    \"document\": \"1234567890\",\n    \"fullName\": \"Juan P\u00e9rez\",\n    \"phone\": \"3001234567\",\n    \"userName\": \"jperez\",\n    \"password\": \"password123\",\n    \"role\": \"MESSENGER\"\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/employees",
@@ -183,7 +241,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"document\": \"1234567890\",\n    \"fullName\": \"Juan Pérez Updated\",\n    \"phone\": \"3009876543\",\n    \"userName\": \"jperez\",\n    \"password\": \"newpassword123\",\n    \"role\": \"MESSENGER\"\n}"
+                            "raw": "{\n    \"document\": \"1234567890\",\n    \"fullName\": \"Juan P\u00e9rez Updated\",\n    \"phone\": \"3009876543\",\n    \"userName\": \"jperez\",\n    \"password\": \"newpassword123\",\n    \"role\": \"MESSENGER\"\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/employees/1",
@@ -230,7 +288,7 @@
             ]
         },
         {
-            "name": "🏢 Dealerships",
+            "name": "\ud83c\udfe2 Dealerships",
             "item": [
                 {
                     "name": "Create Dealership",
@@ -254,7 +312,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"name\": \"Concesionario Centro\",\n    \"address\": \"Calle 50 #45-20, Medellín\",\n    \"phone\": \"6041234567\",\n    \"zone\": \"CENTRO\"\n}"
+                            "raw": "{\n    \"name\": \"Concesionario Centro\",\n    \"address\": \"Calle 50 #45-20, Medell\u00edn\",\n    \"phone\": \"6041234567\",\n    \"zone\": \"CENTRO\"\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/dealerships",
@@ -346,7 +404,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"name\": \"Concesionario Centro Updated\",\n    \"address\": \"Calle 51 #46-21, Medellín\",\n    \"phone\": \"6049876543\",\n    \"zone\": \"CENTRO\"\n}"
+                            "raw": "{\n    \"name\": \"Concesionario Centro Updated\",\n    \"address\": \"Calle 51 #46-21, Medell\u00edn\",\n    \"phone\": \"6049876543\",\n    \"zone\": \"CENTRO\"\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/dealerships/1",
@@ -422,7 +480,7 @@
             ]
         },
         {
-            "name": "📍 Locations",
+            "name": "\ud83d\udccd Locations",
             "item": [
                 {
                     "name": "Geocode Address",
@@ -446,7 +504,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"address\": \"Parque Berrio, Medellín\"\n}"
+                            "raw": "{\n    \"address\": \"Parque Berrio, Medell\u00edn\"\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/locations/geocode",
@@ -587,7 +645,7 @@
             ]
         },
         {
-            "name": "📡 Tracking",
+            "name": "\ud83d\udce1 Tracking",
             "item": [
                 {
                     "name": "Update Live Location",
@@ -756,7 +814,7 @@
             ]
         },
         {
-            "name": "📦 Service Deliveries",
+            "name": "\ud83d\udce6 Service Deliveries",
             "item": [
                 {
                     "name": "Create Service (with OCR)",
@@ -1068,7 +1126,7 @@
             ]
         },
         {
-            "name": "📁 Files",
+            "name": "\ud83d\udcc1 Files",
             "item": [
                 {
                     "name": "Get File",

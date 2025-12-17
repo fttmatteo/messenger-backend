@@ -139,7 +139,7 @@ public class ServiceDeliveryController {
      * @param photos      Lista de fotos de evidencia (opcional según estado).
      * @return ResponseEntity con mensaje de éxito o error.
      */
-    @PutMapping("/{id}/status")
+    @PutMapping("/update/{id}")
     public ResponseEntity<?> updateStatus(
             @PathVariable Long id,
             @RequestParam("status") String status,
@@ -193,7 +193,7 @@ public class ServiceDeliveryController {
      * @throws UnauthorizedException si el usuario no tiene permiso para ver el
      *                               servicio.
      */
-    @GetMapping("/{id}")
+    @GetMapping("/find/{id}")
     public ResponseEntity<ServiceDeliveryResponse> findById(@PathVariable Long id) throws Exception {
         ServiceDelivery service = serviceDeliveryUseCase.findById(id);
         if (service == null) {
@@ -226,7 +226,7 @@ public class ServiceDeliveryController {
      *
      * @return Lista de servicios correspondientes.
      */
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<ServiceDeliveryResponse>> findAll() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String currentUserName = auth.getName();
@@ -252,7 +252,7 @@ public class ServiceDeliveryController {
      * @param messengerId Documento del mensajero.
      * @return Lista de servicios asignados al mensajero.
      */
-    @GetMapping("/messenger/{messengerId}")
+    @GetMapping("/find/{messengerId}")
     public ResponseEntity<List<ServiceDeliveryResponse>> findByMessenger(@PathVariable Long messengerId) {
         List<ServiceDeliveryResponse> responses = serviceDeliveryUseCase.findByMessenger(messengerId).stream()
                 .map(responseMapper::toResponse)
@@ -266,7 +266,7 @@ public class ServiceDeliveryController {
      * @param dealershipId ID del concesionario.
      * @return Lista de servicios del concesionario.
      */
-    @GetMapping("/dealership/{dealershipId}")
+    @GetMapping("/find/{dealershipId}")
     public ResponseEntity<List<ServiceDeliveryResponse>> findByDealership(@PathVariable Long dealershipId) {
         List<ServiceDeliveryResponse> responses = serviceDeliveryUseCase.findByDealership(dealershipId).stream()
                 .map(responseMapper::toResponse)
@@ -280,7 +280,7 @@ public class ServiceDeliveryController {
      * @param status Estado por el cual filtrar (PENDING, DELIVERED, etc).
      * @return Lista de servicios con el estado especificado.
      */
-    @GetMapping("/status/{status}")
+    @GetMapping("/find/{status}")
     public ResponseEntity<List<ServiceDeliveryResponse>> findByStatus(@PathVariable Status status) {
         List<ServiceDeliveryResponse> responses = serviceDeliveryUseCase.findByStatus(status).stream()
                 .map(responseMapper::toResponse)

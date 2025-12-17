@@ -43,6 +43,24 @@
             "description": "Whether to automatically baseline a database when migrating."
         },
         {
+            "name": "spring.flyway.baseline-version",
+            "type": "java.lang.String",
+            "description": "Version to tag an existing schema with when executing baseline (default: 1).",
+            "defaultValue": "1"
+        },
+        {
+            "name": "spring.flyway.validate-on-migrate",
+            "type": "java.lang.Boolean",
+            "description": "Whether to automatically call validate when performing a migration (default: true).",
+            "defaultValue": true
+        },
+        {
+            "name": "spring.flyway.out-of-order",
+            "type": "java.lang.Boolean",
+            "description": "Whether to allow migrations to be run out of order (default: false).",
+            "defaultValue": false
+        },
+        {
             "name": "cors.allowed-origins",
             "type": "java.lang.String",
             "description": "Comma-separated list of allowed origins for CORS."
