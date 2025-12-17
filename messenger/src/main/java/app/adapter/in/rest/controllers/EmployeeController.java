@@ -16,6 +16,7 @@ import app.application.exceptions.BusinessException;
 import app.application.exceptions.InputsException;
 import app.application.usecase.EmployeeUseCase;
 import app.domain.model.Employee;
+import app.infrastructure.audit.AuditableAction;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,6 +53,7 @@ public class EmployeeController {
      */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
+    @AuditableAction(action = "CREATE_EMPLOYEE", description = "Crear nuevo empleado")
     public ResponseEntity<String> create(@Valid @RequestBody EmployeeRequest request) throws Exception {
         logger.info("Creando empleado: {}", request.getUserName());
         Employee employee = builder.build(request.getDocument(),
@@ -108,6 +110,7 @@ public class EmployeeController {
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @AuditableAction(action = "UPDATE_EMPLOYEE", description = "Actualizar empleado existente")
     public ResponseEntity<String> update(@PathVariable Long id, @Valid @RequestBody EmployeeRequest request)
             throws Exception {
         logger.info("Actualizando empleado ID: {}", id);
@@ -131,6 +134,7 @@ public class EmployeeController {
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @AuditableAction(action = "DELETE_EMPLOYEE", description = "Eliminar empleado")
     public ResponseEntity<String> delete(@PathVariable Long id) throws Exception {
         logger.warn("Eliminando empleado ID: {}", id);
         employeeUseCase.deleteById(id);

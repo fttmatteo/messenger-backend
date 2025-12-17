@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.0</version>
+		<version>4.0.0</version> 
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>app</groupId>
@@ -71,7 +71,7 @@
 			<artifactId>google-cloud-storage</artifactId>
 			<version>2.61.0</version>
 		</dependency>
-
+		
 		<!-- 
 			Spring Boot Starter Validation:
 			Proporciona soporte para validación de beans con Hibernate Validator.
@@ -138,6 +138,17 @@
 			<scope>test</scope>
 		</dependency>
 
+
+		<!-- Flyway for Database Migrations -->
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-mysql</artifactId>
+		</dependency>
+
 		<!-- 
 			JJWT (Java JWT):
 			Conjunto de librerías para trabajar con JSON Web Tokens (JWT).
@@ -173,6 +184,17 @@
 		</dependency>
 
 		<!-- 
+			Spring Security Test:
+			Herramientas para probar componentes de seguridad (mocking de usuarios, CSRF, etc).
+			Esencial para @WebMvcTest cuando hay seguridad habilitada.
+		-->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- 
 			Google Maps Services:
 			Cliente Java para las APIs de Google Maps.
 			Permite geocodificación, cálculo de rutas, matriz de distancias y zonas horarias.
@@ -203,16 +225,7 @@
 			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency>
 
-		<!-- 
-			SLF4J Simple:
-			Implementación simple de logging.
-			Necesaria en runtime para ver logs detallados de la librería de Google Maps.
-		-->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<scope>runtime</scope>
-		</dependency>
+
 
 		<!-- 
 			Spring Boot Starter Actuator:
@@ -223,6 +236,30 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+
+		<!-- 
+			SpringDoc OpenAPI:
+			Genera documentación automática de la API (Swagger UI).
+			Disponible en: /swagger-ui/index.html
+		-->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.3.0</version>
+		</dependency>
+
+		<!-- 
+			Bucket4j:
+			Librería de Rate Limiting basada en el algoritmo Token Bucket.
+			Protege contra ataques de fuerza bruta y DDoS.
+			Se usa para limitar requests por IP/usuario en endpoints críticos.
+		-->
+		<dependency>
+			<groupId>com.bucket4j</groupId>
+			<artifactId>bucket4j-core</artifactId>
+			<version>8.10.1</version>
 		</dependency>
 
 	</dependencies>
@@ -241,7 +278,29 @@
 					<argLine>
 						-XX:+EnableDynamicAgentLoading
 						-Djdk.instrument.traceUsage
+						-Dnet.bytebuddy.experimental=true
 					</argLine>
+				</configuration>
+			</plugin>
+			<!-- 
+				OWASP Dependency Check:
+				Escanea dependencias buscando vulnerabilidades de seguridad conocidas (CVEs).
+				Ejecutar: mvn dependency-check:check
+				Genera reporte en: target/dependency-check-report.html
+			-->
+			<plugin>
+				<groupId>org.owasp</groupId>
+				<artifactId>dependency-check-maven</artifactId>
+				<version>10.0.3</version>
+				<configuration>
+					<failBuildOnCVSS>7</failBuildOnCVSS>
+					<formats>
+						<format>HTML</format>
+						<format>JSON</format>
+					</formats>
+					<suppressionFiles>
+						<suppressionFile>dependency-check-suppressions.xml</suppressionFile>
+					</suppressionFiles>
 				</configuration>
 			</plugin>
 		</plugins>

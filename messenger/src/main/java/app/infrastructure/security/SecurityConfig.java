@@ -64,6 +64,9 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    @Autowired
+    private RateLimitFilter rateLimitFilter;
+
     /**
      * Configura la cadena de filtros de seguridad de Spring Security.
      * 
@@ -90,6 +93,8 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // Documentación
+                                                                                                              // API
                         .requestMatchers("/ws/**").permitAll() // WebSocket handshake
                         .requestMatchers("/employees/**").hasRole("ADMIN")
                         .requestMatchers("/dealerships/**").authenticated()
@@ -98,28 +103,21 @@ public class SecurityConfig {
                         .requestMatchers("/api/location/**").authenticated()
                         .requestMatchers("/api/tracking/**").authenticated()
                         .anyRequest().authenticated())
+                // Rate Limit Filter: Se ejecuta PRIMERO para bloquear abusos antes de procesar
+                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
+                // JWT Filter: Valida tokens después de pasar rate limiting
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
+    @org.springframework.beans.factory.annotation.Value("${cors.allowed-origins}")
+    private String corsAllowedOrigins;
+
     /**
      * Configura CORS (Cross-Origin Resource Sharing) para la aplicación.
      * 
-     * Permite peticiones desde múltiples orígenes (frontends en desarrollo):
-     * - React: localhost:3000
-     * - Angular: localhost:4200
-     * - Vite: localhost:5173
-     * - Acceso móvil: 192.168.40.25:3000
-     * 
-     * Configuración:
-     * - Métodos permitidos: GET, POST, PUT, DELETE, OPTIONS, PATCH
-     * - Headers: Todos (*)
-     * - Credenciales: Habilitadas (permite cookies y Authorization header)
-     * - Max Age: 3600s (cache de preflight requests)
-     * - Headers expuestos: Authorization (para que el cliente pueda leerlo)
-     * 
-     * IMPORTANTE: En producción, reemplazar con orígenes específicos del dominio.
+     * Permite peticiones desde múltiples orígenes definidos en la configuración.
      * 
      * @return CorsConfigurationSource configurado
      */
@@ -127,14 +125,15 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Orígenes permitidos (desarrollo)
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000", // React
-                "http://localhost:4200", // Angular
-                "http://localhost:8080",
-                "http://localhost:5173", // Vite
-                "http://192.168.40.25:3000" // Mobile Access (Current Network IP)
-        ));
+        // ========== SEGURIDAD: CORS obligatorio en producción ==========
+        // Orígenes permitidos (desde configuración)
+        if (corsAllowedOrigins == null || corsAllowedOrigins.trim().isEmpty()) {
+            // En lugar de permitir todos los orígenes (inseguro), lanzar error
+            throw new IllegalStateException(
+                    "SEGURIDAD: La propiedad 'cors.allowed-origins' no está configurada. " +
+                            "Configure los orígenes permitidos en application.properties o como variable de entorno.");
+        }
+        configuration.setAllowedOrigins(Arrays.asList(corsAllowedOrigins.split(",")));
 
         // Métodos HTTP permitidos
         configuration.setAllowedMethods(Arrays.asList(

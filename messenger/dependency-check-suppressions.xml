@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Archivo de supresiones para OWASP Dependency Check.
+    
+    Añade aquí falsos positivos o vulnerabilidades que has evaluado 
+    y decidido no corregir (con justificación).
+    
+    Documentación: https://jeremylong.github.io/DependencyCheck/general/suppression.html
+-->
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+
+    <!-- 
+    Ejemplo de supresión:
+    <suppress>
+        <notes><![CDATA[
+            Justificación: Esta vulnerabilidad no nos afecta porque...
+            Fecha de revisión: 2024-01-01
+            Revisado por: nombre_desarrollador
+        ]]></notes>
+        <cpe>cpe:/a:example:library</cpe>
+        <cve>CVE-2023-XXXXX</cve>
+    </suppress>
+    -->
+
+</suppressions>

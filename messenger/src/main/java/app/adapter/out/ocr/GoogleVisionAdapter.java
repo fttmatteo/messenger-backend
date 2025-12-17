@@ -6,6 +6,7 @@ import com.google.cloud.vision.v1.*;
 import com.google.protobuf.ByteString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -19,8 +20,12 @@ import java.util.List;
  * Vision.
  * Se encarga de extraer texto de imágenes y validar formatos de placas
  * detectadas.
+ * 
+ * NOTA: Este bean solo se carga cuando app.ocr.mode=google-vision
+ * Para tests, usar app.ocr.mode=mock
  */
 @Component
+@ConditionalOnProperty(name = "app.ocr.mode", havingValue = "google-vision")
 public class GoogleVisionAdapter implements OcrPort {
 
     private static final Logger logger = LoggerFactory.getLogger(GoogleVisionAdapter.class);

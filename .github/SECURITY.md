@@ -12,7 +12,7 @@ Currently, we only provide security updates for the latest development version o
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 0.0.x   | :white_check_mark: |
+| 1.0.0   | :white_check_mark: |
 | < 0.0.1 | :x:                |
 
 ## Reporting a Vulnerability
@@ -40,7 +40,7 @@ Actualmente, solo proporcionamos actualizaciones de seguridad para la última ve
 
 | Versión | Soportada          |
 | ------- | ------------------ |
-| 0.0.x   | :white_check_mark: |
+| 1.0.0   | :white_check_mark: |
 | < 0.0.1 | :x:                |
 
 ## Reportar una Vulnerabilidad

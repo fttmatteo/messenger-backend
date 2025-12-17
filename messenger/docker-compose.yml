@@ -1,0 +1,93 @@
+version: '3.8'
+
+# ============================================
+# ORQUESTACIÓN DE SERVICIOS (Docker Compose)
+# Define la infraestructura local necesaria para correr la aplicación completa.
+#
+# Comandos útiles:
+# - Iniciar: docker-compose up --build
+# - Detener: docker-compose down
+# - Ver logs: docker-compose logs -f
+# ============================================
+
+services:
+  # ============================================
+  # APP: Backend Spring Boot
+  # ============================================
+  messenger-backend:
+    build: .
+    container_name: messenger-backend
+    ports:
+      - "8080:8080"
+    environment:
+      # Conectar a servicios definidos en este mismo archivo
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_HOST=messenger-db
+      - DB_PORT=3306
+      - DB_NAME=messenger_db
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=messenger-redis
+      - REDIS_PORT=6379
+      # Variables que DEBES proveer en un archivo .env local para seguridad
+      # - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
+      # - GCS_BUCKET_NAME=${GCS_BUCKET_NAME}
+      # - GCP_PROJECT_ID=${GCP_PROJECT_ID}
+    depends_on:
+      - messenger-db
+      - messenger-redis
+    networks:
+      - messenger-network
+
+  # ============================================
+  # DATABASE: MySQL 8.0
+  # ============================================
+  messenger-db:
+    image: mysql:8.0
+    container_name: messenger-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: messenger_db
+    ports:
+      - "3306:3306"
+    volumes:
+      # Persistencia de datos: los datos sobreviven si borras el contenedor
+      - mysql_data:/var/lib/mysql
+    networks:
+      - messenger-network
+    # Healthcheck para asegurar que la DB esté lista antes que la App intente conectar
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+
+  # ============================================
+  # CACHE: Redis
+  # ============================================
+  messenger-redis:
+    image: redis:alpine
+    container_name: messenger-redis
+    # SEGURIDAD: Puerto no expuesto al host, solo accesible dentro de la red Docker
+    # ports:
+    #   - "6379:6379"  # Comentado por seguridad - descomentar solo si es necesario acceso externo
+    # Autenticación con contraseña
+    command: redis-server --requirepass ${REDIS_PASSWORD:-redis_secure_password_dev}
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redis_secure_password_dev}
+    networks:
+      - messenger-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis_secure_password_dev}", "ping"]
+      timeout: 5s
+      retries: 5
+
+# ============================================
+# VOLÚMENES Y REDES
+# ============================================
+volumes:
+  mysql_data:
+
+
+networks:
+  messenger-network:
+    driver: bridge

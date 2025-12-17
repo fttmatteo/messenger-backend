@@ -1,19 +1,272 @@
+<div align="center">
+
 # 🚀 Messenger Backend API
 
-**🇪🇸 Español** | **[🇺🇸 English](./README_EN.md)**
+[![Java](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.0-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![Redis](https://img.shields.io/badge/Redis-6.0+-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](./LICENSE)
 
-Sistema de gestión de entregas y mensajería para operaciones de tránsito. Backend REST API con reconocimiento automático de placas vehiculares mediante OCR.
+**Sistema de gestión de entregas y mensajería con reconocimiento automático de placas vehiculares mediante OCR.**
+
+*Delivery and courier management system with automatic license plate recognition via OCR.*
+
+</div>
+
+---
+
+<details>
+<summary><b>🇺🇸 English Version</b> (Click to expand)</summary>
+
+## 📋 Table of Contents
+
+- [Architecture](#-architecture)
+- [Tech Stack](#-tech-stack)
+- [Project Structure](#-project-structure)
+- [Environment Profiles](#-environment-profiles)
+- [API Endpoints](#-api-endpoints)
+- [Database Schema](#-database-schema)
+- [Real-Time Tracking](#-real-time-tracking)
+- [Security](#-security)
+- [Setup & Installation](#️-setup--installation)
+- [CI/CD](#-cicd)
+
+---
+
+### 🏗 Architecture
+
+The project implements **Hexagonal Architecture (Ports & Adapters)** to keep the domain isolated from external dependencies.
+
+```mermaid
+graph TB
+    subgraph "Adapter Layer"
+        subgraph "Input Adapters"
+            REST[REST Controllers]
+            VAL[Validators]
+            BUILD[Builders]
+        end
+        subgraph "Output Adapters"
+            PERSIST[JPA Persistence]
+            OCR[Google Vision OCR]
+            STORAGE[Google Cloud Storage]
+            SEC[JWT Security]
+            MAPS[Google Maps]
+            TRACKING[Location Tracking]
+        end
+    end
+    
+    subgraph "Application Layer"
+        UC[Use Cases]
+        EXC[Exceptions]
+    end
+    
+    subgraph "Domain Layer"
+        MOD[Models]
+        PORTS[Ports]
+        SVC[Domain Services]
+    end
+    
+    REST --> UC
+    UC --> PORTS
+    PORTS --> PERSIST
+    PORTS --> OCR
+    PORTS --> STORAGE
+    PORTS --> SEC
+    PORTS --> MAPS
+    PORTS --> TRACKING
+    UC --> SVC
+    SVC --> MOD
+```
+
+---
+
+### 💻 Tech Stack
+
+| Component | Technology |
+|-----------|------------|
+| **Framework** | Spring Boot 4.0.0 |
+| **Language** | Java 21 |
+| **Database** | MySQL 8.0+ |
+| **Migrations** | Flyway |
+| **Cache/Streaming** | Redis |
+| **Security** | JWT + BCrypt + Refresh Tokens |
+| **OCR** | Google Cloud Vision API |
+| **Storage** | Google Cloud Storage |
+| **Maps** | Google Maps Platform |
+| **Real-Time** | WebSocket + Redis |
+| **Build** | Maven 3.9+ |
+| **CI/CD** | GitHub Actions |
+
+---
+
+### 🌍 Environment Profiles
+
+| Profile | Purpose | Database | External APIs |
+|---------|---------|----------|---------------|
+| `local` | Local development | H2 In-Memory | Mock/Disabled |
+| `dev` | Development with APIs | MySQL | Enabled |
+| `test` | Automated testing | H2 In-Memory | Mock |
+| `prod` | Production | MySQL (SSL) | Enabled |
+
+**Activation:**
+```bash
+# Environment variable
+export SPRING_PROFILES_ACTIVE=dev
+
+# Command line
+./mvnw spring-boot:run -Dspring.profiles.active=dev
+```
+
+---
+
+### 🔌 API Endpoints
+
+<details>
+<summary><b>Authentication</b> <code>/auth</code></summary>
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/auth/login` | Login with credentials |
+| `POST` | `/auth/refresh` | Refresh access token |
+
+</details>
+
+<details>
+<summary><b>Employees</b> <code>/employees</code> - Admin only</summary>
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/employees` | Create employee |
+| `GET` | `/employees` | List all |
+| `GET` | `/employees/{id}` | Get by ID |
+| `PUT` | `/employees/{id}` | Update |
+| `DELETE` | `/employees/{id}` | Delete |
+
+</details>
+
+<details>
+<summary><b>Dealerships</b> <code>/dealerships</code></summary>
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| `POST` | `/dealerships` | Create | ADMIN |
+| `GET` | `/dealerships` | List | Authenticated |
+| `GET` | `/dealerships/{id}` | Get by ID | Authenticated |
+| `PUT` | `/dealerships/{id}` | Update | ADMIN |
+| `DELETE` | `/dealerships/{id}` | Delete | ADMIN |
+
+</details>
+
+<details>
+<summary><b>Service Deliveries</b> <code>/services</code></summary>
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/services/create` | Create service (multipart) |
+| `PUT` | `/services/{id}/status` | Update status |
+| `GET` | `/services` | List all (ADMIN) or own (MESSENGER) |
+| `GET` | `/services/{id}` | Get by ID |
+| `GET` | `/services/messenger/{doc}` | Filter by messenger |
+| `GET` | `/services/dealership/{id}` | Filter by dealership |
+| `GET` | `/services/status/{status}` | Filter by status |
+
+</details>
+
+<details>
+<summary><b>Locations & Routes</b> <code>/locations</code></summary>
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/locations/geocode` | Address to coordinates |
+| `POST` | `/locations/route` | Calculate optimized route |
+| `GET` | `/locations/distance` | Distance between points |
+| `GET` | `/locations/reverse` | Coordinates to address |
+
+</details>
+
+<details>
+<summary><b>Real-Time Tracking</b> <code>/api/tracking</code></summary>
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| `POST` | `/api/tracking/update` | Update messenger location | MESSENGER/ADMIN |
+| `GET` | `/api/tracking/messenger/{id}` | Get last location | ADMIN |
+| `GET` | `/api/tracking/active` | List active messengers | ADMIN |
+| `GET` | `/api/tracking/history/{id}` | Tracking history by date | MESSENGER/ADMIN |
+| `GET` | `/api/tracking/service/{id}` | Tracking history by service | MESSENGER/ADMIN |
+
+</details>
+
+---
+
+### 🔐 Security
+
+**JWT Authentication with Refresh Tokens:**
+- Access Token: 30 min (prod) / 2 hours (dev)
+- Refresh Token: 7 days
+- Algorithm: HMAC-SHA256
+
+**Roles:**
+- `ADMIN`: Full access
+- `MESSENGER`: Own services only
+
+---
+
+### ⚙️ Setup & Installation
+
+**Prerequisites:**
+- Java 21+
+- MySQL 8.0+
+- Redis 6.0+
+- Maven 3.9+
+- Google Cloud credentials
+
+**Quick Start:**
+```bash
+# Clone
+git clone <repository-url>
+cd messenger-backend/messenger
+
+# Configure environment
+export JWT_SECRET="your-secret-key-base64"
+export DB_HOST="localhost"
+export DB_PORT="3306"
+export DB_NAME="messenger"
+export DB_USERNAME="root"
+export DB_PASSWORD="password"
+
+# Run
+./mvnw spring-boot:run -Dspring.profiles.active=dev
+```
+
+---
+
+### 🔄 CI/CD
+
+Automated pipeline via GitHub Actions:
+- ✅ Build on push/PR to `main`
+- ✅ Java 21 + Maven caching
+- ✅ Secure secrets injection
+- ✅ Google Cloud credentials handling
+
+</details>
+
+---
 
 ## 📋 Tabla de Contenidos
 
 - [Arquitectura](#-arquitectura)
 - [Stack Tecnológico](#-stack-tecnológico)
 - [Estructura del Proyecto](#-estructura-del-proyecto)
-- [API Endpoints](#-api-endpoints)
+- [Perfiles de Ambiente](#-perfiles-de-ambiente)
+- [API Endpoints](#-api-endpoints-1)
 - [Esquema de Base de Datos](#-esquema-de-base-de-datos)
+- [Tracking en Tiempo Real](#-tracking-en-tiempo-real)
 - [Flujo de Estados](#-flujo-de-estados)
 - [Seguridad](#-seguridad)
 - [Configuración e Instalación](#️-configuración-e-instalación)
+- [CI/CD](#-cicd-1)
 - [Colección Postman](#-colección-postman)
 
 ---
@@ -72,14 +325,15 @@ graph TB
 | **Framework** | Spring Boot 4.0.0 |
 | **Lenguaje** | Java 21 |
 | **Base de Datos** | MySQL 8.0+ |
+| **Migraciones** | Flyway |
 | **Cache/Streaming** | Redis |
-| **Seguridad** | JWT + BCrypt |
+| **Seguridad** | JWT + BCrypt + Refresh Tokens |
 | **OCR** | Google Cloud Vision API |
 | **Almacenamiento** | Google Cloud Storage |
 | **Mapas** | Google Maps Platform |
 | **Tiempo Real** | WebSocket + Redis |
 | **Build** | Maven 3.9+ |
-| **Validación** | Spring Validation |
+| **CI/CD** | GitHub Actions |
 
 ---
 
@@ -109,17 +363,93 @@ messenger/
 │   │   ├── exceptions/                  # BusinessException, InputsException
 │   │   └── usecase/                     # 4 Use Cases
 │   ├── domain/
-│   │   ├── model/                       # 7 Modelos de dominio + enums
+│   │   ├── model/                       # 11 Modelos + 7 Enums + Auth
 │   │   ├── ports/                       # 7 Puertos (interfaces)
 │   │   └── services/                    # 15 Servicios de dominio
 │   └── infrastructure/
 │       ├── persistence/
-│       │   ├── entities/                # 7 Entidades JPA
+│       │   ├── entities/                # Entidades JPA
 │       │   ├── mapper/                  # Entity ↔ Domain mappers
 │       │   └── repository/              # Spring Data Repositories
 │       └── security/                    # SecurityConfig, JwtFilter
 └── src/main/resources/
-    └── application.properties
+    ├── application.properties           # Configuración base
+    ├── application-local.properties     # Desarrollo local (H2)
+    ├── application-dev.properties       # Desarrollo con APIs
+    ├── application-test.properties      # Testing automatizado
+    ├── application-prod.properties      # Producción
+    └── db/migration/                    # Migraciones Flyway
+```
+
+---
+
+## 🌍 Perfiles de Ambiente
+
+| Perfil | Propósito | Base de Datos | APIs Externas | JWT Exp. |
+|--------|-----------|---------------|---------------|----------|
+| `local` | Desarrollo local sin dependencias | H2 In-Memory | Mock/Deshabilitado | 8 horas |
+| `dev` | Desarrollo con servicios reales | MySQL | Habilitado | 2 horas |
+| `test` | Testing automatizado (CI/CD) | H2 In-Memory | Mock | 1 hora |
+| `prod` | Producción optimizada | MySQL (SSL) | Habilitado | 30 min |
+
+### Características por Perfil
+
+<details>
+<summary><b>🏠 Local</b> - Sin dependencias externas</summary>
+
+- Base de datos H2 en memoria
+- OCR simulado (placeholder)
+- Almacenamiento en sistema de archivos
+- Logs detallados
+- Perfecto para desarrollo offline
+
+</details>
+
+<details>
+<summary><b>🔧 Dev</b> - Desarrollo con APIs</summary>
+
+- MySQL de desarrollo
+- Google Cloud APIs habilitadas
+- SQL visible para debugging
+- Actuator endpoints habilitados
+- Tracking interval: 15 segundos
+
+</details>
+
+<details>
+<summary><b>🧪 Test</b> - Testing automatizado</summary>
+
+- H2 en memoria (aislamiento)
+- Servicios mock
+- Sin dependencias externas
+- Compatible con GitHub Actions
+
+</details>
+
+<details>
+<summary><b>🚀 Prod</b> - Producción</summary>
+
+- MySQL con SSL obligatorio
+- Pool de conexiones optimizado (HikariCP)
+- Logs mínimos (WARN/INFO)
+- Graceful shutdown habilitado
+- Headers de seguridad (HSTS, HTTP-only cookies)
+- Compresión habilitada
+- Sin stack traces expuestos
+
+</details>
+
+### Activación
+
+```bash
+# Variable de entorno (recomendado)
+export SPRING_PROFILES_ACTIVE=dev
+
+# Línea de comandos
+./mvnw spring-boot:run -Dspring.profiles.active=dev
+
+# Docker
+docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ```
 
 ---
@@ -131,6 +461,19 @@ messenger/
 | Método | Endpoint | Descripción | Auth |
 |--------|----------|-------------|------|
 | `POST` | `/auth/login` | Iniciar sesión | 🔓 Público |
+| `POST` | `/auth/refresh` | Renovar access token | 🔓 Público |
+
+**Respuesta de Login:**
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIs...",
+  "tokenType": "Bearer",
+  "expiresIn": 1800
+}
+```
+
+---
 
 ### Empleados (`/employees`) - Solo ADMIN
 
@@ -142,6 +485,8 @@ messenger/
 | `PUT` | `/employees/{id}` | Actualizar |
 | `DELETE` | `/employees/{id}` | Eliminar |
 
+---
+
 ### Concesionarios (`/dealerships`)
 
 | Método | Endpoint | Descripción | Auth |
@@ -152,42 +497,42 @@ messenger/
 | `PUT` | `/dealerships/{id}` | Actualizar | ADMIN |
 | `DELETE` | `/dealerships/{id}` | Eliminar | ADMIN |
 
+---
+
 ### Servicios de Entrega (`/services`)
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| `POST` | `/services/create` | Crear servicio (multipart: image, dealershipId, messengerDocument, manualPlateNumber) |
-| `PUT` | `/services/{id}/status` | Actualizar estado (multipart: status, observation, signature, photos) |
+| `POST` | `/services/create` | Crear servicio (multipart) |
+| `PUT` | `/services/{id}/status` | Actualizar estado |
 | `GET` | `/services` | Listar todos (ADMIN) o propios (MESSENGER) |
 | `GET` | `/services/{id}` | Obtener por ID |
 | `GET` | `/services/messenger/{doc}` | Filtrar por mensajero |
 | `GET` | `/services/dealership/{id}` | Filtrar por concesionario |
 | `GET` | `/services/status/{status}` | Filtrar por estado |
 
-### Archivos (`/api/files`)
-
-| Método | Endpoint | Descripción | Auth |
-|--------|----------|-------------|------|
-| `GET` | `/api/files/{filename}` | Obtener archivo | 🔓 Público |
+---
 
 ### Ubicaciones y Rutas (`/locations`)
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | `POST` | `/locations/geocode` | Convertir dirección a coordenadas |
-| `POST` | `/locations/route` | Calcular ruta optimizada para múltiples destinos |
-| `GET` | `/locations/distance` | Calcular distancia entre dos puntos |
-| `GET` | `/locations/reverse` | Convertir coordenadas a dirección (reverse geocoding) |
+| `POST` | `/locations/route` | Calcular ruta optimizada |
+| `GET` | `/locations/distance` | Distancia entre dos puntos |
+| `GET` | `/locations/reverse` | Coordenadas a dirección |
+
+---
 
 ### Tracking en Tiempo Real (`/api/tracking`)
 
 | Método | Endpoint | Descripción | Auth |
 |--------|----------|-------------|------|
-| `POST` | `/api/tracking/update` | Actualizar ubicación del mensajero | MESSENGER/ADMIN |
-| `GET` | `/api/tracking/messenger/{id}` | Obtener última ubicación de mensajero | ADMIN |
-| `GET` | `/api/tracking/active` | Listar todos los mensajeros activos | ADMIN |
-| `GET` | `/api/tracking/history/{id}` | Historial de tracking por fecha | MESSENGER/ADMIN |
-| `GET` | `/api/tracking/service/{id}` | Historial de tracking por servicio | MESSENGER/ADMIN |
+| `POST` | `/api/tracking/update` | Actualizar ubicación | MESSENGER/ADMIN |
+| `GET` | `/api/tracking/messenger/{id}` | Última ubicación | ADMIN |
+| `GET` | `/api/tracking/active` | Mensajeros activos | ADMIN |
+| `GET` | `/api/tracking/history/{id}` | Historial por fecha | MESSENGER/ADMIN |
+| `GET` | `/api/tracking/service/{id}` | Historial por servicio | MESSENGER/ADMIN |
 
 ---
 
@@ -211,6 +556,8 @@ erDiagram
         String address
         String phone
         String zone
+        Double latitude
+        Double longitude
     }
     
     plates {
@@ -253,6 +600,17 @@ erDiagram
         Long service_delivery_id FK
     }
     
+    tracking_history {
+        Long id PK
+        Long messenger_id FK
+        Long service_id FK
+        Double latitude
+        Double longitude
+        TrackingStatus status
+        TrackingSource source
+        LocalDateTime timestamp
+    }
+    
     employees ||--o{ service_deliveries : "delivers"
     dealerships ||--o{ service_deliveries : "receives"
     plates ||--o{ service_deliveries : "has"
@@ -261,34 +619,43 @@ erDiagram
     service_deliveries ||--o{ status_history : "tracks"
     employees ||--o{ status_history : "changes"
     status_history ||--o{ photos : "evidence"
+    employees ||--o{ tracking_history : "tracked"
+    service_deliveries ||--o{ tracking_history : "route"
 ```
 
 ### Enums
 
-**Role:** `ADMIN`, `MESSENGER`
-
-**PlateType:** `CAR` (ABC 123), `MOTORCYCLE` (ABC 12A), `MOTORCAR` (123 ABC)
-
-**Status:** `ASSIGNED`, `PENDING`, `DELIVERED`, `FAILED`, `RETURNED`, `CANCELED`, `OBSERVED`, `RESOLVED`
+| Enum | Valores |
+|------|---------|
+| **Role** | `ADMIN`, `MESSENGER` |
+| **PlateType** | `CAR` (ABC 123), `MOTORCYCLE` (ABC 12A), `MOTORCAR` (123 ABC) |
+| **Status** | `ASSIGNED`, `PENDING`, `DELIVERED`, `FAILED`, `RETURNED`, `CANCELED`, `OBSERVED`, `RESOLVED` |
+| **PhotoType** | `EVIDENCE`, `SIGNATURE`, `PLATE` |
+| **TrackingStatus** | `ACTIVE`, `INACTIVE`, `OFFLINE` |
+| **TrackingSource** | `GPS`, `NETWORK`, `MANUAL` |
 
 ---
 
 ## 📡 Tracking en Tiempo Real
 
-El sistema implementa tracking GPS en vivo usando **Redis** + **WebSocket** para monitoreo de mensajeros.
+Sistema de tracking GPS usando **Redis** + **WebSocket** para monitoreo de mensajeros.
 
-### Características:
-- 🔴 **Ubicación en vivo**: Actualización cada 30 segundos
-- 📍 **Validación de entrega**: Radio máximo de 200 metros del concesionario
-- 📊 **Historial completo**: Retención de 30 días de trayectorias
-- ⚡ **Baja latencia**: Redis para caché de ubicaciones activas
-- 🌐 **WebSocket**: Notificaciones push en tiempo real
+### Características
 
-### Integración Google Maps:
-- **Geocoding**: Conversión dirección ↔ coordenadas
-- **Directions API**: Cálculo de rutas optimizadas
-- **Distance Matrix**: Estimación de tiempos de llegada
-- **Reverse Geocoding**: Obtener dirección desde coordenadas
+| Feature | Descripción |
+|---------|-------------|
+| 🔴 **Ubicación en vivo** | Actualización cada 30 segundos |
+| 📍 **Validación de entrega** | Radio máximo de 200m del destino |
+| 📊 **Historial completo** | Retención de 30 días |
+| ⚡ **Baja latencia** | Redis para caché de ubicaciones |
+| 🌐 **WebSocket** | Notificaciones push en tiempo real |
+
+### Integración Google Maps
+
+- **Geocoding**: Dirección ↔ Coordenadas
+- **Directions API**: Rutas optimizadas
+- **Distance Matrix**: Estimación de tiempos
+- **Reverse Geocoding**: Coordenadas → Dirección
 
 ---
 
@@ -313,154 +680,163 @@ stateDiagram-v2
 
 | Estado | Firma | Fotos | Observación |
 |--------|:-----:|:-----:|:-----------:|
-| `DELIVERED` | ✅ Requerida | ⚪ Opcional | ⚪ Opcional |
-| `PENDING` | ✅ Requerida | ✅ Requeridas | ✅ Requerida |
-| `FAILED` | ✅ Requerida | ✅ Requeridas | ✅ Requerida |
-| `RETURNED` | ✅ Requerida | ✅ Requeridas | ✅ Requerida |
-| `CANCELED` | ⚪ No aplica | ⚪ No aplica | ⚪ No aplica |
-| `OBSERVED` | ⚪ No aplica | ⚪ No aplica | ⚪ No aplica |
+| `DELIVERED` | ✅ | ⚪ | ⚪ |
+| `PENDING` | ✅ | ✅ | ✅ |
+| `FAILED` | ✅ | ✅ | ✅ |
+| `RETURNED` | ✅ | ✅ | ✅ |
+| `CANCELED` | ⚪ | ⚪ | ⚪ |
+| `OBSERVED` | ⚪ | ⚪ | ⚪ |
 
 ---
 
 ## 🔐 Seguridad
 
-### Autenticación JWT
-- Tokens firmados con HMAC-SHA256
-- Expiración: 30 minutos
-- Header: `Authorization: Bearer <token>`
+### Autenticación JWT con Refresh Tokens
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Client    │────▶│   /login    │────▶│   Server    │
+└─────────────┘     └─────────────┘     └─────────────┘
+                           │
+                           ▼
+              ┌─────────────────────────┐
+              │  {                      │
+              │    accessToken: "...",  │
+              │    refreshToken: "...", │
+              │    expiresIn: 1800      │
+              │  }                      │
+              └─────────────────────────┘
+```
+
+| Token | Duración (prod) | Uso |
+|-------|-----------------|-----|
+| **Access Token** | 30 minutos | Header `Authorization: Bearer <token>` |
+| **Refresh Token** | 7 días | Endpoint `/auth/refresh` para renovar |
 
 ### Roles y Permisos
-- **ADMIN**: Acceso completo a todos los endpoints
-- **MESSENGER**: Solo puede ver/gestionar sus propios servicios
 
-### CORS
-Orígenes permitidos (desarrollo):
-- `http://localhost:3000` (React)
-- `http://localhost:4200` (Angular)
-- `http://localhost:5173` (Vite)
+- **ADMIN**: Acceso completo a todos los endpoints
+- **MESSENGER**: Solo gestiona sus propios servicios y ubicación
+
+### Headers de Seguridad (Producción)
+
+- HSTS (HTTP Strict Transport Security)
+- Cookies: `Secure`, `HttpOnly`, `SameSite=Strict`
+- CORS configurado por origen
+- Sin exposición de stack traces
 
 ---
 
 ## ⚙️ Configuración e Instalación
 
 ### Prerrequisitos
-- Java 21+
-- MySQL 8.0+
-- Redis 6.0+
-- Maven 3.9+
-- Credenciales de Google Cloud (Vision + Storage)
-- API Key de Google Maps Platform
 
-### 1. Clonar repositorio
+| Requisito | Versión |
+|-----------|---------|
+| Java | 21+ |
+| MySQL | 8.0+ |
+| Redis | 6.0+ |
+| Maven | 3.9+ |
+
+### Variables de Entorno
+
+<details>
+<summary><b>🔐 Variables Requeridas</b></summary>
+
 ```bash
-git clone <repository-url>
-cd messenger-backend/messenger
-```
-
-### 2. Configurar Base de Datos
-```sql
-CREATE DATABASE messenger;
-```
-
-### 3. Configurar Redis
-Redis se utiliza para el tracking en tiempo real de mensajeros.
-
-**macOS (Homebrew):**
-```bash
-brew install redis
-brew services start redis
-```
-
-**Linux (Ubuntu/Debian):**
-```bash
-sudo apt update
-sudo apt install redis-server
-sudo systemctl start redis-server
-```
-
-**Verificar instalación:**
-```bash
-redis-cli ping
-# Debe responder: PONG
-```
-
-### 4. Configurar `application.properties`
-```properties
 # Base de Datos
-spring.datasource.url=jdbc:mysql://localhost:3306/messenger
-spring.datasource.username=root
-spring.datasource.password=<tu-password>
-
-# Google Cloud Storage
-google.cloud.storage.bucket-name=<tu-bucket-name>
-google.cloud.storage.project-id=<tu-project-id>
-google.cloud.storage.signed-url-expiration-hours=24
-
-# Google Cloud Vision
-google.cloud.vision.project-id=<tu-project-id>
-
-# Google Maps Platform
-google.maps.api.key=<tu-api-key>
-
-# Redis (tracking en tiempo real)
-spring.data.redis.host=localhost
-spring.data.redis.port=6379
-
-# WebSocket (notificaciones en tiempo real)
-websocket.allowed.origins=http://localhost:3000,http://localhost:5173,http://localhost:4200
-
-# Configuración de Tracking
-tracking.update.interval=30000
-tracking.max.distance.validation=200
-tracking.history.retention.days=30
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=messenger
+DB_USERNAME=root
+DB_PASSWORD=your_password
 
 # JWT
-jwt.secret=<tu-clave-secreta-base64>
-jwt.expiration=1800000
+JWT_SECRET=your_base64_encoded_secret_key
+
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=            # Solo producción
+
+# Google Cloud
+GCP_PROJECT_ID=your_project_id
+GCS_BUCKET_NAME=your_bucket_name
+GOOGLE_MAPS_API_KEY=your_api_key
+GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
 ```
 
-### 5. Configurar Google Cloud (Vision + Storage)
+</details>
 
-#### Opción recomendada: Application Default Credentials (ADC)
+### Instalación Rápida
+
 ```bash
-# Configura ADC con tu cuenta de Google Cloud
-gcloud auth application-default login
+# 1. Clonar
+git clone <repository-url>
+cd messenger-backend/messenger
 
-# O establece la variable de entorno
-export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
-```
+# 2. Configurar variables (ver sección anterior)
 
-#### Características de Google Cloud Storage:
-- **URLs firmadas temporales**: Acceso seguro sin bucket público
-- **Expiración automática**: Las URLs expiran después de 24 horas (configurable)
-- **Almacenamiento privado**: Máxima seguridad para evidencias legales
-- **Escalabilidad infinita**: No consume espacio del servidor
-- **CDN global**: Entrega rápida desde cualquier ubicación
+# 3. Iniciar Redis
+redis-server
 
-### 6. Ejecutar
-```bash
-./mvnw spring-boot:run
+# 4. Ejecutar
+./mvnw spring-boot:run -Dspring.profiles.active=dev
 ```
 
 La API estará disponible en `http://localhost:8080`
 
 ---
 
-## 📬 Colección Postman
+## 🔄 CI/CD
 
-Importa la colección incluida para probar todos los endpoints:
+Pipeline automatizado con **GitHub Actions**:
+
+```yaml
+# .github/workflows/maven.yml
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+```
+
+### Características
+
+| Feature | Descripción |
+|---------|-------------|
+| ✅ Build automático | Java 21 + Maven |
+| ✅ Caché de dependencias | Builds más rápidos |
+| ✅ Secrets seguros | Inyección de credenciales |
+| ✅ Testing | Profile `test` con H2 |
+
+### Secrets de GitHub Requeridos
+
+```
+DB_HOST, DB_PORT, DB_USERNAME
+JWT_SECRET
+REDIS_HOST, REDIS_PORT
+GCP_PROJECT_ID, GCS_BUCKET_NAME
+GOOGLE_MAPS_API_KEY
+GOOGLE_APPLICATION_CREDENTIALS_JSON
+```
+
+---
+
+## 📬 Colección Postman
 
 📄 **[Messenger_API.postman_collection.json](./Messenger_API.postman_collection.json)**
 
-### Características:
-- ✅ Guardado automático de token JWT
+### Características
+
+- ✅ Token JWT guardado automáticamente
 - ✅ Variables de entorno preconfiguradas
 - ✅ Ejemplos de payloads para todos los endpoints
-- ✅ Documentación inline de cada request
 
-### Uso:
+### Uso
+
 1. Importar colección en Postman
-2. Ejecutar "Login" primero (el token se guarda automáticamente)
+2. Ejecutar "Login" primero
 3. Los demás endpoints usarán el token guardado
 
 ---
@@ -468,3 +844,11 @@ Importa la colección incluida para probar todos los endpoints:
 ## 📄 Licencia
 
 Ver archivo [LICENSE](./LICENSE) para detalles.
+
+---
+
+<div align="center">
+
+**Made with ❤️ using Spring Boot 4.0**
+
+</div>

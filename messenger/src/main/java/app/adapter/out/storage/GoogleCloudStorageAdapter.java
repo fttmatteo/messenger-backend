@@ -6,6 +6,7 @@ import com.google.cloud.storage.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -53,10 +54,14 @@ import java.util.concurrent.TimeUnit;
  * - Local: Variable GOOGLE_APPLICATION_CREDENTIALS
  * - Producción: Service Account del entorno
  * 
+ * NOTA: Este bean solo se carga cuando app.storage.type=gcs
+ * Para tests o desarrollo local, usar app.storage.type=local
+ * 
  * @see app.domain.ports.StoragePort
  * @see com.google.cloud.storage.Storage
  */
 @Component
+@ConditionalOnProperty(name = "app.storage.type", havingValue = "gcs")
 public class GoogleCloudStorageAdapter implements StoragePort {
 
     private static final Logger logger = LoggerFactory.getLogger(GoogleCloudStorageAdapter.class);

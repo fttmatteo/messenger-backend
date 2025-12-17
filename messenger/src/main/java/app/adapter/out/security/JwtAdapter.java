@@ -72,10 +72,18 @@ public class JwtAdapter implements AuthenticationPort {
     public JwtAdapter(
             @Value("${jwt.secret}") String secret,
             @Value("${jwt.expiration:1800000}") long expiration) {
+
+        // ========== VALIDACIÓN DE SEGURIDAD ==========
+        // El secret debe tener al menos 256 bits (32 caracteres) para HS256
+        if (secret == null || secret.length() < 32) {
+            throw new IllegalArgumentException(
+                    "SEGURIDAD: JWT_SECRET debe tener al menos 32 caracteres (256 bits) para ser seguro. " +
+                            "Genere uno con: openssl rand -base64 64");
+        }
+
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationTime = expiration;
-        this.refreshExpirationTime = expiration * 24; // 24 times the access token expiration (e.g., 1 day if access is
-                                                      // 1h)
+        this.refreshExpirationTime = expiration * 24; // 24 times the access token expiration
         logger.info("JwtAdapter inicializado con tiempo de expiración: {} ms y refresh: {} ms", expiration,
                 refreshExpirationTime);
     }
