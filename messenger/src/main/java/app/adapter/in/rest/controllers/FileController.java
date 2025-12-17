@@ -27,7 +27,7 @@ import java.nio.file.Paths;
  * - Verificación de que archivos estén dentro del directorio permitido
  */
 @RestController
-@RequestMapping("/api/files")
+@RequestMapping("/files")
 public class FileController {
 
     private static final Logger logger = LoggerFactory.getLogger(FileController.class);
