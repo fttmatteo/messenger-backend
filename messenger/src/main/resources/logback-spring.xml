@@ -15,7 +15,7 @@
     <property name="CONSOLE_LOG_PATTERN" 
               value="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [%thread] %cyan(%logger{36}) - %msg%n"/>
 
-    <!-- Appender para consola (desarrollo) -->
+    <!-- Appender para consola (desarrollo y producción en Cloud Run) -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>${CONSOLE_LOG_PATTERN}</pattern>
@@ -23,7 +23,14 @@
         </encoder>
     </appender>
 
+    <!-- 
+      NOTA CLOUD RUN: 
+      Los appenders de archivo se han comentado porque Cloud Run tiene sistema de archivos de solo lectura.
+      Logs se envían a stdout (CONSOLE) y Google Cloud Logging los captura automáticamente.
+    -->
+
     <!-- Appender para archivo general -->
+    <!--
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/${APP_NAME}.log</file>
         <encoder>
@@ -31,16 +38,15 @@
             <charset>UTF-8</charset>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <!-- Rotación diaria y por tamaño -->
             <fileNamePattern>${LOG_PATH}/${APP_NAME}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-            <!-- Máximo 10MB por archivo -->
             <maxFileSize>10MB</maxFileSize>
-            <!-- Mantener logs de los últimos 30 días -->
             <maxHistory>30</maxHistory>
         </rollingPolicy>
     </appender>
+    -->
 
     <!-- Appender específico para errores -->
+    <!--
     <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/${APP_NAME}-error.log</file>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -56,8 +62,10 @@
             <maxHistory>90</maxHistory>
         </rollingPolicy>
     </appender>
+    -->
 
     <!-- Appender para servicios externos (Google APIs, etc.) -->
+    <!--
     <appender name="EXTERNAL_SERVICES" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/${APP_NAME}-external.log</file>
         <encoder>
@@ -69,8 +77,10 @@
             <maxHistory>15</maxHistory>
         </rollingPolicy>
     </appender>
+    -->
 
     <!-- Appender para tracking y ubicaciones -->
+    <!--
     <appender name="TRACKING" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/${APP_NAME}-tracking.log</file>
         <encoder>
@@ -82,8 +92,10 @@
             <maxHistory>7</maxHistory>
         </rollingPolicy>
     </appender>
+    -->
 
     <!-- Appender para seguridad (autenticación, JWT) -->
+    <!--
     <appender name="SECURITY" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/${APP_NAME}-security.log</file>
         <encoder>
@@ -95,6 +107,7 @@
             <maxHistory>90</maxHistory>
         </rollingPolicy>
     </appender>
+    -->
 
     <!-- ===================================== -->
     <!-- LOGGERS ESPECÍFICOS POR COMPONENTE   -->
@@ -102,47 +115,39 @@
 
     <!-- Logger para manejo global de excepciones -->
     <logger name="app.infrastructure.config.GlobalExceptionHandler" level="ERROR" additivity="false">
-        <appender-ref ref="ERROR_FILE"/>
-        <appender-ref ref="FILE"/>
+        <appender-ref ref="CONSOLE"/>
     </logger>
 
     <!-- Logger para servicios externos (Google Maps, Vision, Cloud Storage) -->
     <logger name="app.adapter.out.maps" level="INFO" additivity="false">
-        <appender-ref ref="EXTERNAL_SERVICES"/>
-        <appender-ref ref="ERROR_FILE"/>
+        <appender-ref ref="CONSOLE"/>
     </logger>
 
     <logger name="app.adapter.out.ocr" level="INFO" additivity="false">
-        <appender-ref ref="EXTERNAL_SERVICES"/>
-        <appender-ref ref="ERROR_FILE"/>
+        <appender-ref ref="CONSOLE"/>
     </logger>
 
     <logger name="app.adapter.out.storage" level="INFO" additivity="false">
-        <appender-ref ref="EXTERNAL_SERVICES"/>
-        <appender-ref ref="ERROR_FILE"/>
+        <appender-ref ref="CONSOLE"/>
     </logger>
 
     <!-- Logger para tracking de mensajeros -->
     <logger name="app.adapter.out.tracking" level="INFO" additivity="false">
-        <appender-ref ref="TRACKING"/>
-        <appender-ref ref="ERROR_FILE"/>
+        <appender-ref ref="CONSOLE"/>
     </logger>
 
     <!-- Logger para seguridad y autenticación -->
     <logger name="app.adapter.out.security" level="INFO" additivity="false">
-        <appender-ref ref="SECURITY"/>
-        <appender-ref ref="ERROR_FILE"/>
+        <appender-ref ref="CONSOLE"/>
     </logger>
 
     <logger name="app.infrastructure.security" level="INFO" additivity="false">
-        <appender-ref ref="SECURITY"/>
-        <appender-ref ref="ERROR_FILE"/>
+        <appender-ref ref="CONSOLE"/>
     </logger>
 
     <!-- Logger para casos de uso críticos -->
     <logger name="app.application.usecase.ServiceDeliveryUseCase" level="INFO" additivity="false">
-        <appender-ref ref="FILE"/>
-        <appender-ref ref="ERROR_FILE"/>
+        <appender-ref ref="CONSOLE"/>
     </logger>
 
     <!-- Reducir verbosidad de frameworks -->
@@ -160,7 +165,6 @@
         <!-- Nivel DEBUG para ver todos los detalles -->
         <logger name="app" level="DEBUG" additivity="false">
             <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="FILE"/>
         </logger>
 
         <!-- Mostrar queries SQL en desarrollo -->
@@ -169,7 +173,6 @@
 
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="FILE"/>
         </root>
     </springProfile>
 
@@ -177,24 +180,21 @@
     <springProfile name="prod">
         <!-- Nivel INFO para reducir ruido en producción -->
         <logger name="app" level="INFO" additivity="false">
-            <appender-ref ref="FILE"/>
-            <appender-ref ref="ERROR_FILE"/>
+            <appender-ref ref="CONSOLE"/>
         </logger>
 
         <!-- NO mostrar logs de Hibernate en producción -->
         <logger name="org.hibernate.SQL" level="WARN"/>
 
-        <!-- Solo archivos, no consola -->
+        <!-- Logs a consola (Cloud Run captura stdout/stderr) -->
         <root level="WARN">
-            <appender-ref ref="FILE"/>
-            <appender-ref ref="ERROR_FILE"/>
+            <appender-ref ref="CONSOLE"/>
         </root>
     </springProfile>
 
     <!-- Configuración por defecto (cuando no hay perfil activo) -->
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="FILE"/>
     </root>
 
 </configuration>
