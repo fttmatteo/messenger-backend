@@ -127,8 +127,17 @@ export SPRING_PROFILES_ACTIVE=dev
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/auth/login` | Login with credentials |
-| `POST` | `/auth/refresh` | Refresh access token |
+| `POST` | `/auth/login` | Login with credentials and receive access + refresh tokens |
+| `POST` | `/auth/refresh` | Refresh access token using refresh token |
+
+**Login Response:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIs...",
+  "role": "ADMIN"
+}
+```
 
 </details>
 
@@ -203,13 +212,28 @@ export SPRING_PROFILES_ACTIVE=dev
 ### 🔐 Security
 
 **JWT Authentication with Refresh Tokens:**
-- Access Token: 30 min (prod) / 2 hours (dev)
-- Refresh Token: 7 days
-- Algorithm: HMAC-SHA256
+
+The system implements a dual-token authentication strategy:
+- **Access Token**: Short-lived JWT for API requests
+  - Production: 30 minutes
+  - Development: 2 hours
+  - Local: 8 hours
+- **Refresh Token**: Long-lived JWT for session renewal
+  - Duration: 7 days
+  - Used to obtain new access tokens without re-login
+- **Algorithm**: HMAC-SHA256
+- **Storage**: Tokens managed client-side (never stored server-side)
 
 **Roles:**
-- `ADMIN`: Full access
-- `MESSENGER`: Own services only
+- `ADMIN`: Full access to all endpoints and resources
+- `MESSENGER`: Limited access to own services and location updates
+
+**Refresh Flow:**
+1. Login returns both `token` and `refreshToken`
+2. Use `token` for API requests in `Authorization: Bearer <token>` header
+3. When `token` expires, call `/auth/refresh` with `refreshToken`
+4. Receive new `token` and `refreshToken` pair
+5. Refresh token rotation ensures enhanced security
 
 ---
 
@@ -249,6 +273,14 @@ Automated pipeline via GitHub Actions:
 - ✅ Java 21 + Maven caching
 - ✅ Secure secrets injection
 - ✅ Google Cloud credentials handling
+- ✅ Automated testing with H2 in-memory database
+
+### 🧪 Testing
+
+- **Unit Tests**: Comprehensive coverage for all adapters
+- **Integration Tests**: JPA repositories and domain services
+- **Test Profile**: Isolated H2 database, no external dependencies
+- **Coverage**: 100+ tests across adapters, use cases, and repositories
 
 </details>
 
@@ -460,16 +492,22 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Método | Endpoint | Descripción | Auth |
 |--------|----------|-------------|------|
-| `POST` | `/auth/login` | Iniciar sesión | 🔓 Público |
-| `POST` | `/auth/refresh` | Renovar access token | 🔓 Público |
+| `POST` | `/auth/login` | Iniciar sesión y obtener tokens | 🔓 Público |
+| `POST` | `/auth/refresh` | Renovar access token con refresh token | 🔓 Público |
 
 **Respuesta de Login:**
 ```json
 {
-  "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+  "token": "eyJhbGciOiJIUzI1NiIs...",
   "refreshToken": "eyJhbGciOiJIUzI1NiIs...",
-  "tokenType": "Bearer",
-  "expiresIn": 1800
+  "role": "ADMIN"
+}
+```
+
+**Solicitud de Refresh:**
+```json
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
 }
 ```
 
@@ -701,17 +739,42 @@ stateDiagram-v2
                            ▼
               ┌─────────────────────────┐
               │  {                      │
-              │    accessToken: "...",  │
+              │    token: "...",        │
               │    refreshToken: "...", │
-              │    expiresIn: 1800      │
+              │    role: "ADMIN"        │
               │  }                      │
               └─────────────────────────┘
+                           │
+                           ▼
+                   ┌───────────────┐
+                   │  API Request  │
+                   │  Header:      │
+                   │  Authorization│
+                   │  Bearer token │
+                   └───────────────┘
+                           │
+                  Token expired?
+                           │
+                           ▼
+                   ┌───────────────┐
+                   │ /auth/refresh │
+                   │ refreshToken  │
+                   └───────────────┘
+                           │
+                           ▼
+                   New token pair
 ```
 
-| Token | Duración (prod) | Uso |
-|-------|-----------------|-----|
-| **Access Token** | 30 minutos | Header `Authorization: Bearer <token>` |
-| **Refresh Token** | 7 días | Endpoint `/auth/refresh` para renovar |
+| Token | Duración (prod) | Duración (dev) | Duración (local) | Uso |
+|-------|-----------------|----------------|------------------|-----|
+| **Access Token** | 30 minutos | 2 horas | 8 horas | Header `Authorization: Bearer <token>` |
+| **Refresh Token** | 7 días | 7 días | 7 días | Endpoint `/auth/refresh` para renovar |
+
+**Características de Seguridad:**
+- 🔄 **Token Rotation**: Cada refresh genera un nuevo par de tokens
+- 🔒 **Stateless**: No se almacenan tokens en el servidor (Redis solo para caché de datos)
+- ⏱️ **Expiración Automática**: Tokens expire automáticamente
+- 🛡️ **HMAC-SHA256**: Algoritmo robusto de firma digital
 
 ### Roles y Permisos
 
@@ -829,15 +892,34 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 
 ### Características
 
-- ✅ Token JWT guardado automáticamente
-- ✅ Variables de entorno preconfiguradas
-- ✅ Ejemplos de payloads para todos los endpoints
+- ✅ **Token JWT y Refresh Token** guardados automáticamente
+- ✅ **Variables de entorno** preconfiguradas (`baseUrl`, `token`, `refreshToken`)
+- ✅ **Tests automáticos** que guardan tokens en variables de colección
+- ✅ **Ejemplos de payloads** para todos los endpoints
+- ✅ **7 controladores** completamente documentados:
+  - 🔐 Authentication (Login + Refresh)
+  - 👥 Employees
+  - 🏢 Dealerships
+  - 📍 Locations
+  - 📡 Tracking
+  - 📦 Service Deliveries
+  - 📁 Files
 
 ### Uso
 
 1. Importar colección en Postman
-2. Ejecutar "Login" primero
-3. Los demás endpoints usarán el token guardado
+2. Configurar variable `baseUrl` (default: `http://localhost:8080`)
+3. Ejecutar **"Login"** primero
+4. Los tokens (`token` y `refreshToken`) se guardan automáticamente
+5. Todos los demás endpoints usan el token automáticamente
+6. Cuando el access token expire, ejecutar **"Refresh Token"**
+
+### Actualización Reciente
+
+> **Última actualización**: Diciembre 2024
+> - ✨ Añadido endpoint de refresh token
+> - 🔄 Mejorado manejo automático de tokens
+> - 📝 Actualizada documentación de respuestas
 
 ---
 
