@@ -67,10 +67,19 @@ services:
   messenger-redis:
     image: redis:alpine
     container_name: messenger-redis
-    ports:
-      - "6379:6379"
+    # SEGURIDAD: Puerto no expuesto al host, solo accesible dentro de la red Docker
+    # ports:
+    #   - "6379:6379"  # Comentado por seguridad - descomentar solo si es necesario acceso externo
+    # Autenticación con contraseña
+    command: redis-server --requirepass ${REDIS_PASSWORD:-redis_secure_password_dev}
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redis_secure_password_dev}
     networks:
       - messenger-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis_secure_password_dev}", "ping"]
+      timeout: 5s
+      retries: 5
 
 # ============================================
 # VOLÚMENES Y REDES

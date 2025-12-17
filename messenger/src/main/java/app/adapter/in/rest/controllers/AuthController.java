@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import app.application.usecase.LoginUseCase;
+import app.application.usecase.RefreshTokenUseCase;
 import app.domain.model.auth.AuthCredentials;
 import app.domain.model.auth.TokenResponse;
 
@@ -45,7 +46,7 @@ public class AuthController {
     }
 
     @Autowired
-    private app.application.usecase.RefreshTokenUseCase refreshTokenUseCase;
+    private RefreshTokenUseCase refreshTokenUseCase;
 
     /**
      * Refresca el token de acceso utilizando un refresh token válido.

@@ -183,9 +183,15 @@ public class ServiceDeliveryController {
 
     /**
      * Busca un servicio de entrega por su ID.
+     * 
+     * Implementa validación de ownership:
+     * - ADMIN puede ver cualquier servicio
+     * - MESSENGER solo puede ver servicios asignados a él
      *
      * @param id ID del servicio.
      * @return Datos del servicio encontrado o 404 si no existe.
+     * @throws UnauthorizedException si el usuario no tiene permiso para ver el
+     *                               servicio.
      */
     @GetMapping("/{id}")
     public ResponseEntity<ServiceDeliveryResponse> findById(@PathVariable Long id) throws Exception {
@@ -193,6 +199,22 @@ public class ServiceDeliveryController {
         if (service == null) {
             throw new ResourceNotFoundException("Servicio con ID " + id + " no encontrado");
         }
+
+        // ========== VALIDACIÓN DE OWNERSHIP ==========
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserName = auth.getName();
+        Employee currentUser = employeePort.findByUserName(currentUserName);
+
+        if (currentUser != null && currentUser.getRole() == Role.MESSENGER) {
+            // Verificar que el servicio pertenece al mensajero actual
+            if (service.getMessenger() == null ||
+                    !service.getMessenger().getDocument().equals(currentUser.getDocument())) {
+                logger.warn("SEGURIDAD: Usuario {} intentó acceder a servicio {} sin permiso",
+                        currentUserName, id);
+                throw new UnauthorizedException("No tienes permiso para ver este servicio");
+            }
+        }
+
         return ResponseEntity.ok(responseMapper.toResponse(service));
     }
 
