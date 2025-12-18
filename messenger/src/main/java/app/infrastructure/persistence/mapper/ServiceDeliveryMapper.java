@@ -4,6 +4,10 @@ import app.domain.model.*;
 import app.infrastructure.persistence.entities.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -25,21 +29,6 @@ public class ServiceDeliveryMapper {
     /**
      * Convierte un modelo de dominio ServiceDelivery a su entidad JPA
      * correspondiente.
-     * 
-     * Realiza una conversión compleja que incluye:
-     * - Mapeo de la placa del vehículo (usando PlateMapper)
-     * - Mapeo del concesionario (usando DealershipMapper)
-     * - Mapeo del mensajero asignado (usando EmployeeMapper)
-     * - Conversión de firma digital si existe
-     * - Conversión de lista de fotos de evidencia
-     * - Conversión de historial de cambios de estado con sus fotos asociadas
-     * 
-     * Todas las relaciones bidireccionales se configuran correctamente para
-     * mantener la integridad referencial en JPA.
-     * 
-     * @param serviceDelivery El modelo de dominio a convertir (puede ser null)
-     * @return La entidad JPA correspondiente con todas sus relaciones, o null si el
-     *         parámetro es null
      */
     public ServiceDeliveryEntity toEntity(ServiceDelivery serviceDelivery) {
         if (serviceDelivery == null)
@@ -62,13 +51,14 @@ public class ServiceDeliveryMapper {
             entity.setSignature(sigEntity);
         }
 
+        // Cache para evitar entidades duplicadas (Multiple representations error)
+        // Reutilizamos la misma instancia de PhotoEntity si aparece en varias listas
+        Map<Long, PhotoEntity> existingPhotoCache = new HashMap<>();
+        Map<Photo, PhotoEntity> newPhotoCache = new IdentityHashMap<>();
+
         if (serviceDelivery.getPhotos() != null) {
             entity.setPhotos(serviceDelivery.getPhotos().stream().map(p -> {
-                PhotoEntity pEntity = new PhotoEntity();
-                pEntity.setIdPhoto(p.getIdPhoto());
-                pEntity.setPhotoPath(p.getPhotoPath());
-                pEntity.setUploadDate(p.getUploadDate());
-                pEntity.setPhotoType(p.getPhotoType());
+                PhotoEntity pEntity = getOrCreatePhotoEntity(p, existingPhotoCache, newPhotoCache);
                 pEntity.setServiceDelivery(entity);
                 return pEntity;
             }).collect(Collectors.toList()));
@@ -83,17 +73,13 @@ public class ServiceDeliveryMapper {
                 hEntity.setChangeDate(h.getChangeDate());
                 hEntity.setChangedBy(employeeMapper.toEntity(h.getChangedBy()));
                 hEntity.setServiceDelivery(entity);
+
                 if (h.getPhotos() != null) {
                     hEntity.setPhotos(h.getPhotos().stream().map(p -> {
-                        PhotoEntity pEntity = new PhotoEntity();
-                        pEntity.setIdPhoto(p.getIdPhoto());
-                        pEntity.setPhotoPath(p.getPhotoPath());
-                        pEntity.setUploadDate(p.getUploadDate());
-                        pEntity.setPhotoType(p.getPhotoType());
+                        PhotoEntity pEntity = getOrCreatePhotoEntity(p, existingPhotoCache, newPhotoCache);
                         pEntity.setStatusHistory(hEntity);
-                        pEntity.setServiceDelivery(entity); // Maintain service link too? UpdateServiceDelivery logic
-                                                            // will decide. Safest to set if possible, but might be
-                                                            // redundant.
+                        // Aseguramos que también esté vinculada al servicio si es la misma foto
+                        pEntity.setServiceDelivery(entity);
                         return pEntity;
                     }).collect(Collectors.toList()));
                 }
@@ -104,26 +90,38 @@ public class ServiceDeliveryMapper {
         return entity;
     }
 
+    private PhotoEntity getOrCreatePhotoEntity(Photo p, Map<Long, PhotoEntity> existingCache,
+            Map<Photo, PhotoEntity> newCache) {
+        // Para fotos existentes (con ID), usamos el ID como clave única
+        if (p.getIdPhoto() != null) {
+            if (existingCache.containsKey(p.getIdPhoto())) {
+                return existingCache.get(p.getIdPhoto());
+            }
+            PhotoEntity entity = mapPhotoBasic(p);
+            existingCache.put(p.getIdPhoto(), entity);
+            return entity;
+        } else {
+            // Para fotos nuevas (sin ID), usamos la identidad del objeto
+            if (newCache.containsKey(p)) {
+                return newCache.get(p);
+            }
+            PhotoEntity entity = mapPhotoBasic(p);
+            newCache.put(p, entity);
+            return entity;
+        }
+    }
+
+    private PhotoEntity mapPhotoBasic(Photo p) {
+        PhotoEntity pEntity = new PhotoEntity();
+        pEntity.setIdPhoto(p.getIdPhoto());
+        pEntity.setPhotoPath(p.getPhotoPath());
+        pEntity.setUploadDate(p.getUploadDate());
+        pEntity.setPhotoType(p.getPhotoType());
+        return pEntity;
+    }
+
     /**
      * Convierte una entidad JPA ServiceDeliveryEntity a modelo de dominio.
-     * 
-     * Reconstruye el objeto de dominio completo desde la base de datos, incluyendo:
-     * - Datos de la placa del vehículo
-     * - Información del concesionario de destino
-     * - Datos del mensajero asignado
-     * - Firma digital del responsable en concesionario
-     * - Fotos de evidencia de la entrega
-     * - Historial completo de cambios de estado
-     * - Fotos asociadas a cada cambio de estado
-     * 
-     * Utiliza los mappers especializados (PlateMapper, DealershipMapper,
-     * EmployeeMapper)
-     * para convertir cada entidad relacionada a su correspondiente modelo de
-     * dominio.
-     * 
-     * @param entity La entidad JPA a convertir (puede ser null)
-     * @return El modelo de dominio completo con todas sus relaciones, o null si la
-     *         entidad es null
      */
     public ServiceDelivery toDomain(ServiceDeliveryEntity entity) {
         if (entity == null)
@@ -146,14 +144,9 @@ public class ServiceDeliveryMapper {
         }
 
         if (entity.getPhotos() != null) {
-            serviceDelivery.setPhotos(entity.getPhotos().stream().map(p -> {
-                Photo photo = new Photo();
-                photo.setIdPhoto(p.getIdPhoto());
-                photo.setPhotoPath(p.getPhotoPath());
-                photo.setUploadDate(p.getUploadDate());
-                photo.setPhotoType(p.getPhotoType());
-                return photo;
-            }).collect(Collectors.toList()));
+            serviceDelivery.setPhotos(entity.getPhotos().stream()
+                    .map(this::mapPhotoToDomain)
+                    .collect(Collectors.toList()));
         }
 
         if (entity.getHistory() != null) {
@@ -165,14 +158,9 @@ public class ServiceDeliveryMapper {
                 history.setChangeDate(h.getChangeDate());
                 history.setChangedBy(employeeMapper.toDomain(h.getChangedBy()));
                 if (h.getPhotos() != null) {
-                    history.setPhotos(h.getPhotos().stream().map(p -> {
-                        Photo photo = new Photo();
-                        photo.setIdPhoto(p.getIdPhoto());
-                        photo.setPhotoPath(p.getPhotoPath());
-                        photo.setUploadDate(p.getUploadDate());
-                        photo.setPhotoType(p.getPhotoType());
-                        return photo;
-                    }).collect(Collectors.toList()));
+                    history.setPhotos(h.getPhotos().stream()
+                            .map(this::mapPhotoToDomain)
+                            .collect(Collectors.toList()));
                 }
                 return history;
             }).collect(Collectors.toList()));
@@ -181,5 +169,14 @@ public class ServiceDeliveryMapper {
         serviceDelivery.setCreatedAt(entity.getCreatedAt());
 
         return serviceDelivery;
+    }
+
+    private Photo mapPhotoToDomain(PhotoEntity p) {
+        Photo photo = new Photo();
+        photo.setIdPhoto(p.getIdPhoto());
+        photo.setPhotoPath(p.getPhotoPath());
+        photo.setUploadDate(p.getUploadDate());
+        photo.setPhotoType(p.getPhotoType());
+        return photo;
     }
 }
