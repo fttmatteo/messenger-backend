@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -75,7 +76,7 @@ public class ServiceDeliveryController {
      * @param manualPlateNumber Placa ingresada manualmente (opcional, omite OCR).
      * @return ResponseEntity con mensaje de éxito o error.
      */
-    @PostMapping("/create")
+    @PostMapping("/createService")
     public ResponseEntity<?> createService(
             @RequestParam("image") MultipartFile image,
             @RequestParam("dealershipId") String dealershipId,
@@ -139,7 +140,7 @@ public class ServiceDeliveryController {
      * @param photos      Lista de fotos de evidencia (opcional según estado).
      * @return ResponseEntity con mensaje de éxito o error.
      */
-    @PutMapping("/update/{id}")
+    @PutMapping("/updateServiceStatus/{id}")
     public ResponseEntity<?> updateStatus(
             @PathVariable Long id,
             @RequestParam("status") String status,
@@ -193,7 +194,7 @@ public class ServiceDeliveryController {
      * @throws UnauthorizedException si el usuario no tiene permiso para ver el
      *                               servicio.
      */
-    @GetMapping("/find/{id}")
+    @GetMapping("/findService/{id}")
     public ResponseEntity<ServiceDeliveryResponse> findById(@PathVariable Long id) throws Exception {
         ServiceDelivery service = serviceDeliveryUseCase.findById(id);
         if (service == null) {
@@ -226,7 +227,7 @@ public class ServiceDeliveryController {
      *
      * @return Lista de servicios correspondientes.
      */
-    @GetMapping("/all")
+    @GetMapping("/allServices")
     public ResponseEntity<List<ServiceDeliveryResponse>> findAll() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String currentUserName = auth.getName();
@@ -252,7 +253,7 @@ public class ServiceDeliveryController {
      * @param messengerId Documento del mensajero.
      * @return Lista de servicios asignados al mensajero.
      */
-    @GetMapping("/find/{messengerId}")
+    @GetMapping("/findServiceByMessenger/{Id}")
     public ResponseEntity<List<ServiceDeliveryResponse>> findByMessenger(@PathVariable Long messengerId) {
         List<ServiceDeliveryResponse> responses = serviceDeliveryUseCase.findByMessenger(messengerId).stream()
                 .map(responseMapper::toResponse)
@@ -266,7 +267,7 @@ public class ServiceDeliveryController {
      * @param dealershipId ID del concesionario.
      * @return Lista de servicios del concesionario.
      */
-    @GetMapping("/find/{dealershipId}")
+    @GetMapping("/findServiceByDealership/{Id}")
     public ResponseEntity<List<ServiceDeliveryResponse>> findByDealership(@PathVariable Long dealershipId) {
         List<ServiceDeliveryResponse> responses = serviceDeliveryUseCase.findByDealership(dealershipId).stream()
                 .map(responseMapper::toResponse)
@@ -280,7 +281,7 @@ public class ServiceDeliveryController {
      * @param status Estado por el cual filtrar (PENDING, DELIVERED, etc).
      * @return Lista de servicios con el estado especificado.
      */
-    @GetMapping("/find/{status}")
+    @GetMapping("/findServiceByStatus/{status}")
     public ResponseEntity<List<ServiceDeliveryResponse>> findByStatus(@PathVariable Status status) {
         List<ServiceDeliveryResponse> responses = serviceDeliveryUseCase.findByStatus(status).stream()
                 .map(responseMapper::toResponse)
@@ -288,4 +289,18 @@ public class ServiceDeliveryController {
         return ResponseEntity.ok(responses);
     }
 
+    /**
+     * Elimina un servicio de entrega.
+     * Solo administradores pueden eliminar servicios.
+     *
+     * @param id ID del servicio a eliminar.
+     * @return ResponseEntity con mensaje de éxito.
+     */
+    @DeleteMapping("/deleteService/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> delete(@PathVariable Long id) throws Exception {
+        logger.warn("Eliminando servicio ID: {}", id);
+        serviceDeliveryUseCase.deleteById(id);
+        return ResponseEntity.ok("Servicio eliminado exitosamente");
+    }
 }

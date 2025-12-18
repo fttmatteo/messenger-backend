@@ -46,7 +46,7 @@ public class DealershipController {
      * @param request Datos del concesionario a crear.
      * @return ResponseEntity con mensaje de éxito o error.
      */
-    @PostMapping("/create")
+    @PostMapping("/createDealership")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> create(@Valid @RequestBody DealershipRequest request) throws Exception {
         logger.info("Creando concesionario: {}", request.getName());
@@ -61,7 +61,7 @@ public class DealershipController {
      *
      * @return Lista de concesionarios.
      */
-    @GetMapping("/all")
+    @GetMapping("/allDealerships")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<DealershipResponse>> findAll() {
         List<DealershipResponse> responses = dealershipUseCase.findAll().stream()
@@ -76,7 +76,7 @@ public class DealershipController {
      * @param id ID del concesionario.
      * @return Datos del concesionario encontrado o 404 si no existe.
      */
-    @GetMapping("/find/{id}")
+    @GetMapping("/findDealership/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DealershipResponse> findById(@PathVariable Long id) throws Exception {
         Dealership dealership = dealershipUseCase.findById(id);
@@ -90,7 +90,7 @@ public class DealershipController {
      * @param request Nuevos datos del concesionario.
      * @return ResponseEntity con mensaje de éxito o error.
      */
-    @PutMapping("/update/{id}")
+    @PutMapping("/updateDealership/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> update(@PathVariable Long id, @Valid @RequestBody DealershipRequest request)
             throws Exception {
@@ -107,7 +107,7 @@ public class DealershipController {
      * @param id ID del concesionario a eliminar.
      * @return ResponseEntity con mensaje de éxito o error.
      */
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/deleteDealership/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> delete(@PathVariable Long id) throws Exception {
         logger.warn("Eliminando concesionario ID: {}", id);
@@ -124,7 +124,7 @@ public class DealershipController {
      * @return ResponseEntity con los datos del concesionario actualizado o mensaje
      *         de error.
      */
-    @PostMapping("/geocode/{id}")
+    @PostMapping("/geocodeDealership/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DealershipResponse> geocodeDealership(@PathVariable Long id)
             throws GeolocationException, Exception {

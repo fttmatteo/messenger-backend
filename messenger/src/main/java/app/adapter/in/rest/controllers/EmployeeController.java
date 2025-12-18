@@ -51,7 +51,7 @@ public class EmployeeController {
      * @throws InputsException   Si los datos de entrada son inválidos.
      * @throws BusinessException Si hay un error de lógica de negocio.
      */
-    @PostMapping("/create")
+    @PostMapping("/createEmployee")
     @PreAuthorize("hasRole('ADMIN')")
     @AuditableAction(action = "CREATE_EMPLOYEE", description = "Crear nuevo empleado")
     public ResponseEntity<String> create(@Valid @RequestBody EmployeeRequest request) throws Exception {
@@ -72,7 +72,7 @@ public class EmployeeController {
      *
      * @return Lista de empleados mapeados al formato de respuesta.
      */
-    @GetMapping("/all")
+    @GetMapping("/allEmployees")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<EmployeeResponse>> findAll() {
         List<EmployeeResponse> responses = employeeUseCase.findAll().stream()
@@ -89,7 +89,7 @@ public class EmployeeController {
      * @throws app.application.exceptions.ResourceNotFoundException Si el empleado
      *                                                              no existe.
      */
-    @GetMapping("/find/{id}")
+    @GetMapping("/findEmployee/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EmployeeResponse> findById(@PathVariable Long id) {
         Employee employee = employeeUseCase.findById(id);
@@ -108,7 +108,7 @@ public class EmployeeController {
      * @throws InputsException   Si los datos de entrada son inválidos.
      * @throws BusinessException Si hay un error de lógica de negocio.
      */
-    @PutMapping("/update/{id}")
+    @PutMapping("/updateEmployee/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @AuditableAction(action = "UPDATE_EMPLOYEE", description = "Actualizar empleado existente")
     public ResponseEntity<String> update(@PathVariable Long id, @Valid @RequestBody EmployeeRequest request)
@@ -132,7 +132,7 @@ public class EmployeeController {
      * @param id ID del empleado a eliminar.
      * @return ResponseEntity con mensaje de éxito.
      */
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/deleteEmployee/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @AuditableAction(action = "DELETE_EMPLOYEE", description = "Eliminar empleado")
     public ResponseEntity<String> delete(@PathVariable Long id) throws Exception {
