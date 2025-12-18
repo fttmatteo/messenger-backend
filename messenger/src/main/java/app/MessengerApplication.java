@@ -10,7 +10,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * el registro, tracking y gestión de servicios de mensajería.
  */
 
-@SpringBootApplication
+@SpringBootApplication(excludeName = {
+		"org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration" })
 public class MessengerApplication {
 
 	public static void main(String[] args) {
