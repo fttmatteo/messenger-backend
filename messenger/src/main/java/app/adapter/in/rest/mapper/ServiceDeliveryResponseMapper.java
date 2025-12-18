@@ -39,7 +39,8 @@ public class ServiceDeliveryResponseMapper {
     private String getFileUrl(String path) {
         if (storageAdapter != null && path != null) {
             try {
-                return storageAdapter.regenerateSignedUrl(path);
+                String signedUrl = storageAdapter.regenerateSignedUrl(path);
+                return signedUrl;
             } catch (Exception e) {
                 // Si falla la generación de URL firmada, usar path directo
                 return path;
