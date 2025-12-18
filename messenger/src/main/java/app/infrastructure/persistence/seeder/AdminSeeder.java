@@ -33,18 +33,18 @@ public class AdminSeeder implements CommandLineRunner {
         if (employeeRepository.count() == 0) {
             EmployeeEntity admin = new EmployeeEntity();
             admin.setDocument(1000000000L);
-            admin.setFullName("Administrador del Sistema");
+            admin.setFullName("Administrador");
             admin.setPhone("3000000000");
-            admin.setUserName("admin");
-            admin.setPassword(passwordEncoder.encode("admin123"));
+            admin.setUserName("adm");
+            admin.setPassword(passwordEncoder.encode("adm"));
             admin.setRole(Role.ADMIN);
 
             employeeRepository.save(admin);
 
             logger.info("=============================================");
             logger.info("🚀 SEEDER: Usuario ADMIN creado exitosamente");
-            logger.info("👤 User: admin");
-            logger.info("🔑 Pass: admin123");
+            logger.info("👤 User: adm");
+            logger.info("🔑 Pass: adm");
             logger.info("=============================================");
         }
     }
