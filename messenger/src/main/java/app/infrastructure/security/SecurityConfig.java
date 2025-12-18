@@ -102,6 +102,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/files/**").permitAll()
                         .requestMatchers("/api/location/**").authenticated()
                         .requestMatchers("/api/tracking/**").authenticated()
+                        .requestMatchers("/tracking/**").authenticated()
                         .anyRequest().authenticated())
                 // Rate Limit Filter: Se ejecuta PRIMERO para bloquear abusos antes de procesar
                 .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
