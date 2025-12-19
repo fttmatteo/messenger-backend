@@ -15,8 +15,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.concurrent.TimeUnit;
@@ -136,14 +139,82 @@ public class GoogleCloudStorageAdapter implements StoragePort {
     }
 
     private String getServiceAccountEmail(GoogleCredentials creds) {
-        // ComputeEngineCredentials y derivados suelen exponer getAccount()
-        // No está en la clase base, así que hacemos casting seguro.
-        if (creds instanceof com.google.auth.oauth2.ComputeEngineCredentials) {
-            return ((com.google.auth.oauth2.ComputeEngineCredentials) creds).getAccount();
+        logger.info("Iniciando detección de email de cuenta de servicio...");
+
+        // 1. Intentar variable de entorno explícita (Escape hatch)
+        String envEmail = System.getenv("GOOGLE_SERVICE_ACCOUNT_EMAIL");
+        if (envEmail != null && !envEmail.isBlank()) {
+            logger.info("Detectado email vía Variable de Entorno: {}", envEmail);
+            return envEmail;
+        } else {
+            logger.debug("Variable GOOGLE_SERVICE_ACCOUNT_EMAIL no está definida o está vacía.");
         }
-        // UserCredentials también podría aparecer en local, pero no debería usarse en
-        // prod.
+
+        // 2. Intentar obtener de credenciales
+        if (creds instanceof com.google.auth.oauth2.ComputeEngineCredentials) {
+            String email = ((com.google.auth.oauth2.ComputeEngineCredentials) creds).getAccount();
+            if (email != null && !email.isBlank()) {
+                logger.info("Detectado email vía Credenciales (ComputeEngineCredentials): {}", email);
+                return email;
+            }
+        }
+        logger.debug("No se pudo obtener email de las credenciales actuales. Tipo: {}", creds.getClass().getName());
+
+        // 3. Metadata Server (Fuente de verdad en Cloud Run/GCE)
+        try {
+            logger.debug("Intentando consultar Metadata Server...");
+            String metadataEmail = fetchEmailFromMetadataServer();
+            if (metadataEmail != null && !metadataEmail.isBlank()) {
+                logger.info("Detectado email vía Metadata Server: {}", metadataEmail);
+                return metadataEmail;
+            }
+        } catch (Exception e) {
+            logger.warn("No se pudo obtener email del Metadata Server: {}", e.getMessage());
+        }
+
+        logger.error("FALLO TOTAL: No se pudo determinar el email de la cuenta de servicio por ningún método.");
         return null;
+    }
+
+    private String fetchEmailFromMetadataServer() throws IOException {
+        // This method attempts to fetch the service account email from the Google Cloud
+        // Metadata Server.
+        // This is typically available in environments like Cloud Run, GCE, GKE.
+        // It's a placeholder implementation; a robust solution might use a dedicated
+        // library or more error handling.
+        String metadataUrl = "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/email";
+        URL url = java.net.URI.create(metadataUrl).toURL();
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Metadata-Flavor", "Google"); // Required for metadata server requests
+        connection.setConnectTimeout(2000); // 2 seconds
+        connection.setReadTimeout(2000); // 2 seconds
+
+        int responseCode = connection.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                String inputLine;
+                StringBuilder content = new StringBuilder();
+                while ((inputLine = in.readLine()) != null) {
+                    content.append(inputLine);
+                }
+                return content.toString().trim();
+            }
+        } else {
+            logger.debug("Metadata server responded with status code: {}", responseCode);
+            // Read error stream for more details if needed
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getErrorStream()))) {
+                String inputLine;
+                StringBuilder errorContent = new StringBuilder();
+                while ((inputLine = in.readLine()) != null) {
+                    errorContent.append(inputLine);
+                }
+                logger.debug("Metadata server error response: {}", errorContent.toString());
+            } catch (Exception e) {
+                logger.debug("Could not read error stream from metadata server: {}", e.getMessage());
+            }
+            throw new IOException("Failed to fetch email from metadata server. HTTP error code: " + responseCode);
+        }
     }
 
     public String regenerateSignedUrl(String objectName) {
