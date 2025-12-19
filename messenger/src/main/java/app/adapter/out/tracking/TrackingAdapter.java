@@ -9,6 +9,7 @@ import app.infrastructure.persistence.repository.TrackingHistoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -67,6 +68,7 @@ public class TrackingAdapter implements TrackingPort {
     private static final long TRACKING_TTL_MINUTES = 5; // Expira después de 5 minutos sin actualizar
 
     @Autowired
+    @Qualifier("liveTrackingRedisTemplate")
     private RedisTemplate<String, LiveTracking> redisTemplate;
     @Autowired
     private TrackingHistoryRepository historyRepository;
@@ -89,24 +91,26 @@ public class TrackingAdapter implements TrackingPort {
             return;
         }
 
-        String key = TRACKING_KEY_PREFIX + tracking.getMessengerId();
-        tracking.setLastUpdate(LocalDateTime.now());
+        try {
+            String key = TRACKING_KEY_PREFIX + tracking.getMessengerId();
+            tracking.setLastUpdate(LocalDateTime.now());
 
-        // Si el estado es OFFLINE, eliminar de Redis inmediatamente para que no
-        // aparezca como activo
-        if (tracking.getStatus() == TrackingStatus.OFFLINE) {
-            redisTemplate.delete(key);
-            logger.info("Mensajero {} se ha desconectado (OFFLINE), eliminando de Redis", tracking.getMessengerId());
-            return;
+            if (tracking.getStatus() == TrackingStatus.OFFLINE) {
+                redisTemplate.delete(key);
+                logger.info("Mensajero {} se ha desconectado (OFFLINE), eliminando de Redis",
+                        tracking.getMessengerId());
+                return;
+            }
+
+            logger.debug("Guardando ubicación en vivo para mensajero {}: ({}, {})",
+                    tracking.getMessengerId(),
+                    tracking.getCurrentLocation().getLatitude(),
+                    tracking.getCurrentLocation().getLongitude());
+
+            redisTemplate.opsForValue().set(key, tracking, TRACKING_TTL_MINUTES, TimeUnit.MINUTES);
+        } catch (Exception e) {
+            logger.error("Error al guardar en Redis: {}", e.getMessage());
         }
-
-        logger.debug("Guardando ubicación en vivo para mensajero {}: ({}, {})",
-                tracking.getMessengerId(),
-                tracking.getCurrentLocation().getLatitude(),
-                tracking.getCurrentLocation().getLongitude());
-
-        // Guardar en Redis con TTL
-        redisTemplate.opsForValue().set(key, tracking, TRACKING_TTL_MINUTES, TimeUnit.MINUTES);
     }
 
     /**
@@ -121,8 +125,13 @@ public class TrackingAdapter implements TrackingPort {
             return null;
         }
 
-        String key = TRACKING_KEY_PREFIX + messengerId;
-        return redisTemplate.opsForValue().get(key);
+        try {
+            String key = TRACKING_KEY_PREFIX + messengerId;
+            return redisTemplate.opsForValue().get(key);
+        } catch (Exception e) {
+            logger.error("Error al obtener de Redis para messenger {}: {}", messengerId, e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -136,21 +145,31 @@ public class TrackingAdapter implements TrackingPort {
      */
     @Override
     public List<LiveTracking> getAllActiveMessengers() {
-        Set<String> keys = redisTemplate.keys(TRACKING_KEY_PREFIX + "*");
-
-        if (keys == null || keys.isEmpty()) {
-            logger.debug("No hay mensajeros activos en Redis");
-            return new ArrayList<>();
-        }
-
-        logger.debug("Obteniendo {} mensajeros activos de Redis", keys.size());
-
         List<LiveTracking> activeMessengers = new ArrayList<>();
-        for (String key : keys) {
-            LiveTracking tracking = redisTemplate.opsForValue().get(key);
-            if (tracking != null && tracking.getStatus() == TrackingStatus.ACTIVE) {
-                activeMessengers.add(tracking);
+        try {
+            Set<String> keys = redisTemplate.keys(TRACKING_KEY_PREFIX + "*");
+
+            if (keys == null || keys.isEmpty()) {
+                logger.debug("No hay mensajeros activos en Redis");
+                return activeMessengers;
             }
+
+            logger.debug("Obteniendo {} mensajeros activos de Redis", keys.size());
+
+            for (String key : keys) {
+                try {
+                    LiveTracking tracking = redisTemplate.opsForValue().get(key);
+                    if (tracking != null && tracking.getStatus() == TrackingStatus.ACTIVE) {
+                        activeMessengers.add(tracking);
+                    }
+                } catch (Exception e) {
+                    logger.warn("Error al deserializar tracking para key {}: {}", key, e.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error crítico al listar mensajeros desde Redis: {}", e.getMessage());
+            // Si keys() falla (común en Redis Cloud restringido), devolvemos lista vacía
+            // en lugar de lanzar excepcion 500
         }
 
         return activeMessengers;
