@@ -11,8 +11,8 @@
 	<groupId>app</groupId>
 	<artifactId>messenger</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>messenger</name>
-	<description>Project for sabaneta of transit</description>
+	<name>PLAK</name>
+	<description>Sistema de gestión PLAK</description>
 	<url/>
 	<licenses>
 		<license/>
