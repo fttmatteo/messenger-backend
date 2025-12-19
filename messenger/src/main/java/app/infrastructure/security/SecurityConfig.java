@@ -134,7 +134,10 @@ public class SecurityConfig {
                     "SEGURIDAD: La propiedad 'cors.allowed-origins' no está configurada. " +
                             "Configure los orígenes permitidos en application.properties o como variable de entorno.");
         }
-        configuration.setAllowedOrigins(Arrays.asList(corsAllowedOrigins.split(",")));
+        List<String> origins = Arrays.stream(corsAllowedOrigins.split(","))
+                .map(String::trim)
+                .toList();
+        configuration.setAllowedOrigins(origins);
 
         // Métodos HTTP permitidos
         configuration.setAllowedMethods(Arrays.asList(
