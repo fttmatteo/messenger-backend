@@ -99,13 +99,15 @@ public class JwtAdapter implements AuthenticationPort {
      * @return TokenResponse con el token JWT generado y el rol
      */
     @Override
-    public TokenResponse authenticate(AuthCredentials credentials, String role) {
-        String token = this.generateToken(credentials.getUserName(), role);
+    public TokenResponse authenticate(AuthCredentials credentials, String role, Long userId) {
+        String token = this.generateToken(credentials.getUserName(), role, userId);
         TokenResponse response = new TokenResponse();
         response.setToken(token);
         response.setRole(role);
         return response;
     }
+
+    // ...
 
     /**
      * Valida la autenticidad y vigencia de un token JWT.
@@ -171,21 +173,24 @@ public class JwtAdapter implements AuthenticationPort {
      * Crea un token con:
      * - Subject: nombre de usuario
      * - Claim "role": rol del usuario
+     * - Claim "id": id del usuario
      * - Fecha de emisión
      * - Fecha de expiración (configurada)
      * - Firma digital con HS256
      * 
      * @param userName Nombre de usuario
      * @param role     Rol del usuario
+     * @param userId   ID del usuario
      * @return Token JWT firmado y codificado
      */
-    private String generateToken(String userName, String role) {
+    private String generateToken(String userName, String role, Long userId) {
         Date now = new Date();
         Date expiration = new Date(now.getTime() + expirationTime);
 
         String token = Jwts.builder()
                 .subject(userName) // setSubject -> subject
                 .claim("role", role)
+                .claim("id", userId)
                 .issuedAt(now) // setIssuedAt -> issuedAt
                 .expiration(expiration) // setExpiration -> expiration
                 .signWith(secretKey) // Removed SignatureAlgorithm arg

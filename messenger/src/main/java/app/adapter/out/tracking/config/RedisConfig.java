@@ -8,7 +8,6 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
@@ -85,10 +84,20 @@ public class RedisConfig {
         template.setKeySerializer(new StringRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
 
-        // Serializer para values (JSON type-safe sin deprecated warnings)
-        // RedisSerializer.json() es el método recomendado en Spring Data Redis 4.0+
-        template.setValueSerializer(RedisSerializer.json());
-        template.setHashValueSerializer(RedisSerializer.json());
+        // Configurar Jackson 3 usando com.fasterxml.jackson
+        com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        objectMapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        // Usar Jackson2JsonRedisSerializer con tipo específico
+        org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer<LiveTracking> serializer = new org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer<>(
+                LiveTracking.class);
+
+        serializer.setObjectMapper(objectMapper);
+
+        template.setValueSerializer(serializer);
+        template.setHashValueSerializer(serializer);
 
         template.afterPropertiesSet();
         return template;

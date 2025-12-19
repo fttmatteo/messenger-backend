@@ -92,6 +92,14 @@ public class TrackingAdapter implements TrackingPort {
         String key = TRACKING_KEY_PREFIX + tracking.getMessengerId();
         tracking.setLastUpdate(LocalDateTime.now());
 
+        // Si el estado es OFFLINE, eliminar de Redis inmediatamente para que no
+        // aparezca como activo
+        if (tracking.getStatus() == TrackingStatus.OFFLINE) {
+            redisTemplate.delete(key);
+            logger.info("Mensajero {} se ha desconectado (OFFLINE), eliminando de Redis", tracking.getMessengerId());
+            return;
+        }
+
         logger.debug("Guardando ubicación en vivo para mensajero {}: ({}, {})",
                 tracking.getMessengerId(),
                 tracking.getCurrentLocation().getLatitude(),

@@ -77,13 +77,15 @@ public class TrackingWebSocketController {
         LiveTracking domainTracking = new LiveTracking();
         domainTracking.setMessengerId(request.getMessengerId());
 
-        // Crear Location value object
-        app.domain.model.Location location = new app.domain.model.Location(
-                request.getLatitude(),
-                request.getLongitude(),
-                java.time.LocalDateTime.now(),
-                request.getAccuracy());
-        domainTracking.setCurrentLocation(location);
+        // Crear Location value object solo si hay coordenadas
+        if (request.getLatitude() != null && request.getLongitude() != null) {
+            app.domain.model.Location location = new app.domain.model.Location(
+                    request.getLatitude(),
+                    request.getLongitude(),
+                    java.time.LocalDateTime.now(),
+                    request.getAccuracy());
+            domainTracking.setCurrentLocation(location);
+        }
 
         domainTracking.setSpeed(request.getSpeed());
         domainTracking.setHeading(request.getHeading());
