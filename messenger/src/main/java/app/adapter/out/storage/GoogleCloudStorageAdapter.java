@@ -159,26 +159,6 @@ public class GoogleCloudStorageAdapter implements StoragePort {
     }
 
     /**
-     * Genera una URL firmada para acceso temporal a un objeto en GCS.
-     * 
-     * La URL firmada permite acceso sin autenticación durante el tiempo
-     * especificado.
-     * Después de la expiración, la URL deja de funcionar automáticamente.
-     * 
-     * @param blob            Objeto de GCS para el cual generar la URL
-     * @param expirationHours Horas hasta que expire la URL
-     * @return URL firmada temporal
-     */
-    private String generateSignedUrl(Blob blob, int expirationHours) {
-        URL signedUrl = blob.signUrl(
-                expirationHours,
-                TimeUnit.HOURS,
-                Storage.SignUrlOption.withV4Signature());
-
-        return signedUrl.toString();
-    }
-
-    /**
      * Genera una nueva URL firmada para un objeto existente.
      * 
      * Útil cuando una URL firmada ha expirado y necesitas regenerarla
@@ -191,15 +171,15 @@ public class GoogleCloudStorageAdapter implements StoragePort {
     public String regenerateSignedUrl(String objectName, int expirationHours) {
         logger.debug("Generando URL firmada para: {} (expira en {}h)", objectName, expirationHours);
 
-        BlobId blobId = BlobId.of(bucketName, objectName);
-        Blob blob = storage.get(blobId);
+        BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName).build();
 
-        if (blob == null) {
-            logger.error("Objeto no encontrado en GCS: {}", objectName);
-            throw new IllegalArgumentException("Objeto no encontrado: " + objectName);
-        }
+        URL signedUrl = storage.signUrl(
+                blobInfo,
+                expirationHours,
+                TimeUnit.HOURS,
+                Storage.SignUrlOption.withV4Signature());
 
-        return generateSignedUrl(blob, expirationHours);
+        return signedUrl.toString();
     }
 
     /**

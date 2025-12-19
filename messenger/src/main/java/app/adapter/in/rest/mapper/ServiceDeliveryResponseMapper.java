@@ -43,6 +43,9 @@ public class ServiceDeliveryResponseMapper {
                 return signedUrl;
             } catch (Exception e) {
                 // Si falla la generación de URL firmada, usar path directo
+                // Esto ayuda a debuggear por qué fallan las imágenes
+                System.err.println("Error generando URL firmada para path: " + path + ". Error: " + e.getMessage());
+                e.printStackTrace();
                 return path;
             }
         }
