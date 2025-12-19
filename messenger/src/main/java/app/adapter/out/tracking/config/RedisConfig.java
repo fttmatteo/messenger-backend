@@ -84,11 +84,17 @@ public class RedisConfig {
         template.setKeySerializer(new StringRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
 
-        // Configurar Jackson 3 (JavaTime support is built-in)
-        tools.jackson.databind.ObjectMapper objectMapper = new tools.jackson.databind.ObjectMapper();
+        // Configurar Jackson 3 usando com.fasterxml.jackson
+        com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        objectMapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-        org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer serializer = new org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer(
-                objectMapper);
+        // Usar Jackson2JsonRedisSerializer con tipo específico
+        org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer<LiveTracking> serializer = new org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer<>(
+                LiveTracking.class);
+
+        serializer.setObjectMapper(objectMapper);
 
         template.setValueSerializer(serializer);
         template.setHashValueSerializer(serializer);

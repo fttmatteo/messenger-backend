@@ -7,13 +7,21 @@ import java.time.LocalDateTime;
  * Incluye validaciones y cálculo de distancias usando fórmula Haversine.
  */
 public class Location {
-    private final Double latitude;
-    private final Double longitude;
-    private final LocalDateTime timestamp;
-    private final Double accuracy; // Precisión en metros
+    private Double latitude;
+    private Double longitude;
+    private LocalDateTime timestamp;
+    private Double accuracy; // Precisión en metros
 
     // Radio de la Tierra en metros
     private static final double EARTH_RADIUS_METERS = 6371000;
+
+    // Default constructor for Jackson
+    public Location() {
+        this.latitude = null;
+        this.longitude = null;
+        this.timestamp = null;
+        this.accuracy = null;
+    }
 
     public Location(Double latitude, Double longitude) {
         this(latitude, longitude, null, null);
