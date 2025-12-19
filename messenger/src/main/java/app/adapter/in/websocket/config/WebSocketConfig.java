@@ -66,13 +66,18 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
+        String[] origins = allowedOrigins.split(",");
+        for (int i = 0; i < origins.length; i++) {
+            origins[i] = origins[i].trim();
+        }
+
         // Endpoint principal para conexión WebSocket
         registry.addEndpoint("/ws/tracking")
-                .setAllowedOriginPatterns(allowedOrigins.split(","))
+                .setAllowedOriginPatterns(origins)
                 .withSockJS(); // Fallback para navegadores sin WebSocket nativo
 
         // Endpoint sin SockJS (para apps móviles o clientes nativos)
         registry.addEndpoint("/ws/tracking")
-                .setAllowedOriginPatterns(allowedOrigins.split(","));
+                .setAllowedOriginPatterns(origins);
     }
 }
