@@ -51,15 +51,17 @@ public class UpdateLiveTracking {
         // Guardar en Redis (ubicación en tiempo real)
         trackingPort.saveLiveLocation(incomingTracking);
 
-        // Guardar en BD (historial)
-        TrackingHistory history = new TrackingHistory();
-        history.setMessengerId(incomingTracking.getMessengerId());
-        history.setLocation(incomingTracking.getCurrentLocation());
-        history.setRecordedAt(incomingTracking.getLastUpdate());
-        history.setSource(TrackingSource.GPS); // Asumimos GPS por defecto para live tracking
-        history.setSpeed(incomingTracking.getSpeed());
+        // Guardar en BD (historial) solo si hay una ubicación válida
+        if (incomingTracking.getCurrentLocation() != null) {
+            TrackingHistory history = new TrackingHistory();
+            history.setMessengerId(incomingTracking.getMessengerId());
+            history.setLocation(incomingTracking.getCurrentLocation());
+            history.setRecordedAt(incomingTracking.getLastUpdate());
+            history.setSource(TrackingSource.GPS); // Asumimos GPS por defecto para live tracking
+            history.setSpeed(incomingTracking.getSpeed());
 
-        trackingPort.saveTrackingHistory(history);
+            trackingPort.saveTrackingHistory(history);
+        }
 
         return incomingTracking;
     }
