@@ -17,7 +17,7 @@ public interface AuthenticationPort {
      * @param role        Rol esperado del usuario.
      * @return TokenResponse con el token JWT y rol del usuario.
      */
-    TokenResponse authenticate(AuthCredentials credentials, String role);
+    TokenResponse authenticate(AuthCredentials credentials, String role, Long userId);
 
     /**
      * Valida si un token JWT es válido y no ha expirado.

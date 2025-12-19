@@ -81,7 +81,8 @@ public class AuthenticationService {
             }
         }
         logger.info("Usuario autenticado exitosamente: {} (rol: {})", credentials.getUserName(), employee.getRole());
-        TokenResponse response = authenticationPort.authenticate(credentials, String.valueOf(employee.getRole()));
+        TokenResponse response = authenticationPort.authenticate(credentials, String.valueOf(employee.getRole()),
+                employee.getIdEmployee());
         String refreshToken = authenticationPort.generateRefreshToken(credentials);
         response.setRefreshToken(refreshToken);
         return response;
@@ -135,7 +136,8 @@ public class AuthenticationService {
         logger.info("Refrescando token para usuario: {}", username);
 
         // Generamos nuevos tokens
-        TokenResponse response = authenticationPort.authenticate(credentials, String.valueOf(employee.getRole()));
+        TokenResponse response = authenticationPort.authenticate(credentials, String.valueOf(employee.getRole()),
+                employee.getIdEmployee());
 
         // ========== REFRESH TOKEN ROTATION: Generar nuevo y blacklistear anterior
         // ==========

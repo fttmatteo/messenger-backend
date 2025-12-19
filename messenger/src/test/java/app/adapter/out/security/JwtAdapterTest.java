@@ -28,7 +28,7 @@ class JwtAdapterTest {
         AuthCredentials credentials = new AuthCredentials();
         credentials.setUserName("testuser");
 
-        TokenResponse response = jwtAdapter.authenticate(credentials, "ADMIN");
+        TokenResponse response = jwtAdapter.authenticate(credentials, "ADMIN", 1L);
 
         assertNotNull(response);
         assertNotNull(response.getToken());
@@ -41,7 +41,7 @@ class JwtAdapterTest {
         AuthCredentials credentials = new AuthCredentials();
         credentials.setUserName("testuser");
 
-        TokenResponse response = jwtAdapter.authenticate(credentials, "ADMIN");
+        TokenResponse response = jwtAdapter.authenticate(credentials, "ADMIN", 1L);
         boolean isValid = jwtAdapter.validateToken(response.getToken());
 
         assertTrue(isValid);
@@ -61,7 +61,7 @@ class JwtAdapterTest {
         AuthCredentials credentials = new AuthCredentials();
         credentials.setUserName("testuser");
 
-        TokenResponse response = jwtAdapter.authenticate(credentials, "ADMIN");
+        TokenResponse response = jwtAdapter.authenticate(credentials, "ADMIN", 1L);
         String username = jwtAdapter.extractUsername(response.getToken());
 
         assertEquals("testuser", username);
@@ -73,7 +73,7 @@ class JwtAdapterTest {
         AuthCredentials credentials = new AuthCredentials();
         credentials.setUserName("testuser");
 
-        TokenResponse response = jwtAdapter.authenticate(credentials, "MESSENGER");
+        TokenResponse response = jwtAdapter.authenticate(credentials, "MESSENGER", 1L);
         String role = jwtAdapter.extractRole(response.getToken());
 
         assertEquals("MESSENGER", role);

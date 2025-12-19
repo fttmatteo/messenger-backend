@@ -50,6 +50,7 @@ class AuthenticationServiceTest {
     @BeforeEach
     void setUp() {
         sampleEmployee = new Employee();
+        sampleEmployee.setIdEmployee(1L);
         sampleEmployee.setDocument(123456789L);
         sampleEmployee.setUserName("testuser");
         sampleEmployee.setPassword("$2a$10$encodedPasswordHash123456789012345678901234567890123");
@@ -73,7 +74,7 @@ class AuthenticationServiceTest {
         void shouldAuthenticateWithValidCredentials() throws Exception {
             when(employeePort.findByUserName("testuser")).thenReturn(sampleEmployee);
             when(passwordEncoder.matches("correctPassword", sampleEmployee.getPassword())).thenReturn(true);
-            when(authenticationPort.authenticate(eq(validCredentials), eq("MESSENGER")))
+            when(authenticationPort.authenticate(eq(validCredentials), eq("MESSENGER"), anyLong()))
                     .thenReturn(expectedToken);
 
             TokenResponse result = authenticationService.authenticate(validCredentials);
@@ -93,7 +94,7 @@ class AuthenticationServiceTest {
 
             when(employeePort.findByUserName("testuser")).thenReturn(sampleEmployee);
             when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
-            when(authenticationPort.authenticate(any(), eq("ADMIN")))
+            when(authenticationPort.authenticate(any(), eq("ADMIN"), anyLong()))
                     .thenReturn(adminToken);
 
             TokenResponse result = authenticationService.authenticate(validCredentials);
@@ -153,7 +154,7 @@ class AuthenticationServiceTest {
             when(passwordEncoder.matches("plainTextPassword", "plainTextPassword")).thenReturn(false);
             // Encoding del password
             when(passwordEncoder.encode("plainTextPassword")).thenReturn("$2a$10$newEncodedHash");
-            when(authenticationPort.authenticate(any(), anyString())).thenReturn(expectedToken);
+            when(authenticationPort.authenticate(any(), anyString(), anyLong())).thenReturn(expectedToken);
 
             AuthCredentials credentials = new AuthCredentials();
             credentials.setUserName("testuser");
