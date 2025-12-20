@@ -10,11 +10,6 @@ import java.io.File;
  * Vision API.
  */
 public interface OcrPort {
-    /**
-     * Extrae texto de una imagen utilizando OCR.
-     * 
-     * @param imageFile Archivo de imagen a procesar.
-     * @return Texto extraído de la imagen.
-     */
+
     String extractText(File imageFile);
 }

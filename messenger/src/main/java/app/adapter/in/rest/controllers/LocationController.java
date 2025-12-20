@@ -1,5 +1,6 @@
 package app.adapter.in.rest.controllers;
 
+import app.adapter.in.rest.mapper.LocationResponseMapper;
 import app.adapter.in.rest.request.GeocodeRequest;
 import app.adapter.in.rest.request.RouteRequest;
 import app.adapter.in.rest.response.DistanceResponse;
@@ -34,7 +35,7 @@ public class LocationController {
     @Autowired
     private LocationPort locationPort;
     @Autowired
-    private app.adapter.in.rest.mapper.LocationResponseMapper responseMapper;
+    private LocationResponseMapper responseMapper;
 
     @PostMapping("/geocode")
     public ResponseEntity<LocationResponse> geocodeAddress(

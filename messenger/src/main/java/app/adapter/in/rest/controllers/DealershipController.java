@@ -84,4 +84,11 @@ public class DealershipController {
         Dealership dealership = geocodeDealership.execute(id);
         return ResponseEntity.ok(responseMapper.toResponse(dealership));
     }
+
+    @PostMapping("/findDealershipByName/{name}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<DealershipResponse> findByName(@PathVariable String name) throws Exception {
+        Dealership dealership = dealershipUseCase.findByName(name);
+        return ResponseEntity.ok(responseMapper.toResponse(dealership));
+    }
 }

@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import app.application.exceptions.InputsException;
+import app.application.exceptions.ResourceNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,14 +39,14 @@ public class FileController {
     public ResponseEntity<Resource> getFile(@PathVariable String filename) throws Exception {
 
         if (filename == null || filename.isEmpty()) {
-            throw new app.application.exceptions.InputsException("Nombre de archivo requerido");
+            throw new InputsException("Nombre de archivo requerido");
         }
         if (filename.contains("..") ||
                 filename.contains("/") ||
                 filename.contains("\\") ||
-                filename.contains("%2e") || // URL encoded .
-                filename.contains("%2f") || // URL encoded /
-                filename.contains("%5c")) { // URL encoded \
+                filename.contains("%2e") ||
+                filename.contains("%2f") ||
+                filename.contains("%5c")) {
             throw new SecurityException("Nombre de archivo inválido");
         }
 
@@ -70,7 +72,6 @@ public class FileController {
                 }
             }
         }
-
-        throw new app.application.exceptions.ResourceNotFoundException("Archivo " + filename + " no encontrado");
+        throw new ResourceNotFoundException("Archivo " + filename + " no encontrado");
     }
 }

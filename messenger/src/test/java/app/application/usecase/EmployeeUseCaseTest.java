@@ -195,14 +195,6 @@ class EmployeeUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe eliminar empleado por documento sin servicios activos")
-        void shouldDeleteEmployeeByDocumentWithoutActiveServices() throws Exception {
-            employeeUseCase.deleteByDocument(123456789L);
-
-            verify(deleteEmployee, times(1)).deleteByDocument(123456789L);
-        }
-
-        @Test
         @DisplayName("Debe lanzar excepción si tiene servicios activos")
         void shouldThrowExceptionIfHasActiveServices() throws Exception {
             doThrow(new BusinessException("Empleado tiene servicios asignados"))

@@ -5,10 +5,8 @@ import app.domain.ports.DealershipPort;
 import app.infrastructure.persistence.entities.DealershipEntity;
 import app.infrastructure.persistence.mapper.DealershipMapper;
 import app.infrastructure.persistence.repository.DealershipRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,7 +32,6 @@ import java.util.stream.Collectors;
  * - findByName: Buscar por nombre
  * - findAll: Obtener todos los concesionarios
  * - deleteById: Eliminar por ID
- * - deleteByName: Eliminar por nombre
  * 
  * @see app.domain.ports.DealershipPort
  * @see app.infrastructure.persistence.repository.DealershipRepository
@@ -48,10 +45,6 @@ public class DealershipAdapter implements DealershipPort {
     @Autowired
     private DealershipMapper mapper;
 
-    /**
-     * Guarda o actualiza un concesionario en la base de datos.
-     * Retorna el objeto guardado con el ID generado.
-     */
     @Override
     public Dealership save(Dealership dealership) {
         DealershipEntity entity = mapper.toEntity(dealership);
@@ -59,7 +52,6 @@ public class DealershipAdapter implements DealershipPort {
         return mapper.toDomain(savedEntity);
     }
 
-    /** Busca un concesionario por ID. */
     @Override
     public Dealership findById(Long id) {
         Optional<DealershipEntity> entity = repository.findById(id);
@@ -69,7 +61,6 @@ public class DealershipAdapter implements DealershipPort {
         return null;
     }
 
-    /** Obtiene todos los concesionarios. */
     @Override
     public List<Dealership> findAll() {
         return repository.findAll().stream()
@@ -77,19 +68,11 @@ public class DealershipAdapter implements DealershipPort {
                 .collect(Collectors.toList());
     }
 
-    /** Elimina un concesionario por ID. */
     @Override
     public void deleteById(Long idDealership) {
         repository.deleteById(idDealership);
     }
 
-    /** Elimina un concesionario por nombre. */
-    @Override
-    public void deleteByName(String name) {
-        repository.deleteByName(name);
-    }
-
-    /** Busca un concesionario por nombre. */
     @Override
     public Dealership findByName(String name) {
         DealershipEntity entity = repository.findByName(name);

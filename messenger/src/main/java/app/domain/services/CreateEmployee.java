@@ -33,9 +33,10 @@ public class CreateEmployee {
      * Valida unicidad de documento y username, y encripta la contraseña con BCrypt.
      * 
      * @param employee Empleado a crear.
+     * @return El empleado creado con su ID asignado.
      * @throws Exception Si el documento o username ya están en uso.
      */
-    public void create(Employee employee) throws Exception {
+    public Employee create(Employee employee) throws Exception {
         logger.debug("Creando empleado: {}", employee.getUserName());
         validateDocumentIsUnique(employee.getDocument());
         validateUserNameIsUnique(employee.getUserName());
@@ -45,8 +46,9 @@ public class CreateEmployee {
             employee.setPassword(encoded);
         }
 
-        employeePort.save(employee);
-        logger.info("Empleado creado exitosamente: {} (doc: {})", employee.getUserName(), employee.getDocument());
+        Employee saved = employeePort.save(employee);
+        logger.info("Empleado creado exitosamente: {} (doc: {})", saved.getUserName(), saved.getDocument());
+        return saved;
     }
 
     private void validateDocumentIsUnique(Long document) throws Exception {

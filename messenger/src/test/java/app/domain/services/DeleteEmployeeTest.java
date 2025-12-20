@@ -61,18 +61,4 @@ class DeleteEmployeeTest {
         assertEquals("No se puede eliminar el empleado porque tiene servicios de entrega asociados.", ex.getMessage());
         verify(employeePort, never()).deleteById(anyLong());
     }
-
-    @Test
-    @DisplayName("Debe eliminar empleado por Documento si no tiene servicios")
-    void shouldDeleteByDocumentIfNoServices() throws Exception {
-        Employee e = new Employee();
-        e.setDocument(123L);
-        e.setFullName("Juan");
-        when(employeePort.findByDocument(123L)).thenReturn(e);
-        when(serviceDeliveryPort.findByMessengerDocument(123L)).thenReturn(Collections.emptyList());
-
-        deleteEmployee.deleteByDocument(123L);
-
-        verify(employeePort).deleteByDocument(123L);
-    }
 }

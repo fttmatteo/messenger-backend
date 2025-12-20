@@ -45,25 +45,4 @@ public class DeleteDealership {
         dealershipPort.deleteById(id);
         logger.info("Concesionario eliminado: ID {} ({})", id, existing.getName());
     }
-
-    /**
-     * Elimina un concesionario por su nombre.
-     * 
-     * @param name Nombre del concesionario a eliminar.
-     * @throws Exception Si el concesionario no existe o tiene servicios activos.
-     */
-    public void deleteByName(String name) throws Exception {
-        logger.warn("Solicitud de eliminación de concesionario por nombre: {}", name);
-        Dealership existing = dealershipPort.findByName(name);
-        if (existing == null) {
-            throw new BusinessException("El concesionario a eliminar no existe.");
-        }
-        var services = serviceDeliveryPort.findByDealershipId(existing.getIdDealership());
-        if (services != null && !services.isEmpty()) {
-            throw new BusinessException(
-                    "No se puede eliminar el concesionario porque tiene servicios activos asociados.");
-        }
-        dealershipPort.deleteByName(name);
-        logger.info("Concesionario eliminado por nombre: {}", name);
-    }
 }

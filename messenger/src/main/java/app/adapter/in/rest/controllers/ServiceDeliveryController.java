@@ -1,7 +1,5 @@
 package app.adapter.in.rest.controllers;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +8,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import app.adapter.in.builder.ServiceDeliveryBuilder;
 import app.adapter.in.rest.mapper.ServiceDeliveryResponseMapper;
 import app.adapter.in.rest.request.ServiceDeliveryCreateRequest;
@@ -26,7 +23,6 @@ import app.domain.model.enums.Role;
 import app.domain.model.enums.Status;
 import app.domain.ports.EmployeePort;
 import app.infrastructure.helper.FileHelper;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,8 +45,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/services")
 public class ServiceDeliveryController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ServiceDeliveryController.class);
-
     @Autowired
     private ServiceDeliveryUseCase serviceDeliveryUseCase;
     @Autowired
@@ -62,20 +56,6 @@ public class ServiceDeliveryController {
     @Autowired
     private FileHelper fileHelper;
 
-    /**
-     * Crea un nuevo servicio de entrega.
-     *
-     * Permite la creación mediante detección automática de placa (OCR) desde una
-     * imagen
-     * o mediante ingreso manual. Asigna el servicio a un mensajero específico.
-     *
-     * @param image             Archivo de imagen para OCR (requerido).
-     * @param dealershipId      ID del concesionario origen.
-     * @param messengerDocument Documento del mensajero asignado (requerido para
-     *                          ADMIN).
-     * @param manualPlateNumber Placa ingresada manualmente (opcional, omite OCR).
-     * @return ResponseEntity con mensaje de éxito o error.
-     */
     @PostMapping("/createService")
     public ResponseEntity<?> createService(
             @RequestParam("image") MultipartFile image,
@@ -86,8 +66,6 @@ public class ServiceDeliveryController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String currentUserName = auth.getName();
         Employee currentUser = employeePort.findByUserName(currentUserName);
-
-        logger.info("Creando servicio - usuario: {}, concesionario: {}", currentUserName, dealershipId);
 
         if (currentUser == null) {
             throw new UnauthorizedException("Autenticación de usuario no encontrada o inválida.");
@@ -126,20 +104,6 @@ public class ServiceDeliveryController {
         });
     }
 
-    /**
-     * Actualiza el estado de un servicio de entrega existente.
-     *
-     * Permite adjuntar evidencias obligatorias según el nuevo estado (firmas,
-     * fotos).
-     *
-     * @param id          ID del servicio a actualizar.
-     * @param status      Nuevo estado del servicio.
-     * @param observation Observaciones adicionales sobre el cambio de estado.
-     * @param signature   Archivo de imagen con la firma de conformidad (opcional
-     *                    según estado).
-     * @param photos      Lista de fotos de evidencia (opcional según estado).
-     * @return ResponseEntity con mensaje de éxito o error.
-     */
     @PutMapping("/updateServiceStatus/{id}")
     public ResponseEntity<?> updateStatus(
             @PathVariable Long id,
@@ -182,18 +146,6 @@ public class ServiceDeliveryController {
         }
     }
 
-    /**
-     * Busca un servicio de entrega por su ID.
-     * 
-     * Implementa validación de ownership:
-     * - ADMIN puede ver cualquier servicio
-     * - MESSENGER solo puede ver servicios asignados a él
-     *
-     * @param id ID del servicio.
-     * @return Datos del servicio encontrado o 404 si no existe.
-     * @throws UnauthorizedException si el usuario no tiene permiso para ver el
-     *                               servicio.
-     */
     @GetMapping("/findService/{id}")
     public ResponseEntity<ServiceDeliveryResponse> findById(@PathVariable Long id) throws Exception {
         ServiceDelivery service = serviceDeliveryUseCase.findById(id);
@@ -207,11 +159,8 @@ public class ServiceDeliveryController {
         Employee currentUser = employeePort.findByUserName(currentUserName);
 
         if (currentUser != null && currentUser.getRole() == Role.MESSENGER) {
-            // Verificar que el servicio pertenece al mensajero actual
             if (service.getMessenger() == null ||
                     !service.getMessenger().getDocument().equals(currentUser.getDocument())) {
-                logger.warn("SEGURIDAD: Usuario {} intentó acceder a servicio {} sin permiso",
-                        currentUserName, id);
                 throw new UnauthorizedException("No tienes permiso para ver este servicio");
             }
         }
@@ -219,14 +168,6 @@ public class ServiceDeliveryController {
         return ResponseEntity.ok(responseMapper.toResponse(service));
     }
 
-    /**
-     * Obtiene todos los servicios asociados al usuario actual.
-     *
-     * Si es ADMIN, lista todos los servicios.
-     * Si es MESSENGER, lista solo los servicios asignados a él.
-     *
-     * @return Lista de servicios correspondientes.
-     */
     @GetMapping("/allServices")
     public ResponseEntity<List<ServiceDeliveryResponse>> findAll() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -247,12 +188,6 @@ public class ServiceDeliveryController {
         return ResponseEntity.ok(responses);
     }
 
-    /**
-     * Busca servicios asignados a un mensajero específico.
-     *
-     * @param messengerId Documento del mensajero.
-     * @return Lista de servicios asignados al mensajero.
-     */
     @GetMapping("/findServiceByMessenger/{Id}")
     public ResponseEntity<List<ServiceDeliveryResponse>> findByMessenger(@PathVariable Long messengerId) {
         List<ServiceDeliveryResponse> responses = serviceDeliveryUseCase.findByMessenger(messengerId).stream()
@@ -261,12 +196,6 @@ public class ServiceDeliveryController {
         return ResponseEntity.ok(responses);
     }
 
-    /**
-     * Busca servicios asociados a un concesionario específico.
-     *
-     * @param dealershipId ID del concesionario.
-     * @return Lista de servicios del concesionario.
-     */
     @GetMapping("/findServiceByDealership/{Id}")
     public ResponseEntity<List<ServiceDeliveryResponse>> findByDealership(@PathVariable Long dealershipId) {
         List<ServiceDeliveryResponse> responses = serviceDeliveryUseCase.findByDealership(dealershipId).stream()
@@ -275,12 +204,6 @@ public class ServiceDeliveryController {
         return ResponseEntity.ok(responses);
     }
 
-    /**
-     * Busca servicios que se encuentren en un estado específico.
-     *
-     * @param status Estado por el cual filtrar (PENDING, DELIVERED, etc).
-     * @return Lista de servicios con el estado especificado.
-     */
     @GetMapping("/findServiceByStatus/{status}")
     public ResponseEntity<List<ServiceDeliveryResponse>> findByStatus(@PathVariable Status status) {
         List<ServiceDeliveryResponse> responses = serviceDeliveryUseCase.findByStatus(status).stream()
@@ -289,17 +212,9 @@ public class ServiceDeliveryController {
         return ResponseEntity.ok(responses);
     }
 
-    /**
-     * Elimina un servicio de entrega.
-     * Solo administradores pueden eliminar servicios.
-     *
-     * @param id ID del servicio a eliminar.
-     * @return ResponseEntity con mensaje de éxito.
-     */
     @DeleteMapping("/deleteService/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> delete(@PathVariable Long id) throws Exception {
-        logger.warn("Eliminando servicio ID: {}", id);
         serviceDeliveryUseCase.deleteById(id);
         return ResponseEntity.ok("Servicio eliminado exitosamente");
     }

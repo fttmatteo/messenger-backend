@@ -3,7 +3,6 @@ package app.domain.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -60,35 +59,5 @@ class DeleteDealershipTest {
         assertEquals("No se puede eliminar el concesionario porque tiene servicios activos asociados.",
                 ex.getMessage());
         verify(dealershipPort, never()).deleteById(anyLong());
-    }
-
-    @Test
-    @DisplayName("Debe eliminar concesionario por Nombre si no tiene servicios")
-    void shouldDeleteByNameIfNoServices() throws Exception {
-        Dealership d = new Dealership();
-        d.setIdDealership(1L);
-        d.setName("Central");
-        when(dealershipPort.findByName("Central")).thenReturn(d);
-        when(serviceDeliveryPort.findByDealershipId(1L)).thenReturn(Collections.emptyList());
-
-        deleteDealership.deleteByName("Central");
-
-        verify(dealershipPort).deleteByName("Central");
-    }
-
-    @Test
-    @DisplayName("Debe lanzar excepción por Nombre si tiene servicios")
-    void shouldThrowExceptionByNameIfHasServices() {
-        Dealership d = new Dealership();
-        d.setIdDealership(1L);
-        d.setName("Central");
-        when(dealershipPort.findByName("Central")).thenReturn(d);
-        when(serviceDeliveryPort.findByDealershipId(1L)).thenReturn(List.of(new ServiceDelivery()));
-
-        BusinessException ex = assertThrows(BusinessException.class, () -> deleteDealership.deleteByName("Central"));
-
-        assertEquals("No se puede eliminar el concesionario porque tiene servicios activos asociados.",
-                ex.getMessage());
-        verify(dealershipPort, never()).deleteByName(anyString());
     }
 }

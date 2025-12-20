@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
  * - findByUserName: Buscar por nombre de usuario (para autenticación)
  * - findAll: Obtener todos los empleados
  * - deleteById: Eliminar por ID
- * - deleteByDocument: Eliminar por documento
  * 
  * @see app.domain.ports.EmployeePort
  * @see app.infrastructure.persistence.repository.EmployeeRepository
@@ -47,15 +46,13 @@ public class EmployeeAdapter implements EmployeePort {
     @Autowired
     private EmployeeMapper mapper;
 
-    /** Guarda o actualiza un empleado. Actualiza el ID generado. */
     @Override
-    public void save(Employee employee) {
+    public Employee save(Employee employee) {
         EmployeeEntity entity = mapper.toEntity(employee);
         EmployeeEntity savedEntity = repository.save(entity);
-        employee.setIdEmployee(savedEntity.getIdEmployee());
+        return mapper.toDomain(savedEntity);
     }
 
-    /** Busca un empleado por ID. */
     @Override
     public Employee findById(Long idEmployee) {
         Optional<EmployeeEntity> entity = repository.findById(idEmployee);
@@ -65,7 +62,6 @@ public class EmployeeAdapter implements EmployeePort {
         return null;
     }
 
-    /** Busca un empleado por documento de identidad. */
     @Override
     public Employee findByDocument(Long document) {
         EmployeeEntity entity = repository.findByDocument(document);
@@ -75,7 +71,6 @@ public class EmployeeAdapter implements EmployeePort {
         return null;
     }
 
-    /** Busca un empleado por nombre de usuario (para autenticación). */
     @Override
     public Employee findByUserName(String userName) {
         EmployeeEntity entity = repository.findByUserName(userName);
@@ -85,7 +80,6 @@ public class EmployeeAdapter implements EmployeePort {
         return null;
     }
 
-    /** Obtiene todos los empleados. */
     @Override
     public List<Employee> findAll() {
         return repository.findAll().stream()
@@ -93,18 +87,8 @@ public class EmployeeAdapter implements EmployeePort {
                 .collect(Collectors.toList());
     }
 
-    /** Elimina un empleado por ID. */
     @Override
     public void deleteById(Long idEmployee) {
         repository.deleteById(idEmployee);
-    }
-
-    /** Elimina un empleado por documento. */
-    @Override
-    public void deleteByDocument(Long document) {
-        EmployeeEntity entity = repository.findByDocument(document);
-        if (entity != null) {
-            repository.delete(entity);
-        }
     }
 }

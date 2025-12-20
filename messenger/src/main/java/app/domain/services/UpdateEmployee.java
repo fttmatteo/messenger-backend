@@ -37,10 +37,11 @@ public class UpdateEmployee {
      * 
      * @param id           ID del empleado a actualizar.
      * @param incomingData Nuevos datos del empleado.
+     * @return El empleado actualizado.
      * @throws Exception Si el empleado no existe, o el documento/username ya están
      *                   en uso.
      */
-    public void update(Long id, Employee incomingData) throws Exception {
+    public Employee update(Long id, Employee incomingData) throws Exception {
         logger.debug("Actualizando empleado ID: {}", id);
         Employee existingEmployee = employeePort.findById(id);
         if (existingEmployee == null) {
@@ -74,7 +75,8 @@ public class UpdateEmployee {
             logger.debug("Contraseña actualizada para empleado ID: {}", id);
         }
 
-        employeePort.save(existingEmployee);
-        logger.info("Empleado actualizado: ID {} -> {}", id, existingEmployee.getUserName());
+        Employee updated = employeePort.save(existingEmployee);
+        logger.info("Empleado actualizado: ID {} -> {}", id, updated.getUserName());
+        return updated;
     }
 }

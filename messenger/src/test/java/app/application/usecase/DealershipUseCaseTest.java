@@ -179,14 +179,6 @@ class DealershipUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe eliminar concesionario por nombre sin servicios")
-        void shouldDeleteDealershipByNameWithoutServices() throws Exception {
-            dealershipUseCase.deleteByName("Concesionario Test");
-
-            verify(deleteDealership, times(1)).deleteByName("Concesionario Test");
-        }
-
-        @Test
         @DisplayName("Debe lanzar excepción si tiene servicios activos")
         void shouldThrowExceptionIfHasActiveServices() throws Exception {
             doThrow(new BusinessException("Tiene servicios activos"))

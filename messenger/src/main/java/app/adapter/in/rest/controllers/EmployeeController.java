@@ -37,15 +37,15 @@ public class EmployeeController {
     @PostMapping("/createEmployee")
     @PreAuthorize("hasRole('ADMIN')")
     @AuditableAction(action = "CREATE_EMPLOYEE", description = "Crear nuevo empleado")
-    public ResponseEntity<String> create(@Valid @RequestBody EmployeeRequest request) throws Exception {
+    public ResponseEntity<EmployeeResponse> create(@Valid @RequestBody EmployeeRequest request) throws Exception {
         Employee employee = builder.build(request.getDocument(),
                 request.getFullName(),
                 request.getPhone(),
                 request.getUserName(),
                 request.getPassword(),
                 request.getRole());
-        employeeUseCase.create(employee);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Empleado creado exitosamente");
+        Employee created = employeeUseCase.create(employee);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseMapper.toResponse(created));
     }
 
     @GetMapping("/allEmployees")
@@ -70,7 +70,7 @@ public class EmployeeController {
     @PutMapping("/updateEmployee/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @AuditableAction(action = "UPDATE_EMPLOYEE", description = "Actualizar empleado existente")
-    public ResponseEntity<String> update(@PathVariable Long id, @Valid @RequestBody EmployeeRequest request)
+    public ResponseEntity<EmployeeResponse> update(@PathVariable Long id, @Valid @RequestBody EmployeeRequest request)
             throws Exception {
         Employee employee = builder.build(
                 request.getDocument(),
@@ -79,15 +79,15 @@ public class EmployeeController {
                 request.getUserName(),
                 request.getPassword(),
                 request.getRole());
-        employeeUseCase.update(id, employee);
-        return ResponseEntity.ok("Empleado actualizado exitosamente");
+        Employee updated = employeeUseCase.update(id, employee);
+        return ResponseEntity.ok(responseMapper.toResponse(updated));
     }
 
     @DeleteMapping("/deleteEmployee/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @AuditableAction(action = "DELETE_EMPLOYEE", description = "Eliminar empleado")
-    public ResponseEntity<String> delete(@PathVariable Long id) throws Exception {
+    public ResponseEntity<Void> delete(@PathVariable Long id) throws Exception {
         employeeUseCase.deleteById(id);
-        return ResponseEntity.ok("Empleado eliminado exitosamente");
+        return ResponseEntity.noContent().build();
     }
 }
