@@ -2,26 +2,6 @@ package app.adapter.in.rest.response;
 
 import app.domain.model.enums.Role;
 
-/**
- * DTO (Data Transfer Object) de respuesta con la información de un empleado.
- * 
- * Este objeto encapsula los datos de un empleado registrado en el sistema,
- * excluyendo información sensible como la contraseña por razones de seguridad.
- * 
- * Campos incluidos:
- * - idEmployee: Identificador único del empleado
- * - document: Documento de identidad
- * - fullName: Nombre completo
- * - phone: Número de teléfono
- * - userName: Nombre de usuario para autenticación
- * - role: Rol asignado (ADMIN, MESSENGER, etc.)
- * 
- * Nota: La contraseña nunca se incluye en las respuestas por seguridad.
- * 
- * @see app.adapter.in.rest.controllers.EmployeeController
- * @see app.domain.model.Employee
- * @see app.domain.model.enums.Role
- */
 public class EmployeeResponse {
     private Long idEmployee;
     private Long document;

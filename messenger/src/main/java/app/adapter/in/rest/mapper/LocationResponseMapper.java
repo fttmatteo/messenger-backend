@@ -20,13 +20,6 @@ import java.util.List;
 @Component
 public class LocationResponseMapper {
 
-    /**
-     * Convierte un objeto Location y una dirección formateada a LocationResponse.
-     *
-     * @param location         Objeto de dominio Location con coordenadas.
-     * @param formattedAddress Dirección en texto legible.
-     * @return DTO LocationResponse.
-     */
     public LocationResponse toLocationResponse(Location location, String formattedAddress) {
         if (location == null) {
             return null;
@@ -37,12 +30,6 @@ public class LocationResponseMapper {
                 formattedAddress);
     }
 
-    /**
-     * Convierte un objeto Route a RouteResponse.
-     *
-     * @param route Objeto de dominio Route con detalles de la ruta calculada.
-     * @return DTO RouteResponse con origen, destino, waypoints y métricas.
-     */
     public RouteResponse toRouteResponse(Route route) {
         if (route == null) {
             return null;

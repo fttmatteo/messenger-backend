@@ -21,12 +21,12 @@ import org.springframework.stereotype.Repository;
 public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Long> {
 
     /**
-     * Busca un empleado por su número de documento de identidad.
+     * Verifica si existe un empleado con el documento de identidad dado.
      * 
      * @param document Número de documento del empleado
-     * @return La entidad del empleado encontrado, o null si no existe
+     * @return true si existe, false si no
      */
-    EmployeeEntity findByDocument(Long document);
+    boolean existsByDocument(Long document);
 
     /**
      * Elimina un empleado por su número de documento.

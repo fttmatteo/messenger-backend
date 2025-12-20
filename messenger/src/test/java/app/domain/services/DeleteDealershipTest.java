@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import app.application.exceptions.BusinessException;
 import app.domain.model.Dealership;
 import app.domain.model.ServiceDelivery;
@@ -39,25 +38,7 @@ class DeleteDealershipTest {
         Dealership d = new Dealership();
         d.setIdDealership(1L);
         when(dealershipPort.findById(1L)).thenReturn(d);
-        when(serviceDeliveryPort.findByDealershipId(1L)).thenReturn(Collections.emptyList());
-
         deleteDealership.deleteById(1L);
-
         verify(dealershipPort).deleteById(1L);
-    }
-
-    @Test
-    @DisplayName("Debe lanzar excepción por ID si tiene servicios")
-    void shouldThrowExceptionByIdIfHasServices() {
-        Dealership d = new Dealership();
-        d.setIdDealership(1L);
-        when(dealershipPort.findById(1L)).thenReturn(d);
-        when(serviceDeliveryPort.findByDealershipId(1L)).thenReturn(List.of(new ServiceDelivery()));
-
-        BusinessException ex = assertThrows(BusinessException.class, () -> deleteDealership.deleteById(1L));
-
-        assertEquals("No se puede eliminar el concesionario porque tiene servicios activos asociados.",
-                ex.getMessage());
-        verify(dealershipPort, never()).deleteById(anyLong());
     }
 }

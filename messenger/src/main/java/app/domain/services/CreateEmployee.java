@@ -52,8 +52,7 @@ public class CreateEmployee {
     }
 
     private void validateDocumentIsUnique(Long document) throws Exception {
-        Employee existing = employeePort.findByDocument(document);
-        if (existing != null) {
+        if (employeePort.existsByDocument(document)) {
             throw new BusinessException("Ya existe un empleado registrado con el documento " + document);
         }
     }

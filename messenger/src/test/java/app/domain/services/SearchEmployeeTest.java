@@ -74,33 +74,6 @@ class SearchEmployeeTest {
     }
 
     @Nested
-    @DisplayName("Buscar por Documento")
-    class FindByDocumentTests {
-
-        @Test
-        @DisplayName("Debe retornar empleado para documento existente")
-        void shouldReturnEmployeeForExistingDocument() throws Exception {
-            when(employeePort.findByDocument(123456789L)).thenReturn(sampleEmployee);
-
-            Employee result = searchEmployee.findByDocument(123456789L);
-
-            assertNotNull(result);
-            assertEquals("Juan Pérez", result.getFullName());
-        }
-
-        @Test
-        @DisplayName("Debe lanzar excepción para documento no existente")
-        void shouldThrowExceptionForNonExistingDocument() {
-            when(employeePort.findByDocument(999L)).thenReturn(null);
-
-            Exception exception = assertThrows(Exception.class,
-                    () -> searchEmployee.findByDocument(999L));
-
-            assertTrue(exception.getMessage().contains("no existe"));
-        }
-    }
-
-    @Nested
     @DisplayName("Buscar por ID")
     class FindByIdTests {
 

@@ -49,27 +49,10 @@ public class CreateServiceDelivery {
     @Autowired
     private PlateRecognition plateRecognition;
 
-    /**
-     * Crea un nuevo servicio de entrega.
-     * 
-     * Valida mensajero y concesionario, determina tipo de placa, crea la placa si
-     * no existe,
-     * e inicializa el servicio en estado ASSIGNED con su primer registro de
-     * historial.
-     * 
-     * @param plateNumber       Número de placa vehicular.
-     * @param photoPath         Ruta de la foto de detección de placa (opcional).
-     * @param dealershipId      ID del concesionario destino.
-     * @param messengerDocument Documento del mensajero asignado.
-     * @throws Exception Si el mensajero o concesionario no existen, o si el formato
-     *                   de placa es inválido.
-     */
-    public void create(String plateNumber, String photoPath, Long dealershipId, Long messengerDocument)
+    public ServiceDelivery create(String plateNumber, String photoPath, Long dealershipId, Long messengerId)
             throws Exception {
-        logger.info("Creando servicio de entrega: placa={}, concesionario={}, mensajero={}",
-                plateNumber, dealershipId, messengerDocument);
 
-        Employee messenger = employeePort.findByDocument(messengerDocument);
+        Employee messenger = employeePort.findById(messengerId);
         if (messenger == null) {
             throw new BusinessException("El mensajero no existe.");
         }
@@ -114,8 +97,9 @@ public class CreateServiceDelivery {
 
         service.addHistory(history);
 
-        serviceDeliveryPort.save(service);
+        ServiceDelivery saved = serviceDeliveryPort.save(service);
         logger.info("Servicio creado exitosamente: placa={}, concesionario={}, mensajero={}",
                 normalizedPlate, dealership.getName(), messenger.getFullName());
+        return saved;
     }
 }

@@ -49,8 +49,7 @@ public class UpdateEmployee {
         }
 
         if (!existingEmployee.getDocument().equals(incomingData.getDocument())) {
-            Employee other = employeePort.findByDocument(incomingData.getDocument());
-            if (other != null) {
+            if (employeePort.existsByDocument(incomingData.getDocument())) {
                 throw new BusinessException(
                         "El documento " + incomingData.getDocument() + " ya está registrado por otro empleado.");
             }

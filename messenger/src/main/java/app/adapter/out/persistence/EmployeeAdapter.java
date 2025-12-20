@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  * Operaciones soportadas:
  * - save: Guardar o actualizar un empleado
  * - findById: Buscar por ID
- * - findByDocument: Buscar por documento de identidad
+ * - existsByDocument: Verificar existencia por documento de identidad
  * - findByUserName: Buscar por nombre de usuario (para autenticación)
  * - findAll: Obtener todos los empleados
  * - deleteById: Eliminar por ID
@@ -63,12 +63,8 @@ public class EmployeeAdapter implements EmployeePort {
     }
 
     @Override
-    public Employee findByDocument(Long document) {
-        EmployeeEntity entity = repository.findByDocument(document);
-        if (entity != null) {
-            return mapper.toDomain(entity);
-        }
-        return null;
+    public boolean existsByDocument(Long document) {
+        return repository.existsByDocument(document);
     }
 
     @Override

@@ -25,52 +25,20 @@ public class ServiceDeliveryResponseMapper {
     private EmployeeResponseMapper employeeMapper;
     @Autowired
     private DealershipResponseMapper dealershipMapper;
-
-    // Opcional: solo disponible cuando app.storage.type=gcs
     @Autowired(required = false)
     private GoogleCloudStorageAdapter storageAdapter;
 
-    /**
-     * Genera una URL para acceder a un archivo.
-     * 
-     * Si GCS está disponible, genera una URL firmada temporal.
-     * Si no, retorna el path tal cual (para almacenamiento local).
-     */
     private String getFileUrl(String path) {
         if (storageAdapter != null && path != null) {
             try {
                 return storageAdapter.regenerateSignedUrl(path);
             } catch (Exception e) {
-                // CRITICAL ERROR LOGGING
-                // Esto es vital para entender por qué falla la firma en Producción
-                System.err.println("==================================================================");
-                System.err.println("ERROR GRAVE GENERANDO URL FIRMADA PARA: " + path);
-                System.err.println("Excepción: " + e.getClass().getName());
-                System.err.println("Mensaje: " + e.getMessage());
-                e.printStackTrace(System.err);
-                System.err.println("==================================================================");
-
-                // NO devolver el path crudo, porque el frontend trata de abrirlo como link
-                // relativo al backend
-                // Devolver null para que el frontend sepa que no hay imagen disponible por
-                // ahora
                 return null;
             }
         }
         return path;
     }
 
-    /**
-     * Convierte una entidad ServiceDelivery a ServiceDeliveryResponse.
-     *
-     * Mapea todos los campos relevantes, incluyendo estado actual, historial,
-     * evidencias (fotos y firma), y entidades relacionadas (placa, mensajero,
-     * concesionario).
-     *
-     * @param service Entidad ServiceDelivery de origen.
-     * @return DTO ServiceDeliveryResponse completamente poblado o null si la
-     *         entrada es nula.
-     */
     public ServiceDeliveryResponse toResponse(ServiceDelivery service) {
         if (service == null) {
             return null;
@@ -91,7 +59,6 @@ public class ServiceDeliveryResponseMapper {
         }
 
         response.setDealership(dealershipMapper.toResponse(service.getDealership()));
-
         response.setMessenger(employeeMapper.toResponse(service.getMessenger()));
 
         if (service.getSignature() != null) {

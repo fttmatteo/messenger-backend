@@ -59,8 +59,8 @@ public class UpdateServiceDelivery {
      * @throws Exception Si la transición no es válida, faltan evidencias, o el
      *                   usuario no tiene permisos.
      */
-    public void updateStatus(Long serviceId, Status newStatus, String observation,
-            Signature signature, List<Photo> photos, Long userDocument) throws Exception {
+    public ServiceDelivery updateStatus(Long serviceId, Status newStatus, String observation,
+            Signature signature, List<Photo> photos, Long userId) throws Exception {
 
         logger.info("Actualizando estado servicio ID: {} -> {}", serviceId, newStatus);
 
@@ -69,9 +69,9 @@ public class UpdateServiceDelivery {
             throw new BusinessException("El servicio con ID " + serviceId + " no existe.");
         }
 
-        Employee user = employeePort.findByDocument(userDocument);
+        Employee user = employeePort.findById(userId);
         if (user == null) {
-            throw new BusinessException("El usuario con documento " + userDocument + " no existe.");
+            throw new BusinessException("El usuario con ID " + userId + " no existe.");
         }
 
         Status previousStatus = service.getCurrentStatus();
@@ -116,9 +116,10 @@ public class UpdateServiceDelivery {
 
         service.addHistory(history);
 
-        serviceDeliveryPort.save(service);
+        ServiceDelivery updated = serviceDeliveryPort.save(service);
         logger.info("Estado actualizado: servicio {} de {} a {} por {}",
                 serviceId, previousStatus, newStatus, user.getUserName());
+        return updated;
     }
 
     private void validateEvidence(Status status, Signature signature, List<Photo> photos, String observation)

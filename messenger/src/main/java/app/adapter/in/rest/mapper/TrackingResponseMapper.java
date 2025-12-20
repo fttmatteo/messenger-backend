@@ -17,12 +17,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class TrackingResponseMapper {
 
-    /**
-     * Convierte un objeto LiveTracking a LiveTrackingResponse.
-     *
-     * @param tracking Objeto de dominio con la información de rastreo en vivo.
-     * @return DTO LiveTrackingResponse.
-     */
     public LiveTrackingResponse toResponse(LiveTracking tracking) {
         if (tracking == null) {
             return null;
@@ -38,12 +32,6 @@ public class TrackingResponseMapper {
                 tracking.getHeading());
     }
 
-    /**
-     * Convierte un objeto TrackingHistory a TrackingHistoryResponse.
-     *
-     * @param history Objeto de dominio con el historial de rastreo.
-     * @return DTO TrackingHistoryResponse.
-     */
     public TrackingHistoryResponse toHistoryResponse(TrackingHistory history) {
         if (history == null) {
             return null;

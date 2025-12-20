@@ -2,6 +2,7 @@ package app.domain.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,9 +58,10 @@ class UpdateEmployeeTest {
         income.setPassword("newPass");
 
         when(employeePort.findById(1L)).thenReturn(existingEmployee);
-        when(employeePort.findByDocument(999L)).thenReturn(null);
+        when(employeePort.existsByDocument(999L)).thenReturn(false);
         when(employeePort.findByUserName("newUser")).thenReturn(null);
         when(passwordEncoder.encode("newPass")).thenReturn("encodedNewPass");
+        when(employeePort.save(any())).thenReturn(existingEmployee);
 
         updateEmployee.update(1L, income);
 
@@ -76,7 +78,7 @@ class UpdateEmployeeTest {
         income.setDocument(999L);
 
         when(employeePort.findById(1L)).thenReturn(existingEmployee);
-        when(employeePort.findByDocument(999L)).thenReturn(new Employee());
+        when(employeePort.existsByDocument(999L)).thenReturn(true);
 
         BusinessException ex = assertThrows(BusinessException.class, () -> updateEmployee.update(1L, income));
 

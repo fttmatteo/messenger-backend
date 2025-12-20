@@ -20,7 +20,6 @@ import app.application.usecase.ServiceDeliveryUseCase;
 import app.domain.model.Employee;
 import app.domain.model.ServiceDelivery;
 import app.domain.model.enums.Role;
-import app.domain.model.enums.Status;
 import app.domain.ports.EmployeePort;
 import app.infrastructure.helper.FileHelper;
 import java.io.File;
@@ -28,21 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Controlador REST para gestionar servicios de entrega.
- *
- * Proporciona endpoints para:
- * - Crear servicios con detección OCR automática o entrada manual de placas.
- * - Actualizar estados con evidencias (firmas y fotos).
- * - Consultar servicios por diversos criterios (ID, mensajero, concesionario,
- * estado).
- *
- * Implementa control de acceso basado en roles:
- * - ADMIN puede asignar servicios a cualquier mensajero.
- * - MESSENGER solo puede gestionar sus propios servicios asignados.
- */
 @RestController
 @RequestMapping("/services")
+@PreAuthorize("isAuthenticated()")
 public class ServiceDeliveryController {
 
     @Autowired
@@ -57,10 +44,11 @@ public class ServiceDeliveryController {
     private FileHelper fileHelper;
 
     @PostMapping("/createService")
-    public ResponseEntity<?> createService(
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ServiceDeliveryResponse> createService(
             @RequestParam("image") MultipartFile image,
             @RequestParam("dealershipId") String dealershipId,
-            @RequestParam(value = "messengerDocument", required = false) String messengerDocument,
+            @RequestParam(value = "messengerId", required = false) String messengerId,
             @RequestParam(value = "manualPlateNumber", required = false) String manualPlateNumber) throws Exception {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -71,41 +59,41 @@ public class ServiceDeliveryController {
             throw new UnauthorizedException("Autenticación de usuario no encontrada o inválida.");
         }
 
-        String finalMessengerDocument = messengerDocument;
+        String finalMessengerId = messengerId;
         if (currentUser.getRole() != Role.ADMIN) {
-            finalMessengerDocument = String.valueOf(currentUser.getDocument());
+            finalMessengerId = String.valueOf(currentUser.getIdEmployee());
         } else {
-            if (messengerDocument == null || messengerDocument.trim().isEmpty()) {
-                throw new InputsException("El documento del mensajero es requerido para usuarios Admin.");
+            if (messengerId == null || messengerId.trim().isEmpty()) {
+                throw new InputsException("El ID del mensajero es requerido para usuarios Admin.");
             }
         }
 
-        ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest(dealershipId,
-                finalMessengerDocument);
+        ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest(dealershipId, finalMessengerId);
         request.setManualPlateNumber(manualPlateNumber);
 
         ServiceDeliveryBuilder.ServiceDeliveryCreateData data = builder.buildCreateData(request);
 
-        // Usa withTempFile para cleanup automático del archivo temporal
         return fileHelper.withTempFile(image, imageFile -> {
+            ServiceDelivery created;
             if (manualPlateNumber != null && !manualPlateNumber.isEmpty()) {
-                serviceDeliveryUseCase.createServiceWithManualPlate(
+                created = serviceDeliveryUseCase.createServiceWithManualPlate(
                         imageFile,
                         manualPlateNumber,
                         data.getDealershipId(),
-                        data.getMessengerDocument());
+                        data.getMessengerId());
             } else {
-                serviceDeliveryUseCase.createServiceFromImage(
+                created = serviceDeliveryUseCase.createServiceFromImage(
                         imageFile,
                         data.getDealershipId(),
-                        data.getMessengerDocument());
+                        data.getMessengerId());
             }
-            return ResponseEntity.status(HttpStatus.CREATED).body("Servicio creado exitosamente.");
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseMapper.toResponse(created));
         });
     }
 
     @PutMapping("/updateServiceStatus/{id}")
-    public ResponseEntity<?> updateStatus(
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ServiceDeliveryResponse> updateStatus(
             @PathVariable Long id,
             @RequestParam("status") String status,
             @RequestParam(value = "observation", required = false) String observation,
@@ -122,10 +110,10 @@ public class ServiceDeliveryController {
                 throw new UnauthorizedException("Autenticación de usuario no encontrada o inválida.");
             }
 
-            String userDocument = String.valueOf(currentUser.getDocument());
+            String userId = String.valueOf(currentUser.getIdEmployee());
 
             ServiceDeliveryUpdateStatusRequest request = new ServiceDeliveryUpdateStatusRequest(status, observation,
-                    userDocument);
+                    userId);
             ServiceDeliveryBuilder.ServiceDeliveryUpdateData data = builder.buildUpdateStatusData(request);
 
             File signatureFile = null;
@@ -137,30 +125,31 @@ public class ServiceDeliveryController {
             List<File> photoFiles = fileHelper.convertToFiles(photos);
             tempFiles.addAll(photoFiles);
 
-            serviceDeliveryUseCase.updateStatusWithFiles(id, data.getStatus(), data.getObservation(),
-                    signatureFile, photoFiles, data.getUserDocument());
+            ServiceDelivery updated = serviceDeliveryUseCase.updateStatusWithFiles(id, data.getStatus(),
+                    data.getObservation(),
+                    signatureFile, photoFiles, data.getUserId());
 
-            return ResponseEntity.ok("Estado actualizado exitosamente.");
+            return ResponseEntity.ok(responseMapper.toResponse(updated));
         } finally {
             fileHelper.cleanupTempFiles(tempFiles);
         }
     }
 
     @GetMapping("/findService/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ServiceDeliveryResponse> findById(@PathVariable Long id) throws Exception {
         ServiceDelivery service = serviceDeliveryUseCase.findById(id);
         if (service == null) {
             throw new ResourceNotFoundException("Servicio con ID " + id + " no encontrado");
         }
 
-        // ========== VALIDACIÓN DE OWNERSHIP ==========
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String currentUserName = auth.getName();
         Employee currentUser = employeePort.findByUserName(currentUserName);
 
         if (currentUser != null && currentUser.getRole() == Role.MESSENGER) {
             if (service.getMessenger() == null ||
-                    !service.getMessenger().getDocument().equals(currentUser.getDocument())) {
+                    !service.getMessenger().getIdEmployee().equals(currentUser.getIdEmployee())) {
                 throw new UnauthorizedException("No tienes permiso para ver este servicio");
             }
         }
@@ -169,6 +158,7 @@ public class ServiceDeliveryController {
     }
 
     @GetMapping("/allServices")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ServiceDeliveryResponse>> findAll() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String currentUserName = auth.getName();
@@ -176,10 +166,14 @@ public class ServiceDeliveryController {
 
         List<ServiceDelivery> services;
 
+        services = serviceDeliveryUseCase.findAll();
+
         if (currentUser != null && currentUser.getRole() == Role.MESSENGER) {
-            services = serviceDeliveryUseCase.findByMessenger(currentUser.getDocument());
-        } else {
-            services = serviceDeliveryUseCase.findAll();
+            Long messengerId = currentUser.getIdEmployee();
+            services = services.stream()
+                    .filter(s -> s.getMessenger() != null &&
+                            s.getMessenger().getIdEmployee().equals(messengerId))
+                    .collect(Collectors.toList());
         }
 
         List<ServiceDeliveryResponse> responses = services.stream()
@@ -188,34 +182,10 @@ public class ServiceDeliveryController {
         return ResponseEntity.ok(responses);
     }
 
-    @GetMapping("/findServiceByMessenger/{Id}")
-    public ResponseEntity<List<ServiceDeliveryResponse>> findByMessenger(@PathVariable Long messengerId) {
-        List<ServiceDeliveryResponse> responses = serviceDeliveryUseCase.findByMessenger(messengerId).stream()
-                .map(responseMapper::toResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(responses);
-    }
-
-    @GetMapping("/findServiceByDealership/{Id}")
-    public ResponseEntity<List<ServiceDeliveryResponse>> findByDealership(@PathVariable Long dealershipId) {
-        List<ServiceDeliveryResponse> responses = serviceDeliveryUseCase.findByDealership(dealershipId).stream()
-                .map(responseMapper::toResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(responses);
-    }
-
-    @GetMapping("/findServiceByStatus/{status}")
-    public ResponseEntity<List<ServiceDeliveryResponse>> findByStatus(@PathVariable Status status) {
-        List<ServiceDeliveryResponse> responses = serviceDeliveryUseCase.findByStatus(status).stream()
-                .map(responseMapper::toResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(responses);
-    }
-
     @DeleteMapping("/deleteService/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> delete(@PathVariable Long id) throws Exception {
+    @PreAuthorize("hasAnyRole('ADMIN', 'MESSENGER')")
+    public ResponseEntity<Void> delete(@PathVariable Long id) throws Exception {
         serviceDeliveryUseCase.deleteById(id);
-        return ResponseEntity.ok("Servicio eliminado exitosamente");
+        return ResponseEntity.noContent().build();
     }
 }

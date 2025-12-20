@@ -1,26 +1,5 @@
 package app.adapter.in.rest.response;
 
-/**
- * DTO (Data Transfer Object) de respuesta con la información completa de un
- * concesionario.
- * 
- * Este objeto encapsula todos los datos de un concesionario registrado en el
- * sistema,
- * incluyendo información de contacto, ubicación física y coordenadas
- * geocodificadas.
- * 
- * Campos incluidos:
- * - idDealership: Identificador único del concesionario
- * - name: Nombre comercial
- * - address: Dirección física completa
- * - phone: Número de teléfono de contacto
- * - zone: Zona geográfica o administrativa
- * - latitude/longitude: Coordenadas geocodificadas (si están disponibles)
- * - isGeolocated: Indica si el concesionario ha sido geocodificado exitosamente
- * 
- * @see app.adapter.in.rest.controllers.DealershipController
- * @see app.domain.model.Dealership
- */
 public class DealershipResponse {
     private Long idDealership;
     private String name;

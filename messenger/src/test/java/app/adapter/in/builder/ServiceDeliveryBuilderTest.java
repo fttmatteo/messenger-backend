@@ -16,11 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Tests unitarios para ServiceDeliveryBuilder.
- * 
- * Verifica la construcción de objetos de datos validados para servicios.
- */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ServiceDeliveryBuilder Unit Tests")
 class ServiceDeliveryBuilderTest {
@@ -40,16 +35,16 @@ class ServiceDeliveryBuilderTest {
         void shouldBuildValidCreateData() throws Exception {
             ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest();
             request.setDealershipId("1");
-            request.setMessengerDocument("123456789");
+            request.setMessengerId("100");
 
             when(validator.idValidator("1")).thenReturn(1L);
-            when(validator.documentValidator("123456789")).thenReturn(123456789L);
+            when(validator.idValidator("100")).thenReturn(100L);
 
             ServiceDeliveryBuilder.ServiceDeliveryCreateData result = builder.buildCreateData(request);
 
             assertNotNull(result);
             assertEquals(1L, result.getDealershipId());
-            assertEquals(123456789L, result.getMessengerDocument());
+            assertEquals(100L, result.getMessengerId());
         }
 
         @Test
@@ -57,7 +52,7 @@ class ServiceDeliveryBuilderTest {
         void shouldPropagateExceptionForInvalidId() throws Exception {
             ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest();
             request.setDealershipId("invalid");
-            request.setMessengerDocument("123456789");
+            request.setMessengerId("100");
 
             when(validator.idValidator("invalid"))
                     .thenThrow(new InputsException("ID inválido"));
@@ -66,15 +61,15 @@ class ServiceDeliveryBuilderTest {
         }
 
         @Test
-        @DisplayName("Debe propagar excepción si documento es inválido")
-        void shouldPropagateExceptionForInvalidDocument() throws Exception {
+        @DisplayName("Debe propagar excepción si messengerId es inválido")
+        void shouldPropagateExceptionForInvalidMessengerId() throws Exception {
             ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest();
             request.setDealershipId("1");
-            request.setMessengerDocument("abc");
+            request.setMessengerId("abc");
 
             when(validator.idValidator("1")).thenReturn(1L);
-            when(validator.documentValidator("abc"))
-                    .thenThrow(new InputsException("Documento inválido"));
+            when(validator.idValidator("abc"))
+                    .thenThrow(new InputsException("ID inválido"));
 
             assertThrows(InputsException.class, () -> builder.buildCreateData(request));
         }
@@ -90,18 +85,18 @@ class ServiceDeliveryBuilderTest {
             ServiceDeliveryUpdateStatusRequest request = new ServiceDeliveryUpdateStatusRequest();
             request.setStatus("DELIVERED");
             request.setObservation("Entregado correctamente");
-            request.setUserDocument("123456789");
+            request.setUserId("100");
 
             when(validator.statusValidator("DELIVERED")).thenReturn(Status.DELIVERED);
             when(validator.observationValidator("Entregado correctamente")).thenReturn("Entregado correctamente");
-            when(validator.documentValidator("123456789")).thenReturn(123456789L);
+            when(validator.idValidator("100")).thenReturn(100L);
 
             ServiceDeliveryBuilder.ServiceDeliveryUpdateData result = builder.buildUpdateStatusData(request);
 
             assertNotNull(result);
             assertEquals(Status.DELIVERED, result.getStatus());
             assertEquals("Entregado correctamente", result.getObservation());
-            assertEquals(123456789L, result.getUserDocument());
+            assertEquals(100L, result.getUserId());
         }
 
         @Test
@@ -110,7 +105,7 @@ class ServiceDeliveryBuilderTest {
             ServiceDeliveryUpdateStatusRequest request = new ServiceDeliveryUpdateStatusRequest();
             request.setStatus("INVALID");
             request.setObservation("Test");
-            request.setUserDocument("123456789");
+            request.setUserId("100");
 
             when(validator.statusValidator("INVALID"))
                     .thenThrow(new InputsException("Estado inválido"));
@@ -127,21 +122,21 @@ class ServiceDeliveryBuilderTest {
         @DisplayName("ServiceDeliveryCreateData debe ser inmutable")
         void createDataShouldBeImmutable() {
             ServiceDeliveryBuilder.ServiceDeliveryCreateData data = new ServiceDeliveryBuilder.ServiceDeliveryCreateData(
-                    1L, 123456789L);
+                    1L, 100L);
 
             assertEquals(1L, data.getDealershipId());
-            assertEquals(123456789L, data.getMessengerDocument());
+            assertEquals(100L, data.getMessengerId());
         }
 
         @Test
         @DisplayName("ServiceDeliveryUpdateData debe ser inmutable")
         void updateDataShouldBeImmutable() {
             ServiceDeliveryBuilder.ServiceDeliveryUpdateData data = new ServiceDeliveryBuilder.ServiceDeliveryUpdateData(
-                    Status.DELIVERED, "Obs", 123456789L);
+                    Status.DELIVERED, "Obs", 100L);
 
             assertEquals(Status.DELIVERED, data.getStatus());
             assertEquals("Obs", data.getObservation());
-            assertEquals(123456789L, data.getUserDocument());
+            assertEquals(100L, data.getUserId());
         }
     }
 }

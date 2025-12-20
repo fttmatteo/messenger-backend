@@ -1,7 +1,6 @@
 package app.domain.ports;
 
 import app.domain.model.ServiceDelivery;
-import app.domain.model.enums.Status;
 import java.util.List;
 
 /**
@@ -13,7 +12,7 @@ import java.util.List;
  */
 public interface ServiceDeliveryPort {
 
-    void save(ServiceDelivery serviceDelivery);
+    ServiceDelivery save(ServiceDelivery serviceDelivery);
 
     void deleteById(Long idServiceDelivery);
 
@@ -21,11 +20,5 @@ public interface ServiceDeliveryPort {
 
     List<ServiceDelivery> findAll();
 
-    List<ServiceDelivery> findByStatus(Status status);
-
-    List<ServiceDelivery> findByMessengerDocument(Long messengerDocument);
-
     List<ServiceDelivery> findByPlateNumber(String plateNumber);
-
-    List<ServiceDelivery> findByDealershipId(Long dealershipId);
 }

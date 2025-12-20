@@ -23,7 +23,6 @@ public class AuthController {
 
     @Autowired
     private RefreshTokenUseCase refreshTokenUseCase;
-
     @Autowired
     private LoginUseCase loginUseCase;
 

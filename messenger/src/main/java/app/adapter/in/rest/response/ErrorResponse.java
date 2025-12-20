@@ -4,83 +4,19 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * DTO para respuestas de error estandarizadas en toda la API.
- * 
- * Proporciona un formato consistente para todos los errores HTTP, facilitando
- * el manejo de errores en el cliente y mejorando la experiencia del
- * desarrollador.
- * 
- * Estructura del JSON de respuesta:
- * 
- * <pre>
- * {
- *   "timestamp": "2025-12-16T00:31:28",
- *   "status": 400,
- *   "error": "Bad Request",
- *   "message": "Error de validación",
- *   "path": "/api/employees",
- *   "details": [
- *     {
- *       "field": "document",
- *       "message": "la cédula no puede exceder 10 dígitos"
- *     }
- *   ]
- * }
- * </pre>
- * 
- * @see ErrorDetail
- * @see app.infrastructure.config.GlobalExceptionHandler
- */
 public class ErrorResponse {
-
-    /**
-     * Timestamp del momento en que ocurrió el error (ISO 8601).
-     */
     private LocalDateTime timestamp;
-
-    /**
-     * Código de estado HTTP numérico (400, 401, 404, 500, etc.).
-     */
     private int status;
-
-    /**
-     * Descripción textual del estado HTTP ("Bad Request", "Not Found", etc.).
-     */
     private String error;
-
-    /**
-     * Mensaje principal del error, conciso y descriptivo.
-     */
     private String message;
-
-    /**
-     * Ruta del endpoint que generó el error (ej: "/api/employees").
-     */
     private String path;
-
-    /**
-     * Lista opcional de detalles específicos de error.
-     * Principalmente utilizada para errores de validación de múltiples campos.
-     */
     private List<ErrorDetail> details;
 
-    /**
-     * Constructor por defecto requerido para deserialización JSON.
-     */
     public ErrorResponse() {
         this.timestamp = LocalDateTime.now();
         this.details = new ArrayList<>();
     }
 
-    /**
-     * Constructor para errores simples sin detalles.
-     * 
-     * @param status  Código HTTP
-     * @param error   Descripción del estado HTTP
-     * @param message Mensaje del error
-     * @param path    Ruta del endpoint
-     */
     public ErrorResponse(int status, String error, String message, String path) {
         this.timestamp = LocalDateTime.now();
         this.status = status;
@@ -90,15 +26,6 @@ public class ErrorResponse {
         this.details = new ArrayList<>();
     }
 
-    /**
-     * Constructor para errores con detalles de validación.
-     * 
-     * @param status  Código HTTP
-     * @param error   Descripción del estado HTTP
-     * @param message Mensaje del error
-     * @param path    Ruta del endpoint
-     * @param details Lista de detalles de error
-     */
     public ErrorResponse(int status, String error, String message, String path, List<ErrorDetail> details) {
         this.timestamp = LocalDateTime.now();
         this.status = status;

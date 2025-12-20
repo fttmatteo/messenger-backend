@@ -56,9 +56,10 @@ class CreateEmployeeTest {
         @Test
         @DisplayName("Debe crear empleado con contraseña encriptada")
         void shouldCreateEmployeeWithEncodedPassword() throws Exception {
-            when(employeePort.findByDocument(123456789L)).thenReturn(null);
+            when(employeePort.existsByDocument(123456789L)).thenReturn(false);
             when(employeePort.findByUserName("jperez")).thenReturn(null);
             when(passwordEncoder.encode("plainPassword123")).thenReturn("$2a$10$encodedHash");
+            when(employeePort.save(any())).thenReturn(newEmployee);
 
             createEmployee.create(newEmployee);
 
@@ -69,9 +70,10 @@ class CreateEmployeeTest {
         @Test
         @DisplayName("Debe guardar empleado en el puerto")
         void shouldSaveEmployeeToPort() throws Exception {
-            when(employeePort.findByDocument(anyLong())).thenReturn(null);
+            when(employeePort.existsByDocument(anyLong())).thenReturn(false);
             when(employeePort.findByUserName(anyString())).thenReturn(null);
             when(passwordEncoder.encode(anyString())).thenReturn("encoded");
+            when(employeePort.save(any())).thenReturn(newEmployee);
 
             createEmployee.create(newEmployee);
 
@@ -82,8 +84,9 @@ class CreateEmployeeTest {
         @DisplayName("Debe permitir crear empleado sin contraseña")
         void shouldCreateEmployeeWithoutPassword() throws Exception {
             newEmployee.setPassword(null);
-            when(employeePort.findByDocument(anyLong())).thenReturn(null);
+            when(employeePort.existsByDocument(anyLong())).thenReturn(false);
             when(employeePort.findByUserName(anyString())).thenReturn(null);
+            when(employeePort.save(any())).thenReturn(newEmployee);
 
             createEmployee.create(newEmployee);
 
@@ -99,9 +102,7 @@ class CreateEmployeeTest {
         @Test
         @DisplayName("Debe lanzar excepción si documento ya existe")
         void shouldThrowExceptionIfDocumentExists() {
-            Employee existingEmployee = new Employee();
-            existingEmployee.setDocument(123456789L);
-            when(employeePort.findByDocument(123456789L)).thenReturn(existingEmployee);
+            when(employeePort.existsByDocument(123456789L)).thenReturn(true);
 
             BusinessException exception = assertThrows(BusinessException.class,
                     () -> createEmployee.create(newEmployee));
@@ -119,7 +120,7 @@ class CreateEmployeeTest {
         @Test
         @DisplayName("Debe lanzar excepción si username ya existe")
         void shouldThrowExceptionIfUsernameExists() {
-            when(employeePort.findByDocument(anyLong())).thenReturn(null);
+            when(employeePort.existsByDocument(anyLong())).thenReturn(false);
 
             Employee existingEmployee = new Employee();
             existingEmployee.setUserName("jperez");

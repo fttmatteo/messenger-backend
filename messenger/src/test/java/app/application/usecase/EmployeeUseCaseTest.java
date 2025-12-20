@@ -113,28 +113,6 @@ class EmployeeUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe buscar empleado por documento")
-        void shouldFindEmployeeByDocument() throws Exception {
-            when(searchEmployee.findByDocument(123456789L)).thenReturn(sampleEmployee);
-
-            Employee result = employeeUseCase.findByDocument(123456789L);
-
-            assertNotNull(result);
-            assertEquals("Juan Pérez", result.getFullName());
-            assertEquals(Role.MESSENGER, result.getRole());
-        }
-
-        @Test
-        @DisplayName("Debe retornar null si documento no existe")
-        void shouldReturnNullIfDocumentNotFound() throws Exception {
-            when(searchEmployee.findByDocument(999L)).thenReturn(null);
-
-            Employee result = employeeUseCase.findByDocument(999L);
-
-            assertNull(result);
-        }
-
-        @Test
         @DisplayName("Debe buscar empleado por ID")
         void shouldFindEmployeeById() {
             when(searchEmployee.findById(1L)).thenReturn(sampleEmployee);

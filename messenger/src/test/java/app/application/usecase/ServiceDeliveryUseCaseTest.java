@@ -19,10 +19,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.io.File;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -181,17 +179,6 @@ class ServiceDeliveryUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe buscar por mensajero")
-        void shouldFindByMessenger() {
-            when(searchService.findByMessenger(123456L)).thenReturn(List.of(sampleService));
-
-            List<ServiceDelivery> result = serviceDeliveryUseCase.findByMessenger(123456L);
-
-            assertEquals(1, result.size());
-            verify(searchService).findByMessenger(123456L);
-        }
-
-        @Test
         @DisplayName("Debe buscar por placa")
         void shouldFindByPlate() {
             when(searchService.findByPlate("ABC123")).thenReturn(List.of(sampleService));
@@ -199,27 +186,6 @@ class ServiceDeliveryUseCaseTest {
             List<ServiceDelivery> result = serviceDeliveryUseCase.findByPlate("ABC123");
 
             assertEquals(1, result.size());
-        }
-
-        @Test
-        @DisplayName("Debe buscar por concesionario")
-        void shouldFindByDealership() {
-            when(searchService.findByDealership(1L)).thenReturn(List.of(sampleService));
-
-            List<ServiceDelivery> result = serviceDeliveryUseCase.findByDealership(1L);
-
-            assertEquals(1, result.size());
-        }
-
-        @Test
-        @DisplayName("Debe buscar por estado")
-        void shouldFindByStatus() {
-            when(searchService.findByStatus(Status.ASSIGNED)).thenReturn(List.of(sampleService));
-
-            List<ServiceDelivery> result = serviceDeliveryUseCase.findByStatus(Status.ASSIGNED);
-
-            assertEquals(1, result.size());
-            assertEquals(Status.ASSIGNED, result.get(0).getCurrentStatus());
         }
     }
 

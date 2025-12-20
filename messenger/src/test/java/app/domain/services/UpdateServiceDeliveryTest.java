@@ -69,7 +69,7 @@ class UpdateServiceDeliveryTest {
     @DisplayName("Debe actualizar estado a PENDING con evidencias completas")
     void shouldUpdateStatusToPendingWhenEvidenceComplete() throws Exception {
         when(serviceDeliveryPort.findById(1L)).thenReturn(service);
-        when(employeePort.findByDocument(12345L)).thenReturn(employee);
+        when(employeePort.findById(12345L)).thenReturn(employee);
 
         updateServiceDelivery.updateStatus(1L, Status.PENDING, "Observacion", signature, photos, 12345L);
 
@@ -94,7 +94,7 @@ class UpdateServiceDeliveryTest {
     @DisplayName("Debe lanzar excepción si falta firma para estado PENDING")
     void shouldThrowExceptionIfSignatureMissingForPending() {
         when(serviceDeliveryPort.findById(1L)).thenReturn(service);
-        when(employeePort.findByDocument(12345L)).thenReturn(employee);
+        when(employeePort.findById(12345L)).thenReturn(employee);
 
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> updateServiceDelivery.updateStatus(1L, Status.PENDING, "Obs", null, photos, 12345L));
@@ -106,7 +106,7 @@ class UpdateServiceDeliveryTest {
     @DisplayName("Debe lanzar excepción si falta foto para estado FAILED")
     void shouldThrowExceptionIfPhotoMissingForFailed() {
         when(serviceDeliveryPort.findById(1L)).thenReturn(service);
-        when(employeePort.findByDocument(12345L)).thenReturn(employee);
+        when(employeePort.findById(12345L)).thenReturn(employee);
 
         BusinessException ex = assertThrows(BusinessException.class, () -> updateServiceDelivery.updateStatus(1L,
                 Status.FAILED, "Obs", signature, Collections.emptyList(), 12345L));
@@ -123,7 +123,7 @@ class UpdateServiceDeliveryTest {
         Employee admin = new Employee();
         admin.setDocument(999L);
         admin.setRole(Role.ADMIN);
-        when(employeePort.findByDocument(999L)).thenReturn(admin);
+        when(employeePort.findById(999L)).thenReturn(admin);
 
         updateServiceDelivery.updateStatus(1L, Status.CANCELED, "Cancelado por admin", null, null, 999L);
 
@@ -135,7 +135,7 @@ class UpdateServiceDeliveryTest {
     void shouldForbidCanceledForMessenger() {
         service.setCurrentStatus(Status.PENDING);
         when(serviceDeliveryPort.findById(1L)).thenReturn(service);
-        when(employeePort.findByDocument(12345L)).thenReturn(employee); // Role MESSENGER
+        when(employeePort.findById(12345L)).thenReturn(employee); // Role MESSENGER
 
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> updateServiceDelivery.updateStatus(1L, Status.CANCELED, "Obs", null, null, 12345L));
@@ -148,7 +148,7 @@ class UpdateServiceDeliveryTest {
     void shouldThrowExceptionIfAlreadyDelivered() {
         service.setCurrentStatus(Status.DELIVERED);
         when(serviceDeliveryPort.findById(1L)).thenReturn(service);
-        when(employeePort.findByDocument(12345L)).thenReturn(employee);
+        when(employeePort.findById(12345L)).thenReturn(employee);
 
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> updateServiceDelivery.updateStatus(1L, Status.RETURNED, "Obs", signature, photos, 12345L));
@@ -161,7 +161,7 @@ class UpdateServiceDeliveryTest {
     void shouldThrowExceptionIfSameStatus() {
         service.setCurrentStatus(Status.PENDING);
         when(serviceDeliveryPort.findById(1L)).thenReturn(service);
-        when(employeePort.findByDocument(12345L)).thenReturn(employee);
+        when(employeePort.findById(12345L)).thenReturn(employee);
 
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> updateServiceDelivery.updateStatus(1L, Status.PENDING, "Obs", signature, photos, 12345L));

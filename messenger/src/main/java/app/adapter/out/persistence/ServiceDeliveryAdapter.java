@@ -1,7 +1,6 @@
 package app.adapter.out.persistence;
 
 import app.domain.model.ServiceDelivery;
-import app.domain.model.enums.Status;
 import app.domain.ports.ServiceDeliveryPort;
 import app.infrastructure.persistence.entities.ServiceDeliveryEntity;
 import app.infrastructure.persistence.mapper.ServiceDeliveryMapper;
@@ -52,12 +51,11 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     @Autowired
     private ServiceDeliveryMapper mapper;
 
-    /** Guarda o actualiza un servicio de entrega. Actualiza el ID generado. */
     @Override
-    public void save(ServiceDelivery serviceDelivery) {
+    public ServiceDelivery save(ServiceDelivery serviceDelivery) {
         ServiceDeliveryEntity entity = mapper.toEntity(serviceDelivery);
         ServiceDeliveryEntity savedEntity = repository.save(entity);
-        serviceDelivery.setIdServiceDelivery(savedEntity.getIdServiceDelivery());
+        return mapper.toDomain(savedEntity);
     }
 
     /** Elimina un servicio de entrega por ID. */
@@ -84,34 +82,9 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
                 .collect(Collectors.toList());
     }
 
-    /** Busca servicios por estado (PENDING, DELIVERED, etc.). */
-    @Override
-    public List<ServiceDelivery> findByStatus(Status status) {
-        return repository.findByCurrentStatus(status).stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
-    }
-
-    /** Busca servicios asignados a un mensajero específico. */
-    @Override
-    public List<ServiceDelivery> findByMessengerDocument(Long messengerDocument) {
-        return repository.findByMessenger_Document(messengerDocument).stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
-    }
-
-    /** Busca servicios asociados a una placa vehicular. */
     @Override
     public List<ServiceDelivery> findByPlateNumber(String plateNumber) {
         return repository.findByPlate_PlateNumber(plateNumber).stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
-    }
-
-    /** Busca servicios de un concesionario específico. */
-    @Override
-    public List<ServiceDelivery> findByDealershipId(Long dealershipId) {
-        return repository.findByDealership_IdDealership(dealershipId).stream()
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }

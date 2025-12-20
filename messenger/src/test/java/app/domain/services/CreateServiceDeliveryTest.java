@@ -70,7 +70,7 @@ class CreateServiceDeliveryTest {
     @Test
     @DisplayName("Debe crear servicio exitosamente cuando placa ya existe")
     void shouldCreateServiceWhenPlateExists() throws Exception {
-        when(employeePort.findByDocument(12345678L)).thenReturn(messenger);
+        when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
         when(platePort.findByPlateNumber("ABC123")).thenReturn(plate);
 
@@ -87,7 +87,7 @@ class CreateServiceDeliveryTest {
     @Test
     @DisplayName("Debe crear servicio y nueva placa cuando placa no existe")
     void shouldCreateServiceAndNewPlateWhenPlateDoesNotExist() throws Exception {
-        when(employeePort.findByDocument(12345678L)).thenReturn(messenger);
+        when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
         when(platePort.findByPlateNumber("NNN999")).thenReturn(null);
         when(plateRecognition.determinePlateType("NNN999")).thenReturn(PlateType.MOTORCYCLE);
@@ -104,7 +104,7 @@ class CreateServiceDeliveryTest {
     @Test
     @DisplayName("Debe lanzar excepción si mensajero no existe")
     void shouldThrowExceptionIfMessengerNotFound() {
-        when(employeePort.findByDocument(anyLong())).thenReturn(null);
+        when(employeePort.findById(anyLong())).thenReturn(null);
 
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> createServiceDelivery.create("ABC123", null, 1L, 99999L));
@@ -116,7 +116,7 @@ class CreateServiceDeliveryTest {
     @Test
     @DisplayName("Debe lanzar excepción si concesionario no existe")
     void shouldThrowExceptionIfDealershipNotFound() {
-        when(employeePort.findByDocument(12345678L)).thenReturn(messenger);
+        when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(999L)).thenReturn(null);
 
         BusinessException exception = assertThrows(BusinessException.class,
@@ -129,7 +129,7 @@ class CreateServiceDeliveryTest {
     @Test
     @DisplayName("Debe normalizar la placa a mayúsculas")
     void shouldNormalizePlateToUpperCase() throws Exception {
-        when(employeePort.findByDocument(12345678L)).thenReturn(messenger);
+        when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
         // Stub for the NORMALIZED value that the service should produce
         when(platePort.findByPlateNumber("ABC123")).thenReturn(plate);
@@ -142,7 +142,7 @@ class CreateServiceDeliveryTest {
     @Test
     @DisplayName("Debe agregar foto de detección si se proporciona path")
     void shouldAddDetectionPhotoIfPathProvided() throws Exception {
-        when(employeePort.findByDocument(12345678L)).thenReturn(messenger);
+        when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
         when(platePort.findByPlateNumber("ABC123")).thenReturn(plate);
 
