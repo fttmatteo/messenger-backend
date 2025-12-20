@@ -1,7 +1,5 @@
-# ============================================
 # ETAPA 1: BUILD (Construcción)
 # Usa una imagen oficial de Maven con JDK 21 para compilar el proyecto.
-# ============================================
 FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
 WORKDIR /app
 
@@ -10,16 +8,14 @@ WORKDIR /app
 COPY messenger/pom.xml .
 RUN mvn dependency:go-offline
 
-# Copiar el código fuente y compilar
+# Copiar código fuente y compilar
 COPY messenger/src ./src
-# -DskipTests para acelerar el build en contenedor (los tests corren en CI)
+# -DskipTests para acelerar el build (tests corren en CI)
 RUN mvn clean package -DskipTests
 
-# ============================================
 # ETAPA 2: RUN (Ejecución)
 # Usa una imagen ligera (JRE) solo para correr la app, sin herramientas de compilación.
 # Esto reduce el tamaño de la imagen final y mejora la seguridad.
-# ============================================
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 

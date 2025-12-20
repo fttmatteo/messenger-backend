@@ -90,7 +90,8 @@ graph TB
 | **Database** | MySQL 8.0+ |
 | **Migrations** | Flyway |
 | **Cache/Streaming** | Redis |
-| **Security** | JWT + BCrypt + Refresh Tokens |
+| **Security** | JWT + BCrypt + Bucket4j (Rate Limiting) |
+| **Documentation** | OpenAPI / Swagger UI |
 | **OCR** | Google Cloud Vision API |
 | **Storage** | Google Cloud Storage |
 | **Maps** | Google Maps Platform |
@@ -244,6 +245,15 @@ The system implements a dual-token authentication strategy:
 4. Receive new `token` and `refreshToken` pair
 5. Refresh token rotation ensures enhanced security
 
+**Rate Limiting:**
+- Implemented using **Bucket4j** to prevent abuse.
+- Limits are applied per IP address.
+- Headers included in response: `X-Rate-Limit-Remaining`, `X-Rate-Limit-Retry-After-Seconds`.
+
+**API Documentation:**
+- Swagger UI available at: `/swagger-ui/index.html` (Public)
+- OpenAPI Spec: `/v3/api-docs`
+
 ---
 
 ### ⚙️ Setup & Installation
@@ -368,7 +378,8 @@ graph TB
 | **Base de Datos** | MySQL 8.0+ |
 | **Migraciones** | Flyway |
 | **Cache/Streaming** | Redis |
-| **Seguridad** | JWT + BCrypt + Refresh Tokens |
+| **Seguridad** | JWT + BCrypt + Bucket4j (Rate Limiting) |
+| **Documentación** | OpenAPI / Swagger UI |
 | **OCR** | Google Cloud Vision API |
 | **Almacenamiento** | Google Cloud Storage |
 | **Mapas** | Google Maps Platform |
@@ -793,6 +804,17 @@ stateDiagram-v2
 - 🔒 **Stateless**: No se almacenan tokens en el servidor (Redis solo para caché de datos)
 - ⏱️ **Expiración Automática**: Tokens expire automáticamente
 - 🛡️ **HMAC-SHA256**: Algoritmo robusto de firma digital
+
+### Rate Limiting y Documentación
+
+**Rate Limiting:**
+- Implementado con **Bucket4j** para prevenir abusos.
+- Límites aplicados por dirección IP.
+- Headers de respuesta: `X-Rate-Limit-Remaining`, `X-Rate-Limit-Retry-After-Seconds`.
+
+**Documentación API:**
+- Swagger UI disponible en: `/swagger-ui/index.html` (Público)
+- OpenAPI Spec: `/v3/api-docs`
 
 ### Roles y Permisos
 
