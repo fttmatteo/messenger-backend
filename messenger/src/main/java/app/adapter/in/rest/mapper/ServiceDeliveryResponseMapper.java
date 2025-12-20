@@ -5,19 +5,8 @@ import app.adapter.out.storage.GoogleCloudStorageAdapter;
 import app.domain.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.util.stream.Collectors;
 
-/**
- * Mapper para convertir entidades ServiceDelivery a DTOs de respuesta.
- * 
- * Transforma objetos de dominio ServiceDelivery a ServiceDeliveryResponse,
- * incluyendo mapeo anidado de referencias (placa, concesionario, mensajero,
- * historial).
- * 
- * Soporta tanto Google Cloud Storage (con URLs firmadas) como almacenamiento
- * local (retornando paths directos).
- */
 @Component
 public class ServiceDeliveryResponseMapper {
 

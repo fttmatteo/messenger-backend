@@ -3,27 +3,6 @@ package app.adapter.in.rest.response;
 import app.domain.model.enums.PhotoType;
 import java.time.LocalDateTime;
 
-/**
- * DTO (Data Transfer Object) de respuesta para evidencias fotográficas de
- * servicios de entrega.
- * 
- * Este objeto representa una fotografía asociada a un servicio de entrega,
- * utilizada como evidencia del estado del servicio (entrega exitosa, fallida,
- * etc.).
- * 
- * Campos incluidos:
- * - idPhoto: Identificador único de la fotografía
- * - photoPath: Ruta de acceso al archivo de imagen almacenado
- * - uploadDate: Fecha y hora de carga de la fotografía
- * - photoType: Tipo de evidencia (ENTREGA, FALLIDA, CANCELADA, etc.)
- * 
- * Las fotografías se almacenan en el sistema de archivos o en Google Cloud
- * Storage.
- * 
- * @see app.adapter.in.rest.controllers.ServiceDeliveryController
- * @see app.domain.model.Photo
- * @see app.domain.model.enums.PhotoType
- */
 public class PhotoResponse {
     private Long idPhoto;
     private String photoPath;

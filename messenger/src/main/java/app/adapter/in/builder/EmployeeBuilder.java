@@ -5,13 +5,6 @@ import org.springframework.stereotype.Component;
 import app.adapter.in.validators.EmployeeValidator;
 import app.domain.model.Employee;
 
-/**
- * Componente encargado de la construcción de objetos {@link Employee}.
- *
- * Aplica validaciones de reglas de negocio a través de
- * {@link EmployeeValidator}
- * antes de crear la instancia del modelo de dominio.
- */
 @Component
 public class EmployeeBuilder {
 

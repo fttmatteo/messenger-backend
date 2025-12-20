@@ -3,10 +3,6 @@ package app.domain.model;
 import app.domain.model.enums.TrackingSource;
 import java.time.LocalDateTime;
 
-/**
- * Modelo que representa un registro histórico de ubicación.
- * Se almacena en la base de datos para análisis y reportes.
- */
 public class TrackingHistory {
     private Long historyId;
     private Long messengerId;

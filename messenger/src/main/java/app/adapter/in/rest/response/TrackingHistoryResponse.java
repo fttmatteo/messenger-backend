@@ -2,30 +2,6 @@ package app.adapter.in.rest.response;
 
 import java.time.LocalDateTime;
 
-/**
- * DTO (Data Transfer Object) de respuesta para registros históricos de rastreo
- * de mensajeros.
- * 
- * Este objeto representa un punto en el historial de ubicaciones de un
- * mensajero,
- * permitiendo reconstruir la ruta completa seguida durante un servicio de
- * entrega.
- * 
- * Campos incluidos:
- * - historyId: Identificador único del registro histórico
- * - messengerId: Identificador del mensajero rastreado
- * - latitude/longitude: Coordenadas geográficas registradas
- * - recordedAt: Fecha y hora del registro de ubicación
- * - serviceDeliveryId: ID del servicio asociado (si aplica)
- * - source: Origen del dato (GPS, NETWORK, etc.)
- * - speed: Velocidad registrada en m/s
- * 
- * Los registros históricos se almacenan para análisis posterior y visualización
- * de rutas.
- * 
- * @see app.adapter.in.rest.controllers.TrackingController
- * @see app.domain.model.TrackingHistory
- */
 public class TrackingHistoryResponse {
     private Long historyId;
     private Long messengerId;

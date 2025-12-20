@@ -5,18 +5,9 @@ import app.adapter.in.rest.response.RouteResponse;
 import app.domain.model.Location;
 import app.domain.model.Route;
 import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Mapper para convertir entidades de ubicación y ruta a DTOs de respuesta.
- *
- * Facilita la transformación de objetos de dominio {@link Location} y
- * {@link Route}
- * a sus correspondientes respuestas REST, {@link LocationResponse} y
- * {@link RouteResponse}.
- */
 @Component
 public class LocationResponseMapper {
 

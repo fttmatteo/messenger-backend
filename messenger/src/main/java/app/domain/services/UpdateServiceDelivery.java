@@ -24,14 +24,18 @@ import app.domain.ports.ServiceDeliveryPort;
  * Gestiona las transiciones de estado del ciclo de vida de una entrega:
  * Validación de transiciones de estado permitidas
  * Verificación de evidencias requeridas según el nuevo estado
- * Control de permisos (estados CANCELED y OBSERVED solo para admins)
+ * Control de permisos (estados CANCELED y RESOLVED solo para admins)
  * Registro de firmas digitales, fotos y observaciones
  * Actualización del historial de cambios de estado
  * 
  * Reglas de evidencia:
  * DELIVERED: Solo firma obligatoria
- * PENDING/FAILED/RETURNED: Firma, foto y observación obligatorias
- * CANCELED/OBSERVED: Sin evidencias requeridas (solo admins)
+ * PENDING/RETURNED: Firma, foto y observación obligatorias
+ * CANCELED/RESOLVED: Sin evidencias requeridas (solo admins)
+ * 
+ * Reglas de transición:
+ * PENDING solo puede pasar a RESOLVED (admin)
+ * DELIVERED y RESOLVED son estados finales
  */
 @Service
 public class UpdateServiceDelivery {
@@ -79,7 +83,7 @@ public class UpdateServiceDelivery {
 
         validateStateTransition(previousStatus, newStatus, user.getRole());
 
-        if (newStatus == Status.CANCELED || newStatus == Status.OBSERVED) {
+        if (newStatus == Status.CANCELED || newStatus == Status.RESOLVED) {
             if (!Role.ADMIN.equals(user.getRole())) {
                 throw new BusinessException("Solo el administrador puede cambiar el estado a " + newStatus);
             }
@@ -125,7 +129,7 @@ public class UpdateServiceDelivery {
     private void validateEvidence(Status status, Signature signature, List<Photo> photos, String observation)
             throws BusinessException {
 
-        if (status == Status.CANCELED || status == Status.OBSERVED || status == Status.ASSIGNED) {
+        if (status == Status.CANCELED || status == Status.RESOLVED || status == Status.ASSIGNED) {
             return;
         }
 
@@ -152,6 +156,16 @@ public class UpdateServiceDelivery {
 
         if (currentStatus == Status.DELIVERED) {
             throw new BusinessException("El servicio ya fue entregado y no se puede modificar su estado.");
+        }
+
+        if (currentStatus == Status.RESOLVED) {
+            throw new BusinessException("El servicio ya fue resuelto y no se puede modificar su estado.");
+        }
+
+        if (currentStatus == Status.PENDING) {
+            if (newStatus != Status.RESOLVED) {
+                throw new BusinessException("Desde estado PENDING solo se puede cambiar a RESOLVED.");
+            }
         }
 
         if (currentStatus == newStatus) {

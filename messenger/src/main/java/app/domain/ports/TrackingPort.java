@@ -5,10 +5,6 @@ import app.domain.model.TrackingHistory;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * Puerto para operaciones de tracking de mensajeros.
- * Combina Redis (tiempo real) y JPA (historial).
- */
 public interface TrackingPort {
 
     void saveLiveLocation(LiveTracking tracking);

@@ -17,12 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Controlador REST para operaciones de ubicación y rutas.
- *
- * Proporciona cálculo de rutas óptimas utilizando Google Maps Directions API,
- * así como servicios de geocodificación y cálculo de distancias.
- */
 @RestController
 @RequestMapping("/locations")
 @PreAuthorize("isAuthenticated()")

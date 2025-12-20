@@ -16,12 +16,6 @@ import app.infrastructure.audit.AuditableAction;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Controlador REST para gestionar empleados y mensajeros.
- * 
- * Proporciona operaciones CRUD exclusivas para administradores.
- * Todos los endpoints requieren rol ADMIN.
- */
 @RestController
 @RequestMapping("/employees")
 @PreAuthorize("hasRole('ADMIN')")

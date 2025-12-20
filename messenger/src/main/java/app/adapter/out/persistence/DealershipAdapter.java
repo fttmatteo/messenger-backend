@@ -11,32 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Adaptador de salida para persistencia de concesionarios.
- * 
- * Este adaptador implementa DealershipPort y actúa como puente entre la capa de
- * dominio
- * y la capa de infraestructura (JPA), manejando la conversión entre objetos de
- * dominio
- * (Dealership) y entidades de persistencia (DealershipEntity).
- * 
- * Responsabilidades:
- * - Convertir objetos de dominio a entidades JPA y viceversa usando
- * DealershipMapper
- * - Delegar operaciones de persistencia al DealershipRepository
- * - Mantener la independencia del dominio respecto a detalles de persistencia
- * 
- * Operaciones soportadas:
- * - save: Guardar o actualizar un concesionario
- * - findById: Buscar por ID
- * - findByName: Buscar por nombre
- * - findAll: Obtener todos los concesionarios
- * - deleteById: Eliminar por ID
- * 
- * @see app.domain.ports.DealershipPort
- * @see app.infrastructure.persistence.repository.DealershipRepository
- * @see app.infrastructure.persistence.mapper.DealershipMapper
- */
 @Component
 public class DealershipAdapter implements DealershipPort {
 

@@ -5,32 +5,6 @@ import app.domain.model.enums.Status;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * DTO (Data Transfer Object) de respuesta completa para un servicio de entrega.
- * 
- * Este objeto agrega toda la información relacionada con un servicio de
- * entrega,
- * incluyendo datos del vehículo, concesionario, mensajero, estado actual,
- * evidencias (firma y fotografías) y el historial completo de cambios de
- * estado.
- * 
- * Campos incluidos:
- * - idServiceDelivery: Identificador único del servicio
- * - plate: Información de la placa del vehículo (número y tipo: OCR o MANUAL)
- * - dealership: Datos completos del concesionario
- * - messenger: Datos del mensajero asignado
- * - currentStatus: Estado actual del servicio (PENDING, IN_PROGRESS, DELIVERED,
- * etc.)
- * - observation: Observaciones adicionales sobre el servicio
- * - signature: Firma digital de recepción (si aplica)
- * - photos: Lista de evidencias fotográficas
- * - history: Historial completo de cambios de estado con trazabilidad
- * - createdAt: Fecha y hora de creación del servicio
- * 
- * @see app.adapter.in.rest.controllers.ServiceDeliveryController
- * @see app.domain.model.ServiceDelivery
- * @see app.domain.model.enums.Status
- */
 public class ServiceDeliveryResponse {
     private Long idServiceDelivery;
     private PlateResponse plate;

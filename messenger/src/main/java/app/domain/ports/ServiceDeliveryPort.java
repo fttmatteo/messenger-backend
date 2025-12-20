@@ -3,13 +3,6 @@ package app.domain.ports;
 import app.domain.model.ServiceDelivery;
 import java.util.List;
 
-/**
- * Puerto (interfaz) para operaciones de persistencia de servicios de entrega.
- * 
- * Define el contrato para acceder y manipular datos de servicios de entrega
- * sin depender de detalles de implementación específicos (JPA, MongoDB, etc.).
- * Implementado por adaptadores en la capa de infraestructura.
- */
 public interface ServiceDeliveryPort {
 
     ServiceDelivery save(ServiceDelivery serviceDelivery);

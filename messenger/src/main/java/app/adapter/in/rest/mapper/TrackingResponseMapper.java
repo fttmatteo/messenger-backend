@@ -6,14 +6,6 @@ import app.domain.model.LiveTracking;
 import app.domain.model.TrackingHistory;
 import org.springframework.stereotype.Component;
 
-/**
- * Mapper para convertir entidades de tracking a DTOs de respuesta.
- *
- * Facilita la transformación de objetos de dominio {@link LiveTracking} y
- * {@link TrackingHistory}
- * a sus correspondientes respuestas REST, {@link LiveTrackingResponse} y
- * {@link TrackingHistoryResponse}.
- */
 @Component
 public class TrackingResponseMapper {
 

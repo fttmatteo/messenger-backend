@@ -66,6 +66,12 @@ class ServiceDeliveryValidatorTest {
         void shouldThrowExceptionForEmptyDocument() {
             assertThrows(InputsException.class, () -> validator.documentValidator(""));
         }
+
+        @Test
+        @DisplayName("Debe lanzar excepción para documento no numérico")
+        void shouldThrowExceptionForNonNumericDocument() {
+            assertThrows(InputsException.class, () -> validator.documentValidator("abc123"));
+        }
     }
 
     @Nested
@@ -195,6 +201,14 @@ class ServiceDeliveryValidatorTest {
         class InvalidPlateTests {
 
             @Test
+            @DisplayName("Debe lanzar excepción para placa nula")
+            void shouldThrowExceptionForNullPlate() {
+                InputsException exception = assertThrows(InputsException.class,
+                        () -> validator.plateNumberValidator(null));
+                assertTrue(exception.getMessage().contains("vacío"));
+            }
+
+            @Test
             @DisplayName("Debe lanzar excepción para placa vacía")
             void shouldThrowExceptionForEmptyPlate() {
                 InputsException exception = assertThrows(InputsException.class,
@@ -207,7 +221,15 @@ class ServiceDeliveryValidatorTest {
             void shouldThrowExceptionForShortPlate() {
                 InputsException exception = assertThrows(InputsException.class,
                         () -> validator.plateNumberValidator("AB12"));
-                assertTrue(exception.getMessage().contains("5 y 6"));
+                assertTrue(exception.getMessage().contains("6 caracteres"));
+            }
+
+            @Test
+            @DisplayName("Debe lanzar excepción para placa muy larga")
+            void shouldThrowExceptionForLongPlate() {
+                InputsException exception = assertThrows(InputsException.class,
+                        () -> validator.plateNumberValidator("ABC1234"));
+                assertTrue(exception.getMessage().contains("6 caracteres"));
             }
 
             @Test

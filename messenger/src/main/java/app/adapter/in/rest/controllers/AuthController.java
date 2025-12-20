@@ -12,11 +12,6 @@ import app.application.usecase.RefreshTokenUseCase;
 import app.domain.model.auth.AuthCredentials;
 import app.domain.model.auth.TokenResponse;
 
-/**
- * Controlador REST para el manejo de la autenticación de usuarios.
- * Proporciona endpoints para iniciar sesión, obtener tokens JWT y renovar
- * sesiones mediante refresh tokens.
- */
 @RestController
 @RequestMapping("/auth")
 public class AuthController {

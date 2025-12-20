@@ -17,12 +17,6 @@ import app.domain.model.Dealership;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Controlador REST para gestionar concesionarios.
- * 
- * Proporciona operaciones CRUD completas y geocodificación mediante Google Maps
- * API. Requiere rol ADMIN para operaciones de modificación.
- */
 @RestController
 @RequestMapping("/dealerships")
 public class DealershipController {

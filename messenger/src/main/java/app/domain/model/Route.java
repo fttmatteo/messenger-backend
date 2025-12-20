@@ -4,10 +4,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 
-/**
- * Value Object que representa una ruta calculada entre ubicaciones.
- * Incluye información sobre distancia, duración y waypoints.
- */
 public class Route {
     private final Location origin;
     private final Location destination;
@@ -29,16 +25,10 @@ public class Route {
         this.polyline = polyline;
     }
 
-    /**
-     * Obtiene la distancia en kilómetros.
-     */
     public Double getDistanceKilometers() {
         return distanceMeters != null ? distanceMeters / 1000.0 : null;
     }
 
-    /**
-     * Obtiene la duración formateada como "X horas Y minutos".
-     */
     public String getDurationFormatted() {
         if (durationSeconds == null) {
             return null;
@@ -53,16 +43,10 @@ public class Route {
         }
     }
 
-    /**
-     * Verifica si la ruta tiene waypoints intermedios.
-     */
     public boolean hasWaypoints() {
         return waypoints != null && !waypoints.isEmpty();
     }
 
-    /**
-     * Obtiene el número total de paradas (incluyendo origen y destino).
-     */
     public int getTotalStops() {
         return 2 + (waypoints != null ? waypoints.size() : 0);
     }

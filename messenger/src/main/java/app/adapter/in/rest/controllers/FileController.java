@@ -15,17 +15,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-/**
- * Controlador REST para servir archivos estáticos.
- *
- * Proporciona endpoints para acceder a archivos almacenados como
- * fotos, firmas y documentos del sistema de forma pública.
- * 
- * Seguridad:
- * - Protección contra Path Traversal (../../../ attacks)
- * - Validación de nombres de archivo
- * - Verificación de que archivos estén dentro del directorio permitido
- */
 @RestController
 @RequestMapping("/files")
 public class FileController {

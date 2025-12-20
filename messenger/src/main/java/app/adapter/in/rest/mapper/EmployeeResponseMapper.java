@@ -4,10 +4,6 @@ import app.adapter.in.rest.response.EmployeeResponse;
 import app.domain.model.Employee;
 import org.springframework.stereotype.Component;
 
-/**
- * Mapper para convertir entidades Employee a DTOs de respuesta.
- * Transforma objetos de dominio Employee a EmployeeResponse.
- */
 @Component
 public class EmployeeResponseMapper {
 

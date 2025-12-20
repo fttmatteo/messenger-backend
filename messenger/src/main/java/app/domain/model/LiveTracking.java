@@ -3,10 +3,6 @@ package app.domain.model;
 import app.domain.model.enums.TrackingStatus;
 import java.time.LocalDateTime;
 
-/**
- * Modelo que representa el tracking en tiempo real de un mensajero.
- * Se almacena en Redis para acceso rápido.
- */
 public class LiveTracking {
     private Long trackingId;
     private Long messengerId;

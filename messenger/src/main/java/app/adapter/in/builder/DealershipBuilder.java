@@ -6,13 +6,6 @@ import app.adapter.in.rest.request.DealershipRequest;
 import app.adapter.in.validators.DealershipValidator;
 import app.domain.model.Dealership;
 
-/**
- * Componente encargado de la construcción de objetos {@link Dealership}.
- *
- * Aplica validaciones de reglas de negocio a través de
- * {@link DealershipValidator}
- * antes de crear la instancia del modelo de dominio.
- */
 @Component
 public class DealershipBuilder {
 
