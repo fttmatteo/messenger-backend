@@ -1,4 +1,4 @@
-package app.adapter.out.persistence;
+package app.infrastructure.persistence.adapter;
 
 import app.domain.model.Plate;
 import app.domain.ports.PlatePort;
@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Adapter de persistencia para placas vehiculares.
+ */
 @Component
 public class PlateAdapter implements PlatePort {
 

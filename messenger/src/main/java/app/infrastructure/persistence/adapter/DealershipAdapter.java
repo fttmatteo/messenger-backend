@@ -1,4 +1,4 @@
-package app.adapter.out.persistence;
+package app.infrastructure.persistence.adapter;
 
 import app.domain.model.Dealership;
 import app.domain.ports.DealershipPort;
@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Adapter de persistencia para concesionarios.
+ */
 @Component
 public class DealershipAdapter implements DealershipPort {
 

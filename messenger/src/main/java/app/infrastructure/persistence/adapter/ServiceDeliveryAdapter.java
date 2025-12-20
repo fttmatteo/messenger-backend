@@ -1,4 +1,4 @@
-package app.adapter.out.persistence;
+package app.infrastructure.persistence.adapter;
 
 import app.domain.model.ServiceDelivery;
 import app.domain.ports.ServiceDeliveryPort;
@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Adapter de persistencia para servicios de entrega.
+ */
 @Component
 public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
 
