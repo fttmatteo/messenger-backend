@@ -39,34 +39,36 @@
 The project implements **Hexagonal Architecture (Ports & Adapters)** to keep the domain isolated from external dependencies.
 
 ```mermaid
-graph TB
-    subgraph "Adapter Layer"
-        subgraph "Input Adapters"
-            REST[REST Controllers]
-            VAL[Validators]
-            BUILD[Builders]
-        end
-        subgraph "Output Adapters"
-            PERSIST[JPA Persistence]
-            OCR[Google Vision OCR]
-            STORAGE[Google Cloud Storage]
-            SEC[JWT Security]
-            MAPS[Google Maps]
-            TRACKING[Location Tracking]
-        end
+graph LR
+    subgraph InputAdapters ["Input Adapters"]
+        direction TB
+        REST[REST Controllers]
+        VAL[Validators]
+        BUILD[Builders]
     end
-    
-    subgraph "Application Layer"
+
+    subgraph ApplicationLayer ["Application Layer"]
+        direction TB
         UC[Use Cases]
         EXC[Exceptions]
     end
-    
-    subgraph "Domain Layer"
-        MOD[Models]
+
+    subgraph DomainLayer ["Domain Layer"]
+        direction TB
         PORTS[Ports]
         SVC[Domain Services]
+        MOD[Models]
     end
-    
+
+    subgraph OutputAdapters ["Output Adapters"]
+        direction TB
+        OCR[Google Vision OCR]
+        STORAGE[Google Cloud Storage]
+        SEC[JWT Security]
+        MAPS[Google Maps]
+        TRACKING[Location Tracking]
+    end
+
     REST --> UC
     UC --> PORTS
     PORTS --> PERSIST
@@ -97,6 +99,8 @@ graph TB
 | **Maps** | Google Maps Platform |
 | **Real-Time** | WebSocket + Redis |
 | **Build** | Maven 3.9+ |
+| **Monitoring** | Spring Boot Actuator (Health, Metrics) |
+| **Auditing** | JPA Callbacks + Status History |
 | **CI/CD** | GitHub Actions |
 
 ---
@@ -327,34 +331,36 @@ Automated pipeline via GitHub Actions:
 El proyecto implementa **Arquitectura Hexagonal (Ports & Adapters)** para mantener el dominio aislado de las dependencias externas.
 
 ```mermaid
-graph TB
-    subgraph "Adapter Layer"
-        subgraph "Input Adapters"
-            REST[REST Controllers]
-            VAL[Validators]
-            BUILD[Builders]
-        end
-        subgraph "Output Adapters"
-            PERSIST[JPA Persistence]
-            OCR[Google Vision OCR]
-            STORAGE[Google Cloud Storage]
-            SEC[JWT Security]
-            MAPS[Google Maps]
-            TRACKING[Location Tracking]
-        end
+graph LR
+    subgraph InputAdapters ["Input Adapters"]
+        direction TB
+        REST[REST Controllers]
+        VAL[Validators]
+        BUILD[Builders]
     end
-    
-    subgraph "Application Layer"
+
+    subgraph ApplicationLayer ["Application Layer"]
+        direction TB
         UC[Use Cases]
         EXC[Exceptions]
     end
-    
-    subgraph "Domain Layer"
-        MOD[Models]
+
+    subgraph DomainLayer ["Domain Layer"]
+        direction TB
         PORTS[Ports]
         SVC[Domain Services]
+        MOD[Models]
     end
-    
+
+    subgraph OutputAdapters ["Output Adapters"]
+        direction TB
+        OCR[Google Vision OCR]
+        STORAGE[Google Cloud Storage]
+        SEC[JWT Security]
+        MAPS[Google Maps]
+        TRACKING[Location Tracking]
+    end
+
     REST --> UC
     UC --> PORTS
     PORTS --> PERSIST
@@ -385,6 +391,8 @@ graph TB
 | **Mapas** | Google Maps Platform |
 | **Tiempo Real** | WebSocket + Redis |
 | **Build** | Maven 3.9+ |
+| **Monitoreo** | Spring Boot Actuator (Health, Metrics) |
+| **Auditoría** | JPA Callbacks + Historial de Estados |
 | **CI/CD** | GitHub Actions |
 
 ---
