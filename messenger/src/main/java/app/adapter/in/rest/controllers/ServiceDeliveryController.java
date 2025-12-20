@@ -150,7 +150,11 @@ public class ServiceDeliveryController {
         Long document = Long.parseLong(documentStr);
         Employee currentUser = employeePort.findByDocument(document);
 
-        if (currentUser != null && currentUser.getRole() == Role.MESSENGER) {
+        if (currentUser == null) {
+            throw new UnauthorizedException("Usuario no encontrado");
+        }
+
+        if (currentUser.getRole() == Role.MESSENGER) {
             if (service.getMessenger() == null ||
                     !service.getMessenger().getIdEmployee().equals(currentUser.getIdEmployee())) {
                 throw new UnauthorizedException("No tienes permiso para ver este servicio");
@@ -168,11 +172,15 @@ public class ServiceDeliveryController {
         Long document = Long.parseLong(documentStr);
         Employee currentUser = employeePort.findByDocument(document);
 
+        if (currentUser == null) {
+            throw new UnauthorizedException("Usuario no encontrado");
+        }
+
         List<ServiceDelivery> services;
 
         services = serviceDeliveryUseCase.findAll();
 
-        if (currentUser != null && currentUser.getRole() == Role.MESSENGER) {
+        if (currentUser.getRole() == Role.MESSENGER) {
             Long messengerId = currentUser.getIdEmployee();
             services = services.stream()
                     .filter(s -> s.getMessenger() != null &&
