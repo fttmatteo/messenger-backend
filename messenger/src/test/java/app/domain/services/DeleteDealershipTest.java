@@ -1,18 +1,10 @@
 package app.domain.services;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import app.application.exceptions.BusinessException;
 import app.domain.model.Dealership;
-import app.domain.model.ServiceDelivery;
 import app.domain.ports.DealershipPort;
 import app.domain.ports.ServiceDeliveryPort;
-import java.util.Collections;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
