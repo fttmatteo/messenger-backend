@@ -165,9 +165,9 @@ export SPRING_PROFILES_ACTIVE=dev
 | Method | Endpoint | Description | Auth |
 |--------|----------|-------------|------|
 | `POST` | `/dealerships/createDealership` | Create | ADMIN |
-| `GET` | `/dealerships/allDealerships` | List | Authenticated |
-| `GET` | `/dealerships/findByDealershipId/{id}` | Get by ID | Authenticated |
-| `GET` | `/dealerships/findByDealershipName/{name}` | Get by Name | Authenticated |
+| `GET` | `/dealerships/allDealerships` | List |
+| `GET` | `/dealerships/findByDealershipId/{id}` | Get by ID |
+| `GET` | `/dealerships/findByDealershipName/{name}` | Get by Name |
 | `PUT` | `/dealerships/updateDealership/{id}` | Update | ADMIN |
 | `DELETE` | `/dealerships/deleteDealership/{id}` | Delete | ADMIN |
 | `POST` | `/dealerships/geocodeDealership/{id}` | Geocode | ADMIN |
@@ -181,7 +181,7 @@ export SPRING_PROFILES_ACTIVE=dev
 |--------|----------|-------------|
 | `POST` | `/services/createService` | Create service (multipart) |
 | `PUT` | `/services/updateService/{id}` | Update status |
-| `GET` | `/services/allServices` | List all (ADMIN) or own (MESSENGER) |
+| `GET` | `/services/allServices` | List all |
 | `GET` | `/services/findByServiceId/{id}` | Get by ID |
 | `DELETE` | `/services/deleteService/{id}` | Delete |
 
@@ -230,7 +230,7 @@ export SPRING_PROFILES_ACTIVE=dev
 The system implements a dual-token authentication strategy:
 - **Access Token**: Short-lived JWT for API requests
   - Production: 30 minutes
-  - Development: 2 hours
+  - Development: 8 hours
   - Local: 8 hours
 - **Refresh Token**: Long-lived JWT for session renewal
   - Duration: 7 days
@@ -559,9 +559,9 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | Método | Endpoint | Descripción | Auth |
 |--------|----------|-------------|------|
 | `POST` | `/dealerships/createDealership` | Crear | ADMIN |
-| `GET` | `/dealerships/allDealerships` | Listar | Autenticado |
-| `GET` | `/dealerships/findByDealershipId/{id}` | Obtener por ID | Autenticado |
-| `GET` | `/dealerships/findByDealershipName/{name}` | Obtener por Nombre | Autenticado |
+| `GET` | `/dealerships/allDealerships` | Listar |
+| `GET` | `/dealerships/findByDealershipId/{id}` | Obtener por ID |
+| `GET` | `/dealerships/findByDealershipName/{name}` | Obtener por Nombre |
 | `PUT` | `/dealerships/updateDealership/{id}` | Actualizar | ADMIN |
 | `DELETE` | `/dealerships/deleteDealership/{id}` | Eliminar | ADMIN |
 | `POST` | `/dealerships/geocodeDealership/{id}` | Geocodificar | ADMIN |
@@ -574,7 +574,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 |--------|----------|-------------|
 | `POST` | `/services/createService` | Crear servicio (multipart) |
 | `PUT` | `/services/updateService/{id}` | Actualizar estado |
-| `GET` | `/services/allServices` | Listar todos (ADMIN) o propios (MESSENGER) |
+| `GET` | `/services/allServices` | Listar todos |
 | `GET` | `/services/findByServiceId/{id}` | Obtener por ID |
 | `DELETE` | `/services/deleteService/{id}` | Eliminar |
 
