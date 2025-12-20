@@ -13,6 +13,9 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Filtro de rate limiting basado en IP usando Bucket4j.
+ */
 @Component
 public class RateLimitFilter extends OncePerRequestFilter {
 

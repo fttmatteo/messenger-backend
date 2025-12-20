@@ -4,6 +4,9 @@ import app.domain.model.Dealership;
 import app.infrastructure.persistence.entities.DealershipEntity;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper de persistencia entre Dealership y DealershipEntity.
+ */
 @Component
 public class DealershipMapper {
 

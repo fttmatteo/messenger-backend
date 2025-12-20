@@ -7,6 +7,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Entidad JPA que representa la tabla 'status_history'.
+ */
 @Entity
 @Table(name = "status_history")
 public class StatusHistoryEntity {

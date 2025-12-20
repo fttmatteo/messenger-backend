@@ -4,6 +4,9 @@ import app.domain.model.enums.PlateType;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * Entidad JPA que representa la tabla 'plates'.
+ */
 @Entity
 @Table(name = "plates")
 public class PlateEntity {

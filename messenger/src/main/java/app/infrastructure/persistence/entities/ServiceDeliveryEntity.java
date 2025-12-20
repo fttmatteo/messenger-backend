@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Entidad JPA que representa la tabla 'service_deliveries'.
+ */
 @Entity
 @Table(name = "service_deliveries")
 public class ServiceDeliveryEntity {

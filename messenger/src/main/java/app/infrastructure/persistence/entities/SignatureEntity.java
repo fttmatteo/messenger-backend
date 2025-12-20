@@ -3,6 +3,9 @@ package app.infrastructure.persistence.entities;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * Entidad JPA que representa la tabla 'signatures'.
+ */
 @Entity
 @Table(name = "signatures")
 public class SignatureEntity {

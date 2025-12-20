@@ -15,6 +15,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
+/**
+ * Aspecto AOP para auditoría de acciones marcadas con @AuditableAction.
+ */
 @Aspect
 @Component
 public class AuditAspect {

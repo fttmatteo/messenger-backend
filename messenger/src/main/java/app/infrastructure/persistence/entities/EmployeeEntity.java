@@ -3,6 +3,9 @@ package app.infrastructure.persistence.entities;
 import app.domain.model.enums.Role;
 import jakarta.persistence.*;
 
+/**
+ * Entidad JPA que representa la tabla 'employees'.
+ */
 @Entity
 @Table(name = "employees")
 public class EmployeeEntity {

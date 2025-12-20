@@ -10,6 +10,9 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Mapper de persistencia entre ServiceDelivery y ServiceDeliveryEntity.
+ */
 @Component
 public class ServiceDeliveryMapper {
 

@@ -4,6 +4,9 @@ import app.domain.model.Employee;
 import app.infrastructure.persistence.entities.EmployeeEntity;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper de persistencia entre Employee y EmployeeEntity.
+ */
 @Component
 public class EmployeeMapper {
 

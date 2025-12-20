@@ -4,6 +4,9 @@ import app.domain.model.Plate;
 import app.infrastructure.persistence.entities.PlateEntity;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper de persistencia entre Plate y PlateEntity.
+ */
 @Component
 public class PlateMapper {
 

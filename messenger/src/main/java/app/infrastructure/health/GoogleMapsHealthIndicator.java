@@ -9,6 +9,9 @@ import org.springframework.boot.health.contributor.Health;
 import org.springframework.boot.health.contributor.HealthIndicator;
 import org.springframework.stereotype.Component;
 
+/**
+ * Indicador de salud para verificar conectividad con Google Maps API.
+ */
 @Component
 @ConditionalOnProperty(name = "app.storage.type", havingValue = "gcs")
 public class GoogleMapsHealthIndicator implements HealthIndicator {

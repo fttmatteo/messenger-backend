@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Manejador global de excepciones para la API REST.
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler {
 

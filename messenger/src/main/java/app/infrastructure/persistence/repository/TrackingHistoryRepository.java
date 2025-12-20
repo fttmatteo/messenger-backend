@@ -7,6 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Repositorio Spring Data para historial de tracking GPS.
+ */
 @Repository
 public interface TrackingHistoryRepository extends CrudRepository<TrackingHistoryEntity, Long> {
         List<TrackingHistoryEntity> findByMessengerIdAndRecordedAtBetween(

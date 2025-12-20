@@ -2,50 +2,32 @@ package app.infrastructure.persistence.entities;
 
 import jakarta.persistence.*;
 
-/**
- * Entidad JPA que representa la tabla 'dealerships'.
- * 
- * Almacena la información de los concesionarios incluyendo su ubicación
- * geográfica obtenida mediante geocodificación con Google Maps API.
- * 
- * Relaciones:
- * - Un concesionario puede tener múltiples ServiceDelivery
- */
 @Entity
 @Table(name = "dealerships")
 public class DealershipEntity {
-    /** Identificador único del concesionario (clave primaria). */
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idDealership;
 
-    /** Nombre del concesionario (único en el sistema). */
     @Column(nullable = false, unique = true)
     private String name;
 
-    /** Dirección física del concesionario. */
     @Column(nullable = false, length = 100)
     private String address;
 
-    /** Número de teléfono de contacto. */
     @Column(nullable = false, length = 10)
     private String phone;
 
-    /** Zona geográfica donde opera el concesionario. */
     @Column(nullable = false, length = 10)
     private String zone;
 
-    /** Latitud de la ubicación del concesionario (obtenida por geocodificación). */
     @Column(name = "latitude")
     private Double latitude;
 
-    /**
-     * Longitud de la ubicación del concesionario (obtenida por geocodificación).
-     */
     @Column(name = "longitude")
     private Double longitude;
 
-    /** Indica si el concesionario ha sido geocodificado exitosamente. */
     @Column(name = "is_geolocated")
     private Boolean isGeolocated = false;
 

@@ -10,6 +10,9 @@ import app.domain.model.enums.Role;
 import app.infrastructure.persistence.entities.EmployeeEntity;
 import app.infrastructure.persistence.repository.EmployeeRepository;
 
+/**
+ * Seeder que crea el usuario administrador inicial al arrancar la aplicación.
+ */
 @Component
 public class AdminSeeder implements CommandLineRunner {
 

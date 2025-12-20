@@ -4,6 +4,9 @@ import app.domain.model.enums.TrackingSource;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * Entidad JPA que representa la tabla 'tracking_history'.
+ */
 @Entity
 @Table(name = "tracking_history", indexes = {
         @Index(name = "idx_messenger_date", columnList = "messenger_id,recorded_at"),

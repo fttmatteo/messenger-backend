@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
+/**
+ * Servicio para blacklist de tokens JWT usando Redis.
+ */
 @Service
 public class TokenBlacklistService {
 

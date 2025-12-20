@@ -6,6 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 
+/**
+ * Repositorio Spring Data JPA para servicios de entrega.
+ */
 @Repository
 public interface ServiceDeliveryRepository extends JpaRepository<ServiceDeliveryEntity, Long> {
 

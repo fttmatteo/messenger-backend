@@ -6,6 +6,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Validador de archivos subidos (imágenes) por tipo y tamaño.
+ */
 public class FileValidator {
 
     private static final List<String> ALLOWED_IMAGE_TYPES = Arrays.asList(

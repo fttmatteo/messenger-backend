@@ -7,6 +7,9 @@ import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.stereotype.Component;
 
+/**
+ * Indicador de salud para verificar conectividad con Redis.
+ */
 @Component
 public class RedisHealthIndicator implements HealthIndicator {
 
