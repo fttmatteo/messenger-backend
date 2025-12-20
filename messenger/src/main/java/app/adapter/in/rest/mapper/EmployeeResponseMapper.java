@@ -17,7 +17,6 @@ public class EmployeeResponseMapper {
                 employee.getDocument(),
                 employee.getFullName(),
                 employee.getPhone(),
-                employee.getUserName(),
                 employee.getRole());
     }
 }

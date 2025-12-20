@@ -40,7 +40,7 @@ public class JwtAdapter implements AuthenticationPort {
 
     @Override
     public TokenResponse authenticate(AuthCredentials credentials, String role, Long userId) {
-        String token = this.generateToken(credentials.getUserName(), role, userId);
+        String token = this.generateToken(credentials.getDocument().toString(), role, userId);
         TokenResponse response = new TokenResponse();
         response.setToken(token);
         response.setRole(role);
@@ -77,12 +77,12 @@ public class JwtAdapter implements AuthenticationPort {
         return claims.get("role", String.class);
     }
 
-    private String generateToken(String userName, String role, Long userId) {
+    private String generateToken(String document, String role, Long userId) {
         Date now = new Date();
         Date expiration = new Date(now.getTime() + expirationTime);
 
         String token = Jwts.builder()
-                .subject(userName)
+                .subject(document)
                 .claim("role", role)
                 .claim("id", userId)
                 .issuedAt(now)
@@ -99,7 +99,7 @@ public class JwtAdapter implements AuthenticationPort {
         Date expiration = new Date(now.getTime() + refreshExpirationTime);
 
         return Jwts.builder()
-                .subject(credentials.getUserName())
+                .subject(credentials.getDocument().toString())
                 .issuedAt(now)
                 .expiration(expiration)
                 .signWith(secretKey)

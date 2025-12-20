@@ -52,8 +52,9 @@ public class ServiceDeliveryController {
             @RequestParam(value = "manualPlateNumber", required = false) String manualPlateNumber) throws Exception {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String currentUserName = auth.getName();
-        Employee currentUser = employeePort.findByUserName(currentUserName);
+        String documentStr = auth.getName();
+        Long document = Long.parseLong(documentStr);
+        Employee currentUser = employeePort.findByDocument(document);
 
         if (currentUser == null) {
             throw new UnauthorizedException("Autenticación de usuario no encontrada o inválida.");
@@ -91,7 +92,7 @@ public class ServiceDeliveryController {
         });
     }
 
-    @PutMapping("/updateServiceStatus/{id}")
+    @PutMapping("/updateService/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ServiceDeliveryResponse> updateStatus(
             @PathVariable Long id,
@@ -103,8 +104,9 @@ public class ServiceDeliveryController {
         List<File> tempFiles = new ArrayList<>();
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            String currentUserName = auth.getName();
-            Employee currentUser = employeePort.findByUserName(currentUserName);
+            String documentStr = auth.getName();
+            Long document = Long.parseLong(documentStr);
+            Employee currentUser = employeePort.findByDocument(document);
 
             if (currentUser == null) {
                 throw new UnauthorizedException("Autenticación de usuario no encontrada o inválida.");
@@ -135,7 +137,7 @@ public class ServiceDeliveryController {
         }
     }
 
-    @GetMapping("/findService/{id}")
+    @GetMapping("/findByServiceId/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ServiceDeliveryResponse> findById(@PathVariable Long id) throws Exception {
         ServiceDelivery service = serviceDeliveryUseCase.findById(id);
@@ -144,8 +146,9 @@ public class ServiceDeliveryController {
         }
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String currentUserName = auth.getName();
-        Employee currentUser = employeePort.findByUserName(currentUserName);
+        String documentStr = auth.getName();
+        Long document = Long.parseLong(documentStr);
+        Employee currentUser = employeePort.findByDocument(document);
 
         if (currentUser != null && currentUser.getRole() == Role.MESSENGER) {
             if (service.getMessenger() == null ||
@@ -161,8 +164,9 @@ public class ServiceDeliveryController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ServiceDeliveryResponse>> findAll() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String currentUserName = auth.getName();
-        Employee currentUser = employeePort.findByUserName(currentUserName);
+        String documentStr = auth.getName();
+        Long document = Long.parseLong(documentStr);
+        Employee currentUser = employeePort.findByDocument(document);
 
         List<ServiceDelivery> services;
 

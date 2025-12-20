@@ -7,18 +7,16 @@ public class EmployeeResponse {
     private Long document;
     private String fullName;
     private String phone;
-    private String userName;
     private Role role;
 
     public EmployeeResponse() {
     }
 
-    public EmployeeResponse(Long idEmployee, Long document, String fullName, String phone, String userName, Role role) {
+    public EmployeeResponse(Long idEmployee, Long document, String fullName, String phone, Role role) {
         this.idEmployee = idEmployee;
         this.document = document;
         this.fullName = fullName;
         this.phone = phone;
-        this.userName = userName;
         this.role = role;
     }
 
@@ -52,14 +50,6 @@ public class EmployeeResponse {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
     }
 
     public Role getRole() {

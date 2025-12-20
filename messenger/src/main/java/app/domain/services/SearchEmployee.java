@@ -24,10 +24,10 @@ public class SearchEmployee {
         return employee;
     }
 
-    public Employee findByUserName(String userName) {
-        Employee employee = employeePort.findByUserName(userName);
+    public Employee findByDocument(Long document) {
+        Employee employee = employeePort.findByDocument(document);
         if (employee == null) {
-            throw new RuntimeException("El empleado con nombre de usuario " + userName + " no existe.");
+            throw new RuntimeException("El empleado con documento " + document + " no existe.");
         }
         return employee;
     }

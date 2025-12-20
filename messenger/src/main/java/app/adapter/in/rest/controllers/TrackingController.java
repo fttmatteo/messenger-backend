@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/tracking")
+@PreAuthorize("isAuthenticated()")
 public class TrackingController {
 
     @Autowired
@@ -35,7 +36,7 @@ public class TrackingController {
     private TrackingResponseMapper responseMapper;
 
     @PostMapping("/update")
-    @PreAuthorize("hasAnyRole('MESSENGER', 'ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<LiveTrackingResponse> updateLocation(
             @Valid @RequestBody LiveTrackingRequest request) {
 
@@ -85,7 +86,7 @@ public class TrackingController {
     }
 
     @GetMapping("/history/{messengerId}")
-    @PreAuthorize("hasAnyRole('MESSENGER', 'ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<TrackingHistoryResponse>> getHistory(
             @PathVariable Long messengerId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
@@ -99,7 +100,7 @@ public class TrackingController {
     }
 
     @GetMapping("/service/{serviceId}")
-    @PreAuthorize("hasAnyRole('MESSENGER', 'ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<TrackingHistoryResponse>> getHistoryByService(
             @PathVariable Long serviceId) {
 

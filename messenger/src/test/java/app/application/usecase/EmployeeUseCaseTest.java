@@ -54,7 +54,6 @@ class EmployeeUseCaseTest {
         sampleEmployee.setDocument(123456789L);
         sampleEmployee.setFullName("Juan Pérez");
         sampleEmployee.setPhone("3001234567");
-        sampleEmployee.setUserName("jperez");
         sampleEmployee.setPassword("encoded_password");
         sampleEmployee.setRole(Role.MESSENGER);
     }
@@ -75,16 +74,6 @@ class EmployeeUseCaseTest {
         @DisplayName("Debe propagar excepción si documento duplicado")
         void shouldPropagateExceptionOnDuplicateDocument() throws Exception {
             doThrow(new BusinessException("Documento ya registrado"))
-                    .when(createEmployee).create(any());
-
-            assertThrows(BusinessException.class,
-                    () -> employeeUseCase.create(sampleEmployee));
-        }
-
-        @Test
-        @DisplayName("Debe propagar excepción si username duplicado")
-        void shouldPropagateExceptionOnDuplicateUsername() throws Exception {
-            doThrow(new BusinessException("Username ya existe"))
                     .when(createEmployee).create(any());
 
             assertThrows(BusinessException.class,
@@ -124,14 +113,14 @@ class EmployeeUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe buscar empleado por userName")
-        void shouldFindEmployeeByUserName() throws Exception {
-            when(searchEmployee.findByUserName("jperez")).thenReturn(sampleEmployee);
+        @DisplayName("Debe buscar empleado por documento")
+        void shouldFindEmployeeByDocument() throws Exception {
+            when(searchEmployee.findByDocument(123456789L)).thenReturn(sampleEmployee);
 
-            Employee result = employeeUseCase.findByUserName("jperez");
+            Employee result = employeeUseCase.findByDocument(123456789L);
 
             assertNotNull(result);
-            assertEquals("jperez", result.getUserName());
+            assertEquals(123456789L, result.getDocument());
         }
     }
 

@@ -33,8 +33,8 @@ public class EmployeeUseCase {
         return searchEmployee.findById(id);
     }
 
-    public Employee findByUserName(String userName) throws Exception {
-        return searchEmployee.findByUserName(userName);
+    public Employee findByDocument(Long document) throws Exception {
+        return searchEmployee.findByDocument(document);
     }
 
     public List<Employee> findAll() {

@@ -47,7 +47,7 @@ public class DealershipController {
         return ResponseEntity.ok(responses);
     }
 
-    @GetMapping("/findDealership/{id}")
+    @GetMapping("/findByDealershipId/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DealershipResponse> findById(@PathVariable Long id) throws Exception {
         Dealership dealership = dealershipUseCase.findById(id);
@@ -79,7 +79,7 @@ public class DealershipController {
         return ResponseEntity.ok(responseMapper.toResponse(dealership));
     }
 
-    @PostMapping("/findDealershipByName/{name}")
+    @GetMapping("/findByDealershipName/{name}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DealershipResponse> findByName(@PathVariable String name) throws Exception {
         Dealership dealership = dealershipUseCase.findByName(name);

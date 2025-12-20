@@ -11,9 +11,7 @@ public interface EmployeePort {
 
     Employee findById(Long idEmployee);
 
-    boolean existsByDocument(Long document);
-
-    Employee findByUserName(String userName);
+    Employee findByDocument(Long document);
 
     List<Employee> findAll();
 }

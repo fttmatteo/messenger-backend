@@ -61,22 +61,22 @@ class EmployeeAdapterTest {
     }
 
     @Test
-    @DisplayName("Debe buscar por nombre de usuario")
-    void shouldFindByUserName() {
+    @DisplayName("Debe buscar por documento")
+    void shouldFindByDocument() {
         EmployeeEntity entity = new EmployeeEntity();
-        entity.setUserName("testuser");
+        entity.setDocument(123456789L);
 
         Employee employee = new Employee();
-        employee.setUserName("testuser");
+        employee.setDocument(123456789L);
 
-        when(repository.findByUserName("testuser")).thenReturn(entity);
+        when(repository.findByDocument(123456789L)).thenReturn(entity);
         when(mapper.toDomain(entity)).thenReturn(employee);
 
-        Employee found = employeeAdapter.findByUserName("testuser");
+        Employee found = employeeAdapter.findByDocument(123456789L);
 
         assertNotNull(found);
-        assertEquals("testuser", found.getUserName());
-        verify(repository).findByUserName("testuser");
+        assertEquals(123456789L, found.getDocument());
+        verify(repository).findByDocument(123456789L);
     }
 
     @Test

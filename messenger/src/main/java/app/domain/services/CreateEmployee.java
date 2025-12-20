@@ -17,7 +17,6 @@ public class CreateEmployee {
 
     public Employee create(Employee employee) throws Exception {
         validateDocumentIsUnique(employee.getDocument());
-        validateUserNameIsUnique(employee.getUserName());
 
         if (employee.getPassword() != null) {
             String encoded = passwordEncoder.encode(employee.getPassword());
@@ -29,15 +28,8 @@ public class CreateEmployee {
     }
 
     private void validateDocumentIsUnique(Long document) throws Exception {
-        if (employeePort.existsByDocument(document)) {
+        if (employeePort.findByDocument(document) != null) {
             throw new BusinessException("Ya existe un empleado registrado con el documento " + document);
-        }
-    }
-
-    private void validateUserNameIsUnique(String userName) throws Exception {
-        Employee existing = employeePort.findByUserName(userName);
-        if (existing != null) {
-            throw new BusinessException("El nombre de usuario " + userName + " ya está en uso.");
         }
     }
 }

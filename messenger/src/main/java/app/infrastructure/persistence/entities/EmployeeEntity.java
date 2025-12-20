@@ -23,7 +23,10 @@ public class EmployeeEntity {
     @Column(name = "id_employee")
     private Long idEmployee;
 
-    /** Número de documento de identidad (único en el sistema). */
+    /**
+     * Número de documento de identidad (único en el sistema, usado para
+     * autenticación).
+     */
     @Column(unique = true, nullable = false)
     private Long document;
 
@@ -34,10 +37,6 @@ public class EmployeeEntity {
     /** Número de teléfono de contacto. */
     @Column(length = 20)
     private String phone;
-
-    /** Nombre de usuario para autenticación (único en el sistema). */
-    @Column(name = "user_name", unique = true, nullable = false)
-    private String userName;
 
     /** Contraseña encriptada con BCrypt. */
     @Column(nullable = false)
@@ -78,14 +77,6 @@ public class EmployeeEntity {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
     }
 
     public String getPassword() {

@@ -26,7 +26,7 @@ class JwtAdapterTest {
     @DisplayName("Debe autenticar y generar un token")
     void shouldAuthenticateAndGenerateToken() {
         AuthCredentials credentials = new AuthCredentials();
-        credentials.setUserName("testuser");
+        credentials.setDocument(123456789L);
 
         TokenResponse response = jwtAdapter.authenticate(credentials, "ADMIN", 1L);
 
@@ -39,7 +39,7 @@ class JwtAdapterTest {
     @DisplayName("Debe validar un token válido")
     void shouldValidateValidToken() {
         AuthCredentials credentials = new AuthCredentials();
-        credentials.setUserName("testuser");
+        credentials.setDocument(123456789L);
 
         TokenResponse response = jwtAdapter.authenticate(credentials, "ADMIN", 1L);
         boolean isValid = jwtAdapter.validateToken(response.getToken());
@@ -56,22 +56,22 @@ class JwtAdapterTest {
     }
 
     @Test
-    @DisplayName("Debe extraer el username del token")
-    void shouldExtractUsernameFromToken() {
+    @DisplayName("Debe extraer el documento del token")
+    void shouldExtractDocumentFromToken() {
         AuthCredentials credentials = new AuthCredentials();
-        credentials.setUserName("testuser");
+        credentials.setDocument(123456789L);
 
         TokenResponse response = jwtAdapter.authenticate(credentials, "ADMIN", 1L);
-        String username = jwtAdapter.extractUsername(response.getToken());
+        String document = jwtAdapter.extractUsername(response.getToken());
 
-        assertEquals("testuser", username);
+        assertEquals("123456789", document);
     }
 
     @Test
     @DisplayName("Debe extraer el rol del token")
     void shouldExtractRoleFromToken() {
         AuthCredentials credentials = new AuthCredentials();
-        credentials.setUserName("testuser");
+        credentials.setDocument(123456789L);
 
         TokenResponse response = jwtAdapter.authenticate(credentials, "MESSENGER", 1L);
         String role = jwtAdapter.extractRole(response.getToken());
@@ -83,7 +83,7 @@ class JwtAdapterTest {
     @DisplayName("Debe generar refresh token")
     void shouldGenerateRefreshToken() {
         AuthCredentials credentials = new AuthCredentials();
-        credentials.setUserName("testuser");
+        credentials.setDocument(123456789L);
 
         String refreshToken = jwtAdapter.generateRefreshToken(credentials);
 

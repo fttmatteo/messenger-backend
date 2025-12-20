@@ -32,7 +32,7 @@ public class AuthenticationService {
     private long jwtExpiration;
 
     public TokenResponse authenticate(AuthCredentials credentials) throws Exception {
-        Employee employee = employeePort.findByUserName(credentials.getUserName());
+        Employee employee = employeePort.findByDocument(credentials.getDocument());
         if (employee == null) {
             throw new BusinessException("Usuario no encontrado");
         }
@@ -72,14 +72,15 @@ public class AuthenticationService {
             throw new BusinessException("Refresh token inválido o expirado");
         }
 
-        String username = authenticationPort.extractUsername(refreshToken);
-        Employee employee = employeePort.findByUserName(username);
+        String documentStr = authenticationPort.extractUsername(refreshToken);
+        Long document = Long.parseLong(documentStr);
+        Employee employee = employeePort.findByDocument(document);
         if (employee == null) {
             throw new BusinessException("Usuario no encontrado");
         }
 
         AuthCredentials credentials = new AuthCredentials();
-        credentials.setUserName(username);
+        credentials.setDocument(document);
 
         TokenResponse response = authenticationPort.authenticate(credentials, String.valueOf(employee.getRole()),
                 employee.getIdEmployee());

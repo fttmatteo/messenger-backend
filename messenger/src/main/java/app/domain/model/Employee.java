@@ -7,7 +7,6 @@ public class Employee {
     private Long document;
     private String fullName;
     private String phone;
-    private String userName;
     private String password;
     private Role role;
 
@@ -41,14 +40,6 @@ public class Employee {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
     }
 
     public String getPassword() {

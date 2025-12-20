@@ -4,7 +4,6 @@ public class EmployeeRequest {
     private String document;
     private String fullName;
     private String phone;
-    private String userName;
     private String password;
     private String role;
 
@@ -30,14 +29,6 @@ public class EmployeeRequest {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
     }
 
     public String getPassword() {

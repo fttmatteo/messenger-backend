@@ -29,7 +29,7 @@ class LoginUseCaseTest {
     @DisplayName("Debe delegar login al servicio de autenticación")
     void shouldDelegateLogin() throws Exception {
         AuthCredentials credentials = new AuthCredentials();
-        credentials.setUserName("user");
+        credentials.setDocument(123456789L);
         TokenResponse expectedResponse = new TokenResponse();
         expectedResponse.setToken("token");
         expectedResponse.setRefreshToken("refresh");

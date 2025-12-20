@@ -36,13 +36,8 @@ public class EmployeeAdapter implements EmployeePort {
     }
 
     @Override
-    public boolean existsByDocument(Long document) {
-        return repository.existsByDocument(document);
-    }
-
-    @Override
-    public Employee findByUserName(String userName) {
-        EmployeeEntity entity = repository.findByUserName(userName);
+    public Employee findByDocument(Long document) {
+        EmployeeEntity entity = repository.findByDocument(document);
         if (entity != null) {
             return mapper.toDomain(entity);
         }

@@ -52,12 +52,11 @@ class AuthenticationServiceTest {
         sampleEmployee = new Employee();
         sampleEmployee.setIdEmployee(1L);
         sampleEmployee.setDocument(123456789L);
-        sampleEmployee.setUserName("testuser");
         sampleEmployee.setPassword("$2a$10$encodedPasswordHash123456789012345678901234567890123");
         sampleEmployee.setRole(Role.MESSENGER);
 
         validCredentials = new AuthCredentials();
-        validCredentials.setUserName("testuser");
+        validCredentials.setDocument(123456789L);
         validCredentials.setPassword("correctPassword");
 
         expectedToken = new TokenResponse();
@@ -72,7 +71,7 @@ class AuthenticationServiceTest {
         @Test
         @DisplayName("Debe autenticar con credenciales válidas")
         void shouldAuthenticateWithValidCredentials() throws Exception {
-            when(employeePort.findByUserName("testuser")).thenReturn(sampleEmployee);
+            when(employeePort.findByDocument(123456789L)).thenReturn(sampleEmployee);
             when(passwordEncoder.matches("correctPassword", sampleEmployee.getPassword())).thenReturn(true);
             when(authenticationPort.authenticate(eq(validCredentials), eq("MESSENGER"), anyLong()))
                     .thenReturn(expectedToken);
@@ -92,7 +91,7 @@ class AuthenticationServiceTest {
             adminToken.setToken("token");
             adminToken.setRole("ADMIN");
 
-            when(employeePort.findByUserName("testuser")).thenReturn(sampleEmployee);
+            when(employeePort.findByDocument(123456789L)).thenReturn(sampleEmployee);
             when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
             when(authenticationPort.authenticate(any(), eq("ADMIN"), anyLong()))
                     .thenReturn(adminToken);
@@ -110,10 +109,10 @@ class AuthenticationServiceTest {
         @Test
         @DisplayName("Debe lanzar excepción si usuario no existe")
         void shouldThrowExceptionIfUserNotFound() {
-            when(employeePort.findByUserName("unknownuser")).thenReturn(null);
+            when(employeePort.findByDocument(999999999L)).thenReturn(null);
 
             AuthCredentials credentials = new AuthCredentials();
-            credentials.setUserName("unknownuser");
+            credentials.setDocument(999999999L);
             credentials.setPassword("anypassword");
 
             BusinessException exception = assertThrows(BusinessException.class,
@@ -125,11 +124,11 @@ class AuthenticationServiceTest {
         @Test
         @DisplayName("Debe lanzar excepción si contraseña incorrecta")
         void shouldThrowExceptionIfPasswordIncorrect() {
-            when(employeePort.findByUserName("testuser")).thenReturn(sampleEmployee);
+            when(employeePort.findByDocument(123456789L)).thenReturn(sampleEmployee);
             when(passwordEncoder.matches("wrongPassword", sampleEmployee.getPassword())).thenReturn(false);
 
             AuthCredentials credentials = new AuthCredentials();
-            credentials.setUserName("testuser");
+            credentials.setDocument(123456789L);
             credentials.setPassword("wrongPassword");
 
             BusinessException exception = assertThrows(BusinessException.class,
@@ -149,7 +148,7 @@ class AuthenticationServiceTest {
             // Contraseña en texto plano (no BCrypt)
             sampleEmployee.setPassword("plainTextPassword");
 
-            when(employeePort.findByUserName("testuser")).thenReturn(sampleEmployee);
+            when(employeePort.findByDocument(123456789L)).thenReturn(sampleEmployee);
             // Primera llamada: no coincide con hash (porque está en plano)
             when(passwordEncoder.matches("plainTextPassword", "plainTextPassword")).thenReturn(false);
             // Encoding del password
@@ -157,7 +156,7 @@ class AuthenticationServiceTest {
             when(authenticationPort.authenticate(any(), anyString(), anyLong())).thenReturn(expectedToken);
 
             AuthCredentials credentials = new AuthCredentials();
-            credentials.setUserName("testuser");
+            credentials.setDocument(123456789L);
             credentials.setPassword("plainTextPassword");
 
             TokenResponse result = authenticationService.authenticate(credentials);
@@ -173,18 +172,18 @@ class AuthenticationServiceTest {
     class InputValidationTests {
 
         @Test
-        @DisplayName("Debe manejar username case-sensitive")
-        void shouldHandleUsernameCaseSensitive() {
-            when(employeePort.findByUserName("TestUser")).thenReturn(null);
+        @DisplayName("Debe manejar documento no encontrado")
+        void shouldHandleDocumentNotFound() {
+            when(employeePort.findByDocument(111111111L)).thenReturn(null);
 
             AuthCredentials credentials = new AuthCredentials();
-            credentials.setUserName("TestUser");
+            credentials.setDocument(111111111L);
             credentials.setPassword("password");
 
             assertThrows(BusinessException.class,
                     () -> authenticationService.authenticate(credentials));
 
-            verify(employeePort).findByUserName("TestUser");
+            verify(employeePort).findByDocument(111111111L);
         }
     }
 }

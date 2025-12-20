@@ -29,7 +29,6 @@ public class EmployeeMapper {
         entity.setDocument(employee.getDocument());
         entity.setFullName(employee.getFullName());
         entity.setPhone(employee.getPhone());
-        entity.setUserName(employee.getUserName());
         entity.setPassword(employee.getPassword());
         entity.setRole(employee.getRole());
         return entity;
@@ -52,7 +51,6 @@ public class EmployeeMapper {
         employee.setDocument(entity.getDocument());
         employee.setFullName(entity.getFullName());
         employee.setPhone(entity.getPhone());
-        employee.setUserName(entity.getUserName());
         employee.setPassword(entity.getPassword());
         employee.setRole(entity.getRole());
         return employee;

@@ -53,7 +53,6 @@ class UpdateServiceDeliveryTest {
         employee = new Employee();
         employee.setIdEmployee(1L);
         employee.setDocument(12345L);
-        employee.setUserName("testUser");
         employee.setRole(Role.MESSENGER);
 
         signature = new Signature();

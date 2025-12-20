@@ -3,14 +3,10 @@ package app.adapter.in.validators;
 import app.application.exceptions.InputsException;
 import app.domain.model.enums.Role;
 
-import java.util.regex.Pattern;
-
 import org.springframework.stereotype.Component;
 
 @Component
 public class EmployeeValidator extends SimpleValidator {
-
-    private static final Pattern USERNAME_PATTERN = Pattern.compile("^[A-Za-z0-9]+$");
 
     public long documentValidator(String value) throws InputsException {
         long doc = longValidator("número de cédula", value);
@@ -28,17 +24,6 @@ public class EmployeeValidator extends SimpleValidator {
         stringValidator("número de teléfono", value);
         if (!value.matches("\\d{10}")) {
             throw new InputsException("El número de teléfono debe contener exactamente 10 dígitos");
-        }
-        return value;
-    }
-
-    public String userNameValidator(String value) throws InputsException {
-        stringValidator("nombre de usuario", value);
-        if (value.length() > 15) {
-            throw new InputsException("El nombre de usuario no puede exceder 15 caracteres");
-        }
-        if (!USERNAME_PATTERN.matcher(value).matches()) {
-            throw new InputsException("El nombre de usuario solo debe contener letras y números");
         }
         return value;
     }

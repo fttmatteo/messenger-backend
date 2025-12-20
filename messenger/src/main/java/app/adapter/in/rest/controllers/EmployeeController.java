@@ -35,7 +35,6 @@ public class EmployeeController {
         Employee employee = builder.build(request.getDocument(),
                 request.getFullName(),
                 request.getPhone(),
-                request.getUserName(),
                 request.getPassword(),
                 request.getRole());
         Employee created = employeeUseCase.create(employee);
@@ -51,7 +50,7 @@ public class EmployeeController {
         return ResponseEntity.ok(responses);
     }
 
-    @GetMapping("/findEmployee/{id}")
+    @GetMapping("/findByEmployeeId/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EmployeeResponse> findById(@PathVariable Long id) {
         Employee employee = employeeUseCase.findById(id);
@@ -70,7 +69,6 @@ public class EmployeeController {
                 request.getDocument(),
                 request.getFullName(),
                 request.getPhone(),
-                request.getUserName(),
                 request.getPassword(),
                 request.getRole());
         Employee updated = employeeUseCase.update(id, employee);

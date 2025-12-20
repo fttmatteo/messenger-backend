@@ -32,6 +32,7 @@ public class LocationController {
     private LocationResponseMapper responseMapper;
 
     @PostMapping("/geocode")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<LocationResponse> geocodeAddress(
             @Valid @RequestBody GeocodeRequest request) {
         Location location = geocodeDealership.geocodeAddress(request.getAddress());
@@ -40,6 +41,7 @@ public class LocationController {
     }
 
     @PostMapping("/route")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<RouteResponse> calculateRoute(
             @Valid @RequestBody RouteRequest request) {
         Route route = calculateOptimalRoute.execute(
@@ -50,6 +52,7 @@ public class LocationController {
     }
 
     @GetMapping("/distance")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DistanceResponse> calculateDistance(
             @RequestParam Double fromLat,
             @RequestParam Double fromLng,
@@ -66,6 +69,7 @@ public class LocationController {
     }
 
     @GetMapping("/reverse")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<LocationResponse> reverseGeocode(
             @RequestParam Double lat,
             @RequestParam Double lng) {

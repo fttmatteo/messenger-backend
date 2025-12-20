@@ -22,19 +22,11 @@ public class UpdateEmployee {
         }
 
         if (!existingEmployee.getDocument().equals(incomingData.getDocument())) {
-            if (employeePort.existsByDocument(incomingData.getDocument())) {
+            if (employeePort.findByDocument(incomingData.getDocument()) != null) {
                 throw new BusinessException(
                         "El documento " + incomingData.getDocument() + " ya está registrado por otro empleado.");
             }
             existingEmployee.setDocument(incomingData.getDocument());
-        }
-
-        if (!existingEmployee.getUserName().equals(incomingData.getUserName())) {
-            Employee other = employeePort.findByUserName(incomingData.getUserName());
-            if (other != null) {
-                throw new BusinessException("El nombre de usuario " + incomingData.getUserName() + " ya está en uso.");
-            }
-            existingEmployee.setUserName(incomingData.getUserName());
         }
 
         existingEmployee.setFullName(incomingData.getFullName());
