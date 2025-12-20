@@ -65,6 +65,8 @@ class EmployeeUseCaseTest {
         @Test
         @DisplayName("Debe crear empleado exitosamente")
         void shouldCreateEmployeeSuccessfully() throws Exception {
+            when(createEmployee.create(sampleEmployee)).thenReturn(sampleEmployee);
+
             employeeUseCase.create(sampleEmployee);
 
             verify(createEmployee, times(1)).create(sampleEmployee);
@@ -180,6 +182,7 @@ class EmployeeUseCaseTest {
         @DisplayName("Debe aceptar rol MESSENGER")
         void shouldAcceptMessengerRole() throws Exception {
             sampleEmployee.setRole(Role.MESSENGER);
+            when(createEmployee.create(any(Employee.class))).thenReturn(sampleEmployee);
 
             employeeUseCase.create(sampleEmployee);
 
@@ -190,6 +193,7 @@ class EmployeeUseCaseTest {
         @DisplayName("Debe aceptar rol ADMIN")
         void shouldAcceptAdminRole() throws Exception {
             sampleEmployee.setRole(Role.ADMIN);
+            when(createEmployee.create(any(Employee.class))).thenReturn(sampleEmployee);
 
             employeeUseCase.create(sampleEmployee);
 

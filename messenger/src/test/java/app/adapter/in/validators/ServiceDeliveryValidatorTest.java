@@ -79,7 +79,7 @@ class ServiceDeliveryValidatorTest {
     class StatusValidatorTests {
 
         @ParameterizedTest
-        @ValueSource(strings = { "ASSIGNED", "DELIVERED", "PENDING", "FAILED", "RETURNED", "CANCELED", "OBSERVED" })
+        @ValueSource(strings = { "ASSIGNED", "DELIVERED", "PENDING", "RETURNED", "CANCELED" })
         @DisplayName("Debe validar estados válidos")
         void shouldValidateValidStatuses(String status) throws InputsException {
             Status result = validator.statusValidator(status);

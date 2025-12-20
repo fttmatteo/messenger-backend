@@ -11,6 +11,7 @@ import app.domain.model.enums.Role;
 import app.infrastructure.persistence.entities.EmployeeEntity;
 import app.infrastructure.persistence.mapper.EmployeeMapper;
 import app.infrastructure.persistence.repository.EmployeeRepository;
+import app.infrastructure.persistence.adapter.EmployeeAdapter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -45,15 +46,20 @@ class EmployeeAdapterTest {
         entity.setIdEmployee(1L);
         entity.setFullName("John Doe");
 
+        Employee savedEmployee = new Employee();
+        savedEmployee.setIdEmployee(1L);
+        savedEmployee.setFullName("John Doe");
+        savedEmployee.setRole(Role.ADMIN);
+
         when(mapper.toEntity(employee)).thenReturn(entity);
         when(repository.save(any(EmployeeEntity.class))).thenReturn(entity);
         when(repository.findById(1L)).thenReturn(Optional.of(entity));
-        when(mapper.toDomain(entity)).thenReturn(employee);
+        when(mapper.toDomain(entity)).thenReturn(savedEmployee);
 
-        employeeAdapter.save(employee);
+        Employee saved = employeeAdapter.save(employee);
 
         verify(repository).save(any(EmployeeEntity.class));
-        assertNotNull(employee.getIdEmployee());
+        assertNotNull(saved.getIdEmployee());
 
         Employee found = employeeAdapter.findById(1L);
         assertNotNull(found);

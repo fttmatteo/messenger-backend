@@ -83,6 +83,9 @@ class ServiceDeliveryUseCaseTest {
             when(storagePort.save(eq(mockImageFile), eq("detections"), anyString()))
                     .thenReturn("/path/to/saved/image.png");
 
+            when(createService.create(eq("ABC123"), anyString(), eq(1L), eq(123456L)))
+                    .thenReturn(sampleService);
+
             serviceDeliveryUseCase.createServiceFromImage(mockImageFile, 1L, 123456L);
 
             verify(ocrPort).extractText(mockImageFile);
@@ -111,6 +114,9 @@ class ServiceDeliveryUseCaseTest {
         void shouldCreateServiceWithManualPlate() throws Exception {
             when(storagePort.save(eq(mockImageFile), eq("detections"), anyString()))
                     .thenReturn("/path/to/saved/image.png");
+
+            when(createService.create(eq("XYZ789"), anyString(), eq(1L), eq(123456L)))
+                    .thenReturn(sampleService);
 
             serviceDeliveryUseCase.createServiceWithManualPlate(mockImageFile, "XYZ789", 1L, 123456L);
 

@@ -63,6 +63,7 @@ class DealershipUseCaseTest {
         @Test
         @DisplayName("Debe crear concesionario exitosamente")
         void shouldCreateDealershipSuccessfully() throws Exception {
+            when(createDealership.create(sampleDealership)).thenReturn(sampleDealership);
             dealershipUseCase.create(sampleDealership);
 
             verify(createDealership, times(1)).create(sampleDealership);

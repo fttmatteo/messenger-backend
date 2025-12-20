@@ -10,6 +10,7 @@ import app.domain.model.Dealership;
 import app.infrastructure.persistence.entities.DealershipEntity;
 import app.infrastructure.persistence.mapper.DealershipMapper;
 import app.infrastructure.persistence.repository.DealershipRepository;
+import app.infrastructure.persistence.adapter.DealershipAdapter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -43,15 +44,19 @@ class DealershipAdapterTest {
         entity.setIdDealership(1L);
         entity.setName("Test Dealer");
 
+        Dealership savedDealership = new Dealership();
+        savedDealership.setIdDealership(1L);
+        savedDealership.setName("Test Dealer");
+
         when(mapper.toEntity(dealership)).thenReturn(entity);
         when(repository.save(any(DealershipEntity.class))).thenReturn(entity);
         when(repository.findById(1L)).thenReturn(Optional.of(entity));
-        when(mapper.toDomain(entity)).thenReturn(dealership);
+        when(mapper.toDomain(entity)).thenReturn(savedDealership);
 
-        dealershipAdapter.save(dealership);
+        Dealership saved = dealershipAdapter.save(dealership);
 
         verify(repository).save(any(DealershipEntity.class));
-        assertNotNull(dealership.getIdDealership());
+        assertNotNull(saved.getIdDealership());
 
         Dealership found = dealershipAdapter.findById(1L);
         assertNotNull(found);
