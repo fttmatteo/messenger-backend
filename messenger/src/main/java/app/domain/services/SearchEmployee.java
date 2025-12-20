@@ -6,9 +6,6 @@ import org.springframework.stereotype.Service;
 import app.domain.model.Employee;
 import app.domain.ports.EmployeePort;
 
-/**
- * Servicio de dominio para búsqueda y recuperación de empleados.
- */
 @Service
 public class SearchEmployee {
 

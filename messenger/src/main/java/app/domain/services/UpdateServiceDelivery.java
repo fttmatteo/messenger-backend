@@ -3,8 +3,6 @@ package app.domain.services;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import app.application.exceptions.BusinessException;
@@ -18,55 +16,16 @@ import app.domain.model.enums.Status;
 import app.domain.ports.EmployeePort;
 import app.domain.ports.ServiceDeliveryPort;
 
-/**
- * Servicio de dominio para actualizar el estado de servicios de entrega.
- * 
- * Gestiona las transiciones de estado del ciclo de vida de una entrega:
- * Validación de transiciones de estado permitidas
- * Verificación de evidencias requeridas según el nuevo estado
- * Control de permisos (estados CANCELED y RESOLVED solo para admins)
- * Registro de firmas digitales, fotos y observaciones
- * Actualización del historial de cambios de estado
- * 
- * Reglas de evidencia:
- * DELIVERED: Solo firma obligatoria
- * PENDING/RETURNED: Firma, foto y observación obligatorias
- * CANCELED/RESOLVED: Sin evidencias requeridas (solo admins)
- * 
- * Reglas de transición:
- * PENDING solo puede pasar a RESOLVED (admin)
- * DELIVERED y RESOLVED son estados finales
- */
 @Service
 public class UpdateServiceDelivery {
-
-    private static final Logger logger = LoggerFactory.getLogger(UpdateServiceDelivery.class);
 
     @Autowired
     private ServiceDeliveryPort serviceDeliveryPort;
     @Autowired
     private EmployeePort employeePort;
 
-    /**
-     * Actualiza el estado de un servicio de entrega.
-     * 
-     * Valida transiciones de estado, permisos de usuario, y evidencias requeridas
-     * según el nuevo estado.
-     * Registra el cambio en el historial del servicio.
-     * 
-     * @param serviceId    ID del servicio a actualizar.
-     * @param newStatus    Nuevo estado del servicio.
-     * @param observation  Observación del cambio (opcional según estado).
-     * @param signature    Firma digital (obligatoria según estado).
-     * @param photos       Fotos de evidencia (obligatorias según estado).
-     * @param userDocument Documento del usuario que realiza el cambio.
-     * @throws Exception Si la transición no es válida, faltan evidencias, o el
-     *                   usuario no tiene permisos.
-     */
     public ServiceDelivery updateStatus(Long serviceId, Status newStatus, String observation,
             Signature signature, List<Photo> photos, Long userId) throws Exception {
-
-        logger.info("Actualizando estado servicio ID: {} -> {}", serviceId, newStatus);
 
         ServiceDelivery service = serviceDeliveryPort.findById(serviceId);
         if (service == null) {
@@ -79,7 +38,6 @@ public class UpdateServiceDelivery {
         }
 
         Status previousStatus = service.getCurrentStatus();
-        logger.debug("Cambio de estado: {} -> {} por usuario: {}", previousStatus, newStatus, user.getUserName());
 
         validateStateTransition(previousStatus, newStatus, user.getRole());
 
@@ -121,8 +79,6 @@ public class UpdateServiceDelivery {
         service.addHistory(history);
 
         ServiceDelivery updated = serviceDeliveryPort.save(service);
-        logger.info("Estado actualizado: servicio {} de {} a {} por {}",
-                serviceId, previousStatus, newStatus, user.getUserName());
         return updated;
     }
 

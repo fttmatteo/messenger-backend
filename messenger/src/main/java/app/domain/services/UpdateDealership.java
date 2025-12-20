@@ -1,38 +1,18 @@
 package app.domain.services;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import app.application.exceptions.BusinessException;
 import app.domain.model.Dealership;
 import app.domain.ports.DealershipPort;
 
-/**
- * Servicio de dominio para actualizar información de concesionarios existentes.
- * 
- * Valida unicidad del nombre si se modifica y actualiza los datos del
- * concesionario.
- */
 @Service
 public class UpdateDealership {
-
-    private static final Logger logger = LoggerFactory.getLogger(UpdateDealership.class);
 
     @Autowired
     private DealershipPort dealershipPort;
 
-    /**
-     * Actualiza la información de un concesionario existente.
-     * 
-     * @param id           ID del concesionario a actualizar.
-     * @param incomingData Nuevos datos del concesionario.
-     * @return El concesionario actualizado.
-     * @throws Exception Si el concesionario no existe o el nuevo nombre ya está en
-     *                   uso.
-     */
     public Dealership update(Long id, Dealership incomingData) throws Exception {
-        logger.debug("Actualizando concesionario ID: {}", id);
         Dealership existingDealership = dealershipPort.findById(id);
         if (existingDealership == null) {
             throw new BusinessException("El concesionario con ID " + id + " no existe.");
@@ -51,7 +31,6 @@ public class UpdateDealership {
         existingDealership.setZone(incomingData.getZone());
 
         Dealership updated = dealershipPort.save(existingDealership);
-        logger.info("Concesionario actualizado: ID {} -> {}", id, updated.getName());
         return updated;
     }
 }

@@ -1,8 +1,6 @@
 package app.domain.services;
 
 import java.time.LocalDateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import app.application.exceptions.BusinessException;
@@ -18,25 +16,8 @@ import app.domain.ports.EmployeePort;
 import app.domain.ports.PlatePort;
 import app.domain.ports.ServiceDeliveryPort;
 
-/**
- * Servicio de dominio para crear nuevos servicios de entrega.
- * 
- * Orquesta el proceso completo de creación de un servicio de entrega:
- * 
- * Validación de existencia del mensajero asignado
- * Validación de existencia del concesionario destino
- * Normalización y registro de la placa vehicular
- * Determinación automática del tipo de placa (carro, moto, motocarro)
- * Asociación de foto de detección si está disponible
- * Inicialización del servicio en estado ASSIGNED
- * Creación del primer registro en el historial de estados
- * 
- * Si la placa no existe previamente, se crea automáticamente en el sistema.
- */
 @Service
 public class CreateServiceDelivery {
-
-    private static final Logger logger = LoggerFactory.getLogger(CreateServiceDelivery.class);
 
     @Autowired
     private ServiceDeliveryPort serviceDeliveryPort;
@@ -71,7 +52,6 @@ public class CreateServiceDelivery {
             plate.setPlateType(plateRecognition.determinePlateType(normalizedPlate));
             plate.setUploadDate(LocalDateTime.now());
             platePort.save(plate);
-            logger.debug("Nueva placa registrada: {} ({})", normalizedPlate, plate.getPlateType());
         }
 
         ServiceDelivery service = new ServiceDelivery();
@@ -98,8 +78,6 @@ public class CreateServiceDelivery {
         service.addHistory(history);
 
         ServiceDelivery saved = serviceDeliveryPort.save(service);
-        logger.info("Servicio creado exitosamente: placa={}, concesionario={}, mensajero={}",
-                normalizedPlate, dealership.getName(), messenger.getFullName());
         return saved;
     }
 }
