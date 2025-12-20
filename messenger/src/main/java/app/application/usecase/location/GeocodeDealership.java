@@ -7,6 +7,9 @@ import app.domain.ports.LocationPort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * Caso de uso para geocodificar direcciones de concesionarios.
+ */
 @Service
 public class GeocodeDealership {
 

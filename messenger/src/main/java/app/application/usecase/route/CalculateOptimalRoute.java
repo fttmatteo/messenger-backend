@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Caso de uso para calcular rutas óptimas entre concesionarios.
+ */
 @Service
 public class CalculateOptimalRoute {
 

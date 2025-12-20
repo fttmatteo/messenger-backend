@@ -9,6 +9,9 @@ import app.domain.services.DeleteEmployee;
 import app.domain.services.SearchEmployee;
 import app.domain.services.UpdateEmployee;
 
+/**
+ * Caso de uso para gestión de empleados.
+ */
 @Service
 public class EmployeeUseCase {
 

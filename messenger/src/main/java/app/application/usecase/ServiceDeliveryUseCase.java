@@ -23,6 +23,9 @@ import app.domain.services.DeleteServiceDelivery;
 import app.domain.services.SearchServiceDelivery;
 import app.domain.services.UpdateServiceDelivery;
 
+/**
+ * Caso de uso principal para gestión de servicios de entrega.
+ */
 @Service
 public class ServiceDeliveryUseCase {
 

@@ -6,6 +6,9 @@ import app.domain.model.auth.AuthCredentials;
 import app.domain.model.auth.TokenResponse;
 import app.domain.services.AuthenticationService;
 
+/**
+ * Caso de uso para login de usuarios.
+ */
 @Component
 public class LoginUseCase {
 

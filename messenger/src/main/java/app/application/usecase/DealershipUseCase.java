@@ -9,6 +9,9 @@ import app.domain.services.DeleteDealership;
 import app.domain.services.SearchDealership;
 import app.domain.services.UpdateDealership;
 
+/**
+ * Caso de uso para gestión de concesionarios.
+ */
 @Service
 public class DealershipUseCase {
 

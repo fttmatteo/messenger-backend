@@ -6,6 +6,9 @@ import app.domain.model.auth.RefreshTokenRequest;
 import app.domain.model.auth.TokenResponse;
 import app.domain.services.AuthenticationService;
 
+/**
+ * Caso de uso para renovar tokens JWT.
+ */
 @Component
 public class RefreshTokenUseCase {
 

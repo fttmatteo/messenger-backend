@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 
+/**
+ * Caso de uso para actualizar ubicación en tiempo real de mensajeros.
+ */
 @Service
 public class UpdateLiveTracking {
 

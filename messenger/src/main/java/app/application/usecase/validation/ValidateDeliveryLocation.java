@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+/**
+ * Caso de uso para validar ubicación de entrega vs concesionario.
+ */
 @Service
 public class ValidateDeliveryLocation {
 
