@@ -1,5 +1,9 @@
 package app.domain.model;
 
+/**
+ * Representa un concesionario donde se entregan vehículos.
+ * Contiene información de contacto y ubicación geográfica.
+ */
 public class Dealership {
     private Long idDealership;
     private String name;

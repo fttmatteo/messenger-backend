@@ -4,23 +4,9 @@ import app.domain.model.Employee;
 import app.infrastructure.persistence.entities.EmployeeEntity;
 import org.springframework.stereotype.Component;
 
-/**
- * Mapper de persistencia para convertir entre Employee y EmployeeEntity.
- * Facilita la transformación de datos entre la capa de dominio y la base de
- * datos.
- */
 @Component
 public class EmployeeMapper {
 
-    /**
-     * Convierte un modelo de dominio Employee a su entidad JPA correspondiente.
-     * 
-     * Mapea todos los campos del empleado incluyendo documento, nombre completo,
-     * teléfono, credenciales de acceso y rol para persistencia en base de datos.
-     * 
-     * @param employee El modelo de dominio a convertir (puede ser null)
-     * @return La entidad JPA correspondiente, o null si el parámetro es null
-     */
     public EmployeeEntity toEntity(Employee employee) {
         if (employee == null)
             return null;
@@ -34,15 +20,6 @@ public class EmployeeMapper {
         return entity;
     }
 
-    /**
-     * Convierte una entidad JPA EmployeeEntity a modelo de dominio.
-     * 
-     * Reconstruye el objeto de dominio completo desde la base de datos,
-     * incluyendo todos los datos de identificación, contacto y autenticación.
-     * 
-     * @param entity La entidad JPA a convertir (puede ser null)
-     * @return El modelo de dominio correspondiente, o null si la entidad es null
-     */
     public Employee toDomain(EmployeeEntity entity) {
         if (entity == null)
             return null;

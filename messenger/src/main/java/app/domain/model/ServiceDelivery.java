@@ -4,6 +4,11 @@ import app.domain.model.enums.Status;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Representa un servicio de entrega de placa vehicular.
+ * Contiene la información del vehículo, destino, mensajero asignado e historial
+ * de estados.
+ */
 public class ServiceDelivery {
     private Long idServiceDelivery;
     private Plate plate;

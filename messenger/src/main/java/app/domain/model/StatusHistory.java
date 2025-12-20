@@ -3,6 +3,10 @@ package app.domain.model;
 import app.domain.model.enums.Status;
 import java.time.LocalDateTime;
 
+/**
+ * Representa un cambio de estado en un servicio de entrega.
+ * Registra quién realizó el cambio, cuándo y la ubicación GPS.
+ */
 public class StatusHistory {
     private Long idStatusHistory;
     private Status previousStatus;

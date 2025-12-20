@@ -2,6 +2,10 @@ package app.domain.model;
 
 import app.domain.model.enums.Role;
 
+/**
+ * Representa un empleado del sistema (administrador o mensajero).
+ * Identificado por su número de documento.
+ */
 public class Employee {
     private Long idEmployee;
     private Long document;

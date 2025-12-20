@@ -1,5 +1,8 @@
 package app.domain.model.auth;
 
+/**
+ * Respuesta de autenticación conteniendo tokens JWT y rol del usuario.
+ */
 public class TokenResponse {
     private String token;
     private String refreshToken;

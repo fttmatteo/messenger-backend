@@ -1,5 +1,8 @@
 package app.domain.model.auth;
 
+/**
+ * Credenciales de autenticación con documento y contraseña.
+ */
 public class AuthCredentials {
     private Long document;
     private String password;

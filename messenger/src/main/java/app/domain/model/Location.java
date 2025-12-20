@@ -2,6 +2,10 @@ package app.domain.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Value Object que representa una ubicación geográfica.
+ * Incluye cálculos de distancia usando la fórmula Haversine.
+ */
 public class Location {
     private Double latitude;
     private Double longitude;

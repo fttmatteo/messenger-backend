@@ -4,13 +4,17 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * Value Object inmutable que representa una ruta entre dos ubicaciones.
+ * Contiene información de distancia, duración y puntos intermedios.
+ */
 public class Route {
     private final Location origin;
     private final Location destination;
     private final List<Location> waypoints;
     private final Double distanceMeters;
     private final Long durationSeconds;
-    private final String polyline; // Encoded polyline de Google para dibujar en mapa
+    private final String polyline;
 
     public Route(Location origin, Location destination, List<Location> waypoints,
             Double distanceMeters, Long durationSeconds, String polyline) {
@@ -27,20 +31,6 @@ public class Route {
 
     public Double getDistanceKilometers() {
         return distanceMeters != null ? distanceMeters / 1000.0 : null;
-    }
-
-    public String getDurationFormatted() {
-        if (durationSeconds == null) {
-            return null;
-        }
-        long hours = durationSeconds / 3600;
-        long minutes = (durationSeconds % 3600) / 60;
-
-        if (hours > 0) {
-            return String.format("%d hora(s) %d minuto(s)", hours, minutes);
-        } else {
-            return String.format("%d minuto(s)", minutes);
-        }
     }
 
     public boolean hasWaypoints() {
@@ -77,7 +67,7 @@ public class Route {
 
     @Override
     public String toString() {
-        return String.format("Route[from=%s, to=%s, distance=%.2fkm, duration=%s]",
-                origin, destination, getDistanceKilometers(), getDurationFormatted());
+        return String.format("Route[from=%s, to=%s, distance=%.2fkm, durationSec=%d]",
+                origin, destination, getDistanceKilometers(), durationSeconds);
     }
 }

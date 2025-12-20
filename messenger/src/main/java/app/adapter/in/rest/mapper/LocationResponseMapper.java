@@ -56,9 +56,23 @@ public class LocationResponseMapper {
         response.setDistanceMeters(route.getDistanceMeters());
         response.setDistanceKilometers(route.getDistanceKilometers());
         response.setDurationSeconds(route.getDurationSeconds());
-        response.setDurationFormatted(route.getDurationFormatted());
+        response.setDurationFormatted(formatDuration(route.getDurationSeconds()));
         response.setPolyline(route.getPolyline());
 
         return response;
+    }
+
+    private String formatDuration(Long durationSeconds) {
+        if (durationSeconds == null) {
+            return null;
+        }
+        long hours = durationSeconds / 3600;
+        long minutes = (durationSeconds % 3600) / 60;
+
+        if (hours > 0) {
+            return String.format("%d hora(s) %d minuto(s)", hours, minutes);
+        } else {
+            return String.format("%d minuto(s)", minutes);
+        }
     }
 }

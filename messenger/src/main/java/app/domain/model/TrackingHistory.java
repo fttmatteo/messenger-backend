@@ -3,6 +3,10 @@ package app.domain.model;
 import app.domain.model.enums.TrackingSource;
 import java.time.LocalDateTime;
 
+/**
+ * Registro histórico de ubicación de un mensajero.
+ * Permite reconstruir las rutas recorridas.
+ */
 public class TrackingHistory {
     private Long historyId;
     private Long messengerId;

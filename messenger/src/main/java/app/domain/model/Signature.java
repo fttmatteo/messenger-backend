@@ -2,6 +2,9 @@ package app.domain.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Representa la firma digital del cliente al recibir una entrega.
+ */
 public class Signature {
     private Long idSignature;
     private String signaturePath;

@@ -3,6 +3,10 @@ package app.domain.model;
 import java.time.LocalDateTime;
 import app.domain.model.enums.PlateType;
 
+/**
+ * Representa la placa de un vehículo a entregar.
+ * Incluye el número de placa y su tipo (carro, moto, etc.).
+ */
 public class Plate {
     private Long idPlate;
     private String plateNumber;

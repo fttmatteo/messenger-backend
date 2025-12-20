@@ -10,12 +10,6 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * Mapper de persistencia para convertir entre ServiceDelivery y
- * ServiceDeliveryEntity.
- * Maneja la conversión compleja incluyendo asociaciones con Placa,
- * Concesionario y Mensajero.
- */
 @Component
 public class ServiceDeliveryMapper {
 
@@ -26,10 +20,6 @@ public class ServiceDeliveryMapper {
     @Autowired
     private EmployeeMapper employeeMapper;
 
-    /**
-     * Convierte un modelo de dominio ServiceDelivery a su entidad JPA
-     * correspondiente.
-     */
     public ServiceDeliveryEntity toEntity(ServiceDelivery serviceDelivery) {
         if (serviceDelivery == null)
             return null;
@@ -51,8 +41,6 @@ public class ServiceDeliveryMapper {
             entity.setSignature(sigEntity);
         }
 
-        // Cache para evitar entidades duplicadas (Multiple representations error)
-        // Reutilizamos la misma instancia de PhotoEntity si aparece en varias listas
         Map<Long, PhotoEntity> existingPhotoCache = new HashMap<>();
         Map<Photo, PhotoEntity> newPhotoCache = new IdentityHashMap<>();
 
@@ -78,7 +66,6 @@ public class ServiceDeliveryMapper {
                     hEntity.setPhotos(h.getPhotos().stream().map(p -> {
                         PhotoEntity pEntity = getOrCreatePhotoEntity(p, existingPhotoCache, newPhotoCache);
                         pEntity.setStatusHistory(hEntity);
-                        // Aseguramos que también esté vinculada al servicio si es la misma foto
                         pEntity.setServiceDelivery(entity);
                         return pEntity;
                     }).collect(Collectors.toList()));
@@ -92,7 +79,6 @@ public class ServiceDeliveryMapper {
 
     private PhotoEntity getOrCreatePhotoEntity(Photo p, Map<Long, PhotoEntity> existingCache,
             Map<Photo, PhotoEntity> newCache) {
-        // Para fotos existentes (con ID), usamos el ID como clave única
         if (p.getIdPhoto() != null) {
             if (existingCache.containsKey(p.getIdPhoto())) {
                 return existingCache.get(p.getIdPhoto());
@@ -101,7 +87,6 @@ public class ServiceDeliveryMapper {
             existingCache.put(p.getIdPhoto(), entity);
             return entity;
         } else {
-            // Para fotos nuevas (sin ID), usamos la identidad del objeto
             if (newCache.containsKey(p)) {
                 return newCache.get(p);
             }
@@ -120,9 +105,6 @@ public class ServiceDeliveryMapper {
         return pEntity;
     }
 
-    /**
-     * Convierte una entidad JPA ServiceDeliveryEntity a modelo de dominio.
-     */
     public ServiceDelivery toDomain(ServiceDeliveryEntity entity) {
         if (entity == null)
             return null;

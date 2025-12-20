@@ -3,6 +3,10 @@ package app.domain.model;
 import app.domain.model.enums.TrackingStatus;
 import java.time.LocalDateTime;
 
+/**
+ * Representa el estado de rastreo en tiempo real de un mensajero.
+ * Incluye ubicación actual, velocidad y dirección.
+ */
 public class LiveTracking {
     private Long trackingId;
     private Long messengerId;
