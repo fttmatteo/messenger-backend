@@ -19,16 +19,6 @@ public class DealershipBuilder {
     @Autowired
     private DealershipValidator validator;
 
-    /**
-     * Construye una instancia de Dealership a partir de la solicitud.
-     *
-     * Valida cada campo (nombre, dirección, teléfono, zona) antes de asignarlo.
-     *
-     * @param request Datos de entrada para la creación/actualización del
-     *                concesionario.
-     * @return Instancia de {@link Dealership} validada.
-     * @throws Exception Si alguna validación de campo falla.
-     */
     public Dealership build(DealershipRequest request) throws Exception {
         Dealership dealership = new Dealership();
         dealership.setName(validator.nameValidator(request.getName()));

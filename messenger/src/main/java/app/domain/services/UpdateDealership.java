@@ -27,10 +27,11 @@ public class UpdateDealership {
      * 
      * @param id           ID del concesionario a actualizar.
      * @param incomingData Nuevos datos del concesionario.
+     * @return El concesionario actualizado.
      * @throws Exception Si el concesionario no existe o el nuevo nombre ya está en
      *                   uso.
      */
-    public void update(Long id, Dealership incomingData) throws Exception {
+    public Dealership update(Long id, Dealership incomingData) throws Exception {
         logger.debug("Actualizando concesionario ID: {}", id);
         Dealership existingDealership = dealershipPort.findById(id);
         if (existingDealership == null) {
@@ -49,7 +50,8 @@ public class UpdateDealership {
         existingDealership.setPhone(incomingData.getPhone());
         existingDealership.setZone(incomingData.getZone());
 
-        dealershipPort.save(existingDealership);
-        logger.info("Concesionario actualizado: ID {} -> {}", id, existingDealership.getName());
+        Dealership updated = dealershipPort.save(existingDealership);
+        logger.info("Concesionario actualizado: ID {} -> {}", id, updated.getName());
+        return updated;
     }
 }

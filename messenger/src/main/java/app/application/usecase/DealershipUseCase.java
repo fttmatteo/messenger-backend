@@ -35,11 +35,12 @@ public class DealershipUseCase {
      * Crea un nuevo concesionario en el sistema.
      * 
      * @param dealership La entidad del concesionario a crear.
+     * @return El concesionario creado con su ID asignado.
      * @throws Exception Si ocurre un error durante el proceso de creación.
      */
-    public void create(Dealership dealership) throws Exception {
+    public Dealership create(Dealership dealership) throws Exception {
         logger.debug("UseCase: creando concesionario {}", dealership.getName());
-        createDealership.create(dealership);
+        return createDealership.create(dealership);
     }
 
     /**
@@ -47,12 +48,13 @@ public class DealershipUseCase {
      * 
      * @param id         El ID del concesionario a actualizar.
      * @param dealership Los nuevos datos del concesionario.
+     * @return El concesionario actualizado.
      * @throws Exception Si el concesionario no existe o hay un error en la
      *                   actualización.
      */
-    public void update(Long id, Dealership dealership) throws Exception {
+    public Dealership update(Long id, Dealership dealership) throws Exception {
         logger.debug("UseCase: actualizando concesionario ID {}", id);
-        updateDealership.update(id, dealership);
+        return updateDealership.update(id, dealership);
     }
 
     /**

@@ -50,13 +50,13 @@ public class DealershipAdapter implements DealershipPort {
 
     /**
      * Guarda o actualiza un concesionario en la base de datos.
-     * Actualiza el ID del objeto de dominio con el ID generado.
+     * Retorna el objeto guardado con el ID generado.
      */
     @Override
-    public void save(Dealership dealership) {
+    public Dealership save(Dealership dealership) {
         DealershipEntity entity = mapper.toEntity(dealership);
         DealershipEntity savedEntity = repository.save(entity);
-        dealership.setIdDealership(savedEntity.getIdDealership());
+        return mapper.toDomain(savedEntity);
     }
 
     /** Busca un concesionario por ID. */

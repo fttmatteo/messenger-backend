@@ -14,8 +14,9 @@ public interface DealershipPort {
      * Guarda o actualiza un concesionario en la base de datos.
      * 
      * @param dealership Concesionario a guardar.
+     * @return El concesionario guardado con su ID asignado.
      */
-    void save(Dealership dealership);
+    Dealership save(Dealership dealership);
 
     /**
      * Elimina un concesionario por su ID.
