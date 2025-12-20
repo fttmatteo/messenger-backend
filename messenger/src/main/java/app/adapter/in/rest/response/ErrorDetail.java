@@ -1,5 +1,8 @@
 package app.adapter.in.rest.response;
 
+/**
+ * Detalle de error de validación por campo.
+ */
 public class ErrorDetail {
 
     private String field;

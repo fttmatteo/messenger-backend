@@ -1,5 +1,8 @@
 package app.adapter.in.rest.response;
 
+/**
+ * DTO de respuesta con cálculo de distancia y duración.
+ */
 public class DistanceResponse {
     private Double distanceMeters;
     private Double distanceKilometers;

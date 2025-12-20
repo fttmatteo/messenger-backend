@@ -16,6 +16,9 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 
+/**
+ * Adapter de JWT para generación y validación de tokens.
+ */
 @Component
 public class JwtAdapter implements AuthenticationPort {
 

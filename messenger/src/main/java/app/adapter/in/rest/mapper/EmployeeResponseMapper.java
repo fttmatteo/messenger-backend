@@ -4,6 +4,9 @@ import app.adapter.in.rest.response.EmployeeResponse;
 import app.domain.model.Employee;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper de Employee a EmployeeResponse para API REST.
+ */
 @Component
 public class EmployeeResponseMapper {
 

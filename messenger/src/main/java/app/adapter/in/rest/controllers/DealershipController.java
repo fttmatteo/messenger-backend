@@ -17,6 +17,9 @@ import app.domain.model.Dealership;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador REST para gestión de concesionarios.
+ */
 @RestController
 @RequestMapping("/dealerships")
 public class DealershipController {

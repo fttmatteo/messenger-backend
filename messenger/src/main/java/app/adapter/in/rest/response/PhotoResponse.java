@@ -3,6 +3,9 @@ package app.adapter.in.rest.response;
 import app.domain.model.enums.PhotoType;
 import java.time.LocalDateTime;
 
+/**
+ * DTO de respuesta con datos de foto.
+ */
 public class PhotoResponse {
     private Long idPhoto;
     private String photoPath;

@@ -3,6 +3,9 @@ package app.adapter.in.validators;
 import org.springframework.stereotype.Component;
 import app.application.exceptions.InputsException;
 
+/**
+ * Validador de inputs para concesionarios.
+ */
 @Component
 public class DealershipValidator extends SimpleValidator {
 

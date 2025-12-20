@@ -2,6 +2,9 @@ package app.adapter.in.validators;
 
 import app.application.exceptions.InputsException;
 
+/**
+ * Validador base con métodos comunes para validación de tipos.
+ */
 public abstract class SimpleValidator {
 
     public String stringValidator(String element, String value) throws InputsException {

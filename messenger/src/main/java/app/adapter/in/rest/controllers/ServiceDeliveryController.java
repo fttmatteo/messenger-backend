@@ -27,6 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador REST para gestión de servicios de entrega.
+ */
 @RestController
 @RequestMapping("/services")
 @PreAuthorize("isAuthenticated()")

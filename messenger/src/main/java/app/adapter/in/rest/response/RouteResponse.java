@@ -2,6 +2,9 @@ package app.adapter.in.rest.response;
 
 import java.util.List;
 
+/**
+ * DTO de respuesta con ruta calculada y polyline.
+ */
 public class RouteResponse {
     private LocationResponse origin;
     private LocationResponse destination;

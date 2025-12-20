@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Mapper de Location y Route a respuestas REST.
+ */
 @Component
 public class LocationResponseMapper {
 

@@ -4,6 +4,9 @@ import app.adapter.in.rest.response.DealershipResponse;
 import app.domain.model.Dealership;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper de Dealership a DealershipResponse para API REST.
+ */
 @Component
 public class DealershipResponseMapper {
 

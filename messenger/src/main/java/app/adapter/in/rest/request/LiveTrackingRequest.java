@@ -2,6 +2,9 @@ package app.adapter.in.rest.request;
 
 import app.domain.model.enums.TrackingStatus;
 
+/**
+ * DTO para actualizar ubicación en tiempo real de mensajero.
+ */
 public class LiveTrackingRequest {
     private Long messengerId;
     private Double latitude;

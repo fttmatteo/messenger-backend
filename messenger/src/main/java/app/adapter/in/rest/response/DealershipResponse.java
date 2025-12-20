@@ -1,5 +1,8 @@
 package app.adapter.in.rest.response;
 
+/**
+ * DTO de respuesta con datos de concesionario.
+ */
 public class DealershipResponse {
     private Long idDealership;
     private String name;

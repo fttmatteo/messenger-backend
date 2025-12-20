@@ -6,6 +6,9 @@ import app.domain.model.LiveTracking;
 import app.domain.model.TrackingHistory;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper de LiveTracking y TrackingHistory a respuestas REST.
+ */
 @Component
 public class TrackingResponseMapper {
 

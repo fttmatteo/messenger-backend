@@ -2,6 +2,9 @@ package app.adapter.in.rest.response;
 
 import java.time.LocalDateTime;
 
+/**
+ * DTO de respuesta con historial de tracking de mensajero.
+ */
 public class TrackingHistoryResponse {
     private Long historyId;
     private Long messengerId;

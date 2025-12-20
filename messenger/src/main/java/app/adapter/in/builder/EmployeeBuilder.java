@@ -5,6 +5,9 @@ import org.springframework.stereotype.Component;
 import app.adapter.in.validators.EmployeeValidator;
 import app.domain.model.Employee;
 
+/**
+ * Builder que construye objetos Employee con validación de parámetros.
+ */
 @Component
 public class EmployeeBuilder {
 

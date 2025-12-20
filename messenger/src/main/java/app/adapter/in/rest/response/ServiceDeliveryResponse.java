@@ -5,6 +5,9 @@ import app.domain.model.enums.Status;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * DTO de respuesta con datos completos de servicio de entrega.
+ */
 public class ServiceDeliveryResponse {
     private Long idServiceDelivery;
     private PlateResponse plate;

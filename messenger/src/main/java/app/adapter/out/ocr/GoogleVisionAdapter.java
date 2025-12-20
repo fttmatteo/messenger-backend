@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Adapter de Google Cloud Vision para OCR de placas vehiculares.
+ */
 @Component
 @ConditionalOnProperty(name = "app.ocr.mode", havingValue = "google-vision")
 public class GoogleVisionAdapter implements OcrPort {

@@ -21,6 +21,9 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Adapter de Google Cloud Storage para almacenamiento de archivos.
+ */
 @Component
 @ConditionalOnProperty(name = "app.storage.type", havingValue = "gcs")
 public class GoogleCloudStorageAdapter implements StoragePort {

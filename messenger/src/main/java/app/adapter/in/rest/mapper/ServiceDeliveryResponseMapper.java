@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.stream.Collectors;
 
+/**
+ * Mapper de ServiceDelivery a ServiceDeliveryResponse para API REST.
+ */
 @Component
 public class ServiceDeliveryResponseMapper {
 

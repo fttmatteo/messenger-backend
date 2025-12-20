@@ -1,5 +1,8 @@
 package app.adapter.in.rest.request;
 
+/**
+ * DTO para crear o actualizar empleados.
+ */
 public class EmployeeRequest {
     private String document;
     private String fullName;

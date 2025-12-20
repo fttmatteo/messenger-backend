@@ -14,6 +14,9 @@ import org.springframework.stereotype.Controller;
 import java.security.Principal;
 import java.time.LocalDateTime;
 
+/**
+ * Controlador WebSocket para tracking en tiempo real de mensajeros.
+ */
 @Controller
 public class TrackingWebSocketController {
 

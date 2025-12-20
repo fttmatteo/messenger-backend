@@ -17,6 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Controlador REST para geocodificación y cálculo de rutas.
+ */
 @RestController
 @RequestMapping("/locations")
 @PreAuthorize("isAuthenticated()")

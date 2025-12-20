@@ -12,6 +12,9 @@ import app.application.usecase.RefreshTokenUseCase;
 import app.domain.model.auth.AuthCredentials;
 import app.domain.model.auth.TokenResponse;
 
+/**
+ * Controlador REST para autenticación y gestión de tokens.
+ */
 @RestController
 @RequestMapping("/auth")
 public class AuthController {

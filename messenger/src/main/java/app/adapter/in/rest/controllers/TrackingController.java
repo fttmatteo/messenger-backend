@@ -21,6 +21,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador REST para tracking en tiempo real de mensajeros.
+ */
 @RestController
 @RequestMapping("/tracking")
 @PreAuthorize("isAuthenticated()")

@@ -2,6 +2,9 @@ package app.adapter.in.rest.response;
 
 import app.domain.model.enums.Role;
 
+/**
+ * DTO de respuesta con datos de empleado.
+ */
 public class EmployeeResponse {
     private Long idEmployee;
     private Long document;

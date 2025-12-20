@@ -1,5 +1,8 @@
 package app.adapter.in.rest.request;
 
+/**
+ * DTO para crear un nuevo servicio de entrega.
+ */
 public class ServiceDeliveryCreateRequest {
     private String dealershipId;
     private String messengerId;

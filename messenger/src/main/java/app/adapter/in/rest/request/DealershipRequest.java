@@ -1,5 +1,8 @@
 package app.adapter.in.rest.request;
 
+/**
+ * DTO para crear o actualizar concesionarios.
+ */
 public class DealershipRequest {
     private String name;
     private String address;

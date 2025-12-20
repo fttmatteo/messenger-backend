@@ -7,6 +7,9 @@ import app.adapter.in.rest.request.ServiceDeliveryUpdateStatusRequest;
 import app.adapter.in.validators.ServiceDeliveryValidator;
 import app.domain.model.enums.Status;
 
+/**
+ * Builder que transforma requests de servicio en DTOs validados.
+ */
 @Component
 public class ServiceDeliveryBuilder {
 

@@ -15,6 +15,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Controlador REST para servir archivos estáticos (fotos, firmas).
+ */
 @RestController
 @RequestMapping("/files")
 public class FileController {

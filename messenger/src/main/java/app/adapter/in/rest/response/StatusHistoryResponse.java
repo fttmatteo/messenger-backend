@@ -4,6 +4,9 @@ import app.domain.model.enums.Status;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * DTO de respuesta con historial de cambio de estado.
+ */
 public class StatusHistoryResponse {
     private Long idStatusHistory;
     private Status previousStatus;

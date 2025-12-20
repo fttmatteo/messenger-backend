@@ -6,6 +6,9 @@ import app.adapter.in.rest.request.DealershipRequest;
 import app.adapter.in.validators.DealershipValidator;
 import app.domain.model.Dealership;
 
+/**
+ * Builder que transforma DealershipRequest en modelo de dominio con validación.
+ */
 @Component
 public class DealershipBuilder {
 

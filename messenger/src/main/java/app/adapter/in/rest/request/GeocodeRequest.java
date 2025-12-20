@@ -2,6 +2,9 @@ package app.adapter.in.rest.request;
 
 import jakarta.validation.constraints.NotBlank;
 
+/**
+ * DTO para solicitar geocodificación de dirección.
+ */
 public class GeocodeRequest {
 
     @NotBlank(message = "La dirección es obligatoria")

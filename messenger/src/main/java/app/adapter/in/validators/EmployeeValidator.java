@@ -5,6 +5,9 @@ import app.domain.model.enums.Role;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Validador de inputs para empleados.
+ */
 @Component
 public class EmployeeValidator extends SimpleValidator {
 

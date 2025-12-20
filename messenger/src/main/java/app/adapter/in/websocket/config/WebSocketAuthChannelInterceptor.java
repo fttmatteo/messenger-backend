@@ -13,6 +13,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import java.util.List;
 
+/**
+ * Interceptor para autenticar conexiones WebSocket via JWT.
+ */
 @Component
 public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 

@@ -3,6 +3,9 @@ package app.adapter.in.rest.request;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
+/**
+ * DTO para solicitar cálculo de ruta óptima.
+ */
 public class RouteRequest {
 
     @NotNull(message = "La latitud de origen es obligatoria")

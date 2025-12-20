@@ -3,6 +3,9 @@ package app.adapter.in.rest.response;
 import app.domain.model.enums.TrackingStatus;
 import java.time.LocalDateTime;
 
+/**
+ * DTO de respuesta con tracking en tiempo real de mensajero.
+ */
 public class LiveTrackingResponse {
     private Long messengerId;
     private String messengerName;

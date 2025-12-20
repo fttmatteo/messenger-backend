@@ -16,6 +16,9 @@ import app.infrastructure.audit.AuditableAction;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador REST para gestión de empleados (solo ADMIN).
+ */
 @RestController
 @RequestMapping("/employees")
 @PreAuthorize("hasRole('ADMIN')")

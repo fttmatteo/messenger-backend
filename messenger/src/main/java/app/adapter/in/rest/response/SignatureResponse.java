@@ -2,6 +2,9 @@ package app.adapter.in.rest.response;
 
 import java.time.LocalDateTime;
 
+/**
+ * DTO de respuesta con datos de firma digital.
+ */
 public class SignatureResponse {
     private Long idSignature;
     private String signaturePath;

@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Mapper de objetos Google Maps a modelos de dominio.
+ */
 @Component
 public class GoogleMapsMapper {
 

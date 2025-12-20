@@ -8,6 +8,9 @@ import app.infrastructure.persistence.entities.TrackingHistoryEntity;
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
+/**
+ * Mapper de LiveTracking y TrackingHistory entre dominio y entity.
+ */
 @Component
 public class TrackingMapper {
 

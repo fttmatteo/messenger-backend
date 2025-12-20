@@ -1,5 +1,8 @@
 package app.adapter.in.rest.response;
 
+/**
+ * DTO de respuesta con ubicación geográfica.
+ */
 public class LocationResponse {
     private Double latitude;
     private Double longitude;

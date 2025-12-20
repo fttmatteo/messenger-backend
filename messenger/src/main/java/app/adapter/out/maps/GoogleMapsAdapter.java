@@ -17,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.List;
 
+/**
+ * Adapter de Google Maps para geocodificación y cálculo de rutas.
+ */
 @Component
 public class GoogleMapsAdapter implements LocationPort {
 

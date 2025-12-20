@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * DTO de respuesta estándar para errores HTTP.
+ */
 public class ErrorResponse {
     private LocalDateTime timestamp;
     private int status;

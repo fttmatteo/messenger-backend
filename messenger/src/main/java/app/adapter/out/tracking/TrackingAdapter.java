@@ -19,6 +19,9 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+/**
+ * Adapter de tracking que usa Redis para ubicación en tiempo real.
+ */
 @Component
 public class TrackingAdapter implements TrackingPort {
 
