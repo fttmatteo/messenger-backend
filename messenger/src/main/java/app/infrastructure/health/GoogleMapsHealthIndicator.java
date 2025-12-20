@@ -9,18 +9,6 @@ import org.springframework.boot.health.contributor.Health;
 import org.springframework.boot.health.contributor.HealthIndicator;
 import org.springframework.stereotype.Component;
 
-/**
- * Indicador de salud personalizado para Google Maps API.
- * 
- * Verifica la conectividad con la API de Google Maps realizando
- * una geocodificación de prueba.
- * 
- * Estados:
- * - UP: API de Google Maps accesible
- * - DOWN: Error al conectar con Google Maps
- * 
- * NOTA: Solo se carga cuando app.storage.type=gcs (servicios de Google activos)
- */
 @Component
 @ConditionalOnProperty(name = "app.storage.type", havingValue = "gcs")
 public class GoogleMapsHealthIndicator implements HealthIndicator {
@@ -31,7 +19,6 @@ public class GoogleMapsHealthIndicator implements HealthIndicator {
     @Override
     public Health health() {
         try {
-            // Realizar una geocodificación simple como prueba
             GeocodingResult[] results = GeocodingApi.geocode(geoApiContext, "Google HQ").await();
 
             if (results != null && results.length > 0) {
