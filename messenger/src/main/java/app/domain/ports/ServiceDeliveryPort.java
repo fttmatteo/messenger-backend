@@ -3,6 +3,9 @@ package app.domain.ports;
 import app.domain.model.ServiceDelivery;
 import java.util.List;
 
+/**
+ * Puerto de salida para persistencia de servicios de entrega.
+ */
 public interface ServiceDeliveryPort {
 
     ServiceDelivery save(ServiceDelivery serviceDelivery);

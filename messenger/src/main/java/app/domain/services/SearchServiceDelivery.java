@@ -7,6 +7,9 @@ import app.application.exceptions.BusinessException;
 import app.domain.model.ServiceDelivery;
 import app.domain.ports.ServiceDeliveryPort;
 
+/**
+ * Servicio para búsqueda de servicios de entrega.
+ */
 @Service
 public class SearchServiceDelivery {
 

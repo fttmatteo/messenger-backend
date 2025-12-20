@@ -14,6 +14,9 @@ import app.domain.ports.AuthenticationPort;
 import app.domain.ports.EmployeePort;
 import app.infrastructure.security.TokenBlacklistService;
 
+/**
+ * Servicio de autenticación y gestión de tokens JWT.
+ */
 @Service
 public class AuthenticationService {
 

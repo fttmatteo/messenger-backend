@@ -7,6 +7,9 @@ import app.domain.model.Employee;
 import app.domain.ports.EmployeePort;
 import app.domain.ports.ServiceDeliveryPort;
 
+/**
+ * Servicio para eliminar empleados validando dependencias.
+ */
 @Service
 public class DeleteEmployee {
 

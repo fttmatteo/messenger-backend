@@ -5,6 +5,9 @@ import app.domain.model.TrackingHistory;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Puerto de salida para rastreo GPS de mensajeros en tiempo real.
+ */
 public interface TrackingPort {
 
     void saveLiveLocation(LiveTracking tracking);

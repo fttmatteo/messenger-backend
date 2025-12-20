@@ -7,6 +7,9 @@ import app.application.exceptions.BusinessException;
 import app.domain.model.Employee;
 import app.domain.ports.EmployeePort;
 
+/**
+ * Servicio para actualizar datos de empleados.
+ */
 @Service
 public class UpdateEmployee {
 

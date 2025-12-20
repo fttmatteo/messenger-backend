@@ -7,6 +7,9 @@ import app.domain.model.ServiceDelivery;
 import app.domain.model.enums.Status;
 import app.domain.ports.ServiceDeliveryPort;
 
+/**
+ * Servicio para eliminar servicios de entrega no finalizados.
+ */
 @Service
 public class DeleteServiceDelivery {
 

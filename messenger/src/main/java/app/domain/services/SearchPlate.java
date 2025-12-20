@@ -5,6 +5,9 @@ import org.springframework.stereotype.Service;
 import app.domain.model.Plate;
 import app.domain.ports.PlatePort;
 
+/**
+ * Servicio para búsqueda de placas vehiculares.
+ */
 @Service
 public class SearchPlate {
 

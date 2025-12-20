@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 import app.domain.model.Employee;
 import app.domain.ports.EmployeePort;
 
+/**
+ * Servicio para búsqueda de empleados.
+ */
 @Service
 public class SearchEmployee {
 

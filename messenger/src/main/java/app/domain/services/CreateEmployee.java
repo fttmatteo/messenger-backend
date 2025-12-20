@@ -7,6 +7,9 @@ import app.application.exceptions.BusinessException;
 import app.domain.model.Employee;
 import app.domain.ports.EmployeePort;
 
+/**
+ * Servicio para crear nuevos empleados con encriptación de contraseña.
+ */
 @Service
 public class CreateEmployee {
 

@@ -4,6 +4,9 @@ import app.domain.model.Location;
 import app.domain.model.Route;
 import java.util.List;
 
+/**
+ * Puerto de salida para servicios de geolocalización y rutas.
+ */
 public interface LocationPort {
 
     Location geocodeAddress(String address);

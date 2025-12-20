@@ -3,6 +3,9 @@ package app.domain.ports;
 import app.domain.model.auth.AuthCredentials;
 import app.domain.model.auth.TokenResponse;
 
+/**
+ * Puerto de salida para operaciones de autenticación JWT.
+ */
 public interface AuthenticationPort {
 
     TokenResponse authenticate(AuthCredentials credentials, String role, Long userId);

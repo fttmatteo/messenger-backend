@@ -16,6 +16,9 @@ import app.domain.ports.EmployeePort;
 import app.domain.ports.PlatePort;
 import app.domain.ports.ServiceDeliveryPort;
 
+/**
+ * Servicio para crear nuevos servicios de entrega con reconocimiento de placa.
+ */
 @Service
 public class CreateServiceDelivery {
 

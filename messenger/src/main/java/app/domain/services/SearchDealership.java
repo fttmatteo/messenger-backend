@@ -8,6 +8,9 @@ import app.application.exceptions.ResourceNotFoundException;
 import app.domain.model.Dealership;
 import app.domain.ports.DealershipPort;
 
+/**
+ * Servicio para búsqueda de concesionarios.
+ */
 @Service
 public class SearchDealership {
 

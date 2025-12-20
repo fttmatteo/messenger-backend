@@ -7,61 +7,41 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Entidad JPA que representa la tabla 'status_history'.
- * 
- * Registra la auditoría completa de cambios de estado en los servicios de
- * entrega,
- * incluyendo quién realizó el cambio, cuándo, y la ubicación donde se realizó.
- * 
- * Relaciones:
- * - Pertenece a un ServiceDelivery (N:1)
- * - Registra el Employee que realizó el cambio (N:1)
- * - Puede tener múltiples Photos de evidencia (1:N)
- */
 @Entity
 @Table(name = "status_history")
 public class StatusHistoryEntity {
-
-    /** Identificador único del registro de historial (clave primaria). */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_status_history")
     private Long idStatusHistory;
 
-    /**
-     * Estado anterior del servicio antes del cambio (null para el primer registro).
-     */
     @Enumerated(EnumType.STRING)
     @Column(name = "previous_status")
     private Status previousStatus;
 
-    /** Nuevo estado al que cambió el servicio. */
     @Enumerated(EnumType.STRING)
     @Column(name = "new_status", nullable = false)
     private Status newStatus;
 
-    /** Fecha y hora exacta en que se realizó el cambio de estado. */
     @Column(name = "change_date", nullable = false)
     private LocalDateTime changeDate;
 
-    /** Empleado que realizó el cambio de estado. */
     @ManyToOne
     @JoinColumn(name = "changed_by_employee_id")
     private EmployeeEntity changedBy;
 
-    /** Servicio de entrega al que pertenece este registro de historial. */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "service_delivery_id")
     private ServiceDeliveryEntity serviceDelivery;
 
-    /** Latitud donde se realizó el cambio de estado (para tracking geográfico). */
     @Column(name = "delivery_latitude")
     private Double deliveryLatitude;
 
-    /** Longitud donde se realizó el cambio de estado (para tracking geográfico). */
     @Column(name = "delivery_longitude")
     private Double deliveryLongitude;
+
+    @OneToMany(mappedBy = "statusHistory", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PhotoEntity> photos = new ArrayList<>();
 
     public Long getIdStatusHistory() {
         return idStatusHistory;
@@ -102,10 +82,6 @@ public class StatusHistoryEntity {
     public void setChangedBy(EmployeeEntity changedBy) {
         this.changedBy = changedBy;
     }
-
-    /** Fotos de evidencia asociadas a este cambio de estado específico. */
-    @OneToMany(mappedBy = "statusHistory", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PhotoEntity> photos = new ArrayList<>();
 
     public List<PhotoEntity> getPhotos() {
         return photos;

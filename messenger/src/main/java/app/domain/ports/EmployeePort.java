@@ -3,6 +3,9 @@ package app.domain.ports;
 import app.domain.model.Employee;
 import java.util.List;
 
+/**
+ * Puerto de salida para persistencia de empleados.
+ */
 public interface EmployeePort {
 
     Employee save(Employee employee);

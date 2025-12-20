@@ -3,46 +3,27 @@ package app.infrastructure.persistence.entities;
 import app.domain.model.enums.Role;
 import jakarta.persistence.*;
 
-/**
- * Entidad JPA que representa la tabla 'employees'.
- * 
- * Almacena la información de los empleados (administradores y mensajeros),
- * sus credenciales de acceso y roles en el sistema.
- * 
- * Relaciones:
- * - Un empleado puede ser asignado a múltiples ServiceDelivery como mensajero
- * - Un empleado puede realizar múltiples cambios de estado (StatusHistory)
- */
 @Entity
 @Table(name = "employees")
 public class EmployeeEntity {
 
-    /** Identificador único del empleado (clave primaria). */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_employee")
     private Long idEmployee;
 
-    /**
-     * Número de documento de identidad (único en el sistema, usado para
-     * autenticación).
-     */
     @Column(unique = true, nullable = false)
     private Long document;
 
-    /** Nombre completo del empleado. */
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
-    /** Número de teléfono de contacto. */
     @Column(length = 20)
     private String phone;
 
-    /** Contraseña encriptada con BCrypt. */
     @Column(nullable = false)
     private String password;
 
-    /** Rol del empleado en el sistema (ADMIN o MESSENGER). */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;

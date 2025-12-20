@@ -6,6 +6,9 @@ import app.application.exceptions.BusinessException;
 import app.domain.model.Dealership;
 import app.domain.ports.DealershipPort;
 
+/**
+ * Servicio para crear nuevos concesionarios.
+ */
 @Service
 public class CreateDealership {
 

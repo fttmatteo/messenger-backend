@@ -5,6 +5,10 @@ import app.application.exceptions.BusinessException;
 import app.domain.model.enums.PlateType;
 import java.util.regex.Pattern;
 
+/**
+ * Servicio para reconocimiento y clasificación de placas vehiculares
+ * colombianas.
+ */
 @Service
 public class PlateRecognition {
 

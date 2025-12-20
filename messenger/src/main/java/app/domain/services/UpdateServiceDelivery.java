@@ -16,6 +16,9 @@ import app.domain.model.enums.Status;
 import app.domain.ports.EmployeePort;
 import app.domain.ports.ServiceDeliveryPort;
 
+/**
+ * Servicio para actualizar estado de servicios con validación de evidencias.
+ */
 @Service
 public class UpdateServiceDelivery {
 
