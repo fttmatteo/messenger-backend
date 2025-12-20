@@ -48,15 +48,21 @@ public class ServiceDeliveryUseCase {
     @Transactional(rollbackFor = Exception.class)
     public ServiceDelivery createServiceFromImage(File imageFile, Long dealershipId, Long messengerId)
             throws Exception {
+        logger.info("Iniciando creación de servicio desde imagen. DealershipId: {}, MessengerId: {}", dealershipId,
+                messengerId);
         String extractedText = ocrPort.extractText(imageFile);
+        logger.debug("Texto extraído por OCR: {}", extractedText);
         String timestamp = LocalDateTime.now().format(DATE_FORMAT);
         String fileName = extractedText + "_ASSIGNED_" + timestamp;
 
         String savedPath = storagePort.save(imageFile, "detections", fileName);
 
         try {
-            return createService.create(extractedText, savedPath, dealershipId, messengerId);
+            ServiceDelivery service = createService.create(extractedText, savedPath, dealershipId, messengerId);
+            logger.info("Servicio creado exitosamente con ID: {}", service.getIdServiceDelivery());
+            return service;
         } catch (Exception e) {
+            logger.error("Error creando servicio desde imagen: {}", e.getMessage());
             cleanupFiles(savedPath);
             throw e;
         }
@@ -65,14 +71,19 @@ public class ServiceDeliveryUseCase {
     @Transactional(rollbackFor = Exception.class)
     public ServiceDelivery createServiceWithManualPlate(File imageFile, String manualPlateNumber, Long dealershipId,
             Long messengerId) throws Exception {
+        logger.info("Iniciando creación de servicio manual. Placa: {}, DealershipId: {}, MessengerId: {}",
+                manualPlateNumber, dealershipId, messengerId);
         String timestamp = LocalDateTime.now().format(DATE_FORMAT);
         String fileName = manualPlateNumber + "_ASSIGNED_" + timestamp;
 
         String savedPath = storagePort.save(imageFile, "detections", fileName);
 
         try {
-            return createService.create(manualPlateNumber, savedPath, dealershipId, messengerId);
+            ServiceDelivery service = createService.create(manualPlateNumber, savedPath, dealershipId, messengerId);
+            logger.info("Servicio manual creado exitosamente con ID: {}", service.getIdServiceDelivery());
+            return service;
         } catch (Exception e) {
+            logger.error("Error creando servicio manual: {}", e.getMessage());
             cleanupFiles(savedPath);
             throw e;
         }
@@ -80,14 +91,17 @@ public class ServiceDeliveryUseCase {
 
     public ServiceDelivery updateStatus(Long serviceId, Status newStatus, String observation,
             Signature signature, List<Photo> photos, Long userId) throws Exception {
+        logger.info("Actualizando estado de servicio ID: {} a {}", serviceId, newStatus);
         return updateService.updateStatus(serviceId, newStatus, observation, signature, photos, userId);
     }
 
     public ServiceDelivery updateStatusWithFiles(Long serviceId, Status newStatus, String observation,
             File signatureFile, List<File> photoFiles, Long userId) throws Exception {
+        logger.info("Actualizando estado con archivos. ServiceID: {}, NuevoEstado: {}", serviceId, newStatus);
 
         ServiceDelivery service = searchService.findById(serviceId);
         if (service == null) {
+            logger.warn("Intento de actualizar servicio inexistente ID: {}", serviceId);
             throw new Exception("Servicio no encontrado con ID: " + serviceId);
         }
         String plateNumber = service.getPlate().getPlateNumber();
@@ -121,8 +135,12 @@ public class ServiceDeliveryUseCase {
         }
 
         try {
-            return updateService.updateStatus(serviceId, newStatus, observation, signature, photos, userId);
+            ServiceDelivery updated = updateService.updateStatus(serviceId, newStatus, observation, signature, photos,
+                    userId);
+            logger.info("Estado actualizado exitosamente para servicio ID: {}", serviceId);
+            return updated;
         } catch (Exception e) {
+            logger.error("Error actualizando estado de servicio ID: {}: {}", serviceId, e.getMessage());
             cleanupFiles(savedPaths);
             throw e;
         }

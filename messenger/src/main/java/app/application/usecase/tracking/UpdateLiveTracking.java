@@ -5,6 +5,8 @@ import app.domain.model.TrackingHistory;
 import app.domain.model.enums.TrackingSource;
 import app.domain.model.enums.TrackingStatus;
 import app.domain.ports.TrackingPort;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -15,10 +17,15 @@ import java.time.LocalDateTime;
 @Service
 public class UpdateLiveTracking {
 
+    private static final Logger logger = LoggerFactory.getLogger(UpdateLiveTracking.class);
+
     @Autowired
     private TrackingPort trackingPort;
 
     public LiveTracking execute(LiveTracking incomingTracking) {
+        // Logging nivel DEBUG para no saturar logs en producción dado el alto volumen
+        logger.debug("Actualizando ubicación para mensajero ID: {}", incomingTracking.getMessengerId());
+
         if (incomingTracking.getLastUpdate() == null) {
             incomingTracking.setLastUpdate(LocalDateTime.now());
         }

@@ -13,6 +13,8 @@ import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DistanceMatrix;
 import com.google.maps.model.GeocodingResult;
 import com.google.maps.model.TravelMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.List;
@@ -23,6 +25,8 @@ import java.util.List;
 @Component
 public class GoogleMapsAdapter implements LocationPort {
 
+    private static final Logger logger = LoggerFactory.getLogger(GoogleMapsAdapter.class);
+
     @Autowired
     private GeoApiContext context;
     @Autowired
@@ -30,6 +34,7 @@ public class GoogleMapsAdapter implements LocationPort {
 
     @Override
     public Location geocodeAddress(String address) {
+        logger.info("Geocodificando dirección: {}", address);
         try {
             GeocodingResult[] results = GeocodingApi.geocode(context, address)
                     .language("es")
@@ -37,15 +42,18 @@ public class GoogleMapsAdapter implements LocationPort {
                     .await();
 
             if (results == null || results.length == 0) {
+                logger.warn("No se encontraron resultados para dirección: {}", address);
                 throw new GeolocationException(
                         "No se encontraron coordenadas para la dirección: " + address);
             }
 
             Location location = mapper.toLocation(results[0]);
+            logger.debug("Coordenadas encontradas: {}, {}", location.getLatitude(), location.getLongitude());
             return location;
         } catch (GeolocationException e) {
             throw e;
         } catch (Exception e) {
+            logger.error("Error geocodificando dirección {}: {}", address, e.getMessage());
             throw new GeolocationException(
                     "Error al geocodificar la dirección: " + e.getMessage());
         }
@@ -53,6 +61,8 @@ public class GoogleMapsAdapter implements LocationPort {
 
     @Override
     public Route calculateRoute(Location origin, Location destination) {
+        logger.info("Calculando ruta simple. Origen: {},{} -> Destino: {},{}",
+                origin.getLatitude(), origin.getLongitude(), destination.getLatitude(), destination.getLongitude());
         try {
             DirectionsResult result = DirectionsApi.newRequest(context)
                     .origin(mapper.toLatLng(origin))
@@ -62,6 +72,7 @@ public class GoogleMapsAdapter implements LocationPort {
                     .await();
 
             if (result == null || result.routes == null || result.routes.length == 0) {
+                logger.warn("No se encontró ruta entre los puntos especificados");
                 throw new GeolocationException(
                         "No se pudo calcular la ruta entre los puntos especificados");
             }
@@ -71,6 +82,7 @@ public class GoogleMapsAdapter implements LocationPort {
         } catch (GeolocationException e) {
             throw e;
         } catch (Exception e) {
+            logger.error("Error calculando ruta: {}", e.getMessage());
             throw new GeolocationException(
                     "Error al calcular la ruta: " + e.getMessage());
         }

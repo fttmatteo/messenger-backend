@@ -4,6 +4,8 @@ import app.application.exceptions.GeolocationException;
 import app.domain.model.Dealership;
 import app.domain.model.Location;
 import app.domain.ports.DealershipPort;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ValidateDeliveryLocation {
+
+    private static final Logger logger = LoggerFactory.getLogger(ValidateDeliveryLocation.class);
 
     @Autowired
     private DealershipPort dealershipPort;
@@ -24,6 +28,7 @@ public class ValidateDeliveryLocation {
         Dealership dealership = dealershipPort.findById(dealershipId);
 
         if (dealership.getIsGeolocated() == null || !dealership.getIsGeolocated()) {
+            logger.debug("Validación de ubicación omitida para concesionario ID: {} (no geolocalizado)", dealershipId);
             return true;
         }
 
@@ -32,6 +37,9 @@ public class ValidateDeliveryLocation {
         Double distance = deliveryLocation.distanceTo(dealershipLocation);
 
         if (distance == null || distance > maxDistanceMeters) {
+            logger.warn("Validación fallida: Distancia {}m excede máximo {}m para concesionario {}",
+                    distance, maxDistanceMeters, dealership.getName());
+
             throw new GeolocationException(
                     String.format(
                             "La entrega debe realizarse en el concesionario '%s'. " +
@@ -41,6 +49,7 @@ public class ValidateDeliveryLocation {
                             maxDistanceMeters));
         }
 
+        logger.debug("Validación exitosa: Distancia {}m dentro del rango", distance);
         return true;
     }
 

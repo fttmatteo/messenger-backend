@@ -5,6 +5,8 @@ import app.domain.model.Location;
 import app.domain.model.Route;
 import app.domain.ports.DealershipPort;
 import app.domain.ports.LocationPort;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +19,16 @@ import java.util.List;
 @Service
 public class CalculateOptimalRoute {
 
+    private static final Logger logger = LoggerFactory.getLogger(CalculateOptimalRoute.class);
+
     @Autowired
     private LocationPort locationPort;
     @Autowired
     private DealershipPort dealershipPort;
 
     public Route execute(Double originLat, Double originLng, List<Long> dealershipIds) {
+        logger.info("Calculando ruta óptima desde {},{} para {} destinos", originLat, originLng, dealershipIds.size());
+
         Location origin = new Location(originLat, originLng);
 
         List<Location> destinations = new ArrayList<>();
@@ -30,10 +36,13 @@ public class CalculateOptimalRoute {
             Dealership dealership = dealershipPort.findById(id);
             if (dealership.getIsGeolocated() != null && dealership.getIsGeolocated()) {
                 destinations.add(dealership.getLocation());
+            } else {
+                logger.warn("Concesionario ID: {} ignorado en ruta por falta de geolocalización", id);
             }
         }
 
         if (destinations.isEmpty()) {
+            logger.error("No se encontraron destinos válidos para la ruta");
             throw new IllegalArgumentException("No hay concesionarios geocodificados para calcular la ruta");
         }
 

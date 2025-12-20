@@ -20,6 +20,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Controlador REST para tracking en tiempo real de mensajeros.
@@ -28,6 +30,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/tracking")
 @PreAuthorize("isAuthenticated()")
 public class TrackingController {
+
+    private static final Logger logger = LoggerFactory.getLogger(TrackingController.class);
 
     @Autowired
     private UpdateLiveTracking updateLiveTracking;
@@ -68,6 +72,7 @@ public class TrackingController {
     public ResponseEntity<LiveTrackingResponse> getLastLocation(
             @PathVariable Long messengerId) {
 
+        logger.debug("Solicitud última ubicación mensajero ID: {}", messengerId);
         LiveTracking tracking = trackingPort.getLastLocation(messengerId);
 
         if (tracking == null) {
@@ -94,6 +99,7 @@ public class TrackingController {
             @PathVariable Long messengerId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 
+        logger.info("Solicitud historial tracking mensajero ID: {}, fecha: {}", messengerId, date);
         List<TrackingHistory> history = getTrackingHistory.byMessengerAndDate(messengerId, date);
         List<TrackingHistoryResponse> response = history.stream()
                 .map(responseMapper::toHistoryResponse)

@@ -4,6 +4,8 @@ import app.domain.model.Dealership;
 import app.domain.model.Location;
 import app.domain.ports.DealershipPort;
 import app.domain.ports.LocationPort;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,19 +15,32 @@ import org.springframework.stereotype.Service;
 @Service
 public class GeocodeDealership {
 
+    private static final Logger logger = LoggerFactory.getLogger(GeocodeDealership.class);
+
     @Autowired
     private LocationPort locationPort;
     @Autowired
     private DealershipPort dealershipPort;
 
     public Dealership execute(Long dealershipId) {
+        logger.info("Geocodificando concesionario ID: {}", dealershipId);
         Dealership dealership = dealershipPort.findById(dealershipId);
-        Location location = locationPort.geocodeAddress(dealership.getAddress());
-        dealership.setLatitude(location.getLatitude());
-        dealership.setLongitude(location.getLongitude());
-        dealership.setIsGeolocated(true);
-        dealershipPort.save(dealership);
-        return dealership;
+
+        try {
+            Location location = locationPort.geocodeAddress(dealership.getAddress());
+            logger.debug("Ubicación encontrada: {}, {}", location.getLatitude(), location.getLongitude());
+
+            dealership.setLatitude(location.getLatitude());
+            dealership.setLongitude(location.getLongitude());
+            dealership.setIsGeolocated(true);
+
+            dealershipPort.save(dealership);
+            logger.info("Concesionario geocodificado exitosamente");
+            return dealership;
+        } catch (Exception e) {
+            logger.error("Error geocodificando concesionario ID: {}: {}", dealershipId, e.getMessage());
+            throw e;
+        }
     }
 
     public Location geocodeAddress(String address) {

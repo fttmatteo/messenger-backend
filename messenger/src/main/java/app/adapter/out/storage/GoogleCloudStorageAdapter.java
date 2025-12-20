@@ -9,6 +9,8 @@ import com.google.cloud.iam.credentials.v1.SignBlobRequest;
 import com.google.cloud.iam.credentials.v1.SignBlobResponse;
 import com.google.cloud.storage.*;
 import com.google.protobuf.ByteString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -27,6 +29,8 @@ import java.util.concurrent.TimeUnit;
 @Component
 @ConditionalOnProperty(name = "app.storage.type", havingValue = "gcs")
 public class GoogleCloudStorageAdapter implements StoragePort {
+
+    private static final Logger logger = LoggerFactory.getLogger(GoogleCloudStorageAdapter.class);
 
     private final Storage storage;
     private final String bucketName;
@@ -60,6 +64,7 @@ public class GoogleCloudStorageAdapter implements StoragePort {
 
     private String uploadToGCS(File file, String subDirectory, String fileName) throws IOException {
         String objectName = subDirectory + "/" + fileName;
+        logger.info("Subiendo archivo a GCS. Bucket: {}, Objeto: {}", bucketName, objectName);
 
         String contentType = Files.probeContentType(file.toPath());
         if (contentType == null) {
@@ -73,6 +78,7 @@ public class GoogleCloudStorageAdapter implements StoragePort {
 
         byte[] fileBytes = Files.readAllBytes(file.toPath());
         storage.create(blobInfo, fileBytes);
+        logger.debug("Archivo subido exitosamente. Tamaño: {} bytes", fileBytes.length);
 
         return objectName;
     }
@@ -177,8 +183,14 @@ public class GoogleCloudStorageAdapter implements StoragePort {
     }
 
     public boolean delete(String objectName) {
+        logger.info("Eliminando objeto de GCS: {}", objectName);
         BlobId blobId = BlobId.of(bucketName, objectName);
         boolean deleted = storage.delete(blobId);
+        if (deleted) {
+            logger.info("Objeto eliminado exitosamente");
+        } else {
+            logger.warn("No se pudo eliminar el objeto (posiblemente no existe)");
+        }
         return deleted;
     }
 

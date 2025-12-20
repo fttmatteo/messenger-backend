@@ -4,6 +4,8 @@ import app.domain.ports.OcrPort;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.vision.v1.*;
 import com.google.protobuf.ByteString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import java.io.File;
@@ -19,6 +21,8 @@ import java.util.List;
 @ConditionalOnProperty(name = "app.ocr.mode", havingValue = "google-vision")
 public class GoogleVisionAdapter implements OcrPort {
 
+    private static final Logger logger = LoggerFactory.getLogger(GoogleVisionAdapter.class);
+
     private ImageAnnotatorClient createClient() throws IOException {
         GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
         ImageAnnotatorSettings settings = ImageAnnotatorSettings.newBuilder()
@@ -29,6 +33,7 @@ public class GoogleVisionAdapter implements OcrPort {
 
     @Override
     public String extractText(File imageFile) {
+        logger.info("Iniciando extracción de texto OCR para archivo: {}", imageFile.getName());
         try {
 
             ByteString imgBytes = ByteString.readFrom(new FileInputStream(imageFile));
@@ -44,13 +49,18 @@ public class GoogleVisionAdapter implements OcrPort {
                 BatchAnnotateImagesResponse response = client.batchAnnotateImages(List.of(request));
                 AnnotateImageResponse res = response.getResponses(0);
                 if (res.hasError()) {
+                    logger.error("Error en respuesta Vision API: {}", res.getError().getMessage());
                     throw new RuntimeException("Error de Vision API: " + res.getError().getMessage());
                 }
                 String rawText = res.getFullTextAnnotation().getText();
+                logger.debug("Texto crudo extraído ({} chars)", rawText != null ? rawText.length() : 0);
+
                 String cleanedPlate = cleanPlateNumber(rawText);
+                logger.info("Placa detectada y limpiada: {}", cleanedPlate);
                 return cleanedPlate;
             }
         } catch (IOException e) {
+            logger.error("Error IO procesando imagen para OCR: {}", e.getMessage());
             throw new RuntimeException("Error al procesar la imagen con Vision API", e);
         }
     }

@@ -6,6 +6,8 @@ import app.domain.model.enums.TrackingStatus;
 import app.domain.ports.TrackingPort;
 import app.infrastructure.persistence.entities.TrackingHistoryEntity;
 import app.infrastructure.persistence.repository.TrackingHistoryRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -24,6 +26,8 @@ import java.util.stream.Collectors;
  */
 @Component
 public class TrackingAdapter implements TrackingPort {
+
+    private static final Logger logger = LoggerFactory.getLogger(TrackingAdapter.class);
 
     private static final String TRACKING_KEY_PREFIX = "tracking:messenger:";
     private static final long TRACKING_TTL_MINUTES = 5; // Expira después de 5 minutos sin actualizar
@@ -47,12 +51,16 @@ public class TrackingAdapter implements TrackingPort {
             tracking.setLastUpdate(LocalDateTime.now());
 
             if (tracking.getStatus() == TrackingStatus.OFFLINE) {
+                logger.debug("Mensajero {} offline, eliminando tracking", tracking.getMessengerId());
                 redisTemplate.delete(key);
                 return;
             }
 
             redisTemplate.opsForValue().set(key, tracking, TRACKING_TTL_MINUTES, TimeUnit.MINUTES);
+            logger.debug("Guardado tracking en Redis para mensajero {}: {} (TTL: {} min)",
+                    tracking.getMessengerId(), tracking.getCurrentLocation(), TRACKING_TTL_MINUTES);
         } catch (Exception e) {
+            logger.error("Error guardando tracking en Redis: {}", e.getMessage());
             throw new RuntimeException("Error al guardar en Redis: " + e.getMessage());
         }
     }
@@ -79,8 +87,11 @@ public class TrackingAdapter implements TrackingPort {
             Set<String> keys = redisTemplate.keys(TRACKING_KEY_PREFIX + "*");
 
             if (keys == null || keys.isEmpty()) {
+                logger.debug("No active messengers found in Redis");
                 return activeMessengers;
             }
+
+            logger.debug("Found {} keys for messengers in Redis", keys.size());
 
             for (String key : keys) {
                 try {
@@ -89,11 +100,13 @@ public class TrackingAdapter implements TrackingPort {
                         activeMessengers.add(tracking);
                     }
                 } catch (Exception e) {
+                    logger.warn("Error deserializando tracking para key {}: {}", key, e.getMessage());
                     throw new RuntimeException(
                             "Error al deserializar tracking para key " + key + ": " + e.getMessage());
                 }
             }
         } catch (Exception e) {
+            logger.error("Error crítico listando mensajeros activos desde Redis: {}", e.getMessage());
             throw new RuntimeException("Error crítico al listar mensajeros desde Redis: " + e.getMessage());
         }
 

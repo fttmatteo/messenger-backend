@@ -26,6 +26,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Controlador REST para gestión de servicios de entrega.
@@ -34,6 +36,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/services")
 @PreAuthorize("isAuthenticated()")
 public class ServiceDeliveryController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ServiceDeliveryController.class);
 
     @Autowired
     private ServiceDeliveryUseCase serviceDeliveryUseCase;
@@ -53,6 +57,8 @@ public class ServiceDeliveryController {
             @RequestParam("dealershipId") String dealershipId,
             @RequestParam(value = "messengerId", required = false) String messengerId,
             @RequestParam(value = "manualPlateNumber", required = false) String manualPlateNumber) throws Exception {
+
+        logger.info("Solicitud creación servicio. DealershipId: {}", dealershipId);
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String documentStr = auth.getName();
@@ -103,6 +109,8 @@ public class ServiceDeliveryController {
             @RequestParam(value = "observation", required = false) String observation,
             @RequestParam(value = "signature", required = false) MultipartFile signature,
             @RequestParam(value = "photos", required = false) List<MultipartFile> photos) throws Exception {
+
+        logger.info("Solicitud actualización servicio ID: {} a status: {}", id, status);
 
         List<File> tempFiles = new ArrayList<>();
         try {
@@ -200,6 +208,7 @@ public class ServiceDeliveryController {
     @DeleteMapping("/deleteService/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'MESSENGER')")
     public ResponseEntity<Void> delete(@PathVariable Long id) throws Exception {
+        logger.info("Solicitud eliminación servicio ID: {}", id);
         serviceDeliveryUseCase.deleteById(id);
         return ResponseEntity.noContent().build();
     }

@@ -1,6 +1,8 @@
 package app.application.usecase;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import app.domain.model.Employee;
@@ -15,6 +17,8 @@ import app.domain.services.UpdateEmployee;
 @Service
 public class EmployeeUseCase {
 
+    private static final Logger logger = LoggerFactory.getLogger(EmployeeUseCase.class);
+
     @Autowired
     private CreateEmployee createEmployee;
     @Autowired
@@ -25,11 +29,17 @@ public class EmployeeUseCase {
     private DeleteEmployee deleteEmployee;
 
     public Employee create(Employee employee) throws Exception {
-        return createEmployee.create(employee);
+        logger.info("Creando empleado con documento: {}, rol: {}", employee.getDocument(), employee.getRole());
+        Employee created = createEmployee.create(employee);
+        logger.info("Empleado creado con ID: {}", created.getIdEmployee());
+        return created;
     }
 
     public Employee update(Long id, Employee employee) throws Exception {
-        return updateEmployee.update(id, employee);
+        logger.info("Actualizando empleado ID: {}", id);
+        Employee updated = updateEmployee.update(id, employee);
+        logger.info("Empleado ID: {} actualizado", id);
+        return updated;
     }
 
     public Employee findById(Long id) {
@@ -45,6 +55,8 @@ public class EmployeeUseCase {
     }
 
     public void deleteById(Long id) throws Exception {
+        logger.warn("Eliminando empleado ID: {}", id);
         deleteEmployee.deleteById(id);
+        logger.info("Empleado ID: {} eliminado", id);
     }
 }

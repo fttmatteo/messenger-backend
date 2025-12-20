@@ -14,6 +14,8 @@ import app.application.exceptions.ResourceNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Controlador REST para servir archivos estáticos (fotos, firmas).
@@ -21,6 +23,8 @@ import java.nio.file.Paths;
 @RestController
 @RequestMapping("/files")
 public class FileController {
+
+    private static final Logger logger = LoggerFactory.getLogger(FileController.class);
 
     @Value("${app.storage.path:uploads}")
     private String storageLocation;
@@ -39,6 +43,7 @@ public class FileController {
                 filename.contains("%2e") ||
                 filename.contains("%2f") ||
                 filename.contains("%5c")) {
+            logger.warn("Intento de Path Traversal detectado: {}", filename);
             throw new SecurityException("Nombre de archivo inválido");
         }
 
@@ -48,6 +53,7 @@ public class FileController {
             Path file = rootLocation.resolve(subDir).resolve(filename).normalize();
 
             if (!file.startsWith(rootLocation)) {
+                logger.warn("Intento de acceso fuera del directorio raiz: {}", filename);
                 throw new SecurityException("Acceso denegado");
             }
 
