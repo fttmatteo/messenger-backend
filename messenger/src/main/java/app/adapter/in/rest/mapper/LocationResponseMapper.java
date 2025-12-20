@@ -5,28 +5,15 @@ import app.adapter.in.rest.response.RouteResponse;
 import app.domain.model.Location;
 import app.domain.model.Route;
 import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Mapper para convertir entidades de ubicación y ruta a DTOs de respuesta.
- *
- * Facilita la transformación de objetos de dominio {@link Location} y
- * {@link Route}
- * a sus correspondientes respuestas REST, {@link LocationResponse} y
- * {@link RouteResponse}.
+ * Mapper de Location y Route a respuestas REST.
  */
 @Component
 public class LocationResponseMapper {
 
-    /**
-     * Convierte un objeto Location y una dirección formateada a LocationResponse.
-     *
-     * @param location         Objeto de dominio Location con coordenadas.
-     * @param formattedAddress Dirección en texto legible.
-     * @return DTO LocationResponse.
-     */
     public LocationResponse toLocationResponse(Location location, String formattedAddress) {
         if (location == null) {
             return null;
@@ -37,12 +24,6 @@ public class LocationResponseMapper {
                 formattedAddress);
     }
 
-    /**
-     * Convierte un objeto Route a RouteResponse.
-     *
-     * @param route Objeto de dominio Route con detalles de la ruta calculada.
-     * @return DTO RouteResponse con origen, destino, waypoints y métricas.
-     */
     public RouteResponse toRouteResponse(Route route) {
         if (route == null) {
             return null;
@@ -78,9 +59,23 @@ public class LocationResponseMapper {
         response.setDistanceMeters(route.getDistanceMeters());
         response.setDistanceKilometers(route.getDistanceKilometers());
         response.setDurationSeconds(route.getDurationSeconds());
-        response.setDurationFormatted(route.getDurationFormatted());
+        response.setDurationFormatted(formatDuration(route.getDurationSeconds()));
         response.setPolyline(route.getPolyline());
 
         return response;
+    }
+
+    private String formatDuration(Long durationSeconds) {
+        if (durationSeconds == null) {
+            return null;
+        }
+        long hours = durationSeconds / 3600;
+        long minutes = (durationSeconds % 3600) / 60;
+
+        if (hours > 0) {
+            return String.format("%d hora(s) %d minuto(s)", hours, minutes);
+        } else {
+            return String.format("%d minuto(s)", minutes);
+        }
     }
 }

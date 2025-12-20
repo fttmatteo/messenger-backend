@@ -51,6 +51,7 @@ class UpdateDealershipTest {
 
         when(dealershipPort.findById(1L)).thenReturn(existingDealership);
         when(dealershipPort.findByName("New Name")).thenReturn(null);
+        when(dealershipPort.save(any())).thenReturn(existingDealership);
 
         updateDealership.update(1L, newData);
 
@@ -93,6 +94,7 @@ class UpdateDealershipTest {
         newData.setAddress("Calle 2");
 
         when(dealershipPort.findById(1L)).thenReturn(existingDealership);
+        when(dealershipPort.save(any())).thenReturn(existingDealership);
 
         updateDealership.update(1L, newData);
 

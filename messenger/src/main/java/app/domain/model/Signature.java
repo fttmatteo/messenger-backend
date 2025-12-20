@@ -3,15 +3,7 @@ package app.domain.model;
 import java.time.LocalDateTime;
 
 /**
- * Modelo de dominio que representa una firma digital de confirmación de
- * entrega.
- * 
- * La firma es capturada del asesor del concesionario que recibe la placa
- * vehicular, sirviendo como evidencia legal de que la entrega fue completada
- * exitosamente.
- * 
- * La firma se almacena como imagen en el sistema de archivos y se asocia
- * directamente con el servicio de entrega correspondiente.
+ * Representa la firma digital del cliente al recibir una entrega.
  */
 public class Signature {
     private Long idSignature;

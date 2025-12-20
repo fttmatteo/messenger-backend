@@ -1,8 +1,6 @@
 package app.adapter.in.rest.controllers;
 
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,19 +10,16 @@ import app.adapter.in.builder.EmployeeBuilder;
 import app.adapter.in.rest.mapper.EmployeeResponseMapper;
 import app.adapter.in.rest.request.EmployeeRequest;
 import app.adapter.in.rest.response.EmployeeResponse;
-import app.application.exceptions.BusinessException;
-import app.application.exceptions.InputsException;
 import app.application.usecase.EmployeeUseCase;
 import app.domain.model.Employee;
 import app.infrastructure.audit.AuditableAction;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Controlador REST para gestionar empleados y mensajeros.
- * 
- * Proporciona operaciones CRUD exclusivas para administradores.
- * Todos los endpoints requieren rol ADMIN.
+ * Controlador REST para gestión de empleados (solo ADMIN).
  */
 @RestController
 @RequestMapping("/employees")
@@ -40,38 +35,20 @@ public class EmployeeController {
     @Autowired
     private EmployeeResponseMapper responseMapper;
 
-    /**
-     * Crea un nuevo empleado en el sistema.
-     *
-     * Utiliza el Builder para validar y construir el objeto Empleado antes de
-     * persistirlo.
-     *
-     * @param request Datos del empleado a crear.
-     * @return ResponseEntity con mensaje de éxito.
-     * @throws InputsException   Si los datos de entrada son inválidos.
-     * @throws BusinessException Si hay un error de lógica de negocio.
-     */
     @PostMapping("/createEmployee")
     @PreAuthorize("hasRole('ADMIN')")
     @AuditableAction(action = "CREATE_EMPLOYEE", description = "Crear nuevo empleado")
-    public ResponseEntity<String> create(@Valid @RequestBody EmployeeRequest request) throws Exception {
-        logger.info("Creando empleado: {}", request.getUserName());
+    public ResponseEntity<EmployeeResponse> create(@Valid @RequestBody EmployeeRequest request) throws Exception {
+        logger.info("Solicitud para crear empleado documento: {}", request.getDocument());
         Employee employee = builder.build(request.getDocument(),
                 request.getFullName(),
                 request.getPhone(),
-                request.getUserName(),
                 request.getPassword(),
                 request.getRole());
-        employeeUseCase.create(employee);
-        logger.info("Empleado creado exitosamente: {} (doc: {})", request.getUserName(), request.getDocument());
-        return ResponseEntity.status(HttpStatus.CREATED).body("Empleado creado exitosamente");
+        Employee created = employeeUseCase.create(employee);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseMapper.toResponse(created));
     }
 
-    /**
-     * Obtiene todos los empleados registrados.
-     *
-     * @return Lista de empleados mapeados al formato de respuesta.
-     */
     @GetMapping("/allEmployees")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<EmployeeResponse>> findAll() {
@@ -81,15 +58,7 @@ public class EmployeeController {
         return ResponseEntity.ok(responses);
     }
 
-    /**
-     * Busca un empleado por su ID.
-     *
-     * @param id ID del empleado.
-     * @return Datos del empleado encontrado.
-     * @throws app.application.exceptions.ResourceNotFoundException Si el empleado
-     *                                                              no existe.
-     */
-    @GetMapping("/findEmployee/{id}")
+    @GetMapping("/findByEmployeeId/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EmployeeResponse> findById(@PathVariable Long id) {
         Employee employee = employeeUseCase.findById(id);
@@ -99,46 +68,27 @@ public class EmployeeController {
         return ResponseEntity.ok(responseMapper.toResponse(employee));
     }
 
-    /**
-     * Actualiza los datos de un empleado existente.
-     *
-     * @param id      ID del empleado a actualizar.
-     * @param request Nuevos datos del empleado.
-     * @return ResponseEntity con mensaje de éxito.
-     * @throws InputsException   Si los datos de entrada son inválidos.
-     * @throws BusinessException Si hay un error de lógica de negocio.
-     */
     @PutMapping("/updateEmployee/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @AuditableAction(action = "UPDATE_EMPLOYEE", description = "Actualizar empleado existente")
-    public ResponseEntity<String> update(@PathVariable Long id, @Valid @RequestBody EmployeeRequest request)
+    public ResponseEntity<EmployeeResponse> update(@PathVariable Long id, @Valid @RequestBody EmployeeRequest request)
             throws Exception {
-        logger.info("Actualizando empleado ID: {}", id);
         Employee employee = builder.build(
                 request.getDocument(),
                 request.getFullName(),
                 request.getPhone(),
-                request.getUserName(),
                 request.getPassword(),
                 request.getRole());
-        employeeUseCase.update(id, employee);
-        logger.info("Empleado actualizado: ID {} -> {}", id, request.getUserName());
-        return ResponseEntity.ok("Empleado actualizado exitosamente");
+        Employee updated = employeeUseCase.update(id, employee);
+        return ResponseEntity.ok(responseMapper.toResponse(updated));
     }
 
-    /**
-     * Elimina un empleado por su ID.
-     *
-     * @param id ID del empleado a eliminar.
-     * @return ResponseEntity con mensaje de éxito.
-     */
     @DeleteMapping("/deleteEmployee/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @AuditableAction(action = "DELETE_EMPLOYEE", description = "Eliminar empleado")
-    public ResponseEntity<String> delete(@PathVariable Long id) throws Exception {
-        logger.warn("Eliminando empleado ID: {}", id);
+    public ResponseEntity<Void> delete(@PathVariable Long id) throws Exception {
+        logger.info("Solicitud para eliminar empleado ID: {}", id);
         employeeUseCase.deleteById(id);
-        logger.info("Empleado eliminado: ID {}", id);
-        return ResponseEntity.ok("Empleado eliminado exitosamente");
+        return ResponseEntity.noContent().build();
     }
 }

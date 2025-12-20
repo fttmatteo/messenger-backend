@@ -90,7 +90,8 @@ graph TB
 | **Database** | MySQL 8.0+ |
 | **Migrations** | Flyway |
 | **Cache/Streaming** | Redis |
-| **Security** | JWT + BCrypt + Refresh Tokens |
+| **Security** | JWT + BCrypt + Bucket4j (Rate Limiting) |
+| **Documentation** | OpenAPI / Swagger UI |
 | **OCR** | Google Cloud Vision API |
 | **Storage** | Google Cloud Storage |
 | **Maps** | Google Maps Platform |
@@ -107,7 +108,7 @@ graph TB
 | `local` | Local development | H2 In-Memory | Mock/Disabled |
 | `dev` | Development with APIs | MySQL | Enabled |
 | `test` | Automated testing | H2 In-Memory | Mock |
-| `prod` | Production | MySQL (SSL) | Enabled |
+| `prod` | Production (Cloud Run) | MySQL (SSL) | Enabled (JSON Logging) |
 
 **Activation:**
 ```bash
@@ -146,11 +147,11 @@ export SPRING_PROFILES_ACTIVE=dev
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/employees` | Create employee |
-| `GET` | `/employees` | List all |
-| `GET` | `/employees/{id}` | Get by ID |
-| `PUT` | `/employees/{id}` | Update |
-| `DELETE` | `/employees/{id}` | Delete |
+| `POST` | `/employees/createEmployee` | Create employee |
+| `GET` | `/employees/allEmployees` | List all |
+| `GET` | `/employees/findByEmployeeId/{id}` | Get by ID |
+| `PUT` | `/employees/updateEmployee/{id}` | Update |
+| `DELETE` | `/employees/deleteEmployee/{id}` | Delete |
 
 </details>
 
@@ -159,11 +160,13 @@ export SPRING_PROFILES_ACTIVE=dev
 
 | Method | Endpoint | Description | Auth |
 |--------|----------|-------------|------|
-| `POST` | `/dealerships` | Create | ADMIN |
-| `GET` | `/dealerships` | List | Authenticated |
-| `GET` | `/dealerships/{id}` | Get by ID | Authenticated |
-| `PUT` | `/dealerships/{id}` | Update | ADMIN |
-| `DELETE` | `/dealerships/{id}` | Delete | ADMIN |
+| `POST` | `/dealerships/createDealership` | Create | ADMIN |
+| `GET` | `/dealerships/allDealerships` | List | Authenticated |
+| `GET` | `/dealerships/findByDealershipId/{id}` | Get by ID | Authenticated |
+| `GET` | `/dealerships/findByDealershipName/{name}` | Get by Name | Authenticated |
+| `PUT` | `/dealerships/updateDealership/{id}` | Update | ADMIN |
+| `DELETE` | `/dealerships/deleteDealership/{id}` | Delete | ADMIN |
+| `POST` | `/dealerships/geocodeDealership/{id}` | Geocode | ADMIN |
 
 </details>
 
@@ -172,13 +175,11 @@ export SPRING_PROFILES_ACTIVE=dev
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/services/create` | Create service (multipart) |
-| `PUT` | `/services/{id}/status` | Update status |
-| `GET` | `/services` | List all (ADMIN) or own (MESSENGER) |
-| `GET` | `/services/{id}` | Get by ID |
-| `GET` | `/services/messenger/{doc}` | Filter by messenger |
-| `GET` | `/services/dealership/{id}` | Filter by dealership |
-| `GET` | `/services/status/{status}` | Filter by status |
+| `POST` | `/services/createService` | Create service (multipart) |
+| `PUT` | `/services/updateService/{id}` | Update status |
+| `GET` | `/services/allServices` | List all (ADMIN) or own (MESSENGER) |
+| `GET` | `/services/findByServiceId/{id}` | Get by ID |
+| `DELETE` | `/services/deleteService/{id}` | Delete |
 
 </details>
 
@@ -195,15 +196,24 @@ export SPRING_PROFILES_ACTIVE=dev
 </details>
 
 <details>
-<summary><b>Real-Time Tracking</b> <code>/api/tracking</code></summary>
+<summary><b>Files</b> <code>/files</code></summary>
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/files/{filename}` | Download file (protected) |
+
+</details>
+
+<details>
+<summary><b>Real-Time Tracking</b> <code>/tracking</code></summary>
 
 | Method | Endpoint | Description | Auth |
 |--------|----------|-------------|------|
-| `POST` | `/api/tracking/update` | Update messenger location | MESSENGER/ADMIN |
-| `GET` | `/api/tracking/messenger/{id}` | Get last location | ADMIN |
-| `GET` | `/api/tracking/active` | List active messengers | ADMIN |
-| `GET` | `/api/tracking/history/{id}` | Tracking history by date | MESSENGER/ADMIN |
-| `GET` | `/api/tracking/service/{id}` | Tracking history by service | MESSENGER/ADMIN |
+| `POST` | `/tracking/update` | Update messenger location | MESSENGER/ADMIN |
+| `GET` | `/tracking/messenger/{id}` | Get last location | ADMIN |
+| `GET` | `/tracking/active` | List active messengers | ADMIN |
+| `GET` | `/tracking/history/{id}` | Tracking history by date | MESSENGER/ADMIN |
+| `GET` | `/tracking/service/{id}` | Tracking history by service | MESSENGER/ADMIN |
 
 </details>
 
@@ -234,6 +244,15 @@ The system implements a dual-token authentication strategy:
 3. When `token` expires, call `/auth/refresh` with `refreshToken`
 4. Receive new `token` and `refreshToken` pair
 5. Refresh token rotation ensures enhanced security
+
+**Rate Limiting:**
+- Implemented using **Bucket4j** to prevent abuse.
+- Limits are applied per IP address.
+- Headers included in response: `X-Rate-Limit-Remaining`, `X-Rate-Limit-Retry-After-Seconds`.
+
+**API Documentation:**
+- Swagger UI available at: `/swagger-ui/index.html` (Public)
+- OpenAPI Spec: `/v3/api-docs`
 
 ---
 
@@ -359,7 +378,8 @@ graph TB
 | **Base de Datos** | MySQL 8.0+ |
 | **Migraciones** | Flyway |
 | **Cache/Streaming** | Redis |
-| **Seguridad** | JWT + BCrypt + Refresh Tokens |
+| **Seguridad** | JWT + BCrypt + Bucket4j (Rate Limiting) |
+| **Documentación** | OpenAPI / Swagger UI |
 | **OCR** | Google Cloud Vision API |
 | **Almacenamiento** | Google Cloud Storage |
 | **Mapas** | Google Maps Platform |
@@ -422,7 +442,7 @@ messenger/
 | `local` | Desarrollo local sin dependencias | H2 In-Memory | Mock/Deshabilitado | 8 horas |
 | `dev` | Desarrollo con servicios reales | MySQL | Habilitado | 2 horas |
 | `test` | Testing automatizado (CI/CD) | H2 In-Memory | Mock | 1 hora |
-| `prod` | Producción optimizada | MySQL (SSL) | Habilitado | 30 min |
+| `prod` | Producción (Cloud Run) | MySQL (SSL) | Habilitado (JSON Logs) | 30 min |
 
 ### Características por Perfil
 
@@ -459,15 +479,16 @@ messenger/
 </details>
 
 <details>
-<summary><b>🚀 Prod</b> - Producción</summary>
+<summary><b>🚀 Prod</b> - Producción (Optimizado Cloud Run)</summary>
 
 - MySQL con SSL obligatorio
 - Pool de conexiones optimizado (HikariCP)
-- Logs mínimos (WARN/INFO)
-- Graceful shutdown habilitado
+- **Logging Estructurado JSON** (Logstash Encoder)
+- Graceful shutdown habilitado (30s timeout)
 - Headers de seguridad (HSTS, HTTP-only cookies)
 - Compresión habilitada
 - Sin stack traces expuestos
+- Soporte Proxy Cloud Run (Forwarded Headers)
 
 </details>
 
@@ -517,11 +538,11 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| `POST` | `/employees` | Crear empleado |
-| `GET` | `/employees` | Listar todos |
-| `GET` | `/employees/{id}` | Obtener por ID |
-| `PUT` | `/employees/{id}` | Actualizar |
-| `DELETE` | `/employees/{id}` | Eliminar |
+| `POST` | `/employees/createEmployee` | Crear empleado |
+| `GET` | `/employees/allEmployees` | Listar todos |
+| `GET` | `/employees/findByEmployeeId/{id}` | Obtener por ID |
+| `PUT` | `/employees/updateEmployee/{id}` | Actualizar |
+| `DELETE` | `/employees/deleteEmployee/{id}` | Eliminar |
 
 ---
 
@@ -529,11 +550,13 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Método | Endpoint | Descripción | Auth |
 |--------|----------|-------------|------|
-| `POST` | `/dealerships` | Crear | ADMIN |
-| `GET` | `/dealerships` | Listar | Autenticado |
-| `GET` | `/dealerships/{id}` | Obtener por ID | Autenticado |
-| `PUT` | `/dealerships/{id}` | Actualizar | ADMIN |
-| `DELETE` | `/dealerships/{id}` | Eliminar | ADMIN |
+| `POST` | `/dealerships/createDealership` | Crear | ADMIN |
+| `GET` | `/dealerships/allDealerships` | Listar | Autenticado |
+| `GET` | `/dealerships/findByDealershipId/{id}` | Obtener por ID | Autenticado |
+| `GET` | `/dealerships/findByDealershipName/{name}` | Obtener por Nombre | Autenticado |
+| `PUT` | `/dealerships/updateDealership/{id}` | Actualizar | ADMIN |
+| `DELETE` | `/dealerships/deleteDealership/{id}` | Eliminar | ADMIN |
+| `POST` | `/dealerships/geocodeDealership/{id}` | Geocodificar | ADMIN |
 
 ---
 
@@ -541,13 +564,11 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| `POST` | `/services/create` | Crear servicio (multipart) |
-| `PUT` | `/services/{id}/status` | Actualizar estado |
-| `GET` | `/services` | Listar todos (ADMIN) o propios (MESSENGER) |
-| `GET` | `/services/{id}` | Obtener por ID |
-| `GET` | `/services/messenger/{doc}` | Filtrar por mensajero |
-| `GET` | `/services/dealership/{id}` | Filtrar por concesionario |
-| `GET` | `/services/status/{status}` | Filtrar por estado |
+| `POST` | `/services/createService` | Crear servicio (multipart) |
+| `PUT` | `/services/updateService/{id}` | Actualizar estado |
+| `GET` | `/services/allServices` | Listar todos (ADMIN) o propios (MESSENGER) |
+| `GET` | `/services/findByServiceId/{id}` | Obtener por ID |
+| `DELETE` | `/services/deleteService/{id}` | Eliminar |
 
 ---
 
@@ -562,15 +583,23 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 ---
 
-### Tracking en Tiempo Real (`/api/tracking`)
+### Archivos (`/files`)
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/files/{filename}` | Descargar archivo (protegido) |
+
+---
+
+### Tracking en Tiempo Real (`/tracking`)
 
 | Método | Endpoint | Descripción | Auth |
 |--------|----------|-------------|------|
-| `POST` | `/api/tracking/update` | Actualizar ubicación | MESSENGER/ADMIN |
-| `GET` | `/api/tracking/messenger/{id}` | Última ubicación | ADMIN |
-| `GET` | `/api/tracking/active` | Mensajeros activos | ADMIN |
-| `GET` | `/api/tracking/history/{id}` | Historial por fecha | MESSENGER/ADMIN |
-| `GET` | `/api/tracking/service/{id}` | Historial por servicio | MESSENGER/ADMIN |
+| `POST` | `/tracking/update` | Actualizar ubicación | MESSENGER/ADMIN |
+| `GET` | `/tracking/messenger/{id}` | Última ubicación | ADMIN |
+| `GET` | `/tracking/active` | Mensajeros activos | ADMIN |
+| `GET` | `/tracking/history/{id}` | Historial por fecha | MESSENGER/ADMIN |
+| `GET` | `/tracking/service/{id}` | Historial por servicio | MESSENGER/ADMIN |
 
 ---
 
@@ -776,6 +805,17 @@ stateDiagram-v2
 - ⏱️ **Expiración Automática**: Tokens expire automáticamente
 - 🛡️ **HMAC-SHA256**: Algoritmo robusto de firma digital
 
+### Rate Limiting y Documentación
+
+**Rate Limiting:**
+- Implementado con **Bucket4j** para prevenir abusos.
+- Límites aplicados por dirección IP.
+- Headers de respuesta: `X-Rate-Limit-Remaining`, `X-Rate-Limit-Retry-After-Seconds`.
+
+**Documentación API:**
+- Swagger UI disponible en: `/swagger-ui/index.html` (Público)
+- OpenAPI Spec: `/v3/api-docs`
+
 ### Roles y Permisos
 
 - **ADMIN**: Acceso completo a todos los endpoints
@@ -787,6 +827,21 @@ stateDiagram-v2
 - Cookies: `Secure`, `HttpOnly`, `SameSite=Strict`
 - CORS configurado por origen
 - Sin exposición de stack traces
+
+### 📊 Observabilidad (Actuator & Logging)
+
+**Endpoints de Monitoreo (Actuator):**
+| Endpoint | Descripción | Perfil |
+|----------|-------------|--------|
+| `/actuator/health` | Estado de salud (DB, Redis, Disco) | Todos |
+| `/actuator/metrics` | Métricas de JVM y HTTP | `dev`, `prod` |
+| `/actuator/env` | Variables de entorno | `dev` |
+| `/actuator/info` | Información de la build | Todos |
+
+**Optimización para Cloud Run:**
+- **Logging JSON (Prod):** Salida estructurada compatible con Google Cloud Logging.
+- **Graceful Shutdown:** Espera 30s para terminar conexiones activas.
+- **SSL Offloading:** Confía en headers de proxy (`X-Forwarded-Proto`) de Cloud Run.
 
 ---
 

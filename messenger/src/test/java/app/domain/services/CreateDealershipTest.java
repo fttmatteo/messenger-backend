@@ -50,6 +50,7 @@ class CreateDealershipTest {
         @DisplayName("Debe crear concesionario cuando nombre es único")
         void shouldCreateDealershipWhenNameIsUnique() throws Exception {
             when(dealershipPort.findByName("Concesionario Test")).thenReturn(null);
+            when(dealershipPort.save(newDealership)).thenReturn(newDealership);
 
             createDealership.create(newDealership);
 
@@ -60,6 +61,7 @@ class CreateDealershipTest {
         @DisplayName("Debe buscar por nombre antes de crear")
         void shouldSearchByNameBeforeCreating() throws Exception {
             when(dealershipPort.findByName(anyString())).thenReturn(null);
+            when(dealershipPort.save(any())).thenReturn(newDealership);
 
             createDealership.create(newDealership);
 

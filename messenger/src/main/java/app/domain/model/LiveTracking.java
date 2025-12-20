@@ -4,8 +4,8 @@ import app.domain.model.enums.TrackingStatus;
 import java.time.LocalDateTime;
 
 /**
- * Modelo que representa el tracking en tiempo real de un mensajero.
- * Se almacena en Redis para acceso rápido.
+ * Representa el estado de rastreo en tiempo real de un mensajero.
+ * Incluye ubicación actual, velocidad y dirección.
  */
 public class LiveTracking {
     private Long trackingId;

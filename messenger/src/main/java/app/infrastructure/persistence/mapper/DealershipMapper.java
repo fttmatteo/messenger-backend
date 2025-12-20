@@ -5,22 +5,11 @@ import app.infrastructure.persistence.entities.DealershipEntity;
 import org.springframework.stereotype.Component;
 
 /**
- * Mapper de persistencia para convertir entre Dealership y DealershipEntity.
- * Facilita la transformación de datos entre la capa de dominio y la base de
- * datos.
+ * Mapper de persistencia entre Dealership y DealershipEntity.
  */
 @Component
 public class DealershipMapper {
 
-    /**
-     * Convierte un modelo de dominio Dealership a su entidad JPA correspondiente.
-     * 
-     * Mapea todos los campos del dealership incluyendo coordenadas geográficas
-     * y estado de geolocalización para persistencia en base de datos.
-     * 
-     * @param dealership El modelo de dominio a convertir (puede ser null)
-     * @return La entidad JPA correspondiente, o null si el parámetro es null
-     */
     public DealershipEntity toEntity(Dealership dealership) {
         if (dealership == null)
             return null;
@@ -36,15 +25,6 @@ public class DealershipMapper {
         return entity;
     }
 
-    /**
-     * Convierte una entidad JPA DealershipEntity a modelo de dominio.
-     * 
-     * Reconstruye el objeto de dominio completo desde la base de datos,
-     * incluyendo todos los datos de ubicación y contacto.
-     * 
-     * @param entity La entidad JPA a convertir (puede ser null)
-     * @return El modelo de dominio correspondiente, o null si la entidad es null
-     */
     public Dealership toDomain(DealershipEntity entity) {
         if (entity == null)
             return null;

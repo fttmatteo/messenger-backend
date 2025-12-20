@@ -11,6 +11,7 @@ import app.domain.model.enums.Status;
 import app.infrastructure.persistence.entities.ServiceDeliveryEntity;
 import app.infrastructure.persistence.mapper.ServiceDeliveryMapper;
 import app.infrastructure.persistence.repository.ServiceDeliveryRepository;
+import app.infrastructure.persistence.adapter.ServiceDeliveryAdapter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -43,15 +44,19 @@ class ServiceDeliveryAdapterTest {
         ServiceDeliveryEntity entity = new ServiceDeliveryEntity();
         entity.setIdServiceDelivery(1L);
 
+        ServiceDelivery savedDelivery = new ServiceDelivery();
+        savedDelivery.setIdServiceDelivery(1L);
+        savedDelivery.setCurrentStatus(Status.PENDING);
+
         when(mapper.toEntity(delivery)).thenReturn(entity);
         when(repository.save(any(ServiceDeliveryEntity.class))).thenReturn(entity);
         when(repository.findById(1L)).thenReturn(Optional.of(entity));
-        when(mapper.toDomain(entity)).thenReturn(delivery);
+        when(mapper.toDomain(entity)).thenReturn(savedDelivery);
 
-        serviceDeliveryAdapter.save(delivery);
+        ServiceDelivery saved = serviceDeliveryAdapter.save(delivery);
 
         verify(repository).save(any(ServiceDeliveryEntity.class));
-        assertNotNull(delivery.getIdServiceDelivery());
+        assertNotNull(saved.getIdServiceDelivery());
 
         ServiceDelivery found = serviceDeliveryAdapter.findById(1L);
         assertNotNull(found);

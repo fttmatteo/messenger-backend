@@ -1,23 +1,7 @@
 package app.adapter.in.rest.response;
 
 /**
- * DTO (Data Transfer Object) de respuesta para cálculos de distancia y duración
- * de viaje.
- * 
- * Este objeto proporciona información detallada sobre la distancia entre dos
- * puntos
- * y el tiempo estimado de viaje, utilizando datos de Google Maps Distance
- * Matrix API.
- * 
- * Campos incluidos:
- * - distanceMeters: Distancia en metros
- * - distanceKilometers: Distancia en kilómetros (calculada automáticamente)
- * - durationSeconds: Duración del viaje en segundos
- * - durationFormatted: Duración formateada en formato legible (ej. "2 hora(s)
- * 30 minuto(s)")
- * 
- * @see app.adapter.in.rest.controllers.MapsController
- * @see app.adapter.out.maps.GoogleMapsAdapter
+ * DTO de respuesta con cálculo de distancia y duración.
  */
 public class DistanceResponse {
     private Double distanceMeters;

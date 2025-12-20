@@ -63,6 +63,7 @@ class DealershipUseCaseTest {
         @Test
         @DisplayName("Debe crear concesionario exitosamente")
         void shouldCreateDealershipSuccessfully() throws Exception {
+            when(createDealership.create(sampleDealership)).thenReturn(sampleDealership);
             dealershipUseCase.create(sampleDealership);
 
             verify(createDealership, times(1)).create(sampleDealership);
@@ -176,14 +177,6 @@ class DealershipUseCaseTest {
             dealershipUseCase.deleteById(1L);
 
             verify(deleteDealership, times(1)).deleteById(1L);
-        }
-
-        @Test
-        @DisplayName("Debe eliminar concesionario por nombre sin servicios")
-        void shouldDeleteDealershipByNameWithoutServices() throws Exception {
-            dealershipUseCase.deleteByName("Concesionario Test");
-
-            verify(deleteDealership, times(1)).deleteByName("Concesionario Test");
         }
 
         @Test

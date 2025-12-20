@@ -8,12 +8,7 @@ import app.adapter.in.validators.ServiceDeliveryValidator;
 import app.domain.model.enums.Status;
 
 /**
- * Componente encargado de la construcción de objetos de datos para Servicios de
- * Entrega.
- *
- * Se utiliza para validar y preparar los datos necesarios para la creación
- * y actualización de estados de servicios, encapsulando las reglas de
- * validación.
+ * Builder que transforma requests de servicio en DTOs validados.
  */
 @Component
 public class ServiceDeliveryBuilder {
@@ -21,73 +16,49 @@ public class ServiceDeliveryBuilder {
     @Autowired
     private ServiceDeliveryValidator validator;
 
-    /**
-     * Construye y valida los datos necesarios para crear un servicio.
-     *
-     * @param request DTO con los datos de entrada para la creación.
-     * @return Objeto inmutable ServiceDeliveryCreateData con datos validados.
-     * @throws Exception Si falla alguna validación (IDs, documentos, etc).
-     */
     public ServiceDeliveryCreateData buildCreateData(ServiceDeliveryCreateRequest request) throws Exception {
         Long dealershipId = validator.idValidator(request.getDealershipId());
-        Long messengerDocument = validator.documentValidator(request.getMessengerDocument());
+        Long messengerId = validator.idValidator(request.getMessengerId());
 
-        return new ServiceDeliveryCreateData(dealershipId, messengerDocument);
+        return new ServiceDeliveryCreateData(dealershipId, messengerId);
     }
 
-    /**
-     * Construye y valida los datos necesarios para actualizar el estado de un
-     * servicio.
-     *
-     * @param request DTO con los datos de entrada para la actualización.
-     * @return Objeto inmutable ServiceDeliveryUpdateData con datos validados.
-     * @throws Exception Si falla alguna validación (estado, observación,
-     *                   documento).
-     */
     public ServiceDeliveryUpdateData buildUpdateStatusData(ServiceDeliveryUpdateStatusRequest request)
             throws Exception {
         Status status = validator.statusValidator(request.getStatus());
         String observation = validator.observationValidator(request.getObservation());
-        Long userDocument = validator.documentValidator(request.getUserDocument());
+        Long userId = validator.idValidator(request.getUserId());
 
-        return new ServiceDeliveryUpdateData(status, observation, userDocument);
+        return new ServiceDeliveryUpdateData(status, observation, userId);
     }
 
-    /**
-     * Clase interna inmutable que contiene los datos validados para crear un
-     * servicio.
-     */
     public static class ServiceDeliveryCreateData {
         private final Long dealershipId;
-        private final Long messengerDocument;
+        private final Long messengerId;
 
-        public ServiceDeliveryCreateData(Long dealershipId, Long messengerDocument) {
+        public ServiceDeliveryCreateData(Long dealershipId, Long messengerId) {
             this.dealershipId = dealershipId;
-            this.messengerDocument = messengerDocument;
+            this.messengerId = messengerId;
         }
 
         public Long getDealershipId() {
             return dealershipId;
         }
 
-        public Long getMessengerDocument() {
-            return messengerDocument;
+        public Long getMessengerId() {
+            return messengerId;
         }
     }
 
-    /**
-     * Clase interna inmutable que contiene los datos validados para actualizar un
-     * servicio.
-     */
     public static class ServiceDeliveryUpdateData {
         private final Status status;
         private final String observation;
-        private final Long userDocument;
+        private final Long userId;
 
-        public ServiceDeliveryUpdateData(Status status, String observation, Long userDocument) {
+        public ServiceDeliveryUpdateData(Status status, String observation, Long userId) {
             this.status = status;
             this.observation = observation;
-            this.userDocument = userDocument;
+            this.userId = userId;
         }
 
         public Status getStatus() {
@@ -98,8 +69,8 @@ public class ServiceDeliveryBuilder {
             return observation;
         }
 
-        public Long getUserDocument() {
-            return userDocument;
+        public Long getUserId() {
+            return userId;
         }
     }
 }

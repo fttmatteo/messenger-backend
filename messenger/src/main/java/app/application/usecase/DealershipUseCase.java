@@ -12,10 +12,7 @@ import app.domain.services.SearchDealership;
 import app.domain.services.UpdateDealership;
 
 /**
- * Caso de uso de aplicación para gestionar concesionarios.
- * 
- * Orquesta las operaciones CRUD de concesionarios delegando en los servicios
- * de dominio. Punto de entrada desde controladores REST.
+ * Caso de uso para gestión de concesionarios.
  */
 @Service
 public class DealershipUseCase {
@@ -31,79 +28,35 @@ public class DealershipUseCase {
     @Autowired
     private DeleteDealership deleteDealership;
 
-    /**
-     * Crea un nuevo concesionario en el sistema.
-     * 
-     * @param dealership La entidad del concesionario a crear.
-     * @throws Exception Si ocurre un error durante el proceso de creación.
-     */
-    public void create(Dealership dealership) throws Exception {
-        logger.debug("UseCase: creando concesionario {}", dealership.getName());
-        createDealership.create(dealership);
+    public Dealership create(Dealership dealership) throws Exception {
+        logger.info("Creando concesionario: {}", dealership.getName());
+        Dealership created = createDealership.create(dealership);
+        logger.info("Concesionario creado con ID: {}", created.getIdDealership());
+        return created;
     }
 
-    /**
-     * Actualiza la información de un concesionario existente.
-     * 
-     * @param id         El ID del concesionario a actualizar.
-     * @param dealership Los nuevos datos del concesionario.
-     * @throws Exception Si el concesionario no existe o hay un error en la
-     *                   actualización.
-     */
-    public void update(Long id, Dealership dealership) throws Exception {
-        logger.debug("UseCase: actualizando concesionario ID {}", id);
-        updateDealership.update(id, dealership);
+    public Dealership update(Long id, Dealership dealership) throws Exception {
+        logger.info("Actualizando concesionario ID: {}", id);
+        Dealership updated = updateDealership.update(id, dealership);
+        logger.info("Concesionario ID: {} actualizado", id);
+        return updated;
     }
 
-    /**
-     * Busca un concesionario por su ID único.
-     * 
-     * @param id El ID del concesionario.
-     * @return El concesionario encontrado.
-     * @throws Exception Si no se encuentra el concesionario.
-     */
     public Dealership findById(Long id) throws Exception {
         return searchDealership.findById(id);
     }
 
-    /**
-     * Busca un concesionario por su nombre.
-     * 
-     * @param name El nombre del concesionario.
-     * @return El concesionario encontrado.
-     * @throws Exception Si no se encuentra el concesionario.
-     */
     public Dealership findByName(String name) throws Exception {
         return searchDealership.findByName(name);
     }
 
-    /**
-     * Obtiene una lista de todos los concesionarios registrados.
-     * 
-     * @return Lista completa de concesionarios.
-     */
     public List<Dealership> findAll() {
         return searchDealership.findAll();
     }
 
-    /**
-     * Elimina un concesionario por su ID.
-     * 
-     * @param id El ID del concesionario a eliminar.
-     * @throws Exception Si el concesionario no existe o no se puede eliminar.
-     */
     public void deleteById(Long id) throws Exception {
-        logger.debug("UseCase: eliminando concesionario ID {}", id);
+        logger.warn("Eliminando concesionario ID: {}", id);
         deleteDealership.deleteById(id);
-    }
-
-    /**
-     * Elimina un concesionario por su nombre.
-     * 
-     * @param name El nombre del concesionario a eliminar.
-     * @throws Exception Si el concesionario no existe o no se puede eliminar.
-     */
-    public void deleteByName(String name) throws Exception {
-        deleteDealership.deleteByName(name);
+        logger.info("Concesionario ID: {} eliminado", id);
     }
 }

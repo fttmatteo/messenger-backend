@@ -9,10 +9,7 @@ import app.domain.model.auth.TokenResponse;
 import app.domain.services.AuthenticationService;
 
 /**
- * Caso de uso para autenticación de usuarios.
- * 
- * Procesa solicitudes de login delegando al servicio de autenticación del
- * dominio.
+ * Caso de uso para login de usuarios.
  */
 @Component
 public class LoginUseCase {
@@ -22,18 +19,15 @@ public class LoginUseCase {
     @Autowired
     private AuthenticationService authenticationService;
 
-    /**
-     * Procesa la solicitud de inicio de sesión.
-     * 
-     * @param credentials Las credenciales de autenticación (usuario y contraseña).
-     * @return La respuesta con el token de acceso si las credenciales son válidas.
-     * @throws Exception Si las credenciales son inválidas o hay un error de
-     *                   autenticación.
-     */
     public TokenResponse login(AuthCredentials credentials) throws Exception {
-        logger.debug("Procesando solicitud de login para: {}", credentials.getUserName());
-        TokenResponse response = authenticationService.authenticate(credentials);
-        logger.info("Login procesado exitosamente para: {}", credentials.getUserName());
-        return response;
+        logger.info("Intento de login para documento: {}", credentials.getDocument());
+        try {
+            TokenResponse response = authenticationService.authenticate(credentials);
+            logger.info("Login exitoso para documento: {}", credentials.getDocument());
+            return response;
+        } catch (Exception e) {
+            logger.warn("Login fallido para documento: {} - Razón: {}", credentials.getDocument(), e.getMessage());
+            throw e;
+        }
     }
 }

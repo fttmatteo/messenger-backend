@@ -54,7 +54,6 @@ class EmployeeUseCaseTest {
         sampleEmployee.setDocument(123456789L);
         sampleEmployee.setFullName("Juan Pérez");
         sampleEmployee.setPhone("3001234567");
-        sampleEmployee.setUserName("jperez");
         sampleEmployee.setPassword("encoded_password");
         sampleEmployee.setRole(Role.MESSENGER);
     }
@@ -66,6 +65,8 @@ class EmployeeUseCaseTest {
         @Test
         @DisplayName("Debe crear empleado exitosamente")
         void shouldCreateEmployeeSuccessfully() throws Exception {
+            when(createEmployee.create(sampleEmployee)).thenReturn(sampleEmployee);
+
             employeeUseCase.create(sampleEmployee);
 
             verify(createEmployee, times(1)).create(sampleEmployee);
@@ -75,16 +76,6 @@ class EmployeeUseCaseTest {
         @DisplayName("Debe propagar excepción si documento duplicado")
         void shouldPropagateExceptionOnDuplicateDocument() throws Exception {
             doThrow(new BusinessException("Documento ya registrado"))
-                    .when(createEmployee).create(any());
-
-            assertThrows(BusinessException.class,
-                    () -> employeeUseCase.create(sampleEmployee));
-        }
-
-        @Test
-        @DisplayName("Debe propagar excepción si username duplicado")
-        void shouldPropagateExceptionOnDuplicateUsername() throws Exception {
-            doThrow(new BusinessException("Username ya existe"))
                     .when(createEmployee).create(any());
 
             assertThrows(BusinessException.class,
@@ -113,28 +104,6 @@ class EmployeeUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe buscar empleado por documento")
-        void shouldFindEmployeeByDocument() throws Exception {
-            when(searchEmployee.findByDocument(123456789L)).thenReturn(sampleEmployee);
-
-            Employee result = employeeUseCase.findByDocument(123456789L);
-
-            assertNotNull(result);
-            assertEquals("Juan Pérez", result.getFullName());
-            assertEquals(Role.MESSENGER, result.getRole());
-        }
-
-        @Test
-        @DisplayName("Debe retornar null si documento no existe")
-        void shouldReturnNullIfDocumentNotFound() throws Exception {
-            when(searchEmployee.findByDocument(999L)).thenReturn(null);
-
-            Employee result = employeeUseCase.findByDocument(999L);
-
-            assertNull(result);
-        }
-
-        @Test
         @DisplayName("Debe buscar empleado por ID")
         void shouldFindEmployeeById() {
             when(searchEmployee.findById(1L)).thenReturn(sampleEmployee);
@@ -146,14 +115,14 @@ class EmployeeUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe buscar empleado por userName")
-        void shouldFindEmployeeByUserName() throws Exception {
-            when(searchEmployee.findByUserName("jperez")).thenReturn(sampleEmployee);
+        @DisplayName("Debe buscar empleado por documento")
+        void shouldFindEmployeeByDocument() throws Exception {
+            when(searchEmployee.findByDocument(123456789L)).thenReturn(sampleEmployee);
 
-            Employee result = employeeUseCase.findByUserName("jperez");
+            Employee result = employeeUseCase.findByDocument(123456789L);
 
             assertNotNull(result);
-            assertEquals("jperez", result.getUserName());
+            assertEquals(123456789L, result.getDocument());
         }
     }
 
@@ -195,14 +164,6 @@ class EmployeeUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe eliminar empleado por documento sin servicios activos")
-        void shouldDeleteEmployeeByDocumentWithoutActiveServices() throws Exception {
-            employeeUseCase.deleteByDocument(123456789L);
-
-            verify(deleteEmployee, times(1)).deleteByDocument(123456789L);
-        }
-
-        @Test
         @DisplayName("Debe lanzar excepción si tiene servicios activos")
         void shouldThrowExceptionIfHasActiveServices() throws Exception {
             doThrow(new BusinessException("Empleado tiene servicios asignados"))
@@ -221,6 +182,7 @@ class EmployeeUseCaseTest {
         @DisplayName("Debe aceptar rol MESSENGER")
         void shouldAcceptMessengerRole() throws Exception {
             sampleEmployee.setRole(Role.MESSENGER);
+            when(createEmployee.create(any(Employee.class))).thenReturn(sampleEmployee);
 
             employeeUseCase.create(sampleEmployee);
 
@@ -231,6 +193,7 @@ class EmployeeUseCaseTest {
         @DisplayName("Debe aceptar rol ADMIN")
         void shouldAcceptAdminRole() throws Exception {
             sampleEmployee.setRole(Role.ADMIN);
+            when(createEmployee.create(any(Employee.class))).thenReturn(sampleEmployee);
 
             employeeUseCase.create(sampleEmployee);
 

@@ -30,127 +30,81 @@
 		<java.version>21</java.version>
 	</properties>
 	<dependencies>
-		<!-- 
-			Spring Boot Starter Data JPA:
-			Proporciona soporte para Java Persistence API (JPA) usando Hibernate.
-			Permite la interacción con la base de datos mediante repositorios y entidades.
-		-->
+
+		<!-- JPA / Hibernate -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
-		<!-- 
-			Spring Boot Starter Web:
-			Construye aplicaciones web, incluyendo RESTful.
-			Usa Tomcat como contenedor embebido por defecto.
-		-->
+		<!-- Web / REST API -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<!-- 
-			Google Cloud Vision:
-			Cliente para la API de Google Cloud Vision.
-			Se usa para OCR (Reconocimiento Óptico de Caracteres) en la detección de placas.
-		-->
+		<!-- Google Cloud Vision (OCR) -->
 		<dependency>
 			<groupId>com.google.cloud</groupId>
 			<artifactId>google-cloud-vision</artifactId>
 			<version>3.78.0</version>
 		</dependency>
 
-		<!-- 
-			Google Cloud Storage:
-			Cliente para Google Cloud Storage.
-			Permite subir y gestionar archivos (fotos, firmas) en la nube.
-		-->
+		<!-- Google Cloud Storage (Archivos) -->
 		<dependency>
 			<groupId>com.google.cloud</groupId>
 			<artifactId>google-cloud-storage</artifactId>
 			<version>2.61.0</version>
 		</dependency>
 
-		<!-- 
-			Google Cloud IAM Credentials:
-			Necesario para firmar blobs en entornos donde no hay clave privada local (ej. Cloud Run).
-			Permite usar la API de IAM para firmar remotamente.
-		-->
+		<!-- Firma remota (IAM) - Cloud Run -->
 		<dependency>
 			<groupId>com.google.cloud</groupId>
 			<artifactId>google-cloud-iamcredentials</artifactId>
 			<version>2.16.0</version>
 		</dependency>
 		
-		<!-- 
-			Spring Boot Starter Validation:
-			Proporciona soporte para validación de beans con Hibernate Validator.
-			Se usa para validar datos de entrada (DTOs) con anotaciones como @NotNull, @Size.
-		-->
+		<!-- Validación -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 
-		<!-- 
-			Spring Security Crypto:
-			Ofrece utilidades de criptografía.
-			Se usa principalmente para el hashing de contraseñas (BCrypt).
-		-->
+		<!-- Criptografía (BCrypt) -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-crypto</artifactId>
 		</dependency>
 
-		<!-- 
-			Lombok:
-			Biblioteca para reducir código boilerplate.
-			Genera getters, setters, constructores, etc. automáticamente mediante anotaciones.
-		-->
+		<!-- Lombok (Boilerplate) -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
 
-		<!-- 
-			H2 Database:
-			Base de datos en memoria muy rápida.
-			Útil para desarrollo y pruebas rápidas sin configurar un servidor de BD externo.
-			Scope: runtime (solo necesaria al ejecutar).
-		-->
+		<!-- H2 (BD memoria) -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- 
-			MySQL Connector:
-			Driver JDBC para conectar con bases de datos MySQL.
-			Necesario para la persistencia en producción/desarrollo con BD real.
-			Scope: runtime.
-		-->
+		<!-- MySQL Driver -->
 		<dependency>
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- 
-			Spring Boot Starter Test:
-			Librerías para testing (JUnit, Mockito, Spring Test).
-			Incluye todo lo necesario para pruebas unitarias y de integración.
-		-->
+		<!-- Testing -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 
-
-		<!-- Flyway for Database Migrations -->
+		<!-- Flyway (Migraciones) -->
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
@@ -160,14 +114,7 @@
 			<artifactId>flyway-mysql</artifactId>
 		</dependency>
 
-		<!-- 
-			JJWT (Java JWT):
-			Conjunto de librerías para trabajar con JSON Web Tokens (JWT).
-			- api: Interfaces de la API.
-			- impl: Implementación interna.
-			- jackson: Serializador JSON para los tokens.
-			Se usan para la autenticación y autorización segura basada en tokens.
-		-->
+		<!-- JWT Support -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
@@ -184,95 +131,64 @@
 			<version>0.13.0</version>
 		</dependency>
 
-		<!-- 
-			Spring Boot Starter Security:
-			Proporciona características de autenticación y control de acceso.
-			Protege endpoints y gestiona sesiones/tokens.
-		-->
+		<!-- Seguridad (Auth) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 
-		<!-- 
-			Spring Security Test:
-			Herramientas para probar componentes de seguridad (mocking de usuarios, CSRF, etc).
-			Esencial para @WebMvcTest cuando hay seguridad habilitada.
-		-->
+		<!-- Security Testing -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 
-		<!-- 
-			Google Maps Services:
-			Cliente Java para las APIs de Google Maps.
-			Permite geocodificación, cálculo de rutas, matriz de distancias y zonas horarias.
-		-->
+		<!-- Google Maps Client -->
 		<dependency>
 			<groupId>com.google.maps</groupId>
 			<artifactId>google-maps-services</artifactId>
 			<version>2.2.0</version>
 		</dependency>
 
-		<!-- 
-			Spring Boot Starter WebSocket:
-			Habilita la comunicación bidireccional en tiempo real usando WebSockets.
-			Esencial para el tracking en vivo de los mensajeros.
-		-->
+		<!-- WebSocket -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-websocket</artifactId>
 		</dependency>
 
-		<!-- 
-			Spring Boot Starter Data Redis:
-			Soporte para Redis (base de datos key-value en memoria).
-			Se usa para caché de alto rendimiento, especialmente para almacenar ubicaciones en tiempo real.
-		-->
+		<!-- Redis (Caché) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency>
 
-
-
-		<!-- 
-			Spring Boot Starter Actuator:
-			Proporciona endpoints para monitorear y gestionar la aplicación.
-			Incluye health checks, métricas, info del entorno, etc.
-			Esencial para entornos productivos.
-		-->
+		<!-- Actuator (Health/Metrics) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 
-
-		<!-- 
-			SpringDoc OpenAPI:
-			Genera documentación automática de la API (Swagger UI).
-			Disponible en: /swagger-ui/index.html
-		-->
+		<!-- OpenAPI / Swagger -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.3.0</version>
 		</dependency>
 
-		<!-- 
-			Bucket4j:
-			Librería de Rate Limiting basada en el algoritmo Token Bucket.
-			Protege contra ataques de fuerza bruta y DDoS.
-			Se usa para limitar requests por IP/usuario en endpoints críticos.
-		-->
+		<!-- Rate Limiting -->
 		<dependency>
 			<groupId>com.bucket4j</groupId>
 			<artifactId>bucket4j-core</artifactId>
 			<version>8.10.1</version>
 		</dependency>
 
+		<!-- JSON Logging (Prod) -->
+		<dependency>
+			<groupId>net.logstash.logback</groupId>
+			<artifactId>logstash-logback-encoder</artifactId>
+			<version>7.4</version>
+		</dependency>
 	</dependencies>
 
 	<build>

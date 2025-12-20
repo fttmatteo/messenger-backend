@@ -1,40 +1,20 @@
 package app.adapter.in.rest.request;
 
 /**
- * DTO (Data Transfer Object) para actualizar el estado de un servicio de
- * entrega.
- * 
- * Este objeto se utiliza para registrar cambios de estado en el ciclo de vida
- * de un servicio de entrega, manteniendo trazabilidad de quién realizó el
- * cambio
- * y las razones del mismo.
- * 
- * Campos incluidos:
- * - status: Nuevo estado del servicio (PENDING, IN_PROGRESS, DELIVERED,
- * CANCELED, etc.)
- * - observation: Observaciones o notas sobre el cambio (ej. razón de
- * cancelación)
- * - userDocument: Documento del usuario que registra el cambio (auditoría)
- * 
- * Dependiendo del estado, pueden ser requeridas evidencias adicionales como
- * firma digital, fotografías o coordenadas de ubicación.
- * 
- * @see app.adapter.in.rest.controllers.ServiceDeliveryController
- * @see app.domain.model.ServiceDelivery
- * @see app.domain.model.enums.ServiceStatus
+ * DTO para actualizar estado de un servicio de entrega.
  */
 public class ServiceDeliveryUpdateStatusRequest {
     private String status;
     private String observation;
-    private String userDocument;
+    private String userId;
 
     public ServiceDeliveryUpdateStatusRequest() {
     }
 
-    public ServiceDeliveryUpdateStatusRequest(String status, String observation, String userDocument) {
+    public ServiceDeliveryUpdateStatusRequest(String status, String observation, String userId) {
         this.status = status;
         this.observation = observation;
-        this.userDocument = userDocument;
+        this.userId = userId;
     }
 
     public String getStatus() {
@@ -53,11 +33,11 @@ public class ServiceDeliveryUpdateStatusRequest {
         this.observation = observation;
     }
 
-    public String getUserDocument() {
-        return userDocument;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setUserDocument(String userDocument) {
-        this.userDocument = userDocument;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

@@ -24,7 +24,7 @@ mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" \
   -e "SHOW TABLES LIKE 'flyway_schema_history';" 2>/dev/null
 
 if [ $? -eq 0 ]; then
-  echo "✅ Tabla flyway_schema_history encontrada"
+  echo "Tabla flyway_schema_history encontrada"
   echo ""
   
   echo "2. Contenido de flyway_schema_history:"
@@ -33,12 +33,12 @@ if [ $? -eq 0 ]; then
   
   if [ $? -eq 0 ]; then
     echo ""
-    echo "✅ FLYWAY ESTÁ FUNCIONANDO CORRECTAMENTE"
+    echo "FLYWAY ESTÁ FUNCIONANDO CORRECTAMENTE"
   else
-    echo "⚠️  Error al leer flyway_schema_history"
+    echo "Error al leer flyway_schema_history"
   fi
 else
-  echo "❌ Tabla flyway_schema_history NO encontrada"
+  echo "Tabla flyway_schema_history NO encontrada"
   echo ""
   echo "Esto significa que Flyway NO se ha ejecutado."
   echo "Las tablas se crearon con Hibernate (ddl-auto=update)"

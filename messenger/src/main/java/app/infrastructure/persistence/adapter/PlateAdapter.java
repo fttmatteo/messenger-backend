@@ -1,4 +1,4 @@
-package app.adapter.out.persistence;
+package app.infrastructure.persistence.adapter;
 
 import app.domain.model.Plate;
 import app.domain.ports.PlatePort;
@@ -12,32 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Adaptador de salida para persistencia de placas vehiculares.
- * 
- * Este adaptador implementa PlatePort y actúa como puente entre la capa de
- * dominio
- * y la capa de infraestructura (JPA), manejando la conversión entre objetos de
- * dominio
- * (Plate) y entidades de persistencia (PlateEntity).
- * 
- * Responsabilidades:
- * - Convertir objetos de dominio a entidades JPA y viceversa usando PlateMapper
- * - Delegar operaciones de persistencia al PlateRepository
- * - Mantener la independencia del dominio respecto a detalles de persistencia
- * 
- * Operaciones soportadas:
- * - save: Guardar o actualizar una placa
- * - findById: Buscar por ID
- * - findByPlateNumber: Buscar por número de placa (único)
- * - findAll: Obtener todas las placas registradas
- * 
- * Las placas se asocian a servicios de entrega y pueden ser detectadas mediante
- * OCR
- * o ingresadas manualmente.
- * 
- * @see app.domain.ports.PlatePort
- * @see app.infrastructure.persistence.repository.PlateRepository
- * @see app.infrastructure.persistence.mapper.PlateMapper
+ * Adapter de persistencia para placas vehiculares.
  */
 @Component
 public class PlateAdapter implements PlatePort {
@@ -47,7 +22,6 @@ public class PlateAdapter implements PlatePort {
     @Autowired
     private PlateMapper mapper;
 
-    /** Guarda o actualiza una placa. Actualiza el ID generado. */
     @Override
     public void save(Plate plate) {
         PlateEntity entity = mapper.toEntity(plate);
@@ -55,7 +29,6 @@ public class PlateAdapter implements PlatePort {
         plate.setIdPlate(savedEntity.getIdPlate());
     }
 
-    /** Busca una placa por ID. */
     @Override
     public Plate findById(Long id) {
         Optional<PlateEntity> entity = repository.findById(id);
@@ -65,7 +38,6 @@ public class PlateAdapter implements PlatePort {
         return null;
     }
 
-    /** Busca una placa por su número (ej. ABC123). */
     @Override
     public Plate findByPlateNumber(String plateNumber) {
         PlateEntity entity = repository.findByPlateNumber(plateNumber);
@@ -75,7 +47,6 @@ public class PlateAdapter implements PlatePort {
         return null;
     }
 
-    /** Obtiene todas las placas registradas. */
     @Override
     public List<Plate> findAll() {
         return repository.findAll().stream()

@@ -11,6 +11,7 @@ import app.domain.model.enums.PlateType;
 import app.infrastructure.persistence.entities.PlateEntity;
 import app.infrastructure.persistence.mapper.PlateMapper;
 import app.infrastructure.persistence.repository.PlateRepository;
+import app.infrastructure.persistence.adapter.PlateAdapter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;

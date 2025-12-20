@@ -3,8 +3,8 @@ package app.domain.model;
 import java.time.LocalDateTime;
 
 /**
- * Value Object inmutable que representa una ubicación geográfica.
- * Incluye validaciones y cálculo de distancias usando fórmula Haversine.
+ * Value Object que representa una ubicación geográfica.
+ * Incluye cálculos de distancia usando la fórmula Haversine.
  */
 public class Location {
     private Double latitude;
@@ -15,7 +15,6 @@ public class Location {
     // Radio de la Tierra en metros
     private static final double EARTH_RADIUS_METERS = 6371000;
 
-    // Default constructor for Jackson
     public Location() {
         this.latitude = null;
         this.longitude = null;
@@ -47,12 +46,6 @@ public class Location {
         }
     }
 
-    /**
-     * Calcula la distancia en metros a otra ubicación usando la fórmula Haversine.
-     * 
-     * @param other La otra ubicación
-     * @return Distancia en metros
-     */
     public Double distanceTo(Location other) {
         if (other == null) {
             return null;
@@ -72,14 +65,6 @@ public class Location {
         return EARTH_RADIUS_METERS * c;
     }
 
-    /**
-     * Verifica si esta ubicación está dentro de un radio específico de otra
-     * ubicación.
-     * 
-     * @param center       Ubicación central
-     * @param radiusMeters Radio en metros
-     * @return true si está dentro del radio
-     */
     public boolean isWithinRadius(Location center, Double radiusMeters) {
         if (center == null || radiusMeters == null) {
             return false;
@@ -88,9 +73,6 @@ public class Location {
         return distance != null && distance <= radiusMeters;
     }
 
-    /**
-     * Verifica si las coordenadas son válidas.
-     */
     public boolean isValid() {
         return latitude != null && longitude != null &&
                 latitude >= -90 && latitude <= 90 &&

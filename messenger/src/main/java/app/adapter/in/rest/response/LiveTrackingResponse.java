@@ -4,27 +4,7 @@ import app.domain.model.enums.TrackingStatus;
 import java.time.LocalDateTime;
 
 /**
- * DTO (Data Transfer Object) de respuesta para el seguimiento en tiempo real de
- * un mensajero.
- * 
- * Este objeto proporciona la ubicación actual y datos de movimiento del
- * mensajero,
- * utilizado para visualización en mapas y monitoreo de entregas en tiempo real.
- * 
- * Campos incluidos:
- * - messengerId: Identificador único del mensajero
- * - messengerName: Nombre completo del mensajero
- * - latitude/longitude: Coordenadas geográficas actuales
- * - lastUpdate: Fecha y hora de la última actualización de ubicación
- * - status: Estado actual del rastreo (ACTIVE, INACTIVE, etc.)
- * - speed: Velocidad actual en m/s
- * - heading: Dirección del movimiento en grados (0-360°, 0=Norte)
- * 
- * Los datos se actualizan en tiempo real a través de WebSockets.
- * 
- * @see app.adapter.in.rest.controllers.TrackingController
- * @see app.adapter.in.websocket.TrackingWebSocketController
- * @see app.domain.model.LiveTracking
+ * DTO de respuesta con tracking en tiempo real de mensajero.
  */
 public class LiveTrackingResponse {
     private Long messengerId;

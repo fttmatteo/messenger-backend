@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 /**
- * Value Object que representa una ruta calculada entre ubicaciones.
- * Incluye información sobre distancia, duración y waypoints.
+ * Value Object inmutable que representa una ruta entre dos ubicaciones.
+ * Contiene información de distancia, duración y puntos intermedios.
  */
 public class Route {
     private final Location origin;
@@ -14,7 +14,7 @@ public class Route {
     private final List<Location> waypoints;
     private final Double distanceMeters;
     private final Long durationSeconds;
-    private final String polyline; // Encoded polyline de Google para dibujar en mapa
+    private final String polyline;
 
     public Route(Location origin, Location destination, List<Location> waypoints,
             Double distanceMeters, Long durationSeconds, String polyline) {
@@ -29,40 +29,14 @@ public class Route {
         this.polyline = polyline;
     }
 
-    /**
-     * Obtiene la distancia en kilómetros.
-     */
     public Double getDistanceKilometers() {
         return distanceMeters != null ? distanceMeters / 1000.0 : null;
     }
 
-    /**
-     * Obtiene la duración formateada como "X horas Y minutos".
-     */
-    public String getDurationFormatted() {
-        if (durationSeconds == null) {
-            return null;
-        }
-        long hours = durationSeconds / 3600;
-        long minutes = (durationSeconds % 3600) / 60;
-
-        if (hours > 0) {
-            return String.format("%d hora(s) %d minuto(s)", hours, minutes);
-        } else {
-            return String.format("%d minuto(s)", minutes);
-        }
-    }
-
-    /**
-     * Verifica si la ruta tiene waypoints intermedios.
-     */
     public boolean hasWaypoints() {
         return waypoints != null && !waypoints.isEmpty();
     }
 
-    /**
-     * Obtiene el número total de paradas (incluyendo origen y destino).
-     */
     public int getTotalStops() {
         return 2 + (waypoints != null ? waypoints.size() : 0);
     }
@@ -93,7 +67,7 @@ public class Route {
 
     @Override
     public String toString() {
-        return String.format("Route[from=%s, to=%s, distance=%.2fkm, duration=%s]",
-                origin, destination, getDistanceKilometers(), getDurationFormatted());
+        return String.format("Route[from=%s, to=%s, distance=%.2fkm, durationSec=%d]",
+                origin, destination, getDistanceKilometers(), durationSeconds);
     }
 }

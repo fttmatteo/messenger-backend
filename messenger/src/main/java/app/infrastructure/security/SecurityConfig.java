@@ -18,166 +18,80 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Configuración central de seguridad de Spring Security.
- * 
- * Establece la configuración completa de seguridad para la aplicación
- * incluyendo:
- * - Autenticación basada en JWT (JSON Web Tokens)
- * - Autorización por roles (ADMIN, MESSENGER)
- * - Configuración CORS para permitir frontends en diferentes orígenes
- * - Deshabilitación de CSRF (no necesario con JWT stateless)
- * - Gestión de sesiones STATELESS (sin sesiones de servidor)
- * - Encriptación de contraseñas con BCrypt
- * 
- * Rutas protegidas:
- * - /auth/** - Público (login, registro)
- * - /ws/** - Público (WebSocket handshake)
- * - /employees/** - Solo ADMIN
- * - /dealerships/**, /services/**, /api/location/**, /api/tracking/** -
- * Autenticado
- * - /api/files/** - Público
+ * Configuración de Spring Security: CORS, JWT, rate limiting y rutas.
  */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-    /**
-     * Configura la cadena de filtros de seguridad de Spring Security.
-     * 
-     * Establece:
-     * - CORS: Permite peticiones desde orígenes específicos (localhost:3000, 4200,
-     * etc.)
-     * - CSRF: Deshabilitado (no necesario con JWT stateless)
-     * - Session Management: STATELESS (sin sesiones de servidor)
-     * - Authorization Rules: Define qué rutas requieren autenticación/roles
-     * - JWT Filter: Añade filtro personalizado antes de
-     * UsernamePasswordAuthenticationFilter
-     * 
-     * @param http Objeto HttpSecurity para configurar la seguridad
-     * @return SecurityFilterChain configurado
-     * @throws Exception Si hay error en la configuración
-     */
-    @Autowired
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+        @Autowired
+        private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+        @Autowired
+        private JwtAuthenticationFilter jwtAuthenticationFilter;
+        @Autowired
+        private RateLimitFilter rateLimitFilter;
 
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-    @Autowired
-    private RateLimitFilter rateLimitFilter;
+                http
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                                .csrf(csrf -> csrf.disable())
+                                .exceptionHandling(exception -> exception
+                                                .authenticationEntryPoint(jwtAuthenticationEntryPoint))
+                                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers("/auth/**").permitAll()
+                                                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**",
+                                                                "/swagger-ui.html")
+                                                .permitAll() // API
+                                                .requestMatchers("/ws/**").permitAll()
+                                                .requestMatchers("/employees/**").hasRole("ADMIN")
+                                                .requestMatchers("/dealerships/**").authenticated()
+                                                .requestMatchers("/services/**").authenticated()
+                                                .requestMatchers("/api/files/**").permitAll()
+                                                .requestMatchers("/api/location/**").authenticated()
+                                                .requestMatchers("/api/tracking/**").authenticated()
+                                                .requestMatchers("/tracking/**").authenticated()
+                                                .anyRequest().authenticated())
+                                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
+                                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-    /**
-     * Configura la cadena de filtros de seguridad de Spring Security.
-     * 
-     * Establece:
-     * - CORS: Permite peticiones desde orígenes específicos
-     * - CSRF: Deshabilitado (no necesario con JWT stateless)
-     * - Exception Handling: Usa JwtAuthenticationEntryPoint para errores 401
-     * - Session Management: STATELESS (sin sesiones de servidor)
-     * - Authorization Rules: Define qué rutas requieren autenticación/roles
-     * - JWT Filter: Añade filtro personalizado antes de
-     * UsernamePasswordAuthenticationFilter
-     * 
-     * @param http Objeto HttpSecurity para configurar la seguridad
-     * @return SecurityFilterChain configurado
-     * @throws Exception Si hay error en la configuración
-     */
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
-        http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // Documentación
-                                                                                                              // API
-                        .requestMatchers("/ws/**").permitAll() // WebSocket handshake
-                        .requestMatchers("/employees/**").hasRole("ADMIN")
-                        .requestMatchers("/dealerships/**").authenticated()
-                        .requestMatchers("/services/**").authenticated()
-                        .requestMatchers("/api/files/**").permitAll()
-                        .requestMatchers("/api/location/**").authenticated()
-                        .requestMatchers("/api/tracking/**").authenticated()
-                        .requestMatchers("/tracking/**").authenticated()
-                        .anyRequest().authenticated())
-                // Rate Limit Filter: Se ejecuta PRIMERO para bloquear abusos antes de procesar
-                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
-                // JWT Filter: Valida tokens después de pasar rate limiting
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
-    }
-
-    @org.springframework.beans.factory.annotation.Value("${cors.allowed-origins}")
-    private String corsAllowedOrigins;
-
-    /**
-     * Configura CORS (Cross-Origin Resource Sharing) para la aplicación.
-     * 
-     * Permite peticiones desde múltiples orígenes definidos en la configuración.
-     * 
-     * @return CorsConfigurationSource configurado
-     */
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-
-        // ========== SEGURIDAD: CORS obligatorio en producción ==========
-        // Orígenes permitidos (desde configuración)
-        if (corsAllowedOrigins == null || corsAllowedOrigins.trim().isEmpty()) {
-            // En lugar de permitir todos los orígenes (inseguro), lanzar error
-            throw new IllegalStateException(
-                    "SEGURIDAD: La propiedad 'cors.allowed-origins' no está configurada. " +
-                            "Configure los orígenes permitidos en application.properties o como variable de entorno.");
+                return http.build();
         }
-        List<String> origins = Arrays.stream(corsAllowedOrigins.split(","))
-                .map(String::trim)
-                .toList();
-        configuration.setAllowedOrigins(origins);
 
-        // Métodos HTTP permitidos
-        configuration.setAllowedMethods(Arrays.asList(
-                "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        @org.springframework.beans.factory.annotation.Value("${cors.allowed-origins}")
+        private String corsAllowedOrigins;
 
-        // Headers permitidos
-        configuration.setAllowedHeaders(List.of("*"));
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
+                CorsConfiguration configuration = new CorsConfiguration();
 
-        // Permitir credenciales (cookies, authorization headers)
-        configuration.setAllowCredentials(true);
+                if (corsAllowedOrigins == null || corsAllowedOrigins.trim().isEmpty()) {
+                        throw new IllegalStateException(
+                                        "La propiedad 'cors.allowed-origins' no está configurada. " +
+                                                        "Configure los orígenes permitidos en application.properties o como variable de entorno.");
+                }
+                List<String> origins = Arrays.stream(corsAllowedOrigins.split(","))
+                                .map(String::trim)
+                                .toList();
+                configuration.setAllowedOrigins(origins);
+                configuration.setAllowedMethods(Arrays.asList(
+                                "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+                configuration.setAllowedHeaders(List.of("*"));
+                configuration.setAllowCredentials(true);
+                configuration.setMaxAge(3600L);
+                configuration.setExposedHeaders(Arrays.asList("Authorization"));
 
-        // Cache de preflight requests (1 hora)
-        configuration.setMaxAge(3600L);
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", configuration);
 
-        // Exponer headers adicionales
-        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+                return source;
+        }
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-
-        return source;
-    }
-
-    /**
-     * Bean del codificador de contraseñas.
-     * 
-     * Utiliza BCrypt, un algoritmo de hashing adaptativo y resistente a ataques
-     * de fuerza bruta. BCrypt incluye:
-     * - Salt automático (aleatorio por contraseña)
-     * - Factor de trabajo configurable
-     * - Resistencia a rainbow tables
-     * 
-     * Usado para:
-     * - Hashear contraseñas al crear/actualizar empleados
-     * - Verificar contraseñas durante el login
-     * 
-     * @return BCryptPasswordEncoder para hashear contraseñas de forma segura
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 }

@@ -7,13 +7,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import app.domain.model.Photo;
 import app.domain.model.ServiceDelivery;
 import app.domain.model.Signature;
@@ -26,17 +24,7 @@ import app.domain.services.SearchServiceDelivery;
 import app.domain.services.UpdateServiceDelivery;
 
 /**
- * Caso de uso de aplicación para gestionar servicios de entrega.
- * 
- * Orquesta operaciones complejas de servicios de entrega incluyendo:
- * Creación con detección OCR automática de placas
- * Creación con entrada manual de placas
- * Actualización de estados con gestión de archivos (firmas y fotos)
- * Consultas por múltiples criterios
- * Manejo transaccional con rollback automático en caso de error
- * 
- * Gestiona el almacenamiento de archivos y limpieza automática si falla la
- * operación.
+ * Caso de uso principal para gestión de servicios de entrega.
  */
 @Service
 public class ServiceDeliveryUseCase {
@@ -57,117 +45,66 @@ public class ServiceDeliveryUseCase {
     @Autowired
     private OcrPort ocrPort;
 
-    /**
-     * Crea un servicio de entrega a partir de una imagen de placa.
-     * 
-     * Este método realiza las siguientes acciones:
-     * - Extrae el texto (placa) de la imagen usando OCR.
-     * - Guarda la imagen de la detección en el almacenamiento.
-     * - Crea el registro del servicio en la base de datos.
-     * - Si ocurre un error, intenta eliminar la imagen guardada (compensación).
-     * 
-     * @param imageFile         El archivo de imagen que contiene la placa.
-     * @param dealershipId      El ID del concesionario asociado.
-     * @param messengerDocument El documento del mensajero asignado.
-     * @throws Exception Si falla el OCR, el almacenamiento o la creación del
-     *                   servicio.
-     */
     @Transactional(rollbackFor = Exception.class)
-    public void createServiceFromImage(File imageFile, Long dealershipId, Long messengerDocument) throws Exception {
+    public ServiceDelivery createServiceFromImage(File imageFile, Long dealershipId, Long messengerId)
+            throws Exception {
+        logger.info("Iniciando creación de servicio desde imagen. DealershipId: {}, MessengerId: {}", dealershipId,
+                messengerId);
         String extractedText = ocrPort.extractText(imageFile);
+        logger.debug("Texto extraído por OCR: {}", extractedText);
         String timestamp = LocalDateTime.now().format(DATE_FORMAT);
         String fileName = extractedText + "_ASSIGNED_" + timestamp;
 
         String savedPath = storagePort.save(imageFile, "detections", fileName);
 
         try {
-            createService.create(extractedText, savedPath, dealershipId, messengerDocument);
+            ServiceDelivery service = createService.create(extractedText, savedPath, dealershipId, messengerId);
+            logger.info("Servicio creado exitosamente con ID: {}", service.getIdServiceDelivery());
+            return service;
         } catch (Exception e) {
-            try {
-                Files.deleteIfExists(Paths.get(savedPath));
-            } catch (Exception deleteError) {
-                logger.warn("No se pudo eliminar la imagen: {}", deleteError.getMessage());
-            }
+            logger.error("Error creando servicio desde imagen: {}", e.getMessage());
+            cleanupFiles(savedPath);
             throw e;
         }
     }
 
-    /**
-     * Crea un servicio de entrega con una placa ingresada manualmente.
-     * 
-     * Similar a la creación por imagen, pero usa un número de placa proporcionado
-     * explícitamente. Aún así guarda la imagen como evidencia de la asignación.
-     * 
-     * @param imageFile         Imagen de evidencia (opcional o requerida según
-     *                          reglas).
-     * @param manualPlateNumber El número de placa ingresado manualmente.
-     * @param dealershipId      El ID del concesionario.
-     * @param messengerDocument El documento del mensajero.
-     * @throws Exception Si falla el almacenamiento o la creación.
-     */
     @Transactional(rollbackFor = Exception.class)
-    public void createServiceWithManualPlate(File imageFile, String manualPlateNumber, Long dealershipId,
-            Long messengerDocument) throws Exception {
+    public ServiceDelivery createServiceWithManualPlate(File imageFile, String manualPlateNumber, Long dealershipId,
+            Long messengerId) throws Exception {
+        logger.info("Iniciando creación de servicio manual. Placa: {}, DealershipId: {}, MessengerId: {}",
+                manualPlateNumber, dealershipId, messengerId);
         String timestamp = LocalDateTime.now().format(DATE_FORMAT);
         String fileName = manualPlateNumber + "_ASSIGNED_" + timestamp;
 
         String savedPath = storagePort.save(imageFile, "detections", fileName);
 
         try {
-            createService.create(manualPlateNumber, savedPath, dealershipId, messengerDocument);
+            ServiceDelivery service = createService.create(manualPlateNumber, savedPath, dealershipId, messengerId);
+            logger.info("Servicio manual creado exitosamente con ID: {}", service.getIdServiceDelivery());
+            return service;
         } catch (Exception e) {
-            try {
-                Files.deleteIfExists(Paths.get(savedPath));
-            } catch (Exception deleteError) {
-                logger.warn("No se pudo eliminar la imagen: {}", deleteError.getMessage());
-            }
+            logger.error("Error creando servicio manual: {}", e.getMessage());
+            cleanupFiles(savedPath);
             throw e;
         }
     }
 
-    /**
-     * Actualiza el estado de un servicio (versión simple con objetos de dominio).
-     * 
-     * @param serviceId    ID del servicio.
-     * @param newStatus    Nuevo estado.
-     * @param observation  Observaciones (opcional).
-     * @param signature    Objeto Signature (si existe).
-     * @param photos       Lista de objetos Photo (si existen).
-     * @param userDocument Documento del usuario que realiza la acción.
-     * @throws Exception Si falla la actualización.
-     */
-    public void updateStatus(Long serviceId, Status newStatus, String observation,
-            Signature signature, List<Photo> photos, Long userDocument) throws Exception {
-        updateService.updateStatus(serviceId, newStatus, observation, signature, photos, userDocument);
+    public ServiceDelivery updateStatus(Long serviceId, Status newStatus, String observation,
+            Signature signature, List<Photo> photos, Long userId) throws Exception {
+        logger.info("Actualizando estado de servicio ID: {} a {}", serviceId, newStatus);
+        return updateService.updateStatus(serviceId, newStatus, observation, signature, photos, userId);
     }
 
-    /**
-     * Actualiza el estado de un servicio procesando archivos adjuntos (firmas y
-     * fotos).
-     * 
-     * Este método gestiona la carga de archivos al almacenamiento antes de
-     * actualizar el estado.
-     * Si la actualización del estado falla, intenta eliminar los archivos subidos
-     * para mantener consistencia.
-     * 
-     * @param serviceId     ID del servicio.
-     * @param newStatus     Nuevo estado.
-     * @param observation   Observaciones.
-     * @param signatureFile Archivo de imagen de la firma (opcional).
-     * @param photoFiles    Lista de archivos de fotos de evidencia (opcional).
-     * @param userDocument  Documento del usuario.
-     * @throws Exception Si falla la carga de archivos o la actualización del
-     *                   estado.
-     */
-    public void updateStatusWithFiles(Long serviceId, Status newStatus, String observation,
-            File signatureFile, List<File> photoFiles, Long userDocument) throws Exception {
+    public ServiceDelivery updateStatusWithFiles(Long serviceId, Status newStatus, String observation,
+            File signatureFile, List<File> photoFiles, Long userId) throws Exception {
+        logger.info("Actualizando estado con archivos. ServiceID: {}, NuevoEstado: {}", serviceId, newStatus);
 
         ServiceDelivery service = searchService.findById(serviceId);
         if (service == null) {
+            logger.warn("Intento de actualizar servicio inexistente ID: {}", serviceId);
             throw new Exception("Servicio no encontrado con ID: " + serviceId);
         }
         String plateNumber = service.getPlate().getPlateNumber();
-
         String timestamp = LocalDateTime.now().format(DATE_FORMAT);
 
         List<String> savedPaths = new ArrayList<>();
@@ -198,87 +135,44 @@ public class ServiceDeliveryUseCase {
         }
 
         try {
-            updateService.updateStatus(serviceId, newStatus, observation, signature, photos, userDocument);
+            ServiceDelivery updated = updateService.updateStatus(serviceId, newStatus, observation, signature, photos,
+                    userId);
+            logger.info("Estado actualizado exitosamente para servicio ID: {}", serviceId);
+            return updated;
         } catch (Exception e) {
-            for (String path : savedPaths) {
-                try {
-                    Files.deleteIfExists(Paths.get(path));
-                } catch (Exception deleteError) {
-                    logger.warn("No se pudo eliminar archivo: {}", deleteError.getMessage());
-                }
-            }
+            logger.error("Error actualizando estado de servicio ID: {}: {}", serviceId, e.getMessage());
+            cleanupFiles(savedPaths);
             throw e;
         }
     }
 
-    /**
-     * Busca un servicio por su ID.
-     * 
-     * @param id ID del servicio.
-     * @return El servicio encontrado.
-     * @throws Exception Si no se encuentra.
-     */
     public ServiceDelivery findById(Long id) throws Exception {
         return searchService.findById(id);
     }
 
-    /**
-     * Obtiene todos los servicios.
-     * 
-     * @return Lista completa de servicios.
-     */
     public List<ServiceDelivery> findAll() {
         return searchService.findAll();
     }
 
-    /**
-     * Busca servicios asignados a un mensajero.
-     * 
-     * @param messengerId ID o documento del mensajero.
-     * @return Lista de servicios del mensajero.
-     */
-    public List<ServiceDelivery> findByMessenger(Long messengerId) {
-        return searchService.findByMessenger(messengerId);
-    }
-
-    /**
-     * Busca servicios asociados a una placa vehicular.
-     * 
-     * @param plateNumber Número de placa.
-     * @return Lista de servicios asociados.
-     */
     public List<ServiceDelivery> findByPlate(String plateNumber) {
         return searchService.findByPlate(plateNumber);
     }
 
-    /**
-     * Busca servicios de un concesionario específico.
-     * 
-     * @param dealershipId ID del concesionario.
-     * @return Lista de servicios del concesionario.
-     */
-    public List<ServiceDelivery> findByDealership(Long dealershipId) {
-        return searchService.findByDealership(dealershipId);
-    }
-
-    /**
-     * Busca servicios por su estado actual.
-     * 
-     * @param status Estado a consultar (ej. PENDING, DELIVERED).
-     * @return Lista de servicios en ese estado.
-     */
-    public List<ServiceDelivery> findByStatus(Status status) {
-        return searchService.findByStatus(status);
-    }
-
-    /**
-     * Elimina un servicio por su ID.
-     * 
-     * @param id ID del servicio a eliminar.
-     * @throws Exception Si no se puede eliminar (ej. tiene restricciones de
-     *                   negocio).
-     */
     public void deleteById(Long id) throws Exception {
         deleteService.deleteById(id);
+    }
+
+    private void cleanupFiles(String... paths) {
+        for (String path : paths) {
+            try {
+                Files.deleteIfExists(Paths.get(path));
+            } catch (Exception e) {
+                logger.warn("No se pudo eliminar archivo: {}", e.getMessage());
+            }
+        }
+    }
+
+    private void cleanupFiles(List<String> paths) {
+        cleanupFiles(paths.toArray(new String[0]));
     }
 }

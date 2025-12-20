@@ -16,10 +16,34 @@
               value="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [%thread] %cyan(%logger{36}) - %msg%n"/>
 
     <!-- Appender para consola (desarrollo y producción en Cloud Run) -->
+    <!-- Appender para consola (desarrollo) -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>${CONSOLE_LOG_PATTERN}</pattern>
             <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- Appender JSON para Cloud Run (Producción) -->
+    <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+             <!-- Campos personalizados para Cloud Logging -->
+            <fieldNames>
+                <timestamp>timestamp</timestamp>
+                <level>severity</level>
+                <message>message</message>
+                <logger>logger</logger>
+                <thread>thread</thread>
+                <version>[ignore]</version>
+                <levelValue>[ignore]</levelValue>
+            </fieldNames>
+            <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                <maxDepthPerThrowable>30</maxDepthPerThrowable>
+                <maxLength>2048</maxLength>
+                <shortenedClassNameLength>20</shortenedClassNameLength>
+                <rootCauseFirst>true</rootCauseFirst>
+                <inlineHash>true</inlineHash>
+            </throwableConverter>
         </encoder>
     </appender>
 
@@ -180,7 +204,7 @@
     <springProfile name="prod">
         <!-- Nivel INFO para reducir ruido en producción -->
         <logger name="app" level="INFO" additivity="false">
-            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="JSON_CONSOLE"/>
         </logger>
 
         <!-- NO mostrar logs de Hibernate en producción -->
@@ -188,7 +212,7 @@
 
         <!-- Logs a consola (Cloud Run captura stdout/stderr) -->
         <root level="WARN">
-            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="JSON_CONSOLE"/>
         </root>
     </springProfile>
 

@@ -1,7 +1,5 @@
 package app.domain.services;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -10,56 +8,31 @@ import app.domain.model.Employee;
 import app.domain.ports.EmployeePort;
 
 /**
- * Servicio de dominio para crear nuevos empleados/mensajeros.
- * 
- * Gestiona la creación de empleados validando:
- * Unicidad del número de documento
- * Unicidad del nombre de usuario
- * Encriptación automática de contraseñas con BCrypt
+ * Servicio para crear nuevos empleados con encriptación de contraseña.
  */
 @Service
 public class CreateEmployee {
-
-    private static final Logger logger = LoggerFactory.getLogger(CreateEmployee.class);
 
     @Autowired
     private EmployeePort employeePort;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    /**
-     * Crea un nuevo empleado en el sistema.
-     * 
-     * Valida unicidad de documento y username, y encripta la contraseña con BCrypt.
-     * 
-     * @param employee Empleado a crear.
-     * @throws Exception Si el documento o username ya están en uso.
-     */
-    public void create(Employee employee) throws Exception {
-        logger.debug("Creando empleado: {}", employee.getUserName());
+    public Employee create(Employee employee) throws Exception {
         validateDocumentIsUnique(employee.getDocument());
-        validateUserNameIsUnique(employee.getUserName());
 
         if (employee.getPassword() != null) {
             String encoded = passwordEncoder.encode(employee.getPassword());
             employee.setPassword(encoded);
         }
 
-        employeePort.save(employee);
-        logger.info("Empleado creado exitosamente: {} (doc: {})", employee.getUserName(), employee.getDocument());
+        Employee saved = employeePort.save(employee);
+        return saved;
     }
 
     private void validateDocumentIsUnique(Long document) throws Exception {
-        Employee existing = employeePort.findByDocument(document);
-        if (existing != null) {
+        if (employeePort.findByDocument(document) != null) {
             throw new BusinessException("Ya existe un empleado registrado con el documento " + document);
-        }
-    }
-
-    private void validateUserNameIsUnique(String userName) throws Exception {
-        Employee existing = employeePort.findByUserName(userName);
-        if (existing != null) {
-            throw new BusinessException("El nombre de usuario " + userName + " ya está en uso.");
         }
     }
 }

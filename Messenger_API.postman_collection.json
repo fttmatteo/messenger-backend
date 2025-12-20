@@ -2,7 +2,7 @@
     "info": {
         "_postman_id": "messenger-api-collection",
         "name": "Messenger API - Backend",
-        "description": "Complete API documentation for the Messenger/Delivery Management System Backend.\n\n## Authentication\nAll endpoints except `/auth/login` and `/api/files/**` require JWT authentication.\n\nAdd the token to your requests:\n- Header: `Authorization: Bearer {{token}}`\n\n## Roles\n- **ADMIN**: Full access to all endpoints\n- **MESSENGER**: Limited access (own services only)",
+        "description": "Complete API documentation for the Messenger/Delivery Management System Backend.\n\n## Authentication\nAll endpoints except `/auth/login` and `/files/**` require JWT authentication.\n\nAdd the token to your requests:\n- Header: `Authorization: Bearer {{token}}`\n\n## Roles\n- **ADMIN**: Full access to all endpoints\n- **MESSENGER**: Limited access (own services only)",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "variable": [
@@ -24,7 +24,7 @@
     ],
     "item": [
         {
-            "name": "\ud83d\udd10 Authentication",
+            "name": "🔐 Authentication",
             "item": [
                 {
                     "name": "Login",
@@ -70,7 +70,7 @@
                                 "login"
                             ]
                         },
-                        "description": "Authenticate user and receive JWT tokens.\n\n**Response:**\n```json\n{\n    \"token\": \"eyJhbGciOiJIUzI1NiJ9...\",\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiJ9...\",\n    \"role\": \"ADMIN\"\n}\n```\n\n**Token Expiration:**\n- Access Token: 30 min (prod) / 2 hours (dev)\n- Refresh Token: 7 days"
+                        "description": "Authenticate user and receive JWT tokens."
                     },
                     "response": []
                 },
@@ -117,15 +117,14 @@
                                 "auth",
                                 "refresh"
                             ]
-                        },
-                        "description": "Refresh the access token using a valid refresh token.\n\n**Request:**\n```json\n{\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiJ9...\"\n}\n```\n\n**Response:**\n```json\n{\n    \"token\": \"eyJhbGciOiJIUzI1NiJ9...\",\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiJ9...\",\n    \"role\": \"ADMIN\"\n}\n```\n\n**Note:** The refresh token is automatically saved from the login response and used here."
+                        }
                     },
                     "response": []
                 }
             ]
         },
         {
-            "name": "\ud83d\udc65 Employees",
+            "name": "👥 Employees",
             "item": [
                 {
                     "name": "Create Employee",
@@ -149,15 +148,16 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"document\": \"1234567890\",\n    \"fullName\": \"Juan P\u00e9rez\",\n    \"phone\": \"3001234567\",\n    \"userName\": \"jperez\",\n    \"password\": \"password123\",\n    \"role\": \"MESSENGER\"\n}"
+                            "raw": "{\n    \"document\": \"1234567890\",\n    \"fullName\": \"Juan Pérez\",\n    \"phone\": \"3001234567\",\n    \"userName\": \"jperez\",\n    \"password\": \"password123\",\n    \"role\": \"MESSENGER\"\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/employees",
+                            "raw": "{{baseUrl}}/employees/createEmployee",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "employees"
+                                "employees",
+                                "createEmployee"
                             ]
                         },
                         "description": "Create a new employee. **Requires ADMIN role.**"
@@ -179,12 +179,13 @@
                         },
                         "method": "GET",
                         "url": {
-                            "raw": "{{baseUrl}}/employees",
+                            "raw": "{{baseUrl}}/employees/allEmployees",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "employees"
+                                "employees",
+                                "allEmployees"
                             ]
                         },
                         "description": "Retrieve all employees. **Requires ADMIN role.**"
@@ -206,16 +207,16 @@
                         },
                         "method": "GET",
                         "url": {
-                            "raw": "{{baseUrl}}/employees/1",
+                            "raw": "{{baseUrl}}/employees/findByEmployeeId/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "employees",
+                                "findByEmployeeId",
                                 "1"
                             ]
-                        },
-                        "description": "Retrieve a specific employee by ID. **Requires ADMIN role.**"
+                        }
                     },
                     "response": []
                 },
@@ -241,19 +242,19 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"document\": \"1234567890\",\n    \"fullName\": \"Juan P\u00e9rez Updated\",\n    \"phone\": \"3009876543\",\n    \"userName\": \"jperez\",\n    \"password\": \"newpassword123\",\n    \"role\": \"MESSENGER\"\n}"
+                            "raw": "{\n    \"document\": \"1234567890\",\n    \"fullName\": \"Juan Pérez Updated\",\n    \"phone\": \"3009876543\",\n    \"userName\": \"jperez\",\n    \"password\": \"newpassword123\",\n    \"role\": \"MESSENGER\"\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/employees/1",
+                            "raw": "{{baseUrl}}/employees/updateEmployee/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "employees",
+                                "updateEmployee",
                                 "1"
                             ]
-                        },
-                        "description": "Update an existing employee. **Requires ADMIN role.**"
+                        }
                     },
                     "response": []
                 },
@@ -272,23 +273,23 @@
                         },
                         "method": "DELETE",
                         "url": {
-                            "raw": "{{baseUrl}}/employees/1",
+                            "raw": "{{baseUrl}}/employees/deleteEmployee/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "employees",
+                                "deleteEmployee",
                                 "1"
                             ]
-                        },
-                        "description": "Delete an employee. **Requires ADMIN role.**"
+                        }
                     },
                     "response": []
                 }
             ]
         },
         {
-            "name": "\ud83c\udfe2 Dealerships",
+            "name": "🏢 Dealerships",
             "item": [
                 {
                     "name": "Create Dealership",
@@ -312,18 +313,18 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"name\": \"Concesionario Centro\",\n    \"address\": \"Calle 50 #45-20, Medell\u00edn\",\n    \"phone\": \"6041234567\",\n    \"zone\": \"CENTRO\"\n}"
+                            "raw": "{\n    \"name\": \"Concesionario Centro\",\n    \"address\": \"Calle 50 #45-20, Medellín\",\n    \"phone\": \"6041234567\",\n    \"zone\": \"CENTRO\"\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/dealerships",
+                            "raw": "{{baseUrl}}/dealerships/createDealership",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "dealerships"
+                                "dealerships",
+                                "createDealership"
                             ]
-                        },
-                        "description": "Create a new dealership. **Requires ADMIN role.**"
+                        }
                     },
                     "response": []
                 },
@@ -342,15 +343,15 @@
                         },
                         "method": "GET",
                         "url": {
-                            "raw": "{{baseUrl}}/dealerships",
+                            "raw": "{{baseUrl}}/dealerships/allDealerships",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "dealerships"
+                                "dealerships",
+                                "allDealerships"
                             ]
-                        },
-                        "description": "Retrieve all dealerships. **Requires authentication.**"
+                        }
                     },
                     "response": []
                 },
@@ -369,16 +370,16 @@
                         },
                         "method": "GET",
                         "url": {
-                            "raw": "{{baseUrl}}/dealerships/1",
+                            "raw": "{{baseUrl}}/dealerships/findByDealershipId/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "dealerships",
+                                "findByDealershipId",
                                 "1"
                             ]
-                        },
-                        "description": "Retrieve a specific dealership by ID. **Requires authentication.**"
+                        }
                     },
                     "response": []
                 },
@@ -404,24 +405,24 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"name\": \"Concesionario Centro Updated\",\n    \"address\": \"Calle 51 #46-21, Medell\u00edn\",\n    \"phone\": \"6049876543\",\n    \"zone\": \"CENTRO\"\n}"
+                            "raw": "{\n    \"name\": \"Concesionario Centro Updated\",\n    \"address\": \"Calle 51 #46-21, Medellín\",\n    \"phone\": \"6049876543\",\n    \"zone\": \"CENTRO\"\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/dealerships/1",
+                            "raw": "{{baseUrl}}/dealerships/updateDealership/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "dealerships",
+                                "updateDealership",
                                 "1"
                             ]
-                        },
-                        "description": "Update an existing dealership. **Requires ADMIN role.**"
+                        }
                     },
                     "response": []
                 },
                 {
-                    "name": "Geocode Dealership (Get Coords)",
+                    "name": "Geocode Dealership",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -435,17 +436,16 @@
                         },
                         "method": "POST",
                         "url": {
-                            "raw": "{{baseUrl}}/dealerships/1/geocode",
+                            "raw": "{{baseUrl}}/dealerships/geocodeDealership/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "dealerships",
-                                "1",
-                                "geocode"
+                                "geocodeDealership",
+                                "1"
                             ]
-                        },
-                        "description": "Calculates and updates the latitude/longitude of a dealership based on its address address using Google Maps API. **Requires ADMIN role.**"
+                        }
                     },
                     "response": []
                 },
@@ -464,23 +464,23 @@
                         },
                         "method": "DELETE",
                         "url": {
-                            "raw": "{{baseUrl}}/dealerships/1",
+                            "raw": "{{baseUrl}}/dealerships/deleteDealership/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "dealerships",
+                                "deleteDealership",
                                 "1"
                             ]
-                        },
-                        "description": "Delete a dealership. **Requires ADMIN role.**"
+                        }
                     },
                     "response": []
                 }
             ]
         },
         {
-            "name": "\ud83d\udccd Locations",
+            "name": "📍 Locations",
             "item": [
                 {
                     "name": "Geocode Address",
@@ -504,7 +504,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"address\": \"Parque Berrio, Medell\u00edn\"\n}"
+                            "raw": "{\n    \"address\": \"Parque Berrio, Medellín\"\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/locations/geocode",
@@ -515,13 +515,12 @@
                                 "locations",
                                 "geocode"
                             ]
-                        },
-                        "description": "Convert an address string to coordinates (latitude/longitude)."
+                        }
                     },
                     "response": []
                 },
                 {
-                    "name": "Calculate Optimal Route",
+                    "name": "Calculate Route",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -553,8 +552,7 @@
                                 "locations",
                                 "route"
                             ]
-                        },
-                        "description": "Calculate the optimal route visiting multiple dealerships starting from an origin point."
+                        }
                     },
                     "response": []
                 },
@@ -599,8 +597,7 @@
                                     "value": "-75.5646"
                                 }
                             ]
-                        },
-                        "description": "Calculate driving distance and estimated duration between two coordinates."
+                        }
                     },
                     "response": []
                 },
@@ -637,15 +634,14 @@
                                     "value": "-75.56359"
                                 }
                             ]
-                        },
-                        "description": "Convert coordinates (latitude/longitude) to a human-readable address."
+                        }
                     },
                     "response": []
                 }
             ]
         },
         {
-            "name": "\ud83d\udce1 Tracking",
+            "name": "📡 Tracking",
             "item": [
                 {
                     "name": "Update Live Location",
@@ -672,17 +668,15 @@
                             "raw": "{\n    \"messengerId\": 1,\n    \"latitude\": 6.217,\n    \"longitude\": -75.567,\n    \"accuracy\": 10.5,\n    \"speed\": 35.0,\n    \"heading\": 90.0,\n    \"status\": \"ONLINE\",\n    \"deviceId\": \"android-device-123\"\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/api/tracking/update",
+                            "raw": "{{baseUrl}}/tracking/update",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "tracking",
                                 "update"
                             ]
-                        },
-                        "description": "Update the real-time location of a messenger. **Requires MESSENGER or ADMIN role.**"
+                        }
                     },
                     "response": []
                 },
@@ -701,18 +695,16 @@
                         },
                         "method": "GET",
                         "url": {
-                            "raw": "{{baseUrl}}/api/tracking/messenger/1",
+                            "raw": "{{baseUrl}}/tracking/messenger/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "tracking",
                                 "messenger",
                                 "1"
                             ]
-                        },
-                        "description": "Get the last known location of a specific messenger. **Requires ADMIN role.**"
+                        }
                     },
                     "response": []
                 },
@@ -731,17 +723,15 @@
                         },
                         "method": "GET",
                         "url": {
-                            "raw": "{{baseUrl}}/api/tracking/active",
+                            "raw": "{{baseUrl}}/tracking/active",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "tracking",
                                 "active"
                             ]
-                        },
-                        "description": "Get all messengers currently online/active with their last location. **Requires ADMIN role.**"
+                        }
                     },
                     "response": []
                 },
@@ -760,12 +750,11 @@
                         },
                         "method": "GET",
                         "url": {
-                            "raw": "{{baseUrl}}/api/tracking/history/1?date=2025-12-14",
+                            "raw": "{{baseUrl}}/tracking/history/1?date=2025-12-14",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "tracking",
                                 "history",
                                 "1"
@@ -776,8 +765,7 @@
                                     "value": "2025-12-14"
                                 }
                             ]
-                        },
-                        "description": "Get location history for a messenger on a specific date."
+                        }
                     },
                     "response": []
                 },
@@ -796,25 +784,23 @@
                         },
                         "method": "GET",
                         "url": {
-                            "raw": "{{baseUrl}}/api/tracking/service/1",
+                            "raw": "{{baseUrl}}/tracking/service/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "tracking",
                                 "service",
                                 "1"
                             ]
-                        },
-                        "description": "Get location history associated with a specific service delivery."
+                        }
                     },
                     "response": []
                 }
             ]
         },
         {
-            "name": "\ud83d\udce6 Service Deliveries",
+            "name": "📦 Service Deliveries",
             "item": [
                 {
                     "name": "Create Service (with OCR)",
@@ -849,21 +835,20 @@
                                     "key": "messengerDocument",
                                     "value": "1234567890",
                                     "type": "text",
-                                    "description": "Messenger document (required for ADMIN, auto-assigned for MESSENGER)"
+                                    "description": "Messenger document"
                                 }
                             ]
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/services/create",
+                            "raw": "{{baseUrl}}/services/createService",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "services",
-                                "create"
+                                "createService"
                             ]
-                        },
-                        "description": "Create a new service delivery using OCR to detect the plate number from image.\n\n**Plate Types Detected:**\n- CAR: `ABC 123`\n- MOTORCYCLE: `ABC 12A`\n- MOTORCAR: `123 ABC`"
+                        }
                     },
                     "response": []
                 },
@@ -911,16 +896,15 @@
                             ]
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/services/create",
+                            "raw": "{{baseUrl}}/services/createService",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "services",
-                                "create"
+                                "createService"
                             ]
-                        },
-                        "description": "Create a new service delivery with manual plate number input (bypasses OCR)."
+                        }
                     },
                     "response": []
                 },
@@ -957,27 +941,26 @@
                                 {
                                     "key": "signature",
                                     "type": "file",
-                                    "description": "Signature image (required for most statuses)"
+                                    "description": "Signature image"
                                 },
                                 {
                                     "key": "photos",
                                     "type": "file",
-                                    "description": "Evidence photos (can add multiple)"
+                                    "description": "Evidence photos"
                                 }
                             ]
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/services/1/status",
+                            "raw": "{{baseUrl}}/services/updateService/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "services",
-                                "1",
-                                "status"
+                                "updateService",
+                                "1"
                             ]
-                        },
-                        "description": "Update the status of a service delivery.\n\n**Evidence Requirements:**\n- `DELIVERED`: Signature required\n- `PENDING`, `FAILED`, `RETURNED`: Signature, photos, observation required\n- `CANCELED`, `OBSERVED`: Admin only, no evidence required"
+                        }
                     },
                     "response": []
                 },
@@ -996,15 +979,15 @@
                         },
                         "method": "GET",
                         "url": {
-                            "raw": "{{baseUrl}}/services",
+                            "raw": "{{baseUrl}}/services/allServices",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "services"
+                                "services",
+                                "allServices"
                             ]
-                        },
-                        "description": "Retrieve all services.\n\n- **ADMIN**: Gets all services\n- **MESSENGER**: Gets only their assigned services"
+                        }
                     },
                     "response": []
                 },
@@ -1023,21 +1006,21 @@
                         },
                         "method": "GET",
                         "url": {
-                            "raw": "{{baseUrl}}/services/1",
+                            "raw": "{{baseUrl}}/services/findByServiceId/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "services",
+                                "findByServiceId",
                                 "1"
                             ]
-                        },
-                        "description": "Retrieve a specific service by ID."
+                        }
                     },
                     "response": []
                 },
                 {
-                    "name": "Get Services by Messenger",
+                    "name": "Delete Service",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -1049,101 +1032,41 @@
                                 }
                             ]
                         },
-                        "method": "GET",
+                        "method": "DELETE",
                         "url": {
-                            "raw": "{{baseUrl}}/services/messenger/1234567890",
+                            "raw": "{{baseUrl}}/services/deleteService/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "services",
-                                "messenger",
-                                "1234567890"
-                            ]
-                        },
-                        "description": "Retrieve all services for a specific messenger (by document number)."
-                    },
-                    "response": []
-                },
-                {
-                    "name": "Get Services by Dealership",
-                    "request": {
-                        "auth": {
-                            "type": "bearer",
-                            "bearer": [
-                                {
-                                    "key": "token",
-                                    "value": "{{token}}",
-                                    "type": "string"
-                                }
-                            ]
-                        },
-                        "method": "GET",
-                        "url": {
-                            "raw": "{{baseUrl}}/services/dealership/1",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "services",
-                                "dealership",
+                                "deleteService",
                                 "1"
                             ]
-                        },
-                        "description": "Retrieve all services for a specific dealership."
-                    },
-                    "response": []
-                },
-                {
-                    "name": "Get Services by Status",
-                    "request": {
-                        "auth": {
-                            "type": "bearer",
-                            "bearer": [
-                                {
-                                    "key": "token",
-                                    "value": "{{token}}",
-                                    "type": "string"
-                                }
-                            ]
-                        },
-                        "method": "GET",
-                        "url": {
-                            "raw": "{{baseUrl}}/services/status/PENDING",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "services",
-                                "status",
-                                "PENDING"
-                            ]
-                        },
-                        "description": "Retrieve all services with a specific status.\n\n**Valid statuses:** `ASSIGNED`, `PENDING`, `DELIVERED`, `FAILED`, `RETURNED`, `CANCELED`, `OBSERVED`, `RESOLVED`"
+                        }
                     },
                     "response": []
                 }
             ]
         },
         {
-            "name": "\ud83d\udcc1 Files",
+            "name": "📁 Files",
             "item": [
                 {
                     "name": "Get File",
                     "request": {
                         "method": "GET",
                         "url": {
-                            "raw": "{{baseUrl}}/api/files/example.jpg",
+                            "raw": "{{baseUrl}}/files/example.jpg",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "api",
                                 "files",
                                 "example.jpg"
                             ]
                         },
-                        "description": "Retrieve a file by filename. Searches in `/detections`, `/signatures`, and `/evidence` directories.\n\n**No authentication required.**"
+                        "description": "Retrieve a file by filename."
                     },
                     "response": []
                 }

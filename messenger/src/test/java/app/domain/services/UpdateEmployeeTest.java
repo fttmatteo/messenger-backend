@@ -2,6 +2,7 @@ package app.domain.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,7 +39,6 @@ class UpdateEmployeeTest {
         existingEmployee = new Employee();
         existingEmployee.setIdEmployee(1L);
         existingEmployee.setDocument(123L);
-        existingEmployee.setUserName("user1");
         existingEmployee.setPassword("oldPass");
         existingEmployee.setFullName("Juan");
         existingEmployee.setPhone("111");
@@ -50,7 +50,6 @@ class UpdateEmployeeTest {
     void shouldUpdateFieldsAndPassword() throws Exception {
         Employee income = new Employee();
         income.setDocument(999L); // Changes
-        income.setUserName("newUser"); // Changes
         income.setFullName("Pedro");
         income.setPhone("222");
         income.setRole(Role.ADMIN);
@@ -58,13 +57,12 @@ class UpdateEmployeeTest {
 
         when(employeePort.findById(1L)).thenReturn(existingEmployee);
         when(employeePort.findByDocument(999L)).thenReturn(null);
-        when(employeePort.findByUserName("newUser")).thenReturn(null);
         when(passwordEncoder.encode("newPass")).thenReturn("encodedNewPass");
+        when(employeePort.save(any())).thenReturn(existingEmployee);
 
         updateEmployee.update(1L, income);
 
         verify(employeePort).save(argThat(e -> e.getDocument().equals(999L) &&
-                e.getUserName().equals("newUser") &&
                 e.getPassword().equals("encodedNewPass") &&
                 e.getFullName().equals("Pedro")));
     }
@@ -75,26 +73,14 @@ class UpdateEmployeeTest {
         Employee income = new Employee();
         income.setDocument(999L);
 
+        Employee otherEmployee = new Employee();
+        otherEmployee.setDocument(999L);
+
         when(employeePort.findById(1L)).thenReturn(existingEmployee);
-        when(employeePort.findByDocument(999L)).thenReturn(new Employee());
+        when(employeePort.findByDocument(999L)).thenReturn(otherEmployee);
 
         BusinessException ex = assertThrows(BusinessException.class, () -> updateEmployee.update(1L, income));
 
         assertEquals("El documento 999 ya está registrado por otro empleado.", ex.getMessage());
-    }
-
-    @Test
-    @DisplayName("Debe lanzar excepción si UserName ya existe")
-    void shouldThrowExceptionIfUserNameExists() {
-        Employee income = new Employee();
-        income.setDocument(123L); // Same doc
-        income.setUserName("takenUser");
-
-        when(employeePort.findById(1L)).thenReturn(existingEmployee);
-        when(employeePort.findByUserName("takenUser")).thenReturn(new Employee());
-
-        BusinessException ex = assertThrows(BusinessException.class, () -> updateEmployee.update(1L, income));
-
-        assertEquals("El nombre de usuario takenUser ya está en uso.", ex.getMessage());
     }
 }

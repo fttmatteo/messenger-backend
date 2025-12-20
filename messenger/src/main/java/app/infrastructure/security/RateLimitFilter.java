@@ -5,52 +5,23 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Filtro de Rate Limiting para proteger la API contra abusos.
- * 
- * Implementa el algoritmo Token Bucket para limitar el número de peticiones
- * por IP en un intervalo de tiempo determinado.
- * 
- * Límites configurados:
- * - Endpoints de autenticación (/auth/**): 10 requests por minuto (protección
- * brute force)
- * - API general: 100 requests por minuto por IP
- * 
- * Cuando se excede el límite:
- * - Responde con HTTP 429 Too Many Requests
- * - Incluye header Retry-After indicando segundos hasta próximo request
- * permitido
- * 
- * Seguridad:
- * - Usa buckets separados para auth y API general
- * - Cache en memoria (ConcurrentHashMap) para alto rendimiento
- * - Limpieza automática de IPs inactivas (implementar con TTL)
- * 
- * @see io.github.bucket4j.Bucket
+ * Filtro de rate limiting basado en IP usando Bucket4j.
  */
 @Component
 public class RateLimitFilter extends OncePerRequestFilter {
 
-    private static final Logger logger = LoggerFactory.getLogger(RateLimitFilter.class);
-
-    // Cache de buckets por IP para rate limiting general
     private final Map<String, Bucket> bucketCache = new ConcurrentHashMap<>();
-
-    // Cache de buckets por IP para rate limiting de autenticación (más estricto)
     private final Map<String, Bucket> authBucketCache = new ConcurrentHashMap<>();
 
-    // Límites de rate limiting
     private static final int GENERAL_REQUESTS_PER_MINUTE = 100;
     private static final int AUTH_REQUESTS_PER_MINUTE = 10;
 
@@ -62,31 +33,19 @@ public class RateLimitFilter extends OncePerRequestFilter {
         String clientIp = getClientIP(request);
         String requestUri = request.getRequestURI();
 
-        // Determinar qué bucket usar basado en el endpoint
         Bucket bucket;
-        String limitType;
 
         if (requestUri.startsWith("/auth/")) {
-            // Rate limiting estricto para endpoints de autenticación
             bucket = authBucketCache.computeIfAbsent(clientIp, this::createAuthBucket);
-            limitType = "AUTH";
         } else {
-            // Rate limiting general para el resto de la API
             bucket = bucketCache.computeIfAbsent(clientIp, this::createGeneralBucket);
-            limitType = "GENERAL";
         }
-
-        // Intentar consumir un token
         if (bucket.tryConsume(1)) {
-            // Request permitido
             filterChain.doFilter(request, response);
         } else {
-            // Rate limit excedido
-            logger.warn("RATE LIMIT: {} excedido para IP {} en {}", limitType, clientIp, requestUri);
-
             response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             response.setContentType("application/json");
-            response.setHeader("Retry-After", "60"); // Reintentar en 60 segundos
+            response.setHeader("Retry-After", "60");
 
             String errorJson = """
                     {
@@ -101,10 +60,6 @@ public class RateLimitFilter extends OncePerRequestFilter {
         }
     }
 
-    /**
-     * Crea un bucket para rate limiting de autenticación.
-     * Límite: 10 requests por minuto (protección contra brute force).
-     */
     private Bucket createAuthBucket(String ip) {
         return Bucket.builder()
                 .addLimit(limit -> limit.capacity(AUTH_REQUESTS_PER_MINUTE)
@@ -112,10 +67,6 @@ public class RateLimitFilter extends OncePerRequestFilter {
                 .build();
     }
 
-    /**
-     * Crea un bucket para rate limiting general de la API.
-     * Límite: 100 requests por minuto.
-     */
     private Bucket createGeneralBucket(String ip) {
         return Bucket.builder()
                 .addLimit(limit -> limit.capacity(GENERAL_REQUESTS_PER_MINUTE)
@@ -123,23 +74,14 @@ public class RateLimitFilter extends OncePerRequestFilter {
                 .build();
     }
 
-    /**
-     * Obtiene la IP real del cliente.
-     * Considera headers de proxy (X-Forwarded-For) para obtener la IP original.
-     */
     private String getClientIP(HttpServletRequest request) {
         String xfHeader = request.getHeader("X-Forwarded-For");
         if (xfHeader != null && !xfHeader.isEmpty()) {
-            // X-Forwarded-For puede contener múltiples IPs, la primera es la del cliente
             return xfHeader.split(",")[0].trim();
         }
         return request.getRemoteAddr();
     }
 
-    /**
-     * Excluir endpoints que no requieren rate limiting.
-     * Por ejemplo: health checks, swagger, etc.
-     */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();

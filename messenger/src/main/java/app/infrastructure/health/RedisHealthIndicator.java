@@ -8,14 +8,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * Indicador de salud personalizado para Redis.
- * 
- * Verifica la conectividad con el servidor Redis y reporta el estado
- * al endpoint /actuator/health.
- * 
- * Estados:
- * - UP: Conexión exitosa con Redis
- * - DOWN: No se puede conectar a Redis
+ * Indicador de salud para verificar conectividad con Redis.
  */
 @Component
 public class RedisHealthIndicator implements HealthIndicator {

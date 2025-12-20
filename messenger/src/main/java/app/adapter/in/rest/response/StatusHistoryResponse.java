@@ -1,34 +1,11 @@
 package app.adapter.in.rest.response;
 
 import app.domain.model.enums.Status;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * DTO (Data Transfer Object) de respuesta para registros del historial de
- * estados de un servicio.
- * 
- * Este objeto representa un cambio de estado en el ciclo de vida de un servicio
- * de entrega,
- * proporcionando trazabilidad completa de quién realizó el cambio, cuándo
- * ocurrió,
- * y qué evidencias fotográficas se asociaron al cambio.
- * 
- * Campos incluidos:
- * - idStatusHistory: Identificador único del registro histórico
- * - previousStatus: Estado anterior del servicio
- * - newStatus: Nuevo estado asignado
- * - changeDate: Fecha y hora del cambio de estado
- * - changedBy: Empleado que realizó el cambio (para auditoría)
- * - photos: Lista de fotografías asociadas a este cambio de estado
- * 
- * Este registro permite auditar completamente el flujo de un servicio de
- * entrega.
- * 
- * @see app.adapter.in.rest.controllers.ServiceDeliveryController
- * @see app.domain.model.StatusHistory
- * @see app.domain.model.enums.Status
+ * DTO de respuesta con historial de cambio de estado.
  */
 public class StatusHistoryResponse {
     private Long idStatusHistory;

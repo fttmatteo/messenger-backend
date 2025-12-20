@@ -40,7 +40,6 @@ class SearchEmployeeTest {
         sampleEmployee.setIdEmployee(1L);
         sampleEmployee.setDocument(123456789L);
         sampleEmployee.setFullName("Juan Pérez");
-        sampleEmployee.setUserName("jperez");
         sampleEmployee.setRole(Role.MESSENGER);
     }
 
@@ -74,33 +73,6 @@ class SearchEmployeeTest {
     }
 
     @Nested
-    @DisplayName("Buscar por Documento")
-    class FindByDocumentTests {
-
-        @Test
-        @DisplayName("Debe retornar empleado para documento existente")
-        void shouldReturnEmployeeForExistingDocument() throws Exception {
-            when(employeePort.findByDocument(123456789L)).thenReturn(sampleEmployee);
-
-            Employee result = searchEmployee.findByDocument(123456789L);
-
-            assertNotNull(result);
-            assertEquals("Juan Pérez", result.getFullName());
-        }
-
-        @Test
-        @DisplayName("Debe lanzar excepción para documento no existente")
-        void shouldThrowExceptionForNonExistingDocument() {
-            when(employeePort.findByDocument(999L)).thenReturn(null);
-
-            Exception exception = assertThrows(Exception.class,
-                    () -> searchEmployee.findByDocument(999L));
-
-            assertTrue(exception.getMessage().contains("no existe"));
-        }
-    }
-
-    @Nested
     @DisplayName("Buscar por ID")
     class FindByIdTests {
 
@@ -128,27 +100,27 @@ class SearchEmployeeTest {
     }
 
     @Nested
-    @DisplayName("Buscar por Username")
-    class FindByUserNameTests {
+    @DisplayName("Buscar por Documento")
+    class FindByDocumentTests {
 
         @Test
-        @DisplayName("Debe retornar empleado para username existente")
-        void shouldReturnEmployeeForExistingUsername() {
-            when(employeePort.findByUserName("jperez")).thenReturn(sampleEmployee);
+        @DisplayName("Debe retornar empleado para documento existente")
+        void shouldReturnEmployeeForExistingDocument() throws Exception {
+            when(employeePort.findByDocument(123456789L)).thenReturn(sampleEmployee);
 
-            Employee result = searchEmployee.findByUserName("jperez");
+            Employee result = searchEmployee.findByDocument(123456789L);
 
             assertNotNull(result);
-            assertEquals("jperez", result.getUserName());
+            assertEquals(123456789L, result.getDocument());
         }
 
         @Test
-        @DisplayName("Debe lanzar excepción para username no existente")
-        void shouldThrowExceptionForNonExistingUsername() {
-            when(employeePort.findByUserName("unknown")).thenReturn(null);
+        @DisplayName("Debe lanzar excepción para documento no existente")
+        void shouldThrowExceptionForNonExistingDocument() {
+            when(employeePort.findByDocument(999999999L)).thenReturn(null);
 
             RuntimeException exception = assertThrows(RuntimeException.class,
-                    () -> searchEmployee.findByUserName("unknown"));
+                    () -> searchEmployee.findByDocument(999999999L));
 
             assertTrue(exception.getMessage().contains("no existe"));
         }

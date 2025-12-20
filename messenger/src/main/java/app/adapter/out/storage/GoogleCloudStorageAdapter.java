@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -25,10 +24,7 @@ import java.nio.file.Files;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Adaptador de salida para almacenamiento de archivos en Google Cloud Storage.
- *
- * Implementa firma remota vía IAM cuando se ejecuta en Cloud Run (sin clave
- * privada).
+ * Adapter de Google Cloud Storage para almacenamiento de archivos.
  */
 @Component
 @ConditionalOnProperty(name = "app.storage.type", havingValue = "gcs")
@@ -49,19 +45,12 @@ public class GoogleCloudStorageAdapter implements StoragePort {
 
         this.bucketName = bucketName;
         this.defaultUrlExpirationHours = urlExpirationHours;
-
-        // Usa Application Default Credentials (ADC)
         this.credentials = GoogleCredentials.getApplicationDefault();
-
-        // Inicializar cliente de Storage
         this.storage = StorageOptions.newBuilder()
                 .setProjectId(projectId)
                 .setCredentials(credentials)
                 .build()
                 .getService();
-
-        logger.info("GoogleCloudStorageAdapter inicializado - Bucket: {}, URL expiration: {}h", bucketName,
-                urlExpirationHours);
     }
 
     @Override
@@ -75,8 +64,7 @@ public class GoogleCloudStorageAdapter implements StoragePort {
 
     private String uploadToGCS(File file, String subDirectory, String fileName) throws IOException {
         String objectName = subDirectory + "/" + fileName;
-
-        logger.debug("Subiendo archivo a GCS: {}", objectName);
+        logger.info("Subiendo archivo a GCS. Bucket: {}, Objeto: {}", bucketName, objectName);
 
         String contentType = Files.probeContentType(file.toPath());
         if (contentType == null) {
@@ -90,8 +78,7 @@ public class GoogleCloudStorageAdapter implements StoragePort {
 
         byte[] fileBytes = Files.readAllBytes(file.toPath());
         storage.create(blobInfo, fileBytes);
-
-        logger.info("Archivo subido exitosamente a GCS: {} ({})", objectName, contentType);
+        logger.debug("Archivo subido exitosamente. Tamaño: {} bytes", fileBytes.length);
 
         return objectName;
     }
@@ -101,29 +88,18 @@ public class GoogleCloudStorageAdapter implements StoragePort {
     }
 
     private String regenerateSignedUrl(String objectName, int expirationHours, GoogleCredentials creds) {
-        logger.debug("Generando URL firmada para: {} (expira en {}h)", objectName, expirationHours);
-
         BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName).build();
 
         Storage.SignUrlOption signUrlOption;
 
-        // Lógica de detección: ¿Tenemos clave privada local?
-        // ServiceAccountCredentials tiene clave privada (environment="local" con json
-        // key)
         if (creds instanceof ServiceAccountCredentials) {
             signUrlOption = Storage.SignUrlOption.signWith((ServiceAccountSigner) creds);
         } else {
-            // ComputeEngineCredentials (Cloud Run, GKE, GCE) SOLO tiene token, no clave
-            // privada.
-            // Usamos la API de IAM Credentials para firmar remotamente con la identidad del
-            // servicio.
             String serviceAccountEmail = getServiceAccountEmail(creds);
 
             if (serviceAccountEmail != null) {
                 signUrlOption = Storage.SignUrlOption.signWith(new CloudRunServiceAccountSigner(serviceAccountEmail));
             } else {
-                logger.warn(
-                        "No se pudo determinar el email de la cuenta de servicio. Intentando firma por defecto (podría fallar en Cloud Run).");
                 signUrlOption = Storage.SignUrlOption.withV4Signature();
             }
         }
@@ -139,54 +115,36 @@ public class GoogleCloudStorageAdapter implements StoragePort {
     }
 
     private String getServiceAccountEmail(GoogleCredentials creds) {
-        logger.info("Iniciando detección de email de cuenta de servicio...");
-
-        // 1. Intentar variable de entorno explícita (Escape hatch)
         String envEmail = System.getenv("GOOGLE_SERVICE_ACCOUNT_EMAIL");
         if (envEmail != null && !envEmail.isBlank()) {
-            logger.info("Detectado email vía Variable de Entorno: {}", envEmail);
             return envEmail;
-        } else {
-            logger.debug("Variable GOOGLE_SERVICE_ACCOUNT_EMAIL no está definida o está vacía.");
         }
 
-        // 2. Intentar obtener de credenciales
         if (creds instanceof com.google.auth.oauth2.ComputeEngineCredentials) {
             String email = ((com.google.auth.oauth2.ComputeEngineCredentials) creds).getAccount();
             if (email != null && !email.isBlank()) {
-                logger.info("Detectado email vía Credenciales (ComputeEngineCredentials): {}", email);
                 return email;
             }
         }
-        logger.debug("No se pudo obtener email de las credenciales actuales. Tipo: {}", creds.getClass().getName());
 
-        // 3. Metadata Server (Fuente de verdad en Cloud Run/GCE)
         try {
-            logger.debug("Intentando consultar Metadata Server...");
             String metadataEmail = fetchEmailFromMetadataServer();
             if (metadataEmail != null && !metadataEmail.isBlank()) {
-                logger.info("Detectado email vía Metadata Server: {}", metadataEmail);
                 return metadataEmail;
             }
         } catch (Exception e) {
-            logger.warn("No se pudo obtener email del Metadata Server: {}", e.getMessage());
+            return null;
         }
 
-        logger.error("FALLO TOTAL: No se pudo determinar el email de la cuenta de servicio por ningún método.");
         return null;
     }
 
     private String fetchEmailFromMetadataServer() throws IOException {
-        // This method attempts to fetch the service account email from the Google Cloud
-        // Metadata Server.
-        // This is typically available in environments like Cloud Run, GCE, GKE.
-        // It's a placeholder implementation; a robust solution might use a dedicated
-        // library or more error handling.
         String metadataUrl = "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/email";
         URL url = java.net.URI.create(metadataUrl).toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
-        connection.setRequestProperty("Metadata-Flavor", "Google"); // Required for metadata server requests
+        connection.setRequestProperty("Metadata-Flavor", "Google");
         connection.setConnectTimeout(2000); // 2 seconds
         connection.setReadTimeout(2000); // 2 seconds
 
@@ -201,19 +159,16 @@ public class GoogleCloudStorageAdapter implements StoragePort {
                 return content.toString().trim();
             }
         } else {
-            logger.debug("Metadata server responded with status code: {}", responseCode);
-            // Read error stream for more details if needed
             try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getErrorStream()))) {
                 String inputLine;
                 StringBuilder errorContent = new StringBuilder();
                 while ((inputLine = in.readLine()) != null) {
                     errorContent.append(inputLine);
                 }
-                logger.debug("Metadata server error response: {}", errorContent.toString());
             } catch (Exception e) {
-                logger.debug("Could not read error stream from metadata server: {}", e.getMessage());
+                throw new IOException("Failed to fetch email from metadata server. HTTP error code: " + responseCode);
             }
-            throw new IOException("Failed to fetch email from metadata server. HTTP error code: " + responseCode);
+            return null;
         }
     }
 
@@ -228,13 +183,13 @@ public class GoogleCloudStorageAdapter implements StoragePort {
     }
 
     public boolean delete(String objectName) {
-        logger.debug("Eliminando archivo de GCS: {}", objectName);
+        logger.info("Eliminando objeto de GCS: {}", objectName);
         BlobId blobId = BlobId.of(bucketName, objectName);
         boolean deleted = storage.delete(blobId);
         if (deleted) {
-            logger.info("Archivo eliminado de GCS: {}", objectName);
+            logger.info("Objeto eliminado exitosamente");
         } else {
-            logger.warn("No se pudo eliminar el archivo de GCS (no existe): {}", objectName);
+            logger.warn("No se pudo eliminar el objeto (posiblemente no existe)");
         }
         return deleted;
     }
@@ -264,10 +219,6 @@ public class GoogleCloudStorageAdapter implements StoragePort {
         return "";
     }
 
-    /**
-     * Signer personalizado que usa IAM Credentials API.
-     * Necesario para Cloud Run donde no hay clave privada local.
-     */
     private static class CloudRunServiceAccountSigner implements ServiceAccountSigner {
         private final String serviceAccountEmail;
 
@@ -291,8 +242,6 @@ public class GoogleCloudStorageAdapter implements StoragePort {
                 SignBlobResponse response = client.signBlob(request);
                 return response.getSignedBlob().toByteArray();
             } catch (IOException e) {
-                // Envolvemos en RuntimeException porque la interfaz no permite checked
-                // exceptions
                 throw new RuntimeException("Error firmando blob vía IAM API para " + serviceAccountEmail, e);
             }
         }

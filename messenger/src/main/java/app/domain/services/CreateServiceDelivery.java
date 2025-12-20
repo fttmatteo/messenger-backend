@@ -1,8 +1,6 @@
 package app.domain.services;
 
 import java.time.LocalDateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import app.application.exceptions.BusinessException;
@@ -19,24 +17,10 @@ import app.domain.ports.PlatePort;
 import app.domain.ports.ServiceDeliveryPort;
 
 /**
- * Servicio de dominio para crear nuevos servicios de entrega.
- * 
- * Orquesta el proceso completo de creación de un servicio de entrega:
- * 
- * Validación de existencia del mensajero asignado
- * Validación de existencia del concesionario destino
- * Normalización y registro de la placa vehicular
- * Determinación automática del tipo de placa (carro, moto, motocarro)
- * Asociación de foto de detección si está disponible
- * Inicialización del servicio en estado ASSIGNED
- * Creación del primer registro en el historial de estados
- * 
- * Si la placa no existe previamente, se crea automáticamente en el sistema.
+ * Servicio para crear nuevos servicios de entrega con reconocimiento de placa.
  */
 @Service
 public class CreateServiceDelivery {
-
-    private static final Logger logger = LoggerFactory.getLogger(CreateServiceDelivery.class);
 
     @Autowired
     private ServiceDeliveryPort serviceDeliveryPort;
@@ -49,27 +33,10 @@ public class CreateServiceDelivery {
     @Autowired
     private PlateRecognition plateRecognition;
 
-    /**
-     * Crea un nuevo servicio de entrega.
-     * 
-     * Valida mensajero y concesionario, determina tipo de placa, crea la placa si
-     * no existe,
-     * e inicializa el servicio en estado ASSIGNED con su primer registro de
-     * historial.
-     * 
-     * @param plateNumber       Número de placa vehicular.
-     * @param photoPath         Ruta de la foto de detección de placa (opcional).
-     * @param dealershipId      ID del concesionario destino.
-     * @param messengerDocument Documento del mensajero asignado.
-     * @throws Exception Si el mensajero o concesionario no existen, o si el formato
-     *                   de placa es inválido.
-     */
-    public void create(String plateNumber, String photoPath, Long dealershipId, Long messengerDocument)
+    public ServiceDelivery create(String plateNumber, String photoPath, Long dealershipId, Long messengerId)
             throws Exception {
-        logger.info("Creando servicio de entrega: placa={}, concesionario={}, mensajero={}",
-                plateNumber, dealershipId, messengerDocument);
 
-        Employee messenger = employeePort.findByDocument(messengerDocument);
+        Employee messenger = employeePort.findById(messengerId);
         if (messenger == null) {
             throw new BusinessException("El mensajero no existe.");
         }
@@ -88,7 +55,6 @@ public class CreateServiceDelivery {
             plate.setPlateType(plateRecognition.determinePlateType(normalizedPlate));
             plate.setUploadDate(LocalDateTime.now());
             platePort.save(plate);
-            logger.debug("Nueva placa registrada: {} ({})", normalizedPlate, plate.getPlateType());
         }
 
         ServiceDelivery service = new ServiceDelivery();
@@ -114,8 +80,7 @@ public class CreateServiceDelivery {
 
         service.addHistory(history);
 
-        serviceDeliveryPort.save(service);
-        logger.info("Servicio creado exitosamente: placa={}, concesionario={}, mensajero={}",
-                normalizedPlate, dealership.getName(), messenger.getFullName());
+        ServiceDelivery saved = serviceDeliveryPort.save(service);
+        return saved;
     }
 }

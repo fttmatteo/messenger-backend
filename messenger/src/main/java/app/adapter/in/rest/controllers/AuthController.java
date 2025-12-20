@@ -1,8 +1,6 @@
 package app.adapter.in.rest.controllers;
 
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,11 +11,11 @@ import app.application.usecase.LoginUseCase;
 import app.application.usecase.RefreshTokenUseCase;
 import app.domain.model.auth.AuthCredentials;
 import app.domain.model.auth.TokenResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Controlador REST para el manejo de la autenticación de usuarios.
- * Proporciona endpoints para iniciar sesión, obtener tokens JWT y renovar
- * sesiones mediante refresh tokens.
+ * Controlador REST para autenticación y gestión de tokens.
  */
 @RestController
 @RequestMapping("/auth")
@@ -27,40 +25,20 @@ public class AuthController {
 
     @Autowired
     private RefreshTokenUseCase refreshTokenUseCase;
-
     @Autowired
     private LoginUseCase loginUseCase;
 
-    /**
-     * Inicia sesión con las credenciales proporcionadas.
-     *
-     * @param credentials Objeto que contiene el nombre de usuario y contraseña.
-     * @return ResponseEntity con la respuesta del token (TokenResponse) si es
-     *         exitoso.
-     * @throws Exception Si las credenciales son inválidas o hay un error de
-     *                   autenticación.
-     */
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(@Valid @RequestBody AuthCredentials credentials) throws Exception {
-        logger.info("Intento de login para usuario: {}", credentials.getUserName());
+        logger.info("Solicitud de login recibida para documento: {}", credentials.getDocument());
         TokenResponse response = loginUseCase.login(credentials);
-        logger.info("Login exitoso para usuario: {} con rol: {}", credentials.getUserName(), response.getRole());
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Refresca el token de acceso utilizando un refresh token válido.
-     * 
-     * @param request Objeto que contiene el refresh token.
-     * @return ResponseEntity con los nuevos tokens.
-     * @throws Exception Si el refresh token es inválido o ha expirado.
-     */
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponse> refresh(@Valid @RequestBody app.domain.model.auth.RefreshTokenRequest request)
             throws Exception {
-        logger.info("Intento de refresh token");
         TokenResponse response = refreshTokenUseCase.refreshToken(request);
-        logger.info("Refresh token exitoso");
         return ResponseEntity.ok(response);
     }
 }

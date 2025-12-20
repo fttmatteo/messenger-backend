@@ -16,29 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
 /**
- * Aspecto AOP para auditar acciones administrativas.
- * 
- * Intercepta métodos anotados con @AuditableAction y genera logs de auditoría
- * con información completa sobre la operación realizada.
- * 
- * Información registrada:
- * - Timestamp de la acción
- * - Usuario que ejecutó la acción
- * - Tipo de acción (CREATE, UPDATE, DELETE, etc.)
- * - Método invocado
- * - Parámetros de entrada
- * - Resultado (SUCCESS/FAILURE)
- * - Tiempo de ejecución
- * - Mensaje de error (si aplica)
- * 
- * Los logs se escriben con nivel WARN para garantizar visibilidad en producción
- * y facilitar su recolección por herramientas de monitoreo (ELK, Splunk, etc.).
- * 
- * Formato de log:
- * AUDIT | timestamp | user | action | method | params | result | duration_ms |
- * error
- * 
- * @see AuditableAction
+ * Aspecto AOP para auditoría de acciones marcadas con @AuditableAction.
  */
 @Aspect
 @Component
@@ -47,9 +25,6 @@ public class AuditAspect {
     private static final Logger auditLogger = LoggerFactory.getLogger("AUDIT");
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    /**
-     * Intercepta y audita métodos anotados con @AuditableAction.
-     */
     @Around("@annotation(auditableAction)")
     public Object auditAction(ProceedingJoinPoint joinPoint, AuditableAction auditableAction) throws Throwable {
         long startTime = System.currentTimeMillis();
@@ -73,7 +48,6 @@ public class AuditAspect {
         } finally {
             long duration = System.currentTimeMillis() - startTime;
 
-            // Formato estructurado para fácil parsing
             auditLogger.warn("AUDIT | {} | {} | {} | {} | {} | {} | {}ms | {}",
                     timestamp,
                     user,
@@ -86,9 +60,6 @@ public class AuditAspect {
         }
     }
 
-    /**
-     * Obtiene el username del usuario actual desde el contexto de seguridad.
-     */
     private String getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated()) {
@@ -97,18 +68,11 @@ public class AuditAspect {
         return "ANONYMOUS";
     }
 
-    /**
-     * Obtiene el nombre completo del método (clase.método).
-     */
     private String getMethodName(JoinPoint joinPoint) {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         return signature.getDeclaringType().getSimpleName() + "." + signature.getName();
     }
 
-    /**
-     * Obtiene los parámetros del método de forma segura.
-     * Limita la longitud para evitar logs excesivamente largos.
-     */
     private String getParameters(JoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
         if (args == null || args.length == 0) {
@@ -116,7 +80,6 @@ public class AuditAspect {
         }
 
         String params = Arrays.toString(args);
-        // Limitar longitud para evitar logs muy largos
         if (params.length() > 200) {
             params = params.substring(0, 200) + "...";
         }

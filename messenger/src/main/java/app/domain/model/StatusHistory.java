@@ -4,20 +4,8 @@ import app.domain.model.enums.Status;
 import java.time.LocalDateTime;
 
 /**
- * Modelo de dominio que representa un registro en el historial de cambios de
- * estado.
- * 
- * Cada vez que un servicio de entrega cambia de estado (ej. de PENDING a
- * DELIVERED), se crea un registro de historial que documenta:
- * 
- * Estado anterior y nuevo estado
- * Fecha y hora exacta del cambio
- * Empleado que realizó el cambio
- * Ubicación geográfica donde se realizó el cambio
- * Fotografías de evidencia asociadas al cambio
- * 
- * Este registro es inmutable una vez creado, proporcionando trazabilidad
- * completa del ciclo de vida de cada entrega.
+ * Representa un cambio de estado en un servicio de entrega.
+ * Registra quién realizó el cambio, cuándo y la ubicación GPS.
  */
 public class StatusHistory {
     private Long idStatusHistory;
@@ -94,11 +82,6 @@ public class StatusHistory {
         this.deliveryLongitude = deliveryLongitude;
     }
 
-    /**
-     * Obtiene la ubicación de entrega como un objeto Location.
-     * 
-     * @return Location o null si no hay ubicación registrada
-     */
     public Location getDeliveryLocation() {
         if (deliveryLatitude == null || deliveryLongitude == null) {
             return null;
@@ -106,9 +89,6 @@ public class StatusHistory {
         return new Location(deliveryLatitude, deliveryLongitude);
     }
 
-    /**
-     * Establece la ubicación de entrega desde un objeto Location.
-     */
     public void setDeliveryLocation(Location location) {
         if (location != null) {
             this.deliveryLatitude = location.getLatitude();
