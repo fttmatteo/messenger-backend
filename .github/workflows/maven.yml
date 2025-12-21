@@ -78,7 +78,7 @@ jobs:
         run: mvn -B compile -DskipTests
 
       - name: 🧪 Ejecutar tests
-        run: mvn -B test
+        run: mvn -B test -Dspring.profiles.active=test
 
       - name: 📦 Empaquetar aplicación
         run: mvn -B package -DskipTests
