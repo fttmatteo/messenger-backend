@@ -615,6 +615,17 @@ flowchart LR
 - **Graceful Shutdown:** Waits 30s to finish active connections
 - **SSL Offloading:** Trusts proxy headers (`X-Forwarded-Proto`) from Cloud Run
 
+### API Documentation
+
+| Endpoint | Description |
+|----------|-------------|
+| `/swagger-ui/index.html` | Interactive Swagger UI |
+| `/v3/api-docs` | OpenAPI 3.0 Specification (JSON) |
+| `/v3/api-docs.yaml` | OpenAPI 3.0 Specification (YAML) |
+
+> [!TIP]
+> Swagger UI is publicly accessible in `dev` profile. In production, consider restricting access via security configuration.
+
 ---
 
 ## 📝 Auditing
@@ -1412,8 +1423,14 @@ flowchart LR
 
 ### Documentación API
 
-- Swagger UI disponible en: `/swagger-ui/index.html` (Público)
-- OpenAPI Spec: `/v3/api-docs`
+| Endpoint | Descripción |
+|----------|-------------|
+| `/swagger-ui/index.html` | Interfaz Swagger UI interactiva |
+| `/v3/api-docs` | Especificación OpenAPI 3.0 (JSON) |
+| `/v3/api-docs.yaml` | Especificación OpenAPI 3.0 (YAML) |
+
+> [!TIP]
+> Swagger UI es accesible públicamente en el perfil `dev`. En producción, considera restringir el acceso mediante configuración de seguridad.
 
 ---
 
