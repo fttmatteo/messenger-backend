@@ -28,10 +28,6 @@ import org.mockito.quality.Strictness;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Tests para la lógica del ServiceDeliveryController.
- * Principalmente valida las interacciones con el UseCase.
- */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 @DisplayName("ServiceDeliveryController Unit Tests")
@@ -195,7 +191,6 @@ class ServiceDeliveryControllerTest {
         void findByPlateShouldNormalize() {
             when(serviceDeliveryUseCase.findByPlate("ABC123")).thenReturn(Arrays.asList(sampleService));
 
-            // Buscar con minúsculas - el controller debe normalizar
             List<ServiceDelivery> result = serviceDeliveryUseCase.findByPlate("ABC123");
 
             assertEquals(1, result.size());

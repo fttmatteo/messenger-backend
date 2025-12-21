@@ -11,14 +11,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Tests unitarios para PlateRecognition.
- * 
- * Verifica la correcta identificación de tipos de placa colombianas:
- * - Carros: ABC123 o ABC 123
- * - Motos: ABC12D o ABC 12D
- * - Motocarros: 123ABC o 123 ABC
- */
 @DisplayName("PlateRecognition Unit Tests")
 class PlateRecognitionTest {
 

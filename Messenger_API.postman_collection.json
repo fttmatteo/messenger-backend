@@ -2,7 +2,7 @@
     "info": {
         "_postman_id": "messenger-api-collection",
         "name": "Messenger API - Backend",
-        "description": "Complete API documentation for the Messenger/Delivery Management System Backend.\n\n## Authentication\nAll endpoints except `/auth/login` and `/files/**` require JWT authentication.\n\nAdd the token to your requests:\n- Header: `Authorization: Bearer {{token}}`\n\n## Roles\n- **ADMIN**: Full access to all endpoints\n- **MESSENGER**: Limited access (own services only)",
+        "description": "Complete API documentation for the Messenger/Delivery Management System Backend.\n\n## Authentication\nAll endpoints except `/auth/login` and `/files/**` require JWT authentication.\n\nAdd the token to your requests:\n- Header: `Authorization: Bearer {{token}}`\n\n## Roles\n- **ADMIN**: Full access (CANCELED, RESOLVED states only)\n- **MESSENGER**: Limited access (PENDING, DELIVERED, RETURNED states only)\n\n## Status Flow\n- ASSIGNED → PENDING, DELIVERED, RETURNED (Messenger)\n- PENDING → CANCELED, RESOLVED (Admin only)\n- DELIVERED → CANCELED, RESOLVED (Admin, within 72h)\n- CANCELED → Can be reassigned (Admin)\n\n## Available Statuses\n`ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED`",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "variable": [
@@ -476,6 +476,35 @@
                         }
                     },
                     "response": []
+                },
+                {
+                    "name": "Find Dealership by Name",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/dealerships/findByDealershipName/Concesionario",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "dealerships",
+                                "findByDealershipName",
+                                "Concesionario"
+                            ]
+                        },
+                        "description": "Search dealerships by name (partial match)."
+                    },
+                    "response": []
                 }
             ]
         },
@@ -930,7 +959,7 @@
                                     "key": "status",
                                     "value": "DELIVERED",
                                     "type": "text",
-                                    "description": "New status: PENDING, DELIVERED, FAILED, RETURNED, CANCELED, OBSERVED, RESOLVED"
+                                    "description": "New status. MESSENGER: PENDING, DELIVERED, RETURNED. ADMIN: CANCELED, RESOLVED"
                                 },
                                 {
                                     "key": "observation",
@@ -941,26 +970,27 @@
                                 {
                                     "key": "signature",
                                     "type": "file",
-                                    "description": "Signature image"
+                                    "description": "Signature image (required for DELIVERED)"
                                 },
                                 {
                                     "key": "photos",
                                     "type": "file",
-                                    "description": "Evidence photos"
+                                    "description": "Evidence photos (optional)"
                                 }
                             ]
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/services/updateService/1",
+                            "raw": "{{baseUrl}}/services/updateServiceStatus/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "services",
-                                "updateService",
+                                "updateServiceStatus",
                                 "1"
                             ]
-                        }
+                        },
+                        "description": "Update service status with optional evidence.\n\n**Business Rules:**\n- MESSENGER can use: PENDING, DELIVERED, RETURNED (from ASSIGNED/RETURNED states)\n- ADMIN can use: CANCELED, RESOLVED\n- DELIVERED requires signature\n- 72h edit window for DELIVERED/RESOLVED states"
                     },
                     "response": []
                 },
@@ -1020,7 +1050,46 @@
                     "response": []
                 },
                 {
-                    "name": "Delete Service",
+                    "name": "Reassign Messenger",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"messengerId\": 2\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/services/reassign/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "reassign",
+                                "1"
+                            ]
+                        },
+                        "description": "Reassign a service to a different messenger. **Requires ADMIN role.**\n\n**Business Rules:**\n- Only available when service is in CANCELED state\n- The service will be set back to ASSIGNED status with the new messenger"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Service (Soft Delete)",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -1043,7 +1112,66 @@
                                 "deleteService",
                                 "1"
                             ]
-                        }
+                        },
+                        "description": "Move a service to trash (soft delete). The service will be permanently deleted after 60 days.\n\n**Note:** Services in DELIVERED/RESOLVED state cannot be deleted."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Trash (Deleted Services)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/services/trash",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "trash"
+                            ]
+                        },
+                        "description": "List all services in trash. **Requires ADMIN role.**\n\nServices are permanently deleted 60 days after being moved to trash."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Restore from Trash",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "url": {
+                            "raw": "{{baseUrl}}/services/trash/restore/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "trash",
+                                "restore",
+                                "1"
+                            ]
+                        },
+                        "description": "Restore a service from trash. **Requires ADMIN role.**"
                     },
                     "response": []
                 }

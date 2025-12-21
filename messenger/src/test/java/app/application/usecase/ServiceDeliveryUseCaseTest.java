@@ -25,12 +25,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Tests unitarios para ServiceDeliveryUseCase.
- * 
- * Verifica la orquestación correcta de operaciones de servicios de entrega,
- * incluyendo creación con OCR, actualización de estados y búsquedas.
- */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ServiceDeliveryUseCase Unit Tests")
 class ServiceDeliveryUseCaseTest {

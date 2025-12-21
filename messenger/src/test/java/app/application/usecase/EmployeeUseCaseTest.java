@@ -22,11 +22,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Tests unitarios para EmployeeUseCase.
- * 
- * Verifica la orquestación correcta de operaciones CRUD de empleados.
- */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("EmployeeUseCase Unit Tests")
 class EmployeeUseCaseTest {

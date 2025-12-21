@@ -22,16 +22,12 @@ class GoogleMapsAdapterTest {
     @Test
     @DisplayName("Debe geocodificar una dirección válida")
     void shouldGeocodeAddress() throws Exception {
-        // Este test verifica la lógica básica del adapter
-        // En un test real con dependencias externas mockeadas,
-        // verificaríamos la interacción con el API
         assertNotNull(googleMapsAdapter);
     }
 
     @Test
     @DisplayName("Debe calcular distancia entre dos puntos")
     void shouldCalculateDistance() throws Exception {
-        // Test básico de estructura
         assertNotNull(googleMapsAdapter);
     }
 }

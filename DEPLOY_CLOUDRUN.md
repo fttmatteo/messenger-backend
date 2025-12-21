@@ -1,3 +1,5 @@
+> **Copyright (C) 2025 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**
+
 <div align="center">
 
 # 🚀 Deployment Guide - Google Cloud Run
@@ -1234,3 +1236,5 @@ jobs:
 - Última actualización: Diciembre 2025
 
 ---
+
+> **Copyright (C) 2025 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**

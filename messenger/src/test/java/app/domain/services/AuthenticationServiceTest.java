@@ -21,12 +21,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Tests unitarios para AuthenticationService.
- * 
- * Verifica la autenticación, validación de credenciales,
- * y migración de contraseñas planas a BCrypt.
- */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AuthenticationService Unit Tests")
 class AuthenticationServiceTest {
@@ -145,13 +139,10 @@ class AuthenticationServiceTest {
         @Test
         @DisplayName("Debe migrar contraseña plana a BCrypt")
         void shouldMigratePlainPasswordToBcrypt() throws Exception {
-            // Contraseña en texto plano (no BCrypt)
             sampleEmployee.setPassword("plainTextPassword");
 
             when(employeePort.findByDocument(123456789L)).thenReturn(sampleEmployee);
-            // Primera llamada: no coincide con hash (porque está en plano)
             when(passwordEncoder.matches("plainTextPassword", "plainTextPassword")).thenReturn(false);
-            // Encoding del password
             when(passwordEncoder.encode("plainTextPassword")).thenReturn("$2a$10$newEncodedHash");
             when(authenticationPort.authenticate(any(), anyString(), anyLong())).thenReturn(expectedToken);
 
@@ -161,7 +152,6 @@ class AuthenticationServiceTest {
 
             TokenResponse result = authenticationService.authenticate(credentials);
 
-            // Verifica que se guardó el empleado con el password codificado
             verify(employeePort).save(argThat(emp -> emp.getPassword().equals("$2a$10$newEncodedHash")));
             assertNotNull(result);
         }

@@ -243,10 +243,6 @@ class UpdateServiceDeliveryTest {
         assertEquals("El servicio ya se encuentra en estado ASSIGNED", ex.getMessage());
     }
 
-    // ===============================
-    // Tests de Ventana de 72 horas
-    // ===============================
-
     @Test
     @DisplayName("Debe bloquear edición después de 72 horas")
     void shouldBlockEditAfter72Hours() {
@@ -288,10 +284,6 @@ class UpdateServiceDeliveryTest {
         verify(serviceDeliveryPort)
                 .save(argThat(s -> s.getCurrentStatus() == Status.DELIVERED && s.getLockedAt() != null));
     }
-
-    // ===============================
-    // Tests de Reasignación
-    // ===============================
 
     @Test
     @DisplayName("Debe reasignar mensajero cuando servicio está en CANCELED")
@@ -340,7 +332,6 @@ class UpdateServiceDeliveryTest {
         assertEquals("Solo los administradores pueden reasignar servicios.", ex.getMessage());
     }
 
-    // Helper para assertions con assertTrue
     private static void assertTrue(boolean condition) {
         org.junit.jupiter.api.Assertions.assertTrue(condition);
     }

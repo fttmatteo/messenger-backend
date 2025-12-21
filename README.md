@@ -1,3 +1,5 @@
+> **Copyright (C) 2025 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**
+
 <div align="center">
 
 # 🚀 Messenger Backend API
@@ -1611,11 +1613,6 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 5. Todos los demás endpoints usan el token automáticamente
 6. Cuando el access token expire, ejecutar **"Refresh Token"**
 
-> **Última actualización**: Diciembre 2025
-> - ✨ Añadido endpoint de refresh token
-> - 🔄 Mejorado manejo automático de tokens
-> - 📝 Actualizada documentación de respuestas
-
 ---
 
 ## 📧 Soporte y Contacto
@@ -1643,3 +1640,5 @@ Ver archivo [LICENSE](./LICENSE) para detalles.
 **Made with ❤️ using Spring Boot 4.0**
 
 </div>
+
+> **Copyright (C) 2025 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**

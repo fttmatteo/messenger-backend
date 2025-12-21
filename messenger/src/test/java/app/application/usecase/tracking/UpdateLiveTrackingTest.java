@@ -51,7 +51,6 @@ class UpdateLiveTrackingTest {
         LiveTracking tracking = new LiveTracking();
         tracking.setMessengerId(1L);
         tracking.setCurrentLocation(new Location(4.0, -72.0));
-        // Missing status and date
 
         LiveTracking result = updateLiveTracking.execute(tracking);
 

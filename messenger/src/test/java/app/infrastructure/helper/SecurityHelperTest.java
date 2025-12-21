@@ -55,16 +55,11 @@ class SecurityHelperTest {
 
     private void mockAuthenticatedUser(String username) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        // Crear token autenticado (con authorities vacías pero autenticado)
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(username, "password",
                 Collections.emptyList());
         context.setAuthentication(auth);
         SecurityContextHolder.setContext(context);
     }
-
-    // ========================================
-    // getCurrentUser() Tests
-    // ========================================
 
     @Test
     @DisplayName("getCurrentUser - Debe retornar empleado cuando autenticación es válida")
@@ -122,10 +117,6 @@ class SecurityHelperTest {
         assertEquals("Usuario autenticado no encontrado en el sistema.", ex.getMessage());
     }
 
-    // ========================================
-    // getCurrentUserId() Tests
-    // ========================================
-
     @Test
     @DisplayName("getCurrentUserId - Debe retornar ID del empleado autenticado")
     void getCurrentUserId_shouldReturnEmployeeId() {
@@ -136,10 +127,6 @@ class SecurityHelperTest {
 
         assertEquals(1L, result);
     }
-
-    // ========================================
-    // isCurrentUserAdmin() Tests
-    // ========================================
 
     @Test
     @DisplayName("isCurrentUserAdmin - Debe retornar true para usuario ADMIN")
@@ -162,10 +149,6 @@ class SecurityHelperTest {
 
         assertFalse(result);
     }
-
-    // ========================================
-    // isCurrentUserMessenger() Tests
-    // ========================================
 
     @Test
     @DisplayName("isCurrentUserMessenger - Debe retornar true para usuario MESSENGER")
