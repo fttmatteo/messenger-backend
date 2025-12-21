@@ -71,7 +71,6 @@ graph LR
 
     subgraph OutputAdapters ["Output Adapters"]
         direction TB
-        PERSIST[JPA Persistence]
         OCR[Google Vision OCR]
         STORAGE[Google Cloud Storage]
         SEC[JWT Security]
@@ -81,7 +80,6 @@ graph LR
 
     REST --> UC
     UC --> PORTS
-    PORTS --> PERSIST
     PORTS --> OCR
     PORTS --> STORAGE
     PORTS --> SEC
@@ -878,7 +876,6 @@ graph LR
 
     subgraph OutputAdapters ["Output Adapters"]
         direction TB
-        PERSIST[JPA Persistence]
         OCR[Google Vision OCR]
         STORAGE[Google Cloud Storage]
         SEC[JWT Security]
@@ -888,7 +885,6 @@ graph LR
 
     REST --> UC
     UC --> PORTS
-    PORTS --> PERSIST
     PORTS --> OCR
     PORTS --> STORAGE
     PORTS --> SEC
