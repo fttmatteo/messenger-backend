@@ -22,6 +22,7 @@ import app.domain.services.CreateServiceDelivery;
 import app.domain.services.DeleteServiceDelivery;
 import app.domain.services.SearchServiceDelivery;
 import app.domain.services.UpdateServiceDelivery;
+import app.infrastructure.audit.AuditableAction;
 
 /**
  * Caso de uso principal para gestión de servicios de entrega.
@@ -55,6 +56,7 @@ public class ServiceDeliveryUseCase {
     private OcrPort ocrPort;
 
     @Transactional(rollbackFor = Exception.class)
+    @AuditableAction(action = "CREATE_SERVICE", description = "Crear servicio desde imagen OCR")
     public ServiceDelivery createServiceFromImage(File imageFile, Long dealershipId, Long messengerId)
             throws Exception {
         logger.info("Iniciando creación de servicio desde imagen. DealershipId: {}, MessengerId: {}", dealershipId,
@@ -78,6 +80,7 @@ public class ServiceDeliveryUseCase {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    @AuditableAction(action = "CREATE_SERVICE_MANUAL", description = "Crear servicio con placa manual")
     public ServiceDelivery createServiceWithManualPlate(File imageFile, String manualPlateNumber, Long dealershipId,
             Long messengerId) throws Exception {
         logger.info("Iniciando creación de servicio manual. Placa: {}, DealershipId: {}, MessengerId: {}",
@@ -98,6 +101,7 @@ public class ServiceDeliveryUseCase {
         }
     }
 
+    @AuditableAction(action = "UPDATE_STATUS", description = "Actualizar estado de servicio")
     public ServiceDelivery updateStatus(Long serviceId, Status newStatus, String observation,
             Signature signature, List<Photo> photos, Long userId) throws Exception {
         logger.info("Actualizando estado de servicio ID: {} a {}", serviceId, newStatus);
@@ -155,6 +159,7 @@ public class ServiceDeliveryUseCase {
      * Reasigna un servicio a otro mensajero (solo ADMIN, solo si está en CANCELED).
      */
     @Transactional(rollbackFor = Exception.class)
+    @AuditableAction(action = "REASSIGN_MESSENGER", description = "Reasignar servicio a otro mensajero")
     public ServiceDelivery reassignMessenger(Long serviceId, Long newMessengerId, Long adminUserId) throws Exception {
         logger.info("Reasignando servicio ID: {} a mensajero ID: {} por admin ID: {}",
                 serviceId, newMessengerId, adminUserId);
@@ -184,6 +189,7 @@ public class ServiceDeliveryUseCase {
     /**
      * Mueve un servicio a la papelera con registro del usuario.
      */
+    @AuditableAction(action = "DELETE_SERVICE", description = "Mover servicio a papelera")
     public void deleteById(Long id, Long userId) throws Exception {
         logger.info("Moviendo servicio ID: {} a la papelera por usuario ID: {}", id, userId);
         deleteService.deleteById(id, userId);
@@ -200,6 +206,7 @@ public class ServiceDeliveryUseCase {
      * Restaura un servicio desde la papelera (solo ADMIN).
      */
     @Transactional(rollbackFor = Exception.class)
+    @AuditableAction(action = "RESTORE_SERVICE", description = "Restaurar servicio desde papelera")
     public ServiceDelivery restore(Long id, Long userId) throws Exception {
         logger.info("Restaurando servicio ID: {} de la papelera por usuario ID: {}", id, userId);
         return deleteService.restore(id, userId);

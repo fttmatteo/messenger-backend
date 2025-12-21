@@ -33,6 +33,7 @@
 - [State Flow](#-state-flow)
 - [Security](#-security)
 - [Observability](#-observability)
+- [Auditing](#-auditing)
 - [Setup & Installation](#️-setup--installation)
 - [CI/CD](#-cicd)
 - [Testing](#-testing)
@@ -616,6 +617,48 @@ flowchart LR
 
 ---
 
+## 📝 Auditing
+
+### AOP-Based Audit System
+
+The application includes a centralized **audit logging system** using Aspect-Oriented Programming (AOP). Critical actions are automatically logged with user context, timing, and results.
+
+### Audited Actions
+
+| Component | Action | Description |
+|-----------|--------|-------------|
+| **AuthController** | `LOGIN` | User login attempts |
+| | `TOKEN_REFRESH` | Access token renewal |
+| **ServiceDeliveryUseCase** | `CREATE_SERVICE` | Create service from OCR image |
+| | `CREATE_SERVICE_MANUAL` | Create service with manual plate |
+| | `UPDATE_STATUS` | Update service status |
+| | `REASSIGN_MESSENGER` | Reassign service to another messenger |
+| | `DELETE_SERVICE` | Move service to trash |
+| | `RESTORE_SERVICE` | Restore service from trash |
+| **EmployeeUseCase** | `CREATE_EMPLOYEE` | Create new employee |
+| | `UPDATE_EMPLOYEE` | Update employee |
+| | `DELETE_EMPLOYEE` | Delete employee |
+
+### Log Format
+
+```
+AUDIT | timestamp | user_document | action | method | params | status | duration | error
+```
+
+**Example:**
+```
+2025-12-21 00:42:00.123 [AUDIT] AUDIT | 2025-12-21 00:42:00 | 123456 | UPDATE_STATUS | ServiceDeliveryUseCase.updateStatus | [1, DELIVERED, "Delivered", ...] | SUCCESS | 125ms |
+```
+
+### Configuration
+
+- **Logger Name:** `AUDIT`
+- **Level:** `WARN` (always visible in all environments)
+- **Output:** Console (Cloud Run captures stdout)
+- **File Output:** Optional, enable `AUDIT_FILE` appender in `logback-spring.xml`
+
+---
+
 ## ⚙️ Setup & Installation
 
 > 🚀 **Deploying to Production?** See the complete [**Cloud Run Deployment Guide**](./DEPLOY_CLOUDRUN.md) for step-by-step instructions on deploying to Google Cloud.
@@ -786,6 +829,7 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 - [Flujo de Estados](#-flujo-de-estados)
 - [Seguridad](#-seguridad-1)
 - [Observabilidad](#-observabilidad)
+- [Auditoría](#-auditoría)
 - [Configuración e Instalación](#️-configuración-e-instalación)
 - [CI/CD](#-cicd-1)
 - [Testing](#-testing-1)
@@ -1370,6 +1414,48 @@ flowchart LR
 
 - Swagger UI disponible en: `/swagger-ui/index.html` (Público)
 - OpenAPI Spec: `/v3/api-docs`
+
+---
+
+## 📝 Auditoría
+
+### Sistema de Auditoría Basado en AOP
+
+La aplicación incluye un **sistema de logging de auditoría centralizado** usando Programación Orientada a Aspectos (AOP). Las acciones críticas se registran automáticamente con contexto de usuario, tiempo y resultados.
+
+### Acciones Auditadas
+
+| Componente | Acción | Descripción |
+|------------|--------|-------------|
+| **AuthController** | `LOGIN` | Intentos de inicio de sesión |
+| | `TOKEN_REFRESH` | Renovación de token de acceso |
+| **ServiceDeliveryUseCase** | `CREATE_SERVICE` | Crear servicio desde imagen OCR |
+| | `CREATE_SERVICE_MANUAL` | Crear servicio con placa manual |
+| | `UPDATE_STATUS` | Actualizar estado de servicio |
+| | `REASSIGN_MESSENGER` | Reasignar servicio a otro mensajero |
+| | `DELETE_SERVICE` | Mover servicio a papelera |
+| | `RESTORE_SERVICE` | Restaurar servicio desde papelera |
+| **EmployeeUseCase** | `CREATE_EMPLOYEE` | Crear nuevo empleado |
+| | `UPDATE_EMPLOYEE` | Actualizar empleado |
+| | `DELETE_EMPLOYEE` | Eliminar empleado |
+
+### Formato del Log
+
+```
+AUDIT | timestamp | documento_usuario | accion | metodo | parametros | estado | duracion | error
+```
+
+**Ejemplo:**
+```
+2025-12-21 00:42:00.123 [AUDIT] AUDIT | 2025-12-21 00:42:00 | 123456 | UPDATE_STATUS | ServiceDeliveryUseCase.updateStatus | [1, DELIVERED, "Entregado", ...] | SUCCESS | 125ms |
+```
+
+### Configuración
+
+- **Nombre del Logger:** `AUDIT`
+- **Nivel:** `WARN` (siempre visible en todos los ambientes)
+- **Salida:** Consola (Cloud Run captura stdout)
+- **Salida a Archivo:** Opcional, habilitar `AUDIT_FILE` appender en `logback-spring.xml`
 
 ---
 
