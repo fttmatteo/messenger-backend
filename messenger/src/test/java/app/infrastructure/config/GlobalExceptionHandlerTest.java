@@ -135,7 +135,10 @@ class GlobalExceptionHandlerTest {
         FieldError fieldError2 = new FieldError("object", "email", "formato inválido");
         when(mockBindingResult.getFieldErrors()).thenReturn(List.of(fieldError1, fieldError2));
 
-        MethodArgumentNotValidException exception = new MethodArgumentNotValidException(null, mockBindingResult);
+        org.springframework.core.MethodParameter mockParameter = mock(org.springframework.core.MethodParameter.class);
+        when(mockParameter.getExecutable()).thenReturn(mock(java.lang.reflect.Method.class));
+        MethodArgumentNotValidException exception = new MethodArgumentNotValidException(mockParameter,
+                mockBindingResult);
 
         ResponseEntity<ErrorResponse> response = exceptionHandler.handleValidationExceptions(exception, mockRequest);
 

@@ -25,10 +25,13 @@ import java.util.List;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+        private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
         @ExceptionHandler(InputsException.class)
         public ResponseEntity<ErrorResponse> handleInputsException(
                         InputsException ex,
                         HttpServletRequest request) {
+                logger.warn("InputsException: {} en {}", ex.getMessage(), request.getRequestURI());
                 ErrorResponse errorResponse = new ErrorResponse(
                                 HttpStatus.BAD_REQUEST.value(),
                                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
@@ -42,6 +45,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleValidationExceptions(
                         MethodArgumentNotValidException ex,
                         HttpServletRequest request) {
+                logger.warn("MethodArgumentNotValidException: {} en {}", ex.getMessage(), request.getRequestURI());
 
                 List<ErrorDetail> details = new ArrayList<>();
                 for (FieldError error : ex.getBindingResult().getFieldErrors()) {
@@ -62,6 +66,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleBusinessException(
                         BusinessException ex,
                         HttpServletRequest request) {
+                logger.warn("BusinessException: {} en {}", ex.getMessage(), request.getRequestURI());
 
                 ErrorResponse errorResponse = new ErrorResponse(
                                 HttpStatus.CONFLICT.value(),
@@ -76,6 +81,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleUnauthorizedException(
                         UnauthorizedException ex,
                         HttpServletRequest request) {
+                logger.warn("UnauthorizedException: {} en {}", ex.getMessage(), request.getRequestURI());
 
                 ErrorResponse errorResponse = new ErrorResponse(
                                 HttpStatus.UNAUTHORIZED.value(),
@@ -90,6 +96,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
                         ResourceNotFoundException ex,
                         HttpServletRequest request) {
+                logger.warn("ResourceNotFoundException: {} en {}", ex.getMessage(), request.getRequestURI());
 
                 ErrorResponse errorResponse = new ErrorResponse(
                                 HttpStatus.NOT_FOUND.value(),
@@ -104,6 +111,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleGeolocationException(
                         GeolocationException ex,
                         HttpServletRequest request) {
+                logger.error("GeolocationException: {} en {}", ex.getMessage(), request.getRequestURI(), ex);
 
                 ErrorResponse errorResponse = new ErrorResponse(
                                 HttpStatus.BAD_REQUEST.value(),
@@ -118,6 +126,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleExternalServiceException(
                         ExternalServiceException ex,
                         HttpServletRequest request) {
+                logger.error("ExternalServiceException: {} en {}", ex.getMessage(), request.getRequestURI(), ex);
 
                 ErrorResponse errorResponse = new ErrorResponse(
                                 HttpStatus.SERVICE_UNAVAILABLE.value(),
@@ -132,6 +141,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleAccessDeniedException(
                         AccessDeniedException ex,
                         HttpServletRequest request) {
+                logger.warn("AccessDeniedException: {} en {}", ex.getMessage(), request.getRequestURI());
 
                 ErrorResponse errorResponse = new ErrorResponse(
                                 HttpStatus.FORBIDDEN.value(),
@@ -146,6 +156,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleSecurityException(
                         SecurityException ex,
                         HttpServletRequest request) {
+                logger.warn("SecurityException: {} en {}", ex.getMessage(), request.getRequestURI());
 
                 ErrorResponse errorResponse = new ErrorResponse(
                                 HttpStatus.FORBIDDEN.value(),
@@ -160,6 +171,8 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleGlobalException(
                         Exception ex,
                         HttpServletRequest request) {
+                // LOGGING CRÍTICO: Registra el stack trace completo para depuración
+                logger.error("ERROR NO CONTROLADO: {} en URI: {}", ex.getMessage(), request.getRequestURI(), ex);
 
                 ErrorResponse errorResponse = new ErrorResponse(
                                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
