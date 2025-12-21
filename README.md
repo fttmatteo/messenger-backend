@@ -12,6 +12,8 @@
 
 *Delivery and courier management system with automatic license plate recognition via OCR.*
 
+[🇪🇸 Español](#-tabla-de-contenidos) • [🇺🇸 English](#-table-of-contents)
+
 </div>
 
 ---
@@ -28,45 +30,52 @@
 - [API Endpoints](#-api-endpoints)
 - [Database Schema](#-database-schema)
 - [Real-Time Tracking](#-real-time-tracking)
+- [State Flow](#-state-flow)
 - [Security](#-security)
+- [Observability](#-observability)
 - [Setup & Installation](#️-setup--installation)
 - [CI/CD](#-cicd)
+- [Testing](#-testing)
+- [Postman Collection](#-postman-collection)
 
 ---
 
-### 🏗 Architecture
+## 🏗 Architecture
 
 The project implements **Hexagonal Architecture (Ports & Adapters)** to keep the domain isolated from external dependencies.
 
 ```mermaid
-graph TB
-    subgraph "Adapter Layer"
-        subgraph "Input Adapters"
-            REST[REST Controllers]
-            VAL[Validators]
-            BUILD[Builders]
-        end
-        subgraph "Output Adapters"
-            PERSIST[JPA Persistence]
-            OCR[Google Vision OCR]
-            STORAGE[Google Cloud Storage]
-            SEC[JWT Security]
-            MAPS[Google Maps]
-            TRACKING[Location Tracking]
-        end
+graph LR
+    subgraph InputAdapters ["Input Adapters"]
+        direction TB
+        REST[REST Controllers]
+        VAL[Validators]
+        BUILD[Builders]
     end
-    
-    subgraph "Application Layer"
+
+    subgraph ApplicationLayer ["Application Layer"]
+        direction TB
         UC[Use Cases]
         EXC[Exceptions]
     end
-    
-    subgraph "Domain Layer"
-        MOD[Models]
+
+    subgraph DomainLayer ["Domain Layer"]
+        direction TB
         PORTS[Ports]
         SVC[Domain Services]
+        MOD[Models]
     end
-    
+
+    subgraph OutputAdapters ["Output Adapters"]
+        direction TB
+        PERSIST[JPA Persistence]
+        OCR[Google Vision OCR]
+        STORAGE[Google Cloud Storage]
+        SEC[JWT Security]
+        MAPS[Google Maps]
+        TRACKING[Location Tracking]
+    end
+
     REST --> UC
     UC --> PORTS
     PORTS --> PERSIST
@@ -81,7 +90,7 @@ graph TB
 
 ---
 
-### 💻 Tech Stack
+## 💻 Tech Stack
 
 | Component | Technology |
 |-----------|------------|
@@ -97,39 +106,137 @@ graph TB
 | **Maps** | Google Maps Platform |
 | **Real-Time** | WebSocket + Redis |
 | **Build** | Maven 3.9+ |
+| **Monitoring** | Spring Boot Actuator (Health, Metrics) |
+| **Auditing** | JPA Callbacks + Status History |
 | **CI/CD** | GitHub Actions |
 
 ---
 
-### 🌍 Environment Profiles
+## 📁 Project Structure
 
-| Profile | Purpose | Database | External APIs |
-|---------|---------|----------|---------------|
-| `local` | Local development | H2 In-Memory | Mock/Disabled |
-| `dev` | Development with APIs | MySQL | Enabled |
-| `test` | Automated testing | H2 In-Memory | Mock |
-| `prod` | Production (Cloud Run) | MySQL (SSL) | Enabled (JSON Logging) |
-
-**Activation:**
-```bash
-# Environment variable
-export SPRING_PROFILES_ACTIVE=dev
-
-# Command line
-./mvnw spring-boot:run -Dspring.profiles.active=dev
+```
+messenger/
+├── src/main/java/app/
+│   ├── MessengerApplication.java
+│   ├── adapter/
+│   │   ├── in/                          # Input Adapters
+│   │   │   ├── builder/                 # Object Builders
+│   │   │   ├── rest/
+│   │   │   │   ├── controllers/         # 5 REST Controllers
+│   │   │   │   ├── mapper/              # Request/Response Mappers
+│   │   │   │   ├── request/             # Input DTOs
+│   │   │   │   └── response/            # Output DTOs
+│   │   │   └── validators/              # Input Validators
+│   │   └── out/                         # Output Adapters
+│   │       ├── maps/                    # Google Maps Integration
+│   │       ├── ocr/                     # Google Vision OCR
+│   │       ├── security/                # JWT Adapter
+│   │       ├── storage/                 # Google Cloud Storage
+│   │       └── tracking/                # Location Tracking
+│   ├── application/
+│   │   ├── exceptions/                  # BusinessException, InputsException
+│   │   └── usecase/                     # 4 Use Cases
+│   ├── domain/
+│   │   ├── model/                       # 11 Models + 7 Enums + Auth
+│   │   ├── ports/                       # 7 Ports (interfaces)
+│   │   └── services/                    # 15 Domain Services
+│   └── infrastructure/
+│       ├── persistence/
+│       │   ├── entities/                # JPA Entities
+│       │   ├── mapper/                  # Entity ↔ Domain mappers
+│       │   └── repository/              # Spring Data Repositories
+│       └── security/                    # SecurityConfig, JwtFilter
+└── src/main/resources/
+    ├── application.properties           # Base Configuration
+    ├── application-local.properties     # Local Development (H2)
+    ├── application-dev.properties       # Development with APIs
+    ├── application-test.properties      # Automated Testing
+    ├── application-prod.properties      # Production
+    └── db/migration/                    # Flyway Migrations
 ```
 
 ---
 
-### 🔌 API Endpoints
+## 🌍 Environment Profiles
+
+| Profile | Purpose | Database | External APIs | JWT Exp. |
+|---------|---------|----------|---------------|----------|
+| `local` | Local development without dependencies | H2 In-Memory | Mock/Disabled | 8 hours |
+| `dev` | Development with real services | MySQL | Enabled | 8 hours |
+| `test` | Automated testing (CI/CD) | H2 In-Memory | Mock | 1 hour |
+| `prod` | Production (Cloud Run) | MySQL (SSL) | Enabled (JSON Logs) | 30 min |
+
+### Profile Characteristics
 
 <details>
-<summary><b>Authentication</b> <code>/auth</code></summary>
+<summary><b>🏠 Local</b> - No external dependencies</summary>
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/auth/login` | Login with credentials and receive access + refresh tokens |
-| `POST` | `/auth/refresh` | Refresh access token using refresh token |
+- H2 in-memory database
+- Simulated OCR (placeholder)
+- Local file storage
+- Detailed logging
+- Perfect for offline development
+
+</details>
+
+<details>
+<summary><b>🔧 Dev</b> - Development with APIs</summary>
+
+- MySQL development database
+- Google Cloud APIs enabled
+- SQL visible for debugging
+- Actuator endpoints enabled
+- Tracking interval: 15 seconds
+
+</details>
+
+<details>
+<summary><b>🧪 Test</b> - Automated testing</summary>
+
+- H2 in-memory (isolation)
+- Mock services
+- No external dependencies
+- GitHub Actions compatible
+
+</details>
+
+<details>
+<summary><b>🚀 Prod</b> - Production (Cloud Run Optimized)</summary>
+
+- MySQL with mandatory SSL
+- Optimized connection pool (HikariCP)
+- **Structured JSON Logging** (Logstash Encoder)
+- Graceful shutdown enabled (30s timeout)
+- Security headers (HSTS, HTTP-only cookies)
+- Compression enabled
+- No exposed stack traces
+- Cloud Run Proxy support (Forwarded Headers)
+
+</details>
+
+### Activation
+
+```bash
+# Environment variable (recommended)
+export SPRING_PROFILES_ACTIVE=dev
+
+# Command line
+./mvnw spring-boot:run -Dspring.profiles.active=dev
+
+# Docker
+docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
+```
+
+---
+
+## 🔌 API Endpoints
+
+### Authentication (`/auth`)
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| `POST` | `/auth/login` | Login and receive access + refresh tokens | 🔓 Public |
+| `POST` | `/auth/refresh` | Renew access token with refresh token | 🔓 Public |
 
 **Login Response:**
 ```json
@@ -140,10 +247,16 @@ export SPRING_PROFILES_ACTIVE=dev
 }
 ```
 
-</details>
+**Refresh Request:**
+```json
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
+}
+```
 
-<details>
-<summary><b>Employees</b> <code>/employees</code> - Admin only</summary>
+---
+
+### Employees (`/employees`) - ADMIN only
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -153,38 +266,35 @@ export SPRING_PROFILES_ACTIVE=dev
 | `PUT` | `/employees/updateEmployee/{id}` | Update |
 | `DELETE` | `/employees/deleteEmployee/{id}` | Delete |
 
-</details>
+---
 
-<details>
-<summary><b>Dealerships</b> <code>/dealerships</code></summary>
+### Dealerships (`/dealerships`)
 
 | Method | Endpoint | Description | Auth |
 |--------|----------|-------------|------|
 | `POST` | `/dealerships/createDealership` | Create | ADMIN |
-| `GET` | `/dealerships/allDealerships` | List | Authenticated |
-| `GET` | `/dealerships/findByDealershipId/{id}` | Get by ID | Authenticated |
-| `GET` | `/dealerships/findByDealershipName/{name}` | Get by Name | Authenticated |
+| `GET` | `/dealerships/allDealerships` | List | |
+| `GET` | `/dealerships/findByDealershipId/{id}` | Get by ID | |
+| `GET` | `/dealerships/findByDealershipName/{name}` | Get by Name | |
 | `PUT` | `/dealerships/updateDealership/{id}` | Update | ADMIN |
 | `DELETE` | `/dealerships/deleteDealership/{id}` | Delete | ADMIN |
 | `POST` | `/dealerships/geocodeDealership/{id}` | Geocode | ADMIN |
 
-</details>
+---
 
-<details>
-<summary><b>Service Deliveries</b> <code>/services</code></summary>
+### Service Deliveries (`/services`)
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/services/createService` | Create service (multipart) |
 | `PUT` | `/services/updateService/{id}` | Update status |
-| `GET` | `/services/allServices` | List all (ADMIN) or own (MESSENGER) |
+| `GET` | `/services/allServices` | List all |
 | `GET` | `/services/findByServiceId/{id}` | Get by ID |
 | `DELETE` | `/services/deleteService/{id}` | Delete |
 
-</details>
+---
 
-<details>
-<summary><b>Locations & Routes</b> <code>/locations</code></summary>
+### Locations & Routes (`/locations`)
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -193,113 +303,423 @@ export SPRING_PROFILES_ACTIVE=dev
 | `GET` | `/locations/distance` | Distance between points |
 | `GET` | `/locations/reverse` | Coordinates to address |
 
-</details>
+---
 
-<details>
-<summary><b>Files</b> <code>/files</code></summary>
+### Files (`/files`)
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/files/{filename}` | Download file (protected) |
 
-</details>
+---
 
-<details>
-<summary><b>Real-Time Tracking</b> <code>/tracking</code></summary>
+### Real-Time Tracking (`/tracking`)
 
 | Method | Endpoint | Description | Auth |
 |--------|----------|-------------|------|
-| `POST` | `/tracking/update` | Update messenger location | MESSENGER/ADMIN |
-| `GET` | `/tracking/messenger/{id}` | Get last location | ADMIN |
-| `GET` | `/tracking/active` | List active messengers | ADMIN |
-| `GET` | `/tracking/history/{id}` | Tracking history by date | MESSENGER/ADMIN |
-| `GET` | `/tracking/service/{id}` | Tracking history by service | MESSENGER/ADMIN |
+| `POST` | `/tracking/update` | Update location | MESSENGER/ADMIN |
+| `GET` | `/tracking/messenger/{id}` | Last location | ADMIN |
+| `GET` | `/tracking/active` | Active messengers | ADMIN |
+| `GET` | `/tracking/history/{id}` | History by date | MESSENGER/ADMIN |
+| `GET` | `/tracking/service/{id}` | History by service | MESSENGER/ADMIN |
+
+---
+
+## 🗄 Database Schema
+
+```mermaid
+erDiagram
+    employees {
+        Long id_employee PK
+        Long document UK
+        String full_name
+        String phone
+
+        String password
+        Role role
+    }
+    
+    dealerships {
+        Long id_dealership PK
+        String name UK
+        String address
+        String phone
+        String zone
+        Double latitude
+        Double longitude
+    }
+    
+    plates {
+        Long id_plate PK
+        String plate_number UK
+        PlateType plate_type
+        LocalDateTime upload_date
+    }
+    
+    service_deliveries {
+        Long id_service_delivery PK
+        Long plate_id FK
+        Long dealership_id FK
+        Long messenger_id FK
+        Status current_status
+        String observation
+        Long signature_id FK
+        LocalDateTime created_at
+    }
+    
+    signatures {
+        Long id_signature PK
+        String file_path
+    }
+    
+    photos {
+        Long id_photo PK
+        String file_path
+        PhotoType photo_type
+        Long service_delivery_id FK
+        Long status_history_id FK
+    }
+    
+    status_history {
+        Long id_status_history PK
+        Status previous_status
+        Status new_status
+        LocalDateTime change_date
+        Long changed_by_employee_id FK
+        Long service_delivery_id FK
+    }
+    
+    tracking_history {
+        Long id PK
+        Long messenger_id FK
+        Long service_id FK
+        Double latitude
+        Double longitude
+        TrackingStatus status
+        TrackingSource source
+        LocalDateTime timestamp
+    }
+    
+    employees ||--o{ service_deliveries : "delivers"
+    dealerships ||--o{ service_deliveries : "receives"
+    plates ||--o{ service_deliveries : "has"
+    service_deliveries ||--o| signatures : "has"
+    service_deliveries ||--o{ photos : "has"
+    service_deliveries ||--o{ status_history : "tracks"
+    employees ||--o{ status_history : "changes"
+    status_history ||--o{ photos : "evidence"
+    employees ||--o{ tracking_history : "tracked"
+    service_deliveries ||--o{ tracking_history : "route"
+```
+
+### Enums
+
+| Enum | Values |
+|------|--------|
+| **Role** | `ADMIN`, `MESSENGER` |
+| **PlateType** | `CAR` (ABC 123), `MOTORCYCLE` (ABC 12A), `MOTORCAR` (123 ABC) |
+| **Status** | `ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED` |
+| **PhotoType** | `EVIDENCE`, `SIGNATURE`, `PLATE` |
+| **TrackingStatus** | `ACTIVE`, `INACTIVE`, `OFFLINE` |
+| **TrackingSource** | `GPS`, `NETWORK`, `MANUAL` |
+
+---
+
+## 📡 Real-Time Tracking
+
+GPS tracking system using **Redis** + **WebSocket** for messenger monitoring.
+
+### Features
+
+| Feature | Description |
+|---------|-------------|
+| 🔴 **Live location** | Updates every 30 seconds |
+| 📍 **Delivery validation** | Maximum 200m radius from destination |
+| 📊 **Complete history** | 30-day retention |
+| ⚡ **Low latency** | Redis for location caching |
+| 🌐 **WebSocket** | Real-time push notifications |
+
+### Google Maps Integration
+
+- **Geocoding**: Address ↔ Coordinates
+- **Directions API**: Optimized routes
+- **Distance Matrix**: Time estimation
+- **Reverse Geocoding**: Coordinates → Address
+
+---
+
+## 🔄 State Flow
+
+```mermaid
+stateDiagram-v2
+    [*] --> ASSIGNED: Plate registered (auto)
+    
+    ASSIGNED --> PENDING: Messenger
+    ASSIGNED --> DELIVERED: Messenger
+    ASSIGNED --> RETURNED: Messenger
+    
+    RETURNED --> PENDING: Messenger
+    RETURNED --> DELIVERED: Messenger
+    
+    PENDING --> CANCELED: Admin only
+    PENDING --> RESOLVED: Admin only
+    
+    DELIVERED --> CANCELED: Admin only
+    DELIVERED --> RESOLVED: Admin only
+    
+    RETURNED --> CANCELED: Admin
+    RETURNED --> RESOLVED: Admin
+    
+    ASSIGNED --> CANCELED: Admin
+    ASSIGNED --> RESOLVED: Admin
+```
+
+### State Rules
+
+| State | Messenger | Admin | Delete |
+|-------|-----------|-------|--------|
+| `ASSIGNED` | Can change to `PENDING`, `DELIVERED`, `RETURNED` | Can change to any state | ✅ Allowed |
+| `RETURNED` | Can change to `PENDING`, `DELIVERED` | Can change to any state | ✅ Allowed |
+| `PENDING` | 🔒 **Locked** - Cannot update | Can change to `CANCELED`, `RESOLVED` | ✅ Allowed |
+| `DELIVERED` | 🔒 **Locked** - Cannot update | Can change to `CANCELED`, `RESOLVED` | ❌ **Protected** |
+| `CANCELED` | 🔒 **Final state** | 🔒 **Final state** | ✅ Allowed |
+| `RESOLVED` | 🔒 **Final state** | 🔒 **Final state** | ✅ Allowed |
+
+### Permissions Summary
+
+| Role | Available States | Notes |
+|------|------------------|-------|
+| **MESSENGER** | `PENDING`, `DELIVERED`, `RETURNED` | Cannot update after `PENDING` or `DELIVERED` |
+| **ADMIN** | All states | Only role that can unlock `PENDING`/`DELIVERED` |
+
+---
+
+## 🔐 Security
+
+### JWT Authentication with Refresh Tokens
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Client    │────▶│   /login    │────▶│   Server    │
+└─────────────┘     └─────────────┘     └─────────────┘
+                           │
+                           ▼
+              ┌─────────────────────────┐
+              │  {                      │
+              │    token: "...",        │
+              │    refreshToken: "...", │
+              │    role: "ADMIN"        │
+              │  }                      │
+              └─────────────────────────┘
+                           │
+                           ▼
+                   ┌───────────────┐
+                   │  API Request  │
+                   │  Header:      │
+                   │  Authorization│
+                   │  Bearer token │
+                   └───────────────┘
+                           │
+                  Token expired?
+                           │
+                           ▼
+                   ┌───────────────┐
+                   │ /auth/refresh │
+                   │ refreshToken  │
+                   └───────────────┘
+                           │
+                           ▼
+                   New token pair
+```
+
+| Token | Prod Duration | Dev Duration | Local Duration | Usage |
+|-------|---------------|--------------|----------------|-------|
+| **Access Token** | 30 minutes | 8 hours | 8 hours | Header `Authorization: Bearer <token>` |
+| **Refresh Token** | 7 days | 7 days | 7 days | Endpoint `/auth/refresh` to renew |
+
+### Security Features
+
+- 🔄 **Token Rotation**: Each refresh generates a new token pair
+- 🔒 **Stateless**: No tokens stored server-side (Redis only for data caching)
+- ⏱️ **Auto Expiration**: Tokens expire automatically
+- 🛡️ **HMAC-SHA256**: Robust digital signature algorithm
+
+### Rate Limiting
+
+- Implemented with **Bucket4j** to prevent abuse
+- Limits applied per IP address
+- Response headers: `X-Rate-Limit-Remaining`, `X-Rate-Limit-Retry-After-Seconds`
+
+### Roles & Permissions
+
+- **ADMIN**: Full access to all endpoints
+- **MESSENGER**: Only manages own services and location
+
+### Security Headers (Production)
+
+- HSTS (HTTP Strict Transport Security)
+- Cookies: `Secure`, `HttpOnly`, `SameSite=Strict`
+- CORS configured by origin
+- No stack trace exposure
+
+---
+
+## 📊 Observability
+
+### Monitoring Endpoints (Actuator)
+
+| Endpoint | Description | Profile |
+|----------|-------------|---------|
+| `/actuator/health` | Health status (DB, Redis, Disk) | All |
+| `/actuator/metrics` | JVM and HTTP metrics | `dev`, `prod` |
+| `/actuator/env` | Environment variables | `dev` |
+| `/actuator/info` | Build information | All |
+
+### Cloud Run Optimization
+
+- **JSON Logging (Prod):** Structured output compatible with Google Cloud Logging
+- **Graceful Shutdown:** Waits 30s to finish active connections
+- **SSL Offloading:** Trusts proxy headers (`X-Forwarded-Proto`) from Cloud Run
+
+---
+
+## ⚙️ Setup & Installation
+
+### Prerequisites
+
+| Requirement | Version |
+|-------------|---------|
+| Java | 21+ |
+| MySQL | 8.0+ |
+| Redis | 6.0+ |
+| Maven | 3.9+ |
+
+### Environment Variables
+
+<details>
+<summary><b>🔐 Required Variables</b></summary>
+
+```bash
+# Database
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=messenger
+DB_USERNAME=root
+DB_PASSWORD=your_password
+
+# JWT
+JWT_SECRET=your_base64_encoded_secret_key
+
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=            # Production only
+
+# Google Cloud
+GCP_PROJECT_ID=your_project_id
+GCS_BUCKET_NAME=your_bucket_name
+GOOGLE_MAPS_API_KEY=your_api_key
+GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
+```
 
 </details>
 
----
+### Quick Start
 
-### 🔐 Security
-
-**JWT Authentication with Refresh Tokens:**
-
-The system implements a dual-token authentication strategy:
-- **Access Token**: Short-lived JWT for API requests
-  - Production: 30 minutes
-  - Development: 2 hours
-  - Local: 8 hours
-- **Refresh Token**: Long-lived JWT for session renewal
-  - Duration: 7 days
-  - Used to obtain new access tokens without re-login
-- **Algorithm**: HMAC-SHA256
-- **Storage**: Tokens managed client-side (never stored server-side)
-
-**Roles:**
-- `ADMIN`: Full access to all endpoints and resources
-- `MESSENGER`: Limited access to own services and location updates
-
-**Refresh Flow:**
-1. Login returns both `token` and `refreshToken`
-2. Use `token` for API requests in `Authorization: Bearer <token>` header
-3. When `token` expires, call `/auth/refresh` with `refreshToken`
-4. Receive new `token` and `refreshToken` pair
-5. Refresh token rotation ensures enhanced security
-
-**Rate Limiting:**
-- Implemented using **Bucket4j** to prevent abuse.
-- Limits are applied per IP address.
-- Headers included in response: `X-Rate-Limit-Remaining`, `X-Rate-Limit-Retry-After-Seconds`.
-
-**API Documentation:**
-- Swagger UI available at: `/swagger-ui/index.html` (Public)
-- OpenAPI Spec: `/v3/api-docs`
-
----
-
-### ⚙️ Setup & Installation
-
-**Prerequisites:**
-- Java 21+
-- MySQL 8.0+
-- Redis 6.0+
-- Maven 3.9+
-- Google Cloud credentials
-
-**Quick Start:**
 ```bash
-# Clone
+# 1. Clone
 git clone <repository-url>
 cd messenger-backend/messenger
 
-# Configure environment
-export JWT_SECRET="your-secret-key-base64"
-export DB_HOST="localhost"
-export DB_PORT="3306"
-export DB_NAME="messenger"
-export DB_USERNAME="root"
-export DB_PASSWORD="password"
+# 2. Configure variables (see above section)
 
-# Run
+# 3. Start Redis
+redis-server
+
+# 4. Run
 ./mvnw spring-boot:run -Dspring.profiles.active=dev
+```
+
+API available at `http://localhost:8080`
+
+---
+
+## 🔄 CI/CD
+
+Automated pipeline with **GitHub Actions**:
+
+```yaml
+# .github/workflows/maven.yml
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+```
+
+### Features
+
+| Feature | Description |
+|---------|-------------|
+| ✅ Automated build | Java 21 + Maven |
+| ✅ Dependency caching | Faster builds |
+| ✅ Secure secrets | Credential injection |
+| ✅ Testing | `test` profile with H2 |
+
+### Required GitHub Secrets
+
+```
+DB_HOST, DB_PORT, DB_USERNAME
+JWT_SECRET
+REDIS_HOST, REDIS_PORT
+GCP_PROJECT_ID, GCS_BUCKET_NAME
+GOOGLE_MAPS_API_KEY
+GOOGLE_APPLICATION_CREDENTIALS_JSON
 ```
 
 ---
 
-### 🔄 CI/CD
-
-Automated pipeline via GitHub Actions:
-- ✅ Build on push/PR to `main`
-- ✅ Java 21 + Maven caching
-- ✅ Secure secrets injection
-- ✅ Google Cloud credentials handling
-- ✅ Automated testing with H2 in-memory database
-
-### 🧪 Testing
+## 🧪 Testing
 
 - **Unit Tests**: Comprehensive coverage for all adapters
 - **Integration Tests**: JPA repositories and domain services
 - **Test Profile**: Isolated H2 database, no external dependencies
 - **Coverage**: 100+ tests across adapters, use cases, and repositories
+
+---
+
+## 📬 Postman Collection
+
+📄 **[Messenger_API.postman_collection.json](./Messenger_API.postman_collection.json)**
+
+### Features
+
+- ✅ **JWT and Refresh Token** saved automatically
+- ✅ **Environment variables** preconfigured (`baseUrl`, `token`, `refreshToken`)
+- ✅ **Automated tests** that save tokens to collection variables
+- ✅ **Payload examples** for all endpoints
+- ✅ **7 controllers** fully documented:
+  - 🔐 Authentication (Login + Refresh)
+  - 👥 Employees
+  - 🏢 Dealerships
+  - 📍 Locations
+  - 📡 Tracking
+  - 📦 Service Deliveries
+  - 📁 Files
+
+### Usage
+
+1. Import collection in Postman
+2. Configure `baseUrl` variable (default: `http://localhost:8080`)
+3. Run **"Login"** first
+4. Tokens (`token` and `refreshToken`) are saved automatically
+5. All other endpoints use the token automatically
+6. When access token expires, run **"Refresh Token"**
+
+> **Last update**: December 2024
+> - ✨ Added refresh token endpoint
+> - 🔄 Improved automatic token handling
+> - 📝 Updated response documentation
 
 </details>
 
@@ -315,9 +735,11 @@ Automated pipeline via GitHub Actions:
 - [Esquema de Base de Datos](#-esquema-de-base-de-datos)
 - [Tracking en Tiempo Real](#-tracking-en-tiempo-real)
 - [Flujo de Estados](#-flujo-de-estados)
-- [Seguridad](#-seguridad)
+- [Seguridad](#-seguridad-1)
+- [Observabilidad](#-observabilidad)
 - [Configuración e Instalación](#️-configuración-e-instalación)
 - [CI/CD](#-cicd-1)
+- [Testing](#-testing-1)
 - [Colección Postman](#-colección-postman)
 
 ---
@@ -327,34 +749,37 @@ Automated pipeline via GitHub Actions:
 El proyecto implementa **Arquitectura Hexagonal (Ports & Adapters)** para mantener el dominio aislado de las dependencias externas.
 
 ```mermaid
-graph TB
-    subgraph "Adapter Layer"
-        subgraph "Input Adapters"
-            REST[REST Controllers]
-            VAL[Validators]
-            BUILD[Builders]
-        end
-        subgraph "Output Adapters"
-            PERSIST[JPA Persistence]
-            OCR[Google Vision OCR]
-            STORAGE[Google Cloud Storage]
-            SEC[JWT Security]
-            MAPS[Google Maps]
-            TRACKING[Location Tracking]
-        end
+graph LR
+    subgraph InputAdapters ["Input Adapters"]
+        direction TB
+        REST[REST Controllers]
+        VAL[Validators]
+        BUILD[Builders]
     end
-    
-    subgraph "Application Layer"
+
+    subgraph ApplicationLayer ["Application Layer"]
+        direction TB
         UC[Use Cases]
         EXC[Exceptions]
     end
-    
-    subgraph "Domain Layer"
-        MOD[Models]
+
+    subgraph DomainLayer ["Domain Layer"]
+        direction TB
         PORTS[Ports]
         SVC[Domain Services]
+        MOD[Models]
     end
-    
+
+    subgraph OutputAdapters ["Output Adapters"]
+        direction TB
+        PERSIST[JPA Persistence]
+        OCR[Google Vision OCR]
+        STORAGE[Google Cloud Storage]
+        SEC[JWT Security]
+        MAPS[Google Maps]
+        TRACKING[Location Tracking]
+    end
+
     REST --> UC
     UC --> PORTS
     PORTS --> PERSIST
@@ -385,6 +810,8 @@ graph TB
 | **Mapas** | Google Maps Platform |
 | **Tiempo Real** | WebSocket + Redis |
 | **Build** | Maven 3.9+ |
+| **Monitoreo** | Spring Boot Actuator (Health, Metrics) |
+| **Auditoría** | JPA Callbacks + Historial de Estados |
 | **CI/CD** | GitHub Actions |
 
 ---
@@ -407,7 +834,6 @@ messenger/
 │   │   └── out/                         # Adaptadores de salida
 │   │       ├── maps/                    # Google Maps Integration
 │   │       ├── ocr/                     # Google Vision OCR
-│   │       ├── persistence/             # JPA Adapters
 │   │       ├── security/                # JWT Adapter
 │   │       ├── storage/                 # Google Cloud Storage
 │   │       └── tracking/                # Location Tracking
@@ -440,7 +866,7 @@ messenger/
 | Perfil | Propósito | Base de Datos | APIs Externas | JWT Exp. |
 |--------|-----------|---------------|---------------|----------|
 | `local` | Desarrollo local sin dependencias | H2 In-Memory | Mock/Deshabilitado | 8 horas |
-| `dev` | Desarrollo con servicios reales | MySQL | Habilitado | 2 horas |
+| `dev` | Desarrollo con servicios reales | MySQL | Habilitado | 8 horas |
 | `test` | Testing automatizado (CI/CD) | H2 In-Memory | Mock | 1 hora |
 | `prod` | Producción (Cloud Run) | MySQL (SSL) | Habilitado (JSON Logs) | 30 min |
 
@@ -551,9 +977,9 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | Método | Endpoint | Descripción | Auth |
 |--------|----------|-------------|------|
 | `POST` | `/dealerships/createDealership` | Crear | ADMIN |
-| `GET` | `/dealerships/allDealerships` | Listar | Autenticado |
-| `GET` | `/dealerships/findByDealershipId/{id}` | Obtener por ID | Autenticado |
-| `GET` | `/dealerships/findByDealershipName/{name}` | Obtener por Nombre | Autenticado |
+| `GET` | `/dealerships/allDealerships` | Listar | |
+| `GET` | `/dealerships/findByDealershipId/{id}` | Obtener por ID | |
+| `GET` | `/dealerships/findByDealershipName/{name}` | Obtener por Nombre | |
 | `PUT` | `/dealerships/updateDealership/{id}` | Actualizar | ADMIN |
 | `DELETE` | `/dealerships/deleteDealership/{id}` | Eliminar | ADMIN |
 | `POST` | `/dealerships/geocodeDealership/{id}` | Geocodificar | ADMIN |
@@ -566,7 +992,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 |--------|----------|-------------|
 | `POST` | `/services/createService` | Crear servicio (multipart) |
 | `PUT` | `/services/updateService/{id}` | Actualizar estado |
-| `GET` | `/services/allServices` | Listar todos (ADMIN) o propios (MESSENGER) |
+| `GET` | `/services/allServices` | Listar todos |
 | `GET` | `/services/findByServiceId/{id}` | Obtener por ID |
 | `DELETE` | `/services/deleteService/{id}` | Eliminar |
 
@@ -612,7 +1038,7 @@ erDiagram
         Long document UK
         String full_name
         String phone
-        String user_name UK
+
         String password
         Role role
     }
@@ -696,7 +1122,7 @@ erDiagram
 |------|---------|
 | **Role** | `ADMIN`, `MESSENGER` |
 | **PlateType** | `CAR` (ABC 123), `MOTORCYCLE` (ABC 12A), `MOTORCAR` (123 ABC) |
-| **Status** | `ASSIGNED`, `PENDING`, `DELIVERED`, `FAILED`, `RETURNED`, `CANCELED`, `OBSERVED`, `RESOLVED` |
+| **Status** | `ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED` |
 | **PhotoType** | `EVIDENCE`, `SIGNATURE`, `PLATE` |
 | **TrackingStatus** | `ACTIVE`, `INACTIVE`, `OFFLINE` |
 | **TrackingSource** | `GPS`, `NETWORK`, `MANUAL` |
@@ -730,29 +1156,45 @@ Sistema de tracking GPS usando **Redis** + **WebSocket** para monitoreo de mensa
 
 ```mermaid
 stateDiagram-v2
-    [*] --> ASSIGNED: Placa registrada
-    ASSIGNED --> PENDING: Mensajero inicia
-    PENDING --> DELIVERED: Entrega exitosa
-    PENDING --> FAILED: Entrega fallida
-    PENDING --> RETURNED: Devolución
-    DELIVERED --> OBSERVED: Admin observa
-    FAILED --> OBSERVED: Admin observa
-    RETURNED --> OBSERVED: Admin observa
-    OBSERVED --> RESOLVED: Resolución final
-    ASSIGNED --> CANCELED: Admin cancela
-    PENDING --> CANCELED: Admin cancela
+    [*] --> ASSIGNED: Placa registrada (auto)
+    
+    ASSIGNED --> PENDING: Mensajero
+    ASSIGNED --> DELIVERED: Mensajero
+    ASSIGNED --> RETURNED: Mensajero
+    
+    RETURNED --> PENDING: Mensajero
+    RETURNED --> DELIVERED: Mensajero
+    
+    PENDING --> CANCELED: Solo Admin
+    PENDING --> RESOLVED: Solo Admin
+    
+    DELIVERED --> CANCELED: Solo Admin
+    DELIVERED --> RESOLVED: Solo Admin
+    
+    RETURNED --> CANCELED: Admin
+    RETURNED --> RESOLVED: Admin
+    
+    ASSIGNED --> CANCELED: Admin
+    ASSIGNED --> RESOLVED: Admin
 ```
 
-### Requisitos de Evidencia
+### Reglas de Estados
 
-| Estado | Firma | Fotos | Observación |
-|--------|:-----:|:-----:|:-----------:|
-| `DELIVERED` | ✅ | ⚪ | ⚪ |
-| `PENDING` | ✅ | ✅ | ✅ |
-| `FAILED` | ✅ | ✅ | ✅ |
-| `RETURNED` | ✅ | ✅ | ✅ |
-| `CANCELED` | ⚪ | ⚪ | ⚪ |
-| `OBSERVED` | ⚪ | ⚪ | ⚪ |
+| Estado | Mensajero | Admin | Eliminar |
+|--------|-----------|-------|----------|
+| `ASSIGNED` | Puede cambiar a `PENDING`, `DELIVERED`, `RETURNED` | Puede cambiar a cualquier estado | ✅ Permitido |
+| `RETURNED` | Puede cambiar a `PENDING`, `DELIVERED` | Puede cambiar a cualquier estado | ✅ Permitido |
+| `PENDING` | 🔒 **Bloqueado** - No puede actualizar | Puede cambiar a `CANCELED`, `RESOLVED` | ✅ Permitido |
+| `DELIVERED` | 🔒 **Bloqueado** - No puede actualizar | Puede cambiar a `CANCELED`, `RESOLVED` | ❌ **Protegido** |
+| `CANCELED` | 🔒 **Estado final** | 🔒 **Estado final** | ✅ Permitido |
+| `RESOLVED` | 🔒 **Estado final** | 🔒 **Estado final** | ✅ Permitido |
+
+### Resumen de Permisos
+
+| Rol | Estados Disponibles | Notas |
+|-----|---------------------|-------|
+| **MESSENGER** | `PENDING`, `DELIVERED`, `RETURNED` | No puede actualizar después de `PENDING` o `DELIVERED` |
+| **ADMIN** | Todos los estados | Único rol que puede desbloquear `PENDING`/`DELIVERED` |
 
 ---
 
@@ -796,25 +1238,21 @@ stateDiagram-v2
 
 | Token | Duración (prod) | Duración (dev) | Duración (local) | Uso |
 |-------|-----------------|----------------|------------------|-----|
-| **Access Token** | 30 minutos | 2 horas | 8 horas | Header `Authorization: Bearer <token>` |
+| **Access Token** | 30 minutos | 8 horas | 8 horas | Header `Authorization: Bearer <token>` |
 | **Refresh Token** | 7 días | 7 días | 7 días | Endpoint `/auth/refresh` para renovar |
 
-**Características de Seguridad:**
+### Características de Seguridad
+
 - 🔄 **Token Rotation**: Cada refresh genera un nuevo par de tokens
 - 🔒 **Stateless**: No se almacenan tokens en el servidor (Redis solo para caché de datos)
 - ⏱️ **Expiración Automática**: Tokens expire automáticamente
 - 🛡️ **HMAC-SHA256**: Algoritmo robusto de firma digital
 
-### Rate Limiting y Documentación
+### Rate Limiting
 
-**Rate Limiting:**
-- Implementado con **Bucket4j** para prevenir abusos.
-- Límites aplicados por dirección IP.
-- Headers de respuesta: `X-Rate-Limit-Remaining`, `X-Rate-Limit-Retry-After-Seconds`.
-
-**Documentación API:**
-- Swagger UI disponible en: `/swagger-ui/index.html` (Público)
-- OpenAPI Spec: `/v3/api-docs`
+- Implementado con **Bucket4j** para prevenir abusos
+- Límites aplicados por dirección IP
+- Headers de respuesta: `X-Rate-Limit-Remaining`, `X-Rate-Limit-Retry-After-Seconds`
 
 ### Roles y Permisos
 
@@ -828,9 +1266,12 @@ stateDiagram-v2
 - CORS configurado por origen
 - Sin exposición de stack traces
 
-### 📊 Observabilidad (Actuator & Logging)
+---
 
-**Endpoints de Monitoreo (Actuator):**
+## 📊 Observabilidad
+
+### Endpoints de Monitoreo (Actuator)
+
 | Endpoint | Descripción | Perfil |
 |----------|-------------|--------|
 | `/actuator/health` | Estado de salud (DB, Redis, Disco) | Todos |
@@ -838,10 +1279,16 @@ stateDiagram-v2
 | `/actuator/env` | Variables de entorno | `dev` |
 | `/actuator/info` | Información de la build | Todos |
 
-**Optimización para Cloud Run:**
-- **Logging JSON (Prod):** Salida estructurada compatible con Google Cloud Logging.
-- **Graceful Shutdown:** Espera 30s para terminar conexiones activas.
-- **SSL Offloading:** Confía en headers de proxy (`X-Forwarded-Proto`) de Cloud Run.
+### Optimización para Cloud Run
+
+- **Logging JSON (Prod):** Salida estructurada compatible con Google Cloud Logging
+- **Graceful Shutdown:** Espera 30s para terminar conexiones activas
+- **SSL Offloading:** Confía en headers de proxy (`X-Forwarded-Proto`) de Cloud Run
+
+### Documentación API
+
+- Swagger UI disponible en: `/swagger-ui/index.html` (Público)
+- OpenAPI Spec: `/v3/api-docs`
 
 ---
 
@@ -941,6 +1388,15 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 
 ---
 
+## 🧪 Testing
+
+- **Unit Tests**: Cobertura completa para todos los adaptadores
+- **Integration Tests**: Repositorios JPA y servicios de dominio
+- **Test Profile**: Base de datos H2 aislada, sin dependencias externas
+- **Coverage**: 100+ tests en adaptadores, use cases y repositorios
+
+---
+
 ## 📬 Colección Postman
 
 📄 **[Messenger_API.postman_collection.json](./Messenger_API.postman_collection.json)**
@@ -968,8 +1424,6 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 4. Los tokens (`token` y `refreshToken`) se guardan automáticamente
 5. Todos los demás endpoints usan el token automáticamente
 6. Cuando el access token expire, ejecutar **"Refresh Token"**
-
-### Actualización Reciente
 
 > **Última actualización**: Diciembre 2024
 > - ✨ Añadido endpoint de refresh token
