@@ -99,7 +99,5 @@ class UpdateDealershipTest {
         updateDealership.update(1L, newData);
 
         verify(dealershipPort).save(any());
-        // verify findByName was NOT called for validation logic ideally, but mocking
-        // makes it simple
     }
 }

@@ -16,12 +16,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Tests unitarios para FileHelper.
- * 
- * Verifica la correcta conversión de MultipartFile a File,
- * detección de extensiones, y limpieza de archivos temporales.
- */
 @DisplayName("FileHelper Unit Tests")
 class FileHelperTest {
 
@@ -54,7 +48,6 @@ class FileHelperTest {
             assertTrue(result.exists());
             assertTrue(result.getName().endsWith(".png"));
 
-            // Cleanup
             result.delete();
         }
 
@@ -79,7 +72,6 @@ class FileHelperTest {
         @Test
         @DisplayName("Debe detectar PNG por magic bytes")
         void shouldDetectPngByMagicBytes() throws IOException {
-            // PNG header: 89 50 4E 47 0D 0A 1A 0A
             byte[] pngHeader = new byte[] { (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
             MockMultipartFile multipartFile = new MockMultipartFile(
                     "file",
@@ -98,7 +90,6 @@ class FileHelperTest {
         @Test
         @DisplayName("Debe detectar JPEG por magic bytes")
         void shouldDetectJpegByMagicBytes() throws IOException {
-            // JPEG header: FF D8 FF
             byte[] jpegContent = new byte[] { (byte) 0xFF, (byte) 0xD8, (byte) 0xFF, (byte) 0xE0, 0x00 };
             MockMultipartFile multipartFile = new MockMultipartFile(
                     "file",
@@ -117,7 +108,6 @@ class FileHelperTest {
         @Test
         @DisplayName("Debe detectar PDF por magic bytes")
         void shouldDetectPdfByMagicBytes() throws IOException {
-            // PDF header: 25 50 44 46 (%PDF)
             byte[] pdfContent = new byte[] { 0x25, 0x50, 0x44, 0x46, 0x2D };
             MockMultipartFile multipartFile = new MockMultipartFile(
                     "file",
@@ -158,7 +148,6 @@ class FileHelperTest {
         @Test
         @DisplayName("Debe eliminar lista de archivos temporales")
         void shouldCleanupTempFiles() throws IOException {
-            // Crear archivos temporales
             File file1 = File.createTempFile("test1-", ".tmp");
             File file2 = File.createTempFile("test2-", ".tmp");
             List<File> files = List.of(file1, file2);
@@ -166,7 +155,6 @@ class FileHelperTest {
             assertTrue(file1.exists());
             assertTrue(file2.exists());
 
-            // Cleanup
             fileHelper.cleanupTempFiles(new ArrayList<>(files));
 
             assertFalse(file1.exists());
@@ -262,7 +250,6 @@ class FileHelperTest {
             assertTrue(result.get(0).exists());
             assertTrue(result.get(1).exists());
 
-            // Cleanup
             fileHelper.cleanupTempFiles(result);
         }
 
@@ -286,7 +273,6 @@ class FileHelperTest {
 
             assertEquals(1, result.size());
 
-            // Cleanup
             fileHelper.cleanupTempFiles(result);
         }
     }

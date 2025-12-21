@@ -11,11 +11,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Tests unitarios para ServiceDeliveryValidator.
- * 
- * Verifica la validación de IDs, documentos, estados y placas vehiculares.
- */
 @DisplayName("ServiceDeliveryValidator Unit Tests")
 class ServiceDeliveryValidatorTest {
 

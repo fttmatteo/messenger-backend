@@ -18,7 +18,6 @@ class JwtAdapterTest {
 
     @BeforeEach
     void setUp() {
-        // Crear JwtAdapter con parámetros requeridos
         jwtAdapter = new JwtAdapter("VGVzdFNlY3JldEtleUZvckpXVFRlc3RpbmdQdXJwb3Nlc09ubHlNdXN0QmU", 1800000L);
     }
 

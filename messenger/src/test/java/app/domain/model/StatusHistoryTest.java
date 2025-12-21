@@ -53,9 +53,6 @@ class StatusHistoryTest {
 
         history.setDeliveryLocation(null);
 
-        assertEquals(5.0, history.getDeliveryLatitude()); // Should remain unchanged or null depending on impl, but
-                                                          // typical setter logic implies update.
-        // Logic in model: if (location != null) { set... }
-        // So it protects against null.
+        assertEquals(5.0, history.getDeliveryLatitude());
     }
 }

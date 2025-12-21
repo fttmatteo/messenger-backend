@@ -18,12 +18,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Tests unitarios para CreateEmployee.
- * 
- * Verifica la creación de empleados incluyendo validaciones de unicidad
- * y encriptación de contraseñas.
- */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CreateEmployee Unit Tests")
 class CreateEmployeeTest {

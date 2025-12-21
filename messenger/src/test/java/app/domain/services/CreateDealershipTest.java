@@ -16,11 +16,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Tests unitarios para CreateDealership.
- * 
- * Verifica la creación de concesionarios y validación de unicidad de nombre.
- */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CreateDealership Unit Tests")
 class CreateDealershipTest {

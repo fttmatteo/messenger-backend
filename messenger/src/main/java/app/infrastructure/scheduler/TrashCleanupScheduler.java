@@ -27,9 +27,6 @@ public class TrashCleanupScheduler {
     @Autowired
     private ServiceDeliveryPort serviceDeliveryPort;
 
-    /**
-     * Ejecuta la limpieza de la papelera diariamente a las 3:00 AM.
-     */
     @Scheduled(cron = "${app.trash.cleanup-cron:0 0 3 * * ?}")
     public void cleanupExpiredTrash() {
         logger.info(

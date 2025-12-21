@@ -17,11 +17,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Tests unitarios para SearchEmployee.
- * 
- * Verifica la búsqueda de empleados por diferentes criterios.
- */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SearchEmployee Unit Tests")
 class SearchEmployeeTest {

@@ -21,11 +21,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Tests unitarios para DealershipUseCase.
- * 
- * Verifica la orquestación correcta de operaciones CRUD de concesionarios.
- */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("DealershipUseCase Unit Tests")
 class DealershipUseCaseTest {
