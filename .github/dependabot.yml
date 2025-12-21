@@ -1,16 +1,53 @@
+# Configuración de Dependabot
+# Crea PRs automáticamente para actualizar dependencias.
+# https://docs.github.com/en/code-security/dependabot
+
 version: 2
+
 updates:
-  # Mantener las GitHub Actions actualizadas
+  # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Bogota"
+    commit-message:
+      prefix: "ci(deps)"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    open-pull-requests-limit: 5
 
-  # Mantener dependencias de Java (Maven) actualizadas
-  # IMPORTANTE: Apunta a la carpeta /messenger donde está tu pom.xml
+  # Maven (dependencias de Java)
   - package-ecosystem: "maven"
-    directory: "/messenger" 
+    directory: "/messenger"
     schedule:
       interval: "weekly"
-    # Opcional: Límite de PRs abiertos para no saturarte
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Bogota"
+    commit-message:
+      prefix: "build(deps)"
+    labels:
+      - "dependencies"
+      - "java"
     open-pull-requests-limit: 10
+    # Agrupar actualizaciones menores y de parche
+    groups:
+      spring:
+        patterns:
+          - "org.springframework*"
+        update-types:
+          - "minor"
+          - "patch"
+      testing:
+        patterns:
+          - "org.junit*"
+          - "org.mockito*"
+          - "org.assertj*"
+      security:
+        patterns:
+          - "io.jsonwebtoken*"
+          - "org.springframework.security*"

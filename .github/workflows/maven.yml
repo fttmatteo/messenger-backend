@@ -1,48 +1,81 @@
-name: Java CI with Maven
+# Messenger Backend
+# Este workflow construye y prueba la aplicación Java en cada
+# push o pull request a las ramas main/develop.
 
-# Disparadores: El flujo se ejecuta automáticamente en 'push' o 'pull_request' a la rama 'main'
+name: CI Pipeline
+
 on:
   push:
-    branches: [ "main" ]
+    branches: [main, develop]
   pull_request:
-    branches: [ "main" ]
+    branches: [main, develop]
+
+# Cancelar ejecuciones en progreso para la misma rama
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
-
+    name: Build & Test
     runs-on: ubuntu-latest
+    
+    # Directorio de trabajo por defecto para todos los pasos
+    defaults:
+      run:
+        working-directory: messenger
 
-    # Variables de entorno inyectadas de forma segura desde los "Secrets" de GitHub
     env:
-      DB_HOST: '${{ secrets.DB_HOST }}'
-      DB_PORT: '${{ secrets.DB_PORT }}'
-      DB_USERNAME: '${{ secrets.DB_USERNAME }}'
-      #DB_PASSWORD: '${{ secrets.DB_PASSWORD }}'
-      JWT_SECRET: '${{ secrets.JWT_SECRET }}'
-      REDIS_HOST: '${{ secrets.REDIS_HOST }}'
-      REDIS_PORT: '${{ secrets.REDIS_PORT }}'
-      #REDIS_PASSWORD: '${{ secrets.REDIS_PASSWORD }}'
-      GOOGLE_MAPS_API_KEY: '${{ secrets.GOOGLE_MAPS_API_KEY }}'
-      GCS_BUCKET_NAME: '${{ secrets.GCS_BUCKET_NAME }}'
-      GCP_PROJECT_ID: '${{ secrets.GCP_PROJECT_ID }}'
-      GOOGLE_APPLICATION_CREDENTIALS: '${{ github.workspace }}/google-credentials.json'
+      # Configuración de base de datos
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_PORT: ${{ secrets.DB_PORT }}
+      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      
+      # Seguridad
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      
+      # Redis (opcional para tests)
+      REDIS_HOST: ${{ secrets.REDIS_HOST }}
+      REDIS_PORT: ${{ secrets.REDIS_PORT }}
+      
+      # Servicios de Google Cloud
+      GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+      GCS_BUCKET_NAME: ${{ secrets.GCS_BUCKET_NAME }}
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/google-credentials.json
 
     steps:
-    # 1. Hacer checkout del código fuente repository
-    - uses: actions/checkout@v4
-    
-    # 2. Configurar el entorno Java (JDK 21) y habilitar caché para Maven
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: maven
-        
-    # 3. Crear archivo de credenciales de Google Cloud dinámicamente desde secret
-    - name: Create Google Credentials File
-      run: echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}" > $GOOGLE_APPLICATION_CREDENTIALS
+      # Configuración inicial
+      - name: 📥 Clonar repositorio
+        uses: actions/checkout@v4
 
-    # 4. Construir y empaquetar el proyecto con Maven (usa el pom.xml en la carpeta messenger)
-    - name: Build with Maven
-      run: mvn -B package --file messenger/pom.xml
+      - name: ☕ Configurar JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: 🔐 Crear archivo de credenciales de Google
+        run: |
+          echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}" > $GOOGLE_APPLICATION_CREDENTIALS
+        working-directory: ${{ github.workspace }}
+
+      # Compilar y probar
+      - name: 🔨 Compilar con Maven
+        run: mvn -B compile -DskipTests
+
+      - name: 🧪 Ejecutar tests
+        run: mvn -B test
+
+      - name: 📦 Empaquetar aplicación
+        run: mvn -B package -DskipTests
+
+      # Artefactos (opcional: subir JAR para inspección)
+      - name: 📤 Subir artefacto JAR
+        uses: actions/upload-artifact@v4
+        if: github.ref == 'refs/heads/main'
+        with:
+          name: messenger-backend-${{ github.sha }}
+          path: messenger/target/*.jar
+          retention-days: 7
