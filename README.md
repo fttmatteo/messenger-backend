@@ -1611,11 +1611,6 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 5. Todos los demás endpoints usan el token automáticamente
 6. Cuando el access token expire, ejecutar **"Refresh Token"**
 
-> **Última actualización**: Diciembre 2025
-> - ✨ Añadido endpoint de refresh token
-> - 🔄 Mejorado manejo automático de tokens
-> - 📝 Actualizada documentación de respuestas
-
 ---
 
 ## 📧 Soporte y Contacto
