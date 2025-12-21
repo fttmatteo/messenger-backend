@@ -19,6 +19,18 @@ jobs:
   build:
     name: Build & Test
     runs-on: ubuntu-latest
+
+    # Servicios necesarios para tests de integración
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     
     # Directorio de trabajo por defecto para todos los pasos
     defaults:
@@ -66,7 +78,7 @@ jobs:
         run: mvn -B compile -DskipTests
 
       - name: 🧪 Ejecutar tests
-        run: mvn -B test
+        run: mvn -B test -Dspring.profiles.active=test
 
       - name: 📦 Empaquetar aplicación
         run: mvn -B package -DskipTests
