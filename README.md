@@ -461,27 +461,69 @@ stateDiagram-v2
     PENDING --> CANCELED: Admin only
     PENDING --> RESOLVED: Admin only
     
-    DELIVERED --> CANCELED: Admin only
-    DELIVERED --> RESOLVED: Admin only
+    DELIVERED --> CANCELED: Admin (within 72h)
+    DELIVERED --> RESOLVED: Admin (within 72h)
+    
+    CANCELED --> ASSIGNED: Admin reassigns
+    
+    RETURNED --> PENDING: Messenger
+    RETURNED --> DELIVERED: Messenger
 ```
+
+### Business Rules
+
+> [!IMPORTANT]
+> **Role-Based Status Transitions**
+> - **MESSENGER** can only use: `PENDING`, `DELIVERED`, `RETURNED`
+> - **ADMIN** can only use: `CANCELED`, `RESOLVED`
+
+> [!WARNING]
+> **Edit Lock (72-Hour Window)**
+> When a service is updated to `DELIVERED` or `RESOLVED`, a **72-hour window** starts. 
+> After this period, the service becomes **immutable** (no status or data changes allowed).
+
+> [!NOTE]
+> **Soft Delete (Trash Bin)**
+> Deleted services are moved to a **trash bin** and permanently deleted after **60 days**.
+> Admins can restore services from the trash before permanent deletion.
 
 ### State Rules
 
-| State | Messenger | Admin | Delete |
-|-------|-----------|-------|--------|
-| `ASSIGNED` | Can change to `PENDING`, `DELIVERED`, `RETURNED` | Can change to any state | ✅ Allowed |
-| `RETURNED` | Can change to `PENDING`, `DELIVERED` | Can change to any state | ✅ Allowed |
-| `PENDING` | 🔒 **Locked** - Cannot update | Can change to `CANCELED`, `RESOLVED` | ✅ Allowed |
-| `DELIVERED` | 🔒 **Locked** - Cannot update | Can change to `CANCELED`, `RESOLVED` | ❌ **Protected** |
-| `CANCELED` | 🔒 **Final state** | 🔒 **Final state** | ✅ Allowed |
-| `RESOLVED` | 🔒 **Final state** | 🔒 **Final state** | ✅ Allowed |
+| State | Messenger | Admin | Delete | Edit Lock |
+|-------|-----------|-------|--------|-----------|
+| `ASSIGNED` | → `PENDING`, `DELIVERED`, `RETURNED` | → `CANCELED`, `RESOLVED` | ✅ Trash | - |
+| `RETURNED` | → `PENDING`, `DELIVERED` | → `CANCELED`, `RESOLVED` | ✅ Trash | - |
+| `PENDING` | 🔒 **Locked** until admin intervenes | → `CANCELED`, `RESOLVED` | ✅ Trash | - |
+| `DELIVERED` | 🔒 **Locked** | → `CANCELED`, `RESOLVED` (within 72h) | ❌ Protected | ⏱️ 72h window |
+| `CANCELED` | 🔒 Final | Admin can **reassign** → `ASSIGNED` | ✅ Trash | - |
+| `RESOLVED` | 🔒 Final | 🔒 Final (within 72h from DELIVERED) | ✅ Trash | ⏱️ 72h window |
 
 ### Permissions Summary
 
-| Role | Available States | Notes |
-|------|------------------|-------|
-| **MESSENGER** | `PENDING`, `DELIVERED`, `RETURNED` | Cannot update after `PENDING` or `DELIVERED` |
-| **ADMIN** | All states | Only role that can unlock `PENDING`/`DELIVERED` |
+| Role | Available States | Special Actions | Notes |
+|------|------------------|-----------------|-------|
+| **MESSENGER** | `PENDING`, `DELIVERED`, `RETURNED` | - | Blocked after using `PENDING` until admin intervenes |
+| **ADMIN** | `CANCELED`, `RESOLVED` | **Reassign messenger** (from `CANCELED` only) | Can unlock blocked services |
+
+### Reassignment Flow
+
+```mermaid
+flowchart LR
+    A[Service in CANCELED] --> B{Admin reassigns}
+    B --> C[New messenger assigned]
+    C --> D[Status → ASSIGNED]
+    D --> E[72h lock reset]
+```
+
+### Trash Management (Soft Delete)
+
+| Action | Endpoint | Description |
+|--------|----------|-------------|
+| Delete → Trash | `DELETE /services/{id}` | Moves to trash (soft delete) |
+| View Trash | `GET /services/trash` | Lists deleted services (ADMIN) |
+| Restore | `POST /services/trash/restore/{id}` | Restores from trash (ADMIN) |
+| Auto-Cleanup | Scheduled job | Permanent deletion after 60 days |
+
 
 ---
 
@@ -1172,27 +1214,68 @@ stateDiagram-v2
     PENDING --> CANCELED: Solo Admin
     PENDING --> RESOLVED: Solo Admin
     
-    DELIVERED --> CANCELED: Solo Admin
-    DELIVERED --> RESOLVED: Solo Admin
+    DELIVERED --> CANCELED: Admin (dentro de 72h)
+    DELIVERED --> RESOLVED: Admin (dentro de 72h)
+    
+    CANCELED --> ASSIGNED: Admin reasigna
+    
+    RETURNED --> PENDING: Mensajero
+    RETURNED --> DELIVERED: Mensajero
 ```
+
+### Reglas de Negocio
+
+> [!IMPORTANT]
+> **Transiciones de Estado por Rol**
+> - **MENSAJERO** solo puede usar: `PENDING`, `DELIVERED`, `RETURNED`
+> - **ADMIN** solo puede usar: `CANCELED`, `RESOLVED`
+
+> [!WARNING]
+> **Bloqueo de Edición (Ventana de 72 Horas)**
+> Cuando un servicio se actualiza a `DELIVERED` o `RESOLVED`, inicia una **ventana de 72 horas**.
+> Después de este período, el servicio se vuelve **inmutable** (no se permiten cambios de estado ni datos).
+
+> [!NOTE]
+> **Eliminación Suave (Papelera)**
+> Los servicios eliminados se mueven a una **papelera** y se eliminan permanentemente después de **60 días**.
+> Los administradores pueden restaurar servicios de la papelera antes de la eliminación permanente.
 
 ### Reglas de Estados
 
-| Estado | Mensajero | Admin | Eliminar |
-|--------|-----------|-------|----------|
-| `ASSIGNED` | Puede cambiar a `PENDING`, `DELIVERED`, `RETURNED` | Puede cambiar a cualquier estado | ✅ Permitido |
-| `RETURNED` | Puede cambiar a `PENDING`, `DELIVERED` | Puede cambiar a cualquier estado | ✅ Permitido |
-| `PENDING` | 🔒 **Bloqueado** - No puede actualizar | Puede cambiar a `CANCELED`, `RESOLVED` | ✅ Permitido |
-| `DELIVERED` | 🔒 **Bloqueado** - No puede actualizar | Puede cambiar a `CANCELED`, `RESOLVED` | ❌ **Protegido** |
-| `CANCELED` | 🔒 **Estado final** | 🔒 **Estado final** | ✅ Permitido |
-| `RESOLVED` | 🔒 **Estado final** | 🔒 **Estado final** | ✅ Permitido |
+| Estado | Mensajero | Admin | Eliminar | Bloqueo |
+|--------|-----------|-------|----------|---------|
+| `ASSIGNED` | → `PENDING`, `DELIVERED`, `RETURNED` | → `CANCELED`, `RESOLVED` | ✅ Papelera | - |
+| `RETURNED` | → `PENDING`, `DELIVERED` | → `CANCELED`, `RESOLVED` | ✅ Papelera | - |
+| `PENDING` | 🔒 **Bloqueado** hasta intervención admin | → `CANCELED`, `RESOLVED` | ✅ Papelera | - |
+| `DELIVERED` | 🔒 **Bloqueado** | → `CANCELED`, `RESOLVED` (dentro de 72h) | ❌ Protegido | ⏱️ 72h |
+| `CANCELED` | 🔒 Final | Admin puede **reasignar** → `ASSIGNED` | ✅ Papelera | - |
+| `RESOLVED` | 🔒 Final | 🔒 Final (dentro de 72h desde DELIVERED) | ✅ Papelera | ⏱️ 72h |
 
 ### Resumen de Permisos
 
-| Rol | Estados Disponibles | Notas |
-|-----|---------------------|-------|
-| **MESSENGER** | `PENDING`, `DELIVERED`, `RETURNED` | No puede actualizar después de `PENDING` o `DELIVERED` |
-| **ADMIN** | Todos los estados | Único rol que puede desbloquear `PENDING`/`DELIVERED` |
+| Rol | Estados Disponibles | Acciones Especiales | Notas |
+|-----|---------------------|---------------------|-------|
+| **MENSAJERO** | `PENDING`, `DELIVERED`, `RETURNED` | - | Bloqueado después de usar `PENDING` hasta intervención admin |
+| **ADMIN** | `CANCELED`, `RESOLVED` | **Reasignar mensajero** (solo desde `CANCELED`) | Puede desbloquear servicios |
+
+### Flujo de Reasignación
+
+```mermaid
+flowchart LR
+    A[Servicio en CANCELED] --> B{Admin reasigna}
+    B --> C[Nuevo mensajero asignado]
+    C --> D[Estado → ASSIGNED]
+    D --> E[Bloqueo 72h reiniciado]
+```
+
+### Gestión de Papelera (Soft Delete)
+
+| Acción | Endpoint | Descripción |
+|--------|----------|-------------|
+| Eliminar → Papelera | `DELETE /services/{id}` | Mueve a papelera (soft delete) |
+| Ver Papelera | `GET /services/trash` | Lista servicios eliminados (ADMIN) |
+| Restaurar | `POST /services/trash/restore/{id}` | Restaura desde papelera (ADMIN) |
+| Limpieza Automática | Job programado | Eliminación permanente después de 60 días |
 
 ---
 

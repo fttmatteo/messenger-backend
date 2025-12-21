@@ -3,8 +3,6 @@ package app.adapter.in.rest.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,8 +18,8 @@ import app.application.usecase.ServiceDeliveryUseCase;
 import app.domain.model.Employee;
 import app.domain.model.ServiceDelivery;
 import app.domain.model.enums.Role;
-import app.domain.ports.EmployeePort;
 import app.infrastructure.helper.FileHelper;
+import app.infrastructure.helper.SecurityHelper;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +52,7 @@ public class ServiceDeliveryController {
     @Autowired
     private ServiceDeliveryResponseMapper responseMapper;
     @Autowired
-    private EmployeePort employeePort;
+    private SecurityHelper securityHelper;
     @Autowired
     private FileHelper fileHelper;
 
@@ -68,7 +66,7 @@ public class ServiceDeliveryController {
 
         logger.info("Solicitud creación servicio. DealershipId: {}", dealershipId);
 
-        Employee currentUser = getCurrentUser();
+        Employee currentUser = securityHelper.getCurrentUser();
 
         String finalMessengerId = messengerId;
         if (currentUser.getRole() != Role.ADMIN) {
@@ -115,7 +113,7 @@ public class ServiceDeliveryController {
 
         List<File> tempFiles = new ArrayList<>();
         try {
-            Employee currentUser = getCurrentUser();
+            Employee currentUser = securityHelper.getCurrentUser();
             String userId = String.valueOf(currentUser.getIdEmployee());
 
             ServiceDeliveryUpdateStatusRequest request = new ServiceDeliveryUpdateStatusRequest(status, observation,
@@ -158,7 +156,7 @@ public class ServiceDeliveryController {
             throw new InputsException("El ID del nuevo mensajero es requerido.");
         }
 
-        Employee currentUser = getCurrentUser();
+        Employee currentUser = securityHelper.getCurrentUser();
         ServiceDelivery reassigned = serviceDeliveryUseCase.reassignMessenger(
                 id, newMessengerId, currentUser.getIdEmployee());
 
@@ -173,7 +171,7 @@ public class ServiceDeliveryController {
             throw new ResourceNotFoundException("Servicio con ID " + id + " no encontrado");
         }
 
-        Employee currentUser = getCurrentUser();
+        Employee currentUser = securityHelper.getCurrentUser();
 
         if (currentUser.getRole() == Role.MESSENGER) {
             if (service.getMessenger() == null ||
@@ -188,7 +186,7 @@ public class ServiceDeliveryController {
     @GetMapping("/allServices")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ServiceDeliveryResponse>> findAll() {
-        Employee currentUser = getCurrentUser();
+        Employee currentUser = securityHelper.getCurrentUser();
 
         List<ServiceDelivery> services = serviceDeliveryUseCase.findAll();
 
@@ -215,7 +213,7 @@ public class ServiceDeliveryController {
     public ResponseEntity<Map<String, String>> delete(@PathVariable Long id) throws Exception {
         logger.info("Solicitud eliminación servicio ID: {}", id);
 
-        Employee currentUser = getCurrentUser();
+        Employee currentUser = securityHelper.getCurrentUser();
         serviceDeliveryUseCase.deleteById(id, currentUser.getIdEmployee());
 
         return ResponseEntity.ok(Map.of(
@@ -251,26 +249,9 @@ public class ServiceDeliveryController {
     public ResponseEntity<ServiceDeliveryResponse> restore(@PathVariable Long id) throws Exception {
         logger.info("Solicitud restaurar servicio ID: {} desde papelera", id);
 
-        Employee currentUser = getCurrentUser();
+        Employee currentUser = securityHelper.getCurrentUser();
         ServiceDelivery restored = serviceDeliveryUseCase.restore(id, currentUser.getIdEmployee());
 
         return ResponseEntity.ok(responseMapper.toResponse(restored));
-    }
-
-    // ================================
-    // Helper Methods
-    // ================================
-
-    private Employee getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String documentStr = auth.getName();
-        Long document = Long.parseLong(documentStr);
-        Employee currentUser = employeePort.findByDocument(document);
-
-        if (currentUser == null) {
-            throw new UnauthorizedException("Autenticación de usuario no encontrada o inválida.");
-        }
-
-        return currentUser;
     }
 }
