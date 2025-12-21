@@ -1,3 +1,5 @@
+> **Copyright (C) 2025 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**
+
 <div align="center">
 
 # 🚀 Messenger Backend API
@@ -1638,3 +1640,5 @@ Ver archivo [LICENSE](./LICENSE) para detalles.
 **Made with ❤️ using Spring Boot 4.0**
 
 </div>
+
+> **Copyright (C) 2025 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**

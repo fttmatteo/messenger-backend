@@ -1,3 +1,5 @@
+> **Copyright (C) 2025 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**
+
 # Security Policy / Política de Seguridad
 
 **[🇺🇸 English](#security-policy)** | **[🇪🇸 Español](#política-de-seguridad)**
@@ -105,3 +107,5 @@ Este proyecto implementa:
 - ✅ HTTPS obligatorio en producción
 - ✅ Secretos gestionados via variables de entorno
 - ✅ Escaneo de dependencias via Dependabot
+
+> **Copyright (C) 2025 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**
