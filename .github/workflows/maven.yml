@@ -47,7 +47,7 @@ jobs:
     steps:
       # Configuración inicial
       - name: 📥 Clonar repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: ☕ Configurar JDK 21
         uses: actions/setup-java@v4
