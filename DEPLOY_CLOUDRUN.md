@@ -1229,8 +1229,8 @@ jobs:
 
 **Proyecto Específico:**
 - Repository: `messenger-backend`
-- Email: valenciaardila988@icloud.com
 - Autor: Matteo
+- Email: valenciaardila988@icloud.com
 - Última actualización: Diciembre 2025
 
 ---

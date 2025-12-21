@@ -458,20 +458,11 @@ stateDiagram-v2
     ASSIGNED --> DELIVERED: Messenger
     ASSIGNED --> RETURNED: Messenger
     
-    RETURNED --> PENDING: Messenger
-    RETURNED --> DELIVERED: Messenger
-    
     PENDING --> CANCELED: Admin only
     PENDING --> RESOLVED: Admin only
     
     DELIVERED --> CANCELED: Admin only
     DELIVERED --> RESOLVED: Admin only
-    
-    RETURNED --> CANCELED: Admin
-    RETURNED --> RESOLVED: Admin
-    
-    ASSIGNED --> CANCELED: Admin
-    ASSIGNED --> RESOLVED: Admin
 ```
 
 ### State Rules
@@ -584,6 +575,8 @@ stateDiagram-v2
 ---
 
 ## ⚙️ Setup & Installation
+
+> 🚀 **Deploying to Production?** See the complete [**Cloud Run Deployment Guide**](./DEPLOY_CLOUDRUN.md) for step-by-step instructions on deploying to Google Cloud.
 
 ### Prerequisites
 
@@ -716,10 +709,24 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 5. All other endpoints use the token automatically
 6. When access token expires, run **"Refresh Token"**
 
-> **Last update**: December 2024
+> **Last update**: December 2025
 > - ✨ Added refresh token endpoint
 > - 🔄 Improved automatic token handling
 > - 📝 Updated response documentation
+
+---
+
+## 📧 Support & Contact
+
+**Official Documentation:**
+- [Spring Boot Documentation](https://spring.io/projects/spring-boot)
+- [Google Cloud Run](https://cloud.google.com/run/docs)
+
+**Project Specific:**
+- Repository: `messenger-backend`
+- Author: Matteo
+- Email: valenciaardila988@icloud.com
+- Last update: December 2025
 
 </details>
 
@@ -1162,20 +1169,11 @@ stateDiagram-v2
     ASSIGNED --> DELIVERED: Mensajero
     ASSIGNED --> RETURNED: Mensajero
     
-    RETURNED --> PENDING: Mensajero
-    RETURNED --> DELIVERED: Mensajero
-    
     PENDING --> CANCELED: Solo Admin
     PENDING --> RESOLVED: Solo Admin
     
     DELIVERED --> CANCELED: Solo Admin
     DELIVERED --> RESOLVED: Solo Admin
-    
-    RETURNED --> CANCELED: Admin
-    RETURNED --> RESOLVED: Admin
-    
-    ASSIGNED --> CANCELED: Admin
-    ASSIGNED --> RESOLVED: Admin
 ```
 
 ### Reglas de Estados
@@ -1293,6 +1291,8 @@ stateDiagram-v2
 ---
 
 ## ⚙️ Configuración e Instalación
+
+> 🚀 **¿Desplegar en Producción?** Consulta la guía completa de [**Despliegue en Cloud Run**](./DEPLOY_CLOUDRUN.md) con instrucciones paso a paso para desplegar en Google Cloud.
 
 ### Prerrequisitos
 
@@ -1425,10 +1425,24 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 5. Todos los demás endpoints usan el token automáticamente
 6. Cuando el access token expire, ejecutar **"Refresh Token"**
 
-> **Última actualización**: Diciembre 2024
+> **Última actualización**: Diciembre 2025
 > - ✨ Añadido endpoint de refresh token
 > - 🔄 Mejorado manejo automático de tokens
 > - 📝 Actualizada documentación de respuestas
+
+---
+
+## 📧 Soporte y Contacto
+
+**Documentación Oficial:**
+- [Documentación de Spring Boot](https://spring.io/projects/spring-boot)
+- [Google Cloud Run](https://cloud.google.com/run/docs)
+
+**Proyecto Específico:**
+- Repositorio: `messenger-backend`
+- Autor: Matteo
+- Email: valenciaardila988@icloud.com
+- Última actualización: Diciembre 2025
 
 ---
 
