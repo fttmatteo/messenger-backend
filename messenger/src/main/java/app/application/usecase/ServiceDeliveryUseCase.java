@@ -166,14 +166,17 @@ public class ServiceDeliveryUseCase {
         return updateService.reassignMessenger(serviceId, newMessengerId, adminUserId);
     }
 
+    @Transactional(readOnly = true)
     public ServiceDelivery findById(Long id) throws Exception {
         return searchService.findById(id);
     }
 
+    @Transactional(readOnly = true)
     public List<ServiceDelivery> findAll() {
         return searchService.findAll();
     }
 
+    @Transactional(readOnly = true)
     public List<ServiceDelivery> findByPlate(String plateNumber) {
         return searchService.findByPlate(plateNumber);
     }
@@ -198,6 +201,7 @@ public class ServiceDeliveryUseCase {
     /**
      * Retorna todos los servicios en la papelera.
      */
+    @Transactional(readOnly = true)
     public List<ServiceDelivery> findDeleted() {
         return searchService.findDeleted();
     }
