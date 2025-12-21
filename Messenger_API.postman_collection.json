@@ -2,13 +2,13 @@
     "info": {
         "_postman_id": "messenger-api-collection",
         "name": "Messenger API - Backend",
-        "description": "Complete API documentation for the Messenger/Delivery Management System Backend.\n\n## Authentication\nAll endpoints except `/auth/login` and `/files/**` require JWT authentication.\n\nAdd the token to your requests:\n- Header: `Authorization: Bearer {{token}}`\n\n## Roles\n- **ADMIN**: Full access (CANCELED, RESOLVED states only)\n- **MESSENGER**: Limited access (PENDING, DELIVERED, RETURNED states only)\n\n## Status Flow\n- ASSIGNED → PENDING, DELIVERED, RETURNED (Messenger)\n- PENDING → CANCELED, RESOLVED (Admin only)\n- DELIVERED → CANCELED, RESOLVED (Admin, within 72h)\n- CANCELED → Can be reassigned (Admin)\n\n## Available Statuses\n`ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED`",
+        "description": "Complete API documentation for the Messenger/Delivery Management System Backend.\n\n## Authentication\nAll endpoints except `/auth/login` and `/files/**` require JWT authentication.\n\nAdd the token to your requests:\n- Header: `Authorization: Bearer {{token}}`\n\n## Roles\n- **ADMIN**: Full access (CANCELED, RESOLVED states only)\n- **MESSENGER**: Limited access (PENDING, DELIVERED, RETURNED states only)\n\n## Status Flow\n- ASSIGNED \u2192 PENDING, DELIVERED, RETURNED (Messenger)\n- PENDING \u2192 CANCELED, RESOLVED (Admin only)\n- DELIVERED \u2192 CANCELED, RESOLVED (Admin, within 72h)\n- CANCELED \u2192 Can be reassigned (Admin)\n\n## Available Statuses\n`ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED`",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "variable": [
         {
             "key": "baseUrl",
-            "value": "http://localhost:8080",
+            "value": "https://messenger-backend-190705671004.us-central1.run.app",
             "type": "string"
         },
         {
@@ -24,7 +24,7 @@
     ],
     "item": [
         {
-            "name": "🔐 Authentication",
+            "name": "\ud83d\udd10 Authentication",
             "item": [
                 {
                     "name": "Login",
@@ -58,7 +58,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"userName\": \"admin\",\n    \"password\": \"admin123\"\n}"
+                            "raw": "{\n    \"document\": 1000000001,\n    \"password\": \"Admin123!\"\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/auth/login",
@@ -124,7 +124,7 @@
             ]
         },
         {
-            "name": "👥 Employees",
+            "name": "\ud83d\udc65 Employees",
             "item": [
                 {
                     "name": "Create Employee",
@@ -148,7 +148,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"document\": \"1234567890\",\n    \"fullName\": \"Juan Pérez\",\n    \"phone\": \"3001234567\",\n    \"userName\": \"jperez\",\n    \"password\": \"password123\",\n    \"role\": \"MESSENGER\"\n}"
+                            "raw": "{\n    \"document\": \"1234567890\",\n    \"fullName\": \"Juan P\u00e9rez\",\n    \"phone\": \"3001234567\",\n    \"userName\": \"jperez\",\n    \"password\": \"password123\",\n    \"role\": \"MESSENGER\"\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/employees/createEmployee",
@@ -242,7 +242,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"document\": \"1234567890\",\n    \"fullName\": \"Juan Pérez Updated\",\n    \"phone\": \"3009876543\",\n    \"userName\": \"jperez\",\n    \"password\": \"newpassword123\",\n    \"role\": \"MESSENGER\"\n}"
+                            "raw": "{\n    \"document\": \"1234567890\",\n    \"fullName\": \"Juan P\u00e9rez Updated\",\n    \"phone\": \"3009876543\",\n    \"userName\": \"jperez\",\n    \"password\": \"newpassword123\",\n    \"role\": \"MESSENGER\"\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/employees/updateEmployee/1",
@@ -289,7 +289,7 @@
             ]
         },
         {
-            "name": "🏢 Dealerships",
+            "name": "\ud83c\udfe2 Dealerships",
             "item": [
                 {
                     "name": "Create Dealership",
@@ -313,7 +313,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"name\": \"Concesionario Centro\",\n    \"address\": \"Calle 50 #45-20, Medellín\",\n    \"phone\": \"6041234567\",\n    \"zone\": \"CENTRO\"\n}"
+                            "raw": "{\n    \"name\": \"Concesionario Centro\",\n    \"address\": \"Calle 50 #45-20, Medell\u00edn\",\n    \"phone\": \"6041234567\",\n    \"zone\": \"CENTRO\"\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/dealerships/createDealership",
@@ -405,7 +405,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"name\": \"Concesionario Centro Updated\",\n    \"address\": \"Calle 51 #46-21, Medellín\",\n    \"phone\": \"6049876543\",\n    \"zone\": \"CENTRO\"\n}"
+                            "raw": "{\n    \"name\": \"Concesionario Centro Updated\",\n    \"address\": \"Calle 51 #46-21, Medell\u00edn\",\n    \"phone\": \"6049876543\",\n    \"zone\": \"CENTRO\"\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/dealerships/updateDealership/1",
@@ -509,7 +509,7 @@
             ]
         },
         {
-            "name": "📍 Locations",
+            "name": "\ud83d\udccd Locations",
             "item": [
                 {
                     "name": "Geocode Address",
@@ -533,7 +533,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"address\": \"Parque Berrio, Medellín\"\n}"
+                            "raw": "{\n    \"address\": \"Parque Berrio, Medell\u00edn\"\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/locations/geocode",
@@ -670,7 +670,7 @@
             ]
         },
         {
-            "name": "📡 Tracking",
+            "name": "\ud83d\udce1 Tracking",
             "item": [
                 {
                     "name": "Update Live Location",
@@ -829,7 +829,7 @@
             ]
         },
         {
-            "name": "📦 Service Deliveries",
+            "name": "\ud83d\udce6 Service Deliveries",
             "item": [
                 {
                     "name": "Create Service (with OCR)",
@@ -1178,7 +1178,7 @@
             ]
         },
         {
-            "name": "📁 Files",
+            "name": "\ud83d\udcc1 Files",
             "item": [
                 {
                     "name": "Get File",
