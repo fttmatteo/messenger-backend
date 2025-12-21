@@ -62,14 +62,6 @@ class SecurityHelperTest {
         SecurityContextHolder.setContext(context);
     }
 
-    private void mockUnauthenticatedUser(String username) {
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        // Token sin authorities = no autenticado
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(username, "password");
-        context.setAuthentication(auth);
-        SecurityContextHolder.setContext(context);
-    }
-
     // ========================================
     // getCurrentUser() Tests
     // ========================================
