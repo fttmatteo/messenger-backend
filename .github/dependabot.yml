@@ -9,9 +9,8 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      interval: "daily"
+      time: "13:45"
       timezone: "America/Bogota"
     commit-message:
       prefix: "ci(deps)"
@@ -24,9 +23,8 @@ updates:
   - package-ecosystem: "maven"
     directory: "/messenger"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      interval: "daily"
+      time: "13:45"
       timezone: "America/Bogota"
     commit-message:
       prefix: "build(deps)"
