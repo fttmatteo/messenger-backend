@@ -242,4 +242,106 @@ class UpdateServiceDeliveryTest {
 
         assertEquals("El servicio ya se encuentra en estado ASSIGNED", ex.getMessage());
     }
+
+    // ===============================
+    // Tests de Ventana de 72 horas
+    // ===============================
+
+    @Test
+    @DisplayName("Debe bloquear edición después de 72 horas")
+    void shouldBlockEditAfter72Hours() {
+        service.setCurrentStatus(Status.DELIVERED);
+        service.setLockedAt(java.time.LocalDateTime.now().minusHours(73)); // Pasaron 73 horas
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(2L)).thenReturn(admin);
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> updateServiceDelivery.updateStatus(1L, Status.RESOLVED, "Obs", null, null, 2L));
+
+        assertTrue(ex.getMessage().contains("El período de edición de 72 horas ha expirado"));
+    }
+
+    @Test
+    @DisplayName("Debe permitir edición dentro de 72 horas")
+    void shouldAllowEditWithin72Hours() throws Exception {
+        service.setCurrentStatus(Status.DELIVERED);
+        service.setLockedAt(java.time.LocalDateTime.now().minusHours(50)); // Solo 50 horas
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(2L)).thenReturn(admin);
+        when(serviceDeliveryPort.save(argThat(s -> s.getCurrentStatus() == Status.RESOLVED))).thenReturn(service);
+
+        updateServiceDelivery.updateStatus(1L, Status.RESOLVED, "Resuelto dentro de ventana", null, null, 2L);
+
+        verify(serviceDeliveryPort).save(argThat(s -> s.getCurrentStatus() == Status.RESOLVED));
+    }
+
+    @Test
+    @DisplayName("Debe establecer lockedAt al cambiar a DELIVERED")
+    void shouldSetLockedAtWhenDelivered() throws Exception {
+        service.setCurrentStatus(Status.ASSIGNED);
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(1L)).thenReturn(messenger);
+        when(serviceDeliveryPort.save(argThat(s -> s.getLockedAt() != null))).thenReturn(service);
+
+        updateServiceDelivery.updateStatus(1L, Status.DELIVERED, null, signature, null, 1L);
+
+        verify(serviceDeliveryPort)
+                .save(argThat(s -> s.getCurrentStatus() == Status.DELIVERED && s.getLockedAt() != null));
+    }
+
+    // ===============================
+    // Tests de Reasignación
+    // ===============================
+
+    @Test
+    @DisplayName("Debe reasignar mensajero cuando servicio está en CANCELED")
+    void shouldReassignMessengerFromCanceled() throws Exception {
+        service.setCurrentStatus(Status.CANCELED);
+
+        Employee newMessenger = new Employee();
+        newMessenger.setIdEmployee(3L);
+        newMessenger.setRole(Role.MESSENGER);
+
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(2L)).thenReturn(admin);
+        when(employeePort.findById(3L)).thenReturn(newMessenger);
+        when(serviceDeliveryPort.save(argThat(s -> s.getCurrentStatus() == Status.ASSIGNED))).thenReturn(service);
+
+        updateServiceDelivery.reassignMessenger(1L, 3L, 2L);
+
+        verify(serviceDeliveryPort).save(argThat(s -> s.getCurrentStatus() == Status.ASSIGNED &&
+                s.getMessenger().equals(newMessenger) &&
+                s.getLockedAt() == null));
+    }
+
+    @Test
+    @DisplayName("Debe impedir reasignación si no está en CANCELED")
+    void shouldForbidReassignIfNotCanceled() {
+        service.setCurrentStatus(Status.PENDING);
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(2L)).thenReturn(admin);
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> updateServiceDelivery.reassignMessenger(1L, 3L, 2L));
+
+        assertEquals("Solo se pueden reasignar servicios en estado CANCELED. Estado actual: PENDING", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Debe impedir reasignación si no es ADMIN")
+    void shouldForbidReassignIfNotAdmin() {
+        service.setCurrentStatus(Status.CANCELED);
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(1L)).thenReturn(messenger);
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> updateServiceDelivery.reassignMessenger(1L, 3L, 1L));
+
+        assertEquals("Solo los administradores pueden reasignar servicios.", ex.getMessage());
+    }
+
+    // Helper para assertions con assertTrue
+    private static void assertTrue(boolean condition) {
+        org.junit.jupiter.api.Assertions.assertTrue(condition);
+    }
 }
