@@ -8,9 +8,9 @@
 [![Redis](https://img.shields.io/badge/Redis-6.0+-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](./LICENSE)
 
-**Sistema de gestión de entregas y mensajería con reconocimiento automático de placas vehiculares mediante OCR.**
+**Sistema de entregas con reconocimiento automático de placas vehiculares mediante OCR.**
 
-*Delivery and courier management system with automatic license plate recognition via OCR.*
+*Delivery management system with automatic license plate recognition via OCR.*
 
 [🇪🇸 Español](#-tabla-de-contenidos) • [🇺🇸 English](#-table-of-contents)
 
