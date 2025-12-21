@@ -25,6 +25,15 @@ import app.domain.services.UpdateServiceDelivery;
 
 /**
  * Caso de uso principal para gestión de servicios de entrega.
+ * 
+ * Reglas de negocio implementadas:
+ * - Creación automática con estado ASSIGNED al mensajero autenticado
+ * - Mensajero: solo puede usar PENDING, DELIVERED, RETURNED
+ * - Admin: solo puede usar CANCELED, RESOLVED y reasignar mensajero
+ * - Cuando mensajero usa PENDING → bloqueado hasta que admin use
+ * CANCELED/RESOLVED
+ * - DELIVERED/RESOLVED → 72 horas para cambiar estado, después bloqueado
+ * - Eliminación → Papelera (soft delete) con borrado definitivo a los 60 días
  */
 @Service
 public class ServiceDeliveryUseCase {
@@ -100,10 +109,6 @@ public class ServiceDeliveryUseCase {
         logger.info("Actualizando estado con archivos. ServiceID: {}, NuevoEstado: {}", serviceId, newStatus);
 
         ServiceDelivery service = searchService.findById(serviceId);
-        if (service == null) {
-            logger.warn("Intento de actualizar servicio inexistente ID: {}", serviceId);
-            throw new Exception("Servicio no encontrado con ID: " + serviceId);
-        }
         String plateNumber = service.getPlate().getPlateNumber();
         String timestamp = LocalDateTime.now().format(DATE_FORMAT);
 
@@ -146,6 +151,16 @@ public class ServiceDeliveryUseCase {
         }
     }
 
+    /**
+     * Reasigna un servicio a otro mensajero (solo ADMIN, solo si está en CANCELED).
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public ServiceDelivery reassignMessenger(Long serviceId, Long newMessengerId, Long adminUserId) throws Exception {
+        logger.info("Reasignando servicio ID: {} a mensajero ID: {} por admin ID: {}",
+                serviceId, newMessengerId, adminUserId);
+        return updateService.reassignMessenger(serviceId, newMessengerId, adminUserId);
+    }
+
     public ServiceDelivery findById(Long id) throws Exception {
         return searchService.findById(id);
     }
@@ -158,8 +173,36 @@ public class ServiceDeliveryUseCase {
         return searchService.findByPlate(plateNumber);
     }
 
+    /**
+     * Mueve un servicio a la papelera (soft delete).
+     */
     public void deleteById(Long id) throws Exception {
+        logger.info("Moviendo servicio ID: {} a la papelera", id);
         deleteService.deleteById(id);
+    }
+
+    /**
+     * Mueve un servicio a la papelera con registro del usuario.
+     */
+    public void deleteById(Long id, Long userId) throws Exception {
+        logger.info("Moviendo servicio ID: {} a la papelera por usuario ID: {}", id, userId);
+        deleteService.deleteById(id, userId);
+    }
+
+    /**
+     * Retorna todos los servicios en la papelera.
+     */
+    public List<ServiceDelivery> findDeleted() {
+        return searchService.findDeleted();
+    }
+
+    /**
+     * Restaura un servicio desde la papelera (solo ADMIN).
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public ServiceDelivery restore(Long id, Long userId) throws Exception {
+        logger.info("Restaurando servicio ID: {} de la papelera por usuario ID: {}", id, userId);
+        return deleteService.restore(id, userId);
     }
 
     private void cleanupFiles(String... paths) {

@@ -7,6 +7,7 @@ import app.infrastructure.persistence.mapper.ServiceDeliveryMapper;
 import app.infrastructure.persistence.repository.ServiceDeliveryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -55,5 +56,37 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
         return repository.findByPlate_PlateNumber(plateNumber).stream()
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ServiceDelivery> findAllActive() {
+        return repository.findByDeletedFalse().stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public ServiceDelivery findByIdActive(Long idServiceDelivery) {
+        Optional<ServiceDeliveryEntity> entity = repository.findByIdServiceDeliveryAndDeletedFalse(idServiceDelivery);
+        return entity.map(mapper::toDomain).orElse(null);
+    }
+
+    @Override
+    public List<ServiceDelivery> findDeleted() {
+        return repository.findByDeletedTrue().stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ServiceDelivery> findDeletedExpiredBefore(LocalDateTime date) {
+        return repository.findByDeletedTrueAndDeletedAtBefore(date).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void hardDeleteById(Long idServiceDelivery) {
+        repository.deleteById(idServiceDelivery);
     }
 }

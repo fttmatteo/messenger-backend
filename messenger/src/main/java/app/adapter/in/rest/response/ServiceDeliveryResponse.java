@@ -20,12 +20,61 @@ public class ServiceDeliveryResponse {
     private List<StatusHistoryResponse> history = new ArrayList<>();
     private java.time.LocalDateTime createdAt;
 
+    // Campos de bloqueo (ventana de 72 horas)
+    private java.time.LocalDateTime lockedAt;
+    private java.time.LocalDateTime editDeadline;
+    private boolean isLocked;
+
+    // Campos de papelera (soft delete)
+    private boolean deleted;
+    private java.time.LocalDateTime deletedAt;
+
     public java.time.LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
     public void setCreatedAt(java.time.LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public java.time.LocalDateTime getLockedAt() {
+        return lockedAt;
+    }
+
+    public void setLockedAt(java.time.LocalDateTime lockedAt) {
+        this.lockedAt = lockedAt;
+    }
+
+    public java.time.LocalDateTime getEditDeadline() {
+        return editDeadline;
+    }
+
+    public void setEditDeadline(java.time.LocalDateTime editDeadline) {
+        this.editDeadline = editDeadline;
+    }
+
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    public void setLocked(boolean locked) {
+        isLocked = locked;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public java.time.LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(java.time.LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
     }
 
     public ServiceDeliveryResponse() {

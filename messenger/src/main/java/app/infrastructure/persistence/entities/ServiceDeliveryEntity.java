@@ -123,6 +123,21 @@ public class ServiceDeliveryEntity {
     @Column(name = "created_at", nullable = true, updatable = false)
     private java.time.LocalDateTime createdAt;
 
+    /** Indica si el servicio está en la papelera (soft delete). */
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+
+    /** Fecha y hora en que el servicio fue movido a la papelera. */
+    @Column(name = "deleted_at")
+    private java.time.LocalDateTime deletedAt;
+
+    /**
+     * Fecha y hora en que el servicio fue bloqueado (DELIVERED/RESOLVED). Ventana
+     * de 72h para edición.
+     */
+    @Column(name = "locked_at")
+    private java.time.LocalDateTime lockedAt;
+
     /** Callback JPA para establecer la fecha de creación automáticamente. */
     @PrePersist
     protected void onCreate() {
@@ -135,5 +150,29 @@ public class ServiceDeliveryEntity {
 
     public void setCreatedAt(java.time.LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public java.time.LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(java.time.LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public java.time.LocalDateTime getLockedAt() {
+        return lockedAt;
+    }
+
+    public void setLockedAt(java.time.LocalDateTime lockedAt) {
+        this.lockedAt = lockedAt;
     }
 }

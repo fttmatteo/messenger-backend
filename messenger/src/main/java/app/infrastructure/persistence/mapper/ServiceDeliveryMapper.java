@@ -35,6 +35,9 @@ public class ServiceDeliveryMapper {
         entity.setCurrentStatus(serviceDelivery.getCurrentStatus());
         entity.setObservation(serviceDelivery.getObservation());
         entity.setCreatedAt(serviceDelivery.getCreatedAt());
+        entity.setDeleted(serviceDelivery.isDeleted());
+        entity.setDeletedAt(serviceDelivery.getDeletedAt());
+        entity.setLockedAt(serviceDelivery.getLockedAt());
 
         if (serviceDelivery.getSignature() != null) {
             SignatureEntity sigEntity = new SignatureEntity();
@@ -152,6 +155,9 @@ public class ServiceDeliveryMapper {
         }
 
         serviceDelivery.setCreatedAt(entity.getCreatedAt());
+        serviceDelivery.setDeleted(entity.isDeleted());
+        serviceDelivery.setDeletedAt(entity.getDeletedAt());
+        serviceDelivery.setLockedAt(entity.getLockedAt());
 
         return serviceDelivery;
     }

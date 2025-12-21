@@ -5,6 +5,7 @@ import app.adapter.out.storage.GoogleCloudStorageAdapter;
 import app.domain.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 /**
@@ -12,6 +13,8 @@ import java.util.stream.Collectors;
  */
 @Component
 public class ServiceDeliveryResponseMapper {
+
+    private static final long EDIT_WINDOW_HOURS = 72;
 
     @Autowired
     private EmployeeResponseMapper employeeMapper;
@@ -41,6 +44,20 @@ public class ServiceDeliveryResponseMapper {
         response.setCurrentStatus(service.getCurrentStatus());
         response.setObservation(service.getObservation());
         response.setCreatedAt(service.getCreatedAt());
+
+        // Campos de bloqueo (ventana de 72 horas)
+        response.setLockedAt(service.getLockedAt());
+        if (service.getLockedAt() != null) {
+            LocalDateTime editDeadline = service.getLockedAt().plusHours(EDIT_WINDOW_HOURS);
+            response.setEditDeadline(editDeadline);
+            response.setLocked(LocalDateTime.now().isAfter(editDeadline));
+        } else {
+            response.setLocked(false);
+        }
+
+        // Campos de papelera (soft delete)
+        response.setDeleted(service.isDeleted());
+        response.setDeletedAt(service.getDeletedAt());
 
         if (service.getPlate() != null) {
             Plate plate = service.getPlate();
