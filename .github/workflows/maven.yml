@@ -73,7 +73,7 @@ jobs:
 
       # Artefactos (opcional: subir JAR para inspección)
       - name: 📤 Subir artefacto JAR
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: github.ref == 'refs/heads/main'
         with:
           name: messenger-backend-${{ github.sha }}
