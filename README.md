@@ -2,6 +2,9 @@
 
 <div align="center">
 
+[![Dependabot Updates](https://github.com/fttmatteo/messenger-backend/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/fttmatteo/messenger-backend/actions/workflows/dependabot/dependabot-updates)
+[![CI Pipeline](https://github.com/fttmatteo/messenger-backend/actions/workflows/maven.yml/badge.svg)](https://github.com/fttmatteo/messenger-backend/actions/workflows/maven.yml)
+
 # 🚀 Messenger Backend API
 
 [![Java](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
