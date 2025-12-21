@@ -9,6 +9,7 @@ import app.domain.ports.ServiceDeliveryPort;
 
 /**
  * Servicio para búsqueda de servicios de entrega.
+ * Por defecto, excluye los servicios eliminados (en papelera).
  */
 @Service
 public class SearchServiceDelivery {
@@ -16,12 +17,35 @@ public class SearchServiceDelivery {
     @Autowired
     private ServiceDeliveryPort serviceDeliveryPort;
 
+    /**
+     * Retorna todos los servicios activos (excluye los eliminados).
+     */
     public List<ServiceDelivery> findAll() {
-        List<ServiceDelivery> services = serviceDeliveryPort.findAll();
-        return services;
+        return serviceDeliveryPort.findAllActive();
     }
 
+    /**
+     * Retorna todos los servicios incluyendo los eliminados.
+     */
+    public List<ServiceDelivery> findAllIncludingDeleted() {
+        return serviceDeliveryPort.findAll();
+    }
+
+    /**
+     * Busca un servicio por ID (excluye los eliminados).
+     */
     public ServiceDelivery findById(Long id) throws BusinessException {
+        ServiceDelivery service = serviceDeliveryPort.findByIdActive(id);
+        if (service == null) {
+            throw new BusinessException("El servicio con ID " + id + " no existe o está en la papelera.");
+        }
+        return service;
+    }
+
+    /**
+     * Busca un servicio por ID incluyendo los eliminados.
+     */
+    public ServiceDelivery findByIdIncludingDeleted(Long id) throws BusinessException {
         ServiceDelivery service = serviceDeliveryPort.findById(id);
         if (service == null) {
             throw new BusinessException("El servicio con ID " + id + " no existe.");
@@ -29,8 +53,18 @@ public class SearchServiceDelivery {
         return service;
     }
 
+    /**
+     * Busca servicios por número de placa (excluye los eliminados).
+     */
     public List<ServiceDelivery> findByPlate(String plateNumber) {
         String normalized = plateNumber.trim().toUpperCase();
         return serviceDeliveryPort.findByPlateNumber(normalized);
+    }
+
+    /**
+     * Retorna todos los servicios en la papelera.
+     */
+    public List<ServiceDelivery> findDeleted() {
+        return serviceDeliveryPort.findDeleted();
     }
 }

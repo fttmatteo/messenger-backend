@@ -33,6 +33,7 @@
 - [State Flow](#-state-flow)
 - [Security](#-security)
 - [Observability](#-observability)
+- [Auditing](#-auditing)
 - [Setup & Installation](#️-setup--installation)
 - [CI/CD](#-cicd)
 - [Testing](#-testing)
@@ -461,27 +462,69 @@ stateDiagram-v2
     PENDING --> CANCELED: Admin only
     PENDING --> RESOLVED: Admin only
     
-    DELIVERED --> CANCELED: Admin only
-    DELIVERED --> RESOLVED: Admin only
+    DELIVERED --> CANCELED: Admin (within 72h)
+    DELIVERED --> RESOLVED: Admin (within 72h)
+    
+    CANCELED --> ASSIGNED: Admin reassigns
+    
+    RETURNED --> PENDING: Messenger
+    RETURNED --> DELIVERED: Messenger
 ```
+
+### Business Rules
+
+> [!IMPORTANT]
+> **Role-Based Status Transitions**
+> - **MESSENGER** can only use: `PENDING`, `DELIVERED`, `RETURNED`
+> - **ADMIN** can only use: `CANCELED`, `RESOLVED`
+
+> [!WARNING]
+> **Edit Lock (72-Hour Window)**
+> When a service is updated to `DELIVERED` or `RESOLVED`, a **72-hour window** starts. 
+> After this period, the service becomes **immutable** (no status or data changes allowed).
+
+> [!NOTE]
+> **Soft Delete (Trash Bin)**
+> Deleted services are moved to a **trash bin** and permanently deleted after **60 days**.
+> Admins can restore services from the trash before permanent deletion.
 
 ### State Rules
 
-| State | Messenger | Admin | Delete |
-|-------|-----------|-------|--------|
-| `ASSIGNED` | Can change to `PENDING`, `DELIVERED`, `RETURNED` | Can change to any state | ✅ Allowed |
-| `RETURNED` | Can change to `PENDING`, `DELIVERED` | Can change to any state | ✅ Allowed |
-| `PENDING` | 🔒 **Locked** - Cannot update | Can change to `CANCELED`, `RESOLVED` | ✅ Allowed |
-| `DELIVERED` | 🔒 **Locked** - Cannot update | Can change to `CANCELED`, `RESOLVED` | ❌ **Protected** |
-| `CANCELED` | 🔒 **Final state** | 🔒 **Final state** | ✅ Allowed |
-| `RESOLVED` | 🔒 **Final state** | 🔒 **Final state** | ✅ Allowed |
+| State | Messenger | Admin | Delete | Edit Lock |
+|-------|-----------|-------|--------|-----------|
+| `ASSIGNED` | → `PENDING`, `DELIVERED`, `RETURNED` | → `CANCELED`, `RESOLVED` | ✅ Trash | - |
+| `RETURNED` | → `PENDING`, `DELIVERED` | → `CANCELED`, `RESOLVED` | ✅ Trash | - |
+| `PENDING` | 🔒 **Locked** until admin intervenes | → `CANCELED`, `RESOLVED` | ✅ Trash | - |
+| `DELIVERED` | 🔒 **Locked** | → `CANCELED`, `RESOLVED` (within 72h) | ❌ Protected | ⏱️ 72h window |
+| `CANCELED` | 🔒 Final | Admin can **reassign** → `ASSIGNED` | ✅ Trash | - |
+| `RESOLVED` | 🔒 Final | 🔒 Final (within 72h from DELIVERED) | ✅ Trash | ⏱️ 72h window |
 
 ### Permissions Summary
 
-| Role | Available States | Notes |
-|------|------------------|-------|
-| **MESSENGER** | `PENDING`, `DELIVERED`, `RETURNED` | Cannot update after `PENDING` or `DELIVERED` |
-| **ADMIN** | All states | Only role that can unlock `PENDING`/`DELIVERED` |
+| Role | Available States | Special Actions | Notes |
+|------|------------------|-----------------|-------|
+| **MESSENGER** | `PENDING`, `DELIVERED`, `RETURNED` | - | Blocked after using `PENDING` until admin intervenes |
+| **ADMIN** | `CANCELED`, `RESOLVED` | **Reassign messenger** (from `CANCELED` only) | Can unlock blocked services |
+
+### Reassignment Flow
+
+```mermaid
+flowchart LR
+    A[Service in CANCELED] --> B{Admin reassigns}
+    B --> C[New messenger assigned]
+    C --> D[Status → ASSIGNED]
+    D --> E[72h lock reset]
+```
+
+### Trash Management (Soft Delete)
+
+| Action | Endpoint | Description |
+|--------|----------|-------------|
+| Delete → Trash | `DELETE /services/{id}` | Moves to trash (soft delete) |
+| View Trash | `GET /services/trash` | Lists deleted services (ADMIN) |
+| Restore | `POST /services/trash/restore/{id}` | Restores from trash (ADMIN) |
+| Auto-Cleanup | Scheduled job | Permanent deletion after 60 days |
+
 
 ---
 
@@ -571,6 +614,59 @@ stateDiagram-v2
 - **JSON Logging (Prod):** Structured output compatible with Google Cloud Logging
 - **Graceful Shutdown:** Waits 30s to finish active connections
 - **SSL Offloading:** Trusts proxy headers (`X-Forwarded-Proto`) from Cloud Run
+
+### API Documentation
+
+| Endpoint | Description |
+|----------|-------------|
+| `/swagger-ui/index.html` | Interactive Swagger UI |
+| `/v3/api-docs` | OpenAPI 3.0 Specification (JSON) |
+| `/v3/api-docs.yaml` | OpenAPI 3.0 Specification (YAML) |
+
+> [!TIP]
+> Swagger UI is publicly accessible in `dev` profile. In production, consider restricting access via security configuration.
+
+---
+
+## 📝 Auditing
+
+### AOP-Based Audit System
+
+The application includes a centralized **audit logging system** using Aspect-Oriented Programming (AOP). Critical actions are automatically logged with user context, timing, and results.
+
+### Audited Actions
+
+| Component | Action | Description |
+|-----------|--------|-------------|
+| **AuthController** | `LOGIN` | User login attempts |
+| | `TOKEN_REFRESH` | Access token renewal |
+| **ServiceDeliveryUseCase** | `CREATE_SERVICE` | Create service from OCR image |
+| | `CREATE_SERVICE_MANUAL` | Create service with manual plate |
+| | `UPDATE_STATUS` | Update service status |
+| | `REASSIGN_MESSENGER` | Reassign service to another messenger |
+| | `DELETE_SERVICE` | Move service to trash |
+| | `RESTORE_SERVICE` | Restore service from trash |
+| **EmployeeUseCase** | `CREATE_EMPLOYEE` | Create new employee |
+| | `UPDATE_EMPLOYEE` | Update employee |
+| | `DELETE_EMPLOYEE` | Delete employee |
+
+### Log Format
+
+```
+AUDIT | timestamp | user_document | action | method | params | status | duration | error
+```
+
+**Example:**
+```
+2025-12-21 00:42:00.123 [AUDIT] AUDIT | 2025-12-21 00:42:00 | 123456 | UPDATE_STATUS | ServiceDeliveryUseCase.updateStatus | [1, DELIVERED, "Delivered", ...] | SUCCESS | 125ms |
+```
+
+### Configuration
+
+- **Logger Name:** `AUDIT`
+- **Level:** `WARN` (always visible in all environments)
+- **Output:** Console (Cloud Run captures stdout)
+- **File Output:** Optional, enable `AUDIT_FILE` appender in `logback-spring.xml`
 
 ---
 
@@ -744,6 +840,7 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 - [Flujo de Estados](#-flujo-de-estados)
 - [Seguridad](#-seguridad-1)
 - [Observabilidad](#-observabilidad)
+- [Auditoría](#-auditoría)
 - [Configuración e Instalación](#️-configuración-e-instalación)
 - [CI/CD](#-cicd-1)
 - [Testing](#-testing-1)
@@ -1172,27 +1269,68 @@ stateDiagram-v2
     PENDING --> CANCELED: Solo Admin
     PENDING --> RESOLVED: Solo Admin
     
-    DELIVERED --> CANCELED: Solo Admin
-    DELIVERED --> RESOLVED: Solo Admin
+    DELIVERED --> CANCELED: Admin (dentro de 72h)
+    DELIVERED --> RESOLVED: Admin (dentro de 72h)
+    
+    CANCELED --> ASSIGNED: Admin reasigna
+    
+    RETURNED --> PENDING: Mensajero
+    RETURNED --> DELIVERED: Mensajero
 ```
+
+### Reglas de Negocio
+
+> [!IMPORTANT]
+> **Transiciones de Estado por Rol**
+> - **MENSAJERO** solo puede usar: `PENDING`, `DELIVERED`, `RETURNED`
+> - **ADMIN** solo puede usar: `CANCELED`, `RESOLVED`
+
+> [!WARNING]
+> **Bloqueo de Edición (Ventana de 72 Horas)**
+> Cuando un servicio se actualiza a `DELIVERED` o `RESOLVED`, inicia una **ventana de 72 horas**.
+> Después de este período, el servicio se vuelve **inmutable** (no se permiten cambios de estado ni datos).
+
+> [!NOTE]
+> **Eliminación Suave (Papelera)**
+> Los servicios eliminados se mueven a una **papelera** y se eliminan permanentemente después de **60 días**.
+> Los administradores pueden restaurar servicios de la papelera antes de la eliminación permanente.
 
 ### Reglas de Estados
 
-| Estado | Mensajero | Admin | Eliminar |
-|--------|-----------|-------|----------|
-| `ASSIGNED` | Puede cambiar a `PENDING`, `DELIVERED`, `RETURNED` | Puede cambiar a cualquier estado | ✅ Permitido |
-| `RETURNED` | Puede cambiar a `PENDING`, `DELIVERED` | Puede cambiar a cualquier estado | ✅ Permitido |
-| `PENDING` | 🔒 **Bloqueado** - No puede actualizar | Puede cambiar a `CANCELED`, `RESOLVED` | ✅ Permitido |
-| `DELIVERED` | 🔒 **Bloqueado** - No puede actualizar | Puede cambiar a `CANCELED`, `RESOLVED` | ❌ **Protegido** |
-| `CANCELED` | 🔒 **Estado final** | 🔒 **Estado final** | ✅ Permitido |
-| `RESOLVED` | 🔒 **Estado final** | 🔒 **Estado final** | ✅ Permitido |
+| Estado | Mensajero | Admin | Eliminar | Bloqueo |
+|--------|-----------|-------|----------|---------|
+| `ASSIGNED` | → `PENDING`, `DELIVERED`, `RETURNED` | → `CANCELED`, `RESOLVED` | ✅ Papelera | - |
+| `RETURNED` | → `PENDING`, `DELIVERED` | → `CANCELED`, `RESOLVED` | ✅ Papelera | - |
+| `PENDING` | 🔒 **Bloqueado** hasta intervención admin | → `CANCELED`, `RESOLVED` | ✅ Papelera | - |
+| `DELIVERED` | 🔒 **Bloqueado** | → `CANCELED`, `RESOLVED` (dentro de 72h) | ❌ Protegido | ⏱️ 72h |
+| `CANCELED` | 🔒 Final | Admin puede **reasignar** → `ASSIGNED` | ✅ Papelera | - |
+| `RESOLVED` | 🔒 Final | 🔒 Final (dentro de 72h desde DELIVERED) | ✅ Papelera | ⏱️ 72h |
 
 ### Resumen de Permisos
 
-| Rol | Estados Disponibles | Notas |
-|-----|---------------------|-------|
-| **MESSENGER** | `PENDING`, `DELIVERED`, `RETURNED` | No puede actualizar después de `PENDING` o `DELIVERED` |
-| **ADMIN** | Todos los estados | Único rol que puede desbloquear `PENDING`/`DELIVERED` |
+| Rol | Estados Disponibles | Acciones Especiales | Notas |
+|-----|---------------------|---------------------|-------|
+| **MENSAJERO** | `PENDING`, `DELIVERED`, `RETURNED` | - | Bloqueado después de usar `PENDING` hasta intervención admin |
+| **ADMIN** | `CANCELED`, `RESOLVED` | **Reasignar mensajero** (solo desde `CANCELED`) | Puede desbloquear servicios |
+
+### Flujo de Reasignación
+
+```mermaid
+flowchart LR
+    A[Servicio en CANCELED] --> B{Admin reasigna}
+    B --> C[Nuevo mensajero asignado]
+    C --> D[Estado → ASSIGNED]
+    D --> E[Bloqueo 72h reiniciado]
+```
+
+### Gestión de Papelera (Soft Delete)
+
+| Acción | Endpoint | Descripción |
+|--------|----------|-------------|
+| Eliminar → Papelera | `DELETE /services/{id}` | Mueve a papelera (soft delete) |
+| Ver Papelera | `GET /services/trash` | Lista servicios eliminados (ADMIN) |
+| Restaurar | `POST /services/trash/restore/{id}` | Restaura desde papelera (ADMIN) |
+| Limpieza Automática | Job programado | Eliminación permanente después de 60 días |
 
 ---
 
@@ -1285,8 +1423,56 @@ stateDiagram-v2
 
 ### Documentación API
 
-- Swagger UI disponible en: `/swagger-ui/index.html` (Público)
-- OpenAPI Spec: `/v3/api-docs`
+| Endpoint | Descripción |
+|----------|-------------|
+| `/swagger-ui/index.html` | Interfaz Swagger UI interactiva |
+| `/v3/api-docs` | Especificación OpenAPI 3.0 (JSON) |
+| `/v3/api-docs.yaml` | Especificación OpenAPI 3.0 (YAML) |
+
+> [!TIP]
+> Swagger UI es accesible públicamente en el perfil `dev`. En producción, considera restringir el acceso mediante configuración de seguridad.
+
+---
+
+## 📝 Auditoría
+
+### Sistema de Auditoría Basado en AOP
+
+La aplicación incluye un **sistema de logging de auditoría centralizado** usando Programación Orientada a Aspectos (AOP). Las acciones críticas se registran automáticamente con contexto de usuario, tiempo y resultados.
+
+### Acciones Auditadas
+
+| Componente | Acción | Descripción |
+|------------|--------|-------------|
+| **AuthController** | `LOGIN` | Intentos de inicio de sesión |
+| | `TOKEN_REFRESH` | Renovación de token de acceso |
+| **ServiceDeliveryUseCase** | `CREATE_SERVICE` | Crear servicio desde imagen OCR |
+| | `CREATE_SERVICE_MANUAL` | Crear servicio con placa manual |
+| | `UPDATE_STATUS` | Actualizar estado de servicio |
+| | `REASSIGN_MESSENGER` | Reasignar servicio a otro mensajero |
+| | `DELETE_SERVICE` | Mover servicio a papelera |
+| | `RESTORE_SERVICE` | Restaurar servicio desde papelera |
+| **EmployeeUseCase** | `CREATE_EMPLOYEE` | Crear nuevo empleado |
+| | `UPDATE_EMPLOYEE` | Actualizar empleado |
+| | `DELETE_EMPLOYEE` | Eliminar empleado |
+
+### Formato del Log
+
+```
+AUDIT | timestamp | documento_usuario | accion | metodo | parametros | estado | duracion | error
+```
+
+**Ejemplo:**
+```
+2025-12-21 00:42:00.123 [AUDIT] AUDIT | 2025-12-21 00:42:00 | 123456 | UPDATE_STATUS | ServiceDeliveryUseCase.updateStatus | [1, DELIVERED, "Entregado", ...] | SUCCESS | 125ms |
+```
+
+### Configuración
+
+- **Nombre del Logger:** `AUDIT`
+- **Nivel:** `WARN` (siempre visible en todos los ambientes)
+- **Salida:** Consola (Cloud Run captura stdout)
+- **Salida a Archivo:** Opcional, habilitar `AUDIT_FILE` appender en `logback-spring.xml`
 
 ---
 

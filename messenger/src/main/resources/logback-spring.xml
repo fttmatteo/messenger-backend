@@ -134,6 +134,39 @@
     -->
 
     <!-- ===================================== -->
+    <!-- APPENDER PARA AUDITORÍA              -->
+    <!-- ===================================== -->
+    
+    <!-- Patrón específico para logs de auditoría -->
+    <property name="AUDIT_PATTERN" 
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [AUDIT] %msg%n"/>
+    
+    <!-- Appender de consola para auditoría (todos los ambientes) -->
+    <appender name="AUDIT_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${AUDIT_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- Appender de archivo para auditoría (desarrollo local) -->
+    <!--
+    <appender name="AUDIT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${APP_NAME}-audit.log</file>
+        <encoder>
+            <pattern>${AUDIT_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${APP_NAME}-audit-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>50MB</maxFileSize>
+            <maxHistory>365</maxHistory>
+            <totalSizeCap>5GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+    -->
+
+    <!-- ===================================== -->
     <!-- LOGGERS ESPECÍFICOS POR COMPONENTE   -->
     <!-- ===================================== -->
 
@@ -173,6 +206,20 @@
     <logger name="app.application.usecase.ServiceDeliveryUseCase" level="INFO" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
+
+    <!-- ===================================== -->
+    <!-- LOGGER DE AUDITORÍA                   -->
+    <!-- ===================================== -->
+    
+    <!-- 
+        Logger específico para auditoría.
+        Captura todas las acciones marcadas con @AuditableAction.
+        Usa nivel WARN para que siempre se muestre (incluso en prod).
+    -->
+    <logger name="AUDIT" level="WARN" additivity="false">
+        <appender-ref ref="AUDIT_CONSOLE"/>
+    </logger>
+
 
     <!-- Reducir verbosidad de frameworks -->
     <logger name="org.springframework" level="WARN"/>

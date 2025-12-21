@@ -40,7 +40,8 @@ class UpdateServiceDeliveryTest {
     private UpdateServiceDelivery updateServiceDelivery;
 
     private ServiceDelivery service;
-    private Employee employee;
+    private Employee messenger;
+    private Employee admin;
     private Signature signature;
     private List<Photo> photos;
 
@@ -50,10 +51,15 @@ class UpdateServiceDeliveryTest {
         service.setIdServiceDelivery(1L);
         service.setCurrentStatus(Status.ASSIGNED);
 
-        employee = new Employee();
-        employee.setIdEmployee(1L);
-        employee.setDocument(12345L);
-        employee.setRole(Role.MESSENGER);
+        messenger = new Employee();
+        messenger.setIdEmployee(1L);
+        messenger.setDocument(12345L);
+        messenger.setRole(Role.MESSENGER);
+
+        admin = new Employee();
+        admin.setIdEmployee(2L);
+        admin.setDocument(999L);
+        admin.setRole(Role.ADMIN);
 
         signature = new Signature();
         signature.setSignaturePath("sig.png");
@@ -67,10 +73,11 @@ class UpdateServiceDeliveryTest {
     @Test
     @DisplayName("Debe actualizar estado a PENDING con evidencias completas")
     void shouldUpdateStatusToPendingWhenEvidenceComplete() throws Exception {
-        when(serviceDeliveryPort.findById(1L)).thenReturn(service);
-        when(employeePort.findById(12345L)).thenReturn(employee);
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(1L)).thenReturn(messenger);
+        when(serviceDeliveryPort.save(argThat(s -> s.getCurrentStatus() == Status.PENDING))).thenReturn(service);
 
-        updateServiceDelivery.updateStatus(1L, Status.PENDING, "Observacion", signature, photos, 12345L);
+        updateServiceDelivery.updateStatus(1L, Status.PENDING, "Observacion", signature, photos, 1L);
 
         verify(serviceDeliveryPort).save(argThat(s -> s.getCurrentStatus() == Status.PENDING &&
                 s.getSignature() != null &&
@@ -79,24 +86,24 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si servicio no existe")
+    @DisplayName("Debe lanzar excepción si servicio no existe o está en papelera")
     void shouldThrowExceptionIfServiceNotFound() {
-        when(serviceDeliveryPort.findById(anyLong())).thenReturn(null);
+        when(serviceDeliveryPort.findByIdActive(anyLong())).thenReturn(null);
 
         BusinessException ex = assertThrows(BusinessException.class,
-                () -> updateServiceDelivery.updateStatus(99L, Status.PENDING, "Obs", signature, photos, 12345L));
+                () -> updateServiceDelivery.updateStatus(99L, Status.PENDING, "Obs", signature, photos, 1L));
 
-        assertEquals("El servicio con ID 99 no existe.", ex.getMessage());
+        assertEquals("El servicio con ID 99 no existe o está en la papelera.", ex.getMessage());
     }
 
     @Test
     @DisplayName("Debe lanzar excepción si falta firma para estado PENDING")
     void shouldThrowExceptionIfSignatureMissingForPending() {
-        when(serviceDeliveryPort.findById(1L)).thenReturn(service);
-        when(employeePort.findById(12345L)).thenReturn(employee);
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(1L)).thenReturn(messenger);
 
         BusinessException ex = assertThrows(BusinessException.class,
-                () -> updateServiceDelivery.updateStatus(1L, Status.PENDING, "Obs", null, photos, 12345L));
+                () -> updateServiceDelivery.updateStatus(1L, Status.PENDING, "Obs", null, photos, 1L));
 
         assertEquals("Para el estado PENDING la firma es obligatoria.", ex.getMessage());
     }
@@ -104,111 +111,237 @@ class UpdateServiceDeliveryTest {
     @Test
     @DisplayName("Debe lanzar excepción si falta foto para estado RETURNED")
     void shouldThrowExceptionIfPhotoMissingForReturned() {
-        when(serviceDeliveryPort.findById(1L)).thenReturn(service);
-        when(employeePort.findById(12345L)).thenReturn(employee);
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(1L)).thenReturn(messenger);
 
         BusinessException ex = assertThrows(BusinessException.class, () -> updateServiceDelivery.updateStatus(1L,
-                Status.RETURNED, "Obs", signature, Collections.emptyList(), 12345L));
+                Status.RETURNED, "Obs", signature, Collections.emptyList(), 1L));
 
         assertEquals("Para el estado RETURNED al menos una foto es obligatoria.", ex.getMessage());
     }
 
     @Test
-    @DisplayName("Debe permitir cambio a CANCELED solo si es ADMIN desde ASSIGNED")
+    @DisplayName("Debe permitir ADMIN cambiar a CANCELED desde ASSIGNED")
     void shouldAllowCanceledOnlyForAdminFromAssigned() throws Exception {
         service.setCurrentStatus(Status.ASSIGNED);
-        when(serviceDeliveryPort.findById(1L)).thenReturn(service);
-
-        Employee admin = new Employee();
-        admin.setDocument(999L);
-        admin.setRole(Role.ADMIN);
-        when(employeePort.findById(999L)).thenReturn(admin);
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(2L)).thenReturn(admin);
         when(serviceDeliveryPort.save(argThat(s -> s.getCurrentStatus() == Status.CANCELED))).thenReturn(service);
 
-        updateServiceDelivery.updateStatus(1L, Status.CANCELED, "Cancelado por admin", null, null, 999L);
+        updateServiceDelivery.updateStatus(1L, Status.CANCELED, "Cancelado por admin", null, null, 2L);
 
         verify(serviceDeliveryPort).save(argThat(s -> s.getCurrentStatus() == Status.CANCELED));
     }
 
     @Test
-    @DisplayName("Debe impedir cambio a CANCELED si es MESSENGER")
+    @DisplayName("Debe impedir MESSENGER cambiar a CANCELED")
     void shouldForbidCanceledForMessenger() {
         service.setCurrentStatus(Status.ASSIGNED);
-        when(serviceDeliveryPort.findById(1L)).thenReturn(service);
-        when(employeePort.findById(12345L)).thenReturn(employee); // Role MESSENGER
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(1L)).thenReturn(messenger);
 
         BusinessException ex = assertThrows(BusinessException.class,
-                () -> updateServiceDelivery.updateStatus(1L, Status.CANCELED, "Obs", null, null, 12345L));
+                () -> updateServiceDelivery.updateStatus(1L, Status.CANCELED, "Obs", null, null, 1L));
 
-        assertEquals("Solo el administrador puede cambiar el estado a CANCELED", ex.getMessage());
+        assertEquals(
+                "Como mensajero solo puedes cambiar el estado a: PENDING, DELIVERED o RETURNED. No tienes permiso para usar el estado CANCELED.",
+                ex.getMessage());
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si servicio ya está entregado")
-    void shouldThrowExceptionIfAlreadyDelivered() {
+    @DisplayName("Debe impedir MESSENGER actualizar desde PENDING (bloqueado)")
+    void shouldBlockMessengerFromPending() {
+        service.setCurrentStatus(Status.PENDING);
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(1L)).thenReturn(messenger);
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> updateServiceDelivery.updateStatus(1L, Status.DELIVERED, "Obs", signature, null, 1L));
+
+        assertEquals("El servicio está en estado PENDING. Solo un administrador puede cambiarlo a CANCELED o RESOLVED.",
+                ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Debe impedir MESSENGER actualizar desde DELIVERED (bloqueado)")
+    void shouldBlockMessengerFromDelivered() {
         service.setCurrentStatus(Status.DELIVERED);
-        when(serviceDeliveryPort.findById(1L)).thenReturn(service);
-        when(employeePort.findById(12345L)).thenReturn(employee);
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(1L)).thenReturn(messenger);
 
         BusinessException ex = assertThrows(BusinessException.class,
-                () -> updateServiceDelivery.updateStatus(1L, Status.RETURNED, "Obs", signature, photos, 12345L));
+                () -> updateServiceDelivery.updateStatus(1L, Status.RETURNED, "Obs", signature, photos, 1L));
 
-        assertEquals("El servicio ya fue entregado y no se puede modificar su estado.", ex.getMessage());
+        assertEquals("El servicio ya fue marcado como ENTREGADO. Solo un administrador puede modificar su estado.",
+                ex.getMessage());
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si servicio ya está resuelto")
-    void shouldThrowExceptionIfAlreadyResolved() {
+    @DisplayName("Debe impedir cambio desde estado CANCELED (final)")
+    void shouldForbidTransitionFromCanceled() {
+        service.setCurrentStatus(Status.CANCELED);
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(2L)).thenReturn(admin);
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> updateServiceDelivery.updateStatus(1L, Status.RESOLVED, "Obs", null, null, 2L));
+
+        assertEquals("El servicio está en estado final CANCELED y no se puede modificar.", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Debe impedir cambio desde estado RESOLVED (final)")
+    void shouldForbidTransitionFromResolved() {
         service.setCurrentStatus(Status.RESOLVED);
-        when(serviceDeliveryPort.findById(1L)).thenReturn(service);
-        when(employeePort.findById(12345L)).thenReturn(employee);
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(2L)).thenReturn(admin);
 
         BusinessException ex = assertThrows(BusinessException.class,
-                () -> updateServiceDelivery.updateStatus(1L, Status.PENDING, "Obs", signature, photos, 12345L));
+                () -> updateServiceDelivery.updateStatus(1L, Status.CANCELED, "Obs", null, null, 2L));
 
-        assertEquals("El servicio ya fue resuelto y no se puede modificar su estado.", ex.getMessage());
+        assertEquals("El servicio está en estado final RESOLVED y no se puede modificar.", ex.getMessage());
     }
 
     @Test
-    @DisplayName("Debe permitir cambio a RESOLVED solo por ADMIN desde PENDING")
+    @DisplayName("Debe permitir ADMIN cambiar a RESOLVED desde PENDING")
     void shouldAllowResolvedOnlyForAdminFromPending() throws Exception {
         service.setCurrentStatus(Status.PENDING);
-        when(serviceDeliveryPort.findById(1L)).thenReturn(service);
-
-        Employee admin = new Employee();
-        admin.setDocument(999L);
-        admin.setRole(Role.ADMIN);
-        when(employeePort.findById(999L)).thenReturn(admin);
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(2L)).thenReturn(admin);
         when(serviceDeliveryPort.save(argThat(s -> s.getCurrentStatus() == Status.RESOLVED))).thenReturn(service);
 
-        updateServiceDelivery.updateStatus(1L, Status.RESOLVED, "Resuelto", null, null, 999L);
+        updateServiceDelivery.updateStatus(1L, Status.RESOLVED, "Resuelto", null, null, 2L);
 
         verify(serviceDeliveryPort).save(argThat(s -> s.getCurrentStatus() == Status.RESOLVED));
     }
 
     @Test
-    @DisplayName("Debe impedir cambio de PENDING a otro estado diferente de RESOLVED")
-    void shouldForbidNonResolvedTransitionFromPending() {
-        service.setCurrentStatus(Status.PENDING);
-        when(serviceDeliveryPort.findById(1L)).thenReturn(service);
-        when(employeePort.findById(12345L)).thenReturn(employee);
+    @DisplayName("Debe impedir ADMIN usar estados de mensajero (PENDING, DELIVERED, RETURNED)")
+    void shouldForbidAdminFromUsingMessengerStates() {
+        service.setCurrentStatus(Status.ASSIGNED);
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(2L)).thenReturn(admin);
 
         BusinessException ex = assertThrows(BusinessException.class,
-                () -> updateServiceDelivery.updateStatus(1L, Status.DELIVERED, "Obs", signature, null, 12345L));
+                () -> updateServiceDelivery.updateStatus(1L, Status.PENDING, "Obs", signature, photos, 2L));
 
-        assertEquals("Desde estado PENDING solo se puede cambiar a RESOLVED.", ex.getMessage());
+        assertEquals(
+                "Como administrador solo puedes cambiar el estado a: CANCELED o RESOLVED. Para otros estados, el mensajero asignado debe realizar el cambio.",
+                ex.getMessage());
     }
 
     @Test
     @DisplayName("Debe validar que no se actualice al mismo estado")
     void shouldThrowExceptionIfSameStatus() {
         service.setCurrentStatus(Status.ASSIGNED);
-        when(serviceDeliveryPort.findById(1L)).thenReturn(service);
-        when(employeePort.findById(12345L)).thenReturn(employee);
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(1L)).thenReturn(messenger);
 
         BusinessException ex = assertThrows(BusinessException.class,
-                () -> updateServiceDelivery.updateStatus(1L, Status.ASSIGNED, "Obs", signature, photos, 12345L));
+                () -> updateServiceDelivery.updateStatus(1L, Status.ASSIGNED, "Obs", signature, photos, 1L));
 
         assertEquals("El servicio ya se encuentra en estado ASSIGNED", ex.getMessage());
+    }
+
+    // ===============================
+    // Tests de Ventana de 72 horas
+    // ===============================
+
+    @Test
+    @DisplayName("Debe bloquear edición después de 72 horas")
+    void shouldBlockEditAfter72Hours() {
+        service.setCurrentStatus(Status.DELIVERED);
+        service.setLockedAt(java.time.LocalDateTime.now().minusHours(73)); // Pasaron 73 horas
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(2L)).thenReturn(admin);
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> updateServiceDelivery.updateStatus(1L, Status.RESOLVED, "Obs", null, null, 2L));
+
+        assertTrue(ex.getMessage().contains("El período de edición de 72 horas ha expirado"));
+    }
+
+    @Test
+    @DisplayName("Debe permitir edición dentro de 72 horas")
+    void shouldAllowEditWithin72Hours() throws Exception {
+        service.setCurrentStatus(Status.DELIVERED);
+        service.setLockedAt(java.time.LocalDateTime.now().minusHours(50)); // Solo 50 horas
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(2L)).thenReturn(admin);
+        when(serviceDeliveryPort.save(argThat(s -> s.getCurrentStatus() == Status.RESOLVED))).thenReturn(service);
+
+        updateServiceDelivery.updateStatus(1L, Status.RESOLVED, "Resuelto dentro de ventana", null, null, 2L);
+
+        verify(serviceDeliveryPort).save(argThat(s -> s.getCurrentStatus() == Status.RESOLVED));
+    }
+
+    @Test
+    @DisplayName("Debe establecer lockedAt al cambiar a DELIVERED")
+    void shouldSetLockedAtWhenDelivered() throws Exception {
+        service.setCurrentStatus(Status.ASSIGNED);
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(1L)).thenReturn(messenger);
+        when(serviceDeliveryPort.save(argThat(s -> s.getLockedAt() != null))).thenReturn(service);
+
+        updateServiceDelivery.updateStatus(1L, Status.DELIVERED, null, signature, null, 1L);
+
+        verify(serviceDeliveryPort)
+                .save(argThat(s -> s.getCurrentStatus() == Status.DELIVERED && s.getLockedAt() != null));
+    }
+
+    // ===============================
+    // Tests de Reasignación
+    // ===============================
+
+    @Test
+    @DisplayName("Debe reasignar mensajero cuando servicio está en CANCELED")
+    void shouldReassignMessengerFromCanceled() throws Exception {
+        service.setCurrentStatus(Status.CANCELED);
+
+        Employee newMessenger = new Employee();
+        newMessenger.setIdEmployee(3L);
+        newMessenger.setRole(Role.MESSENGER);
+
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(2L)).thenReturn(admin);
+        when(employeePort.findById(3L)).thenReturn(newMessenger);
+        when(serviceDeliveryPort.save(argThat(s -> s.getCurrentStatus() == Status.ASSIGNED))).thenReturn(service);
+
+        updateServiceDelivery.reassignMessenger(1L, 3L, 2L);
+
+        verify(serviceDeliveryPort).save(argThat(s -> s.getCurrentStatus() == Status.ASSIGNED &&
+                s.getMessenger().equals(newMessenger) &&
+                s.getLockedAt() == null));
+    }
+
+    @Test
+    @DisplayName("Debe impedir reasignación si no está en CANCELED")
+    void shouldForbidReassignIfNotCanceled() {
+        service.setCurrentStatus(Status.PENDING);
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(2L)).thenReturn(admin);
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> updateServiceDelivery.reassignMessenger(1L, 3L, 2L));
+
+        assertEquals("Solo se pueden reasignar servicios en estado CANCELED. Estado actual: PENDING", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Debe impedir reasignación si no es ADMIN")
+    void shouldForbidReassignIfNotAdmin() {
+        service.setCurrentStatus(Status.CANCELED);
+        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
+        when(employeePort.findById(1L)).thenReturn(messenger);
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> updateServiceDelivery.reassignMessenger(1L, 3L, 1L));
+
+        assertEquals("Solo los administradores pueden reasignar servicios.", ex.getMessage());
+    }
+
+    // Helper para assertions con assertTrue
+    private static void assertTrue(boolean condition) {
+        org.junit.jupiter.api.Assertions.assertTrue(condition);
     }
 }

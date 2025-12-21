@@ -196,15 +196,78 @@ class ServiceDeliveryUseCaseTest {
     }
 
     @Nested
-    @DisplayName("Eliminar Servicio")
+    @DisplayName("Eliminar Servicio (Soft Delete)")
     class DeleteTests {
 
         @Test
-        @DisplayName("Debe eliminar servicio por ID")
-        void shouldDeleteById() throws Exception {
+        @DisplayName("Debe mover servicio a papelera por ID")
+        void shouldSoftDeleteById() throws Exception {
             serviceDeliveryUseCase.deleteById(1L);
 
             verify(deleteService).deleteById(1L);
+        }
+
+        @Test
+        @DisplayName("Debe mover servicio a papelera con registro de usuario")
+        void shouldSoftDeleteByIdWithUser() throws Exception {
+            serviceDeliveryUseCase.deleteById(1L, 123L);
+
+            verify(deleteService).deleteById(1L, 123L);
+        }
+    }
+
+    @Nested
+    @DisplayName("Papelera (Trash)")
+    class TrashTests {
+
+        @Test
+        @DisplayName("Debe listar servicios en papelera")
+        void shouldFindDeleted() {
+            ServiceDelivery deletedService = new ServiceDelivery();
+            deletedService.setIdServiceDelivery(2L);
+            deletedService.setDeleted(true);
+
+            when(searchService.findDeleted()).thenReturn(List.of(deletedService));
+
+            List<ServiceDelivery> result = serviceDeliveryUseCase.findDeleted();
+
+            assertEquals(1, result.size());
+            assertTrue(result.get(0).isDeleted());
+        }
+
+        @Test
+        @DisplayName("Debe restaurar servicio desde papelera")
+        void shouldRestoreFromTrash() throws Exception {
+            ServiceDelivery restoredService = new ServiceDelivery();
+            restoredService.setIdServiceDelivery(1L);
+            restoredService.setDeleted(false);
+
+            when(deleteService.restore(1L, 123L)).thenReturn(restoredService);
+
+            ServiceDelivery result = serviceDeliveryUseCase.restore(1L, 123L);
+
+            assertFalse(result.isDeleted());
+            verify(deleteService).restore(1L, 123L);
+        }
+    }
+
+    @Nested
+    @DisplayName("Reasignación de Mensajero")
+    class ReassignTests {
+
+        @Test
+        @DisplayName("Debe reasignar servicio a nuevo mensajero")
+        void shouldReassignMessenger() throws Exception {
+            ServiceDelivery reassignedService = new ServiceDelivery();
+            reassignedService.setIdServiceDelivery(1L);
+            reassignedService.setCurrentStatus(Status.ASSIGNED);
+
+            when(updateService.reassignMessenger(1L, 456L, 123L)).thenReturn(reassignedService);
+
+            ServiceDelivery result = serviceDeliveryUseCase.reassignMessenger(1L, 456L, 123L);
+
+            assertEquals(Status.ASSIGNED, result.getCurrentStatus());
+            verify(updateService).reassignMessenger(1L, 456L, 123L);
         }
     }
 }

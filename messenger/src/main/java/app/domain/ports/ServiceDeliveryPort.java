@@ -1,6 +1,7 @@
 package app.domain.ports;
 
 import app.domain.model.ServiceDelivery;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -17,4 +18,15 @@ public interface ServiceDeliveryPort {
     List<ServiceDelivery> findAll();
 
     List<ServiceDelivery> findByPlateNumber(String plateNumber);
+
+    // Métodos para soft delete (papelera)
+    List<ServiceDelivery> findAllActive();
+
+    ServiceDelivery findByIdActive(Long idServiceDelivery);
+
+    List<ServiceDelivery> findDeleted();
+
+    List<ServiceDelivery> findDeletedExpiredBefore(LocalDateTime date);
+
+    void hardDeleteById(Long idServiceDelivery);
 }

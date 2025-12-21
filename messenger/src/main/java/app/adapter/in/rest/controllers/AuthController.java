@@ -11,6 +11,7 @@ import app.application.usecase.LoginUseCase;
 import app.application.usecase.RefreshTokenUseCase;
 import app.domain.model.auth.AuthCredentials;
 import app.domain.model.auth.TokenResponse;
+import app.infrastructure.audit.AuditableAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,7 @@ public class AuthController {
     private LoginUseCase loginUseCase;
 
     @PostMapping("/login")
+    @AuditableAction(action = "LOGIN", description = "Inicio de sesión de usuario")
     public ResponseEntity<TokenResponse> login(@Valid @RequestBody AuthCredentials credentials) throws Exception {
         logger.info("Solicitud de login recibida para documento: {}", credentials.getDocument());
         TokenResponse response = loginUseCase.login(credentials);
@@ -36,6 +38,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
+    @AuditableAction(action = "TOKEN_REFRESH", description = "Renovación de token de acceso")
     public ResponseEntity<TokenResponse> refresh(@Valid @RequestBody app.domain.model.auth.RefreshTokenRequest request)
             throws Exception {
         TokenResponse response = refreshTokenUseCase.refreshToken(request);

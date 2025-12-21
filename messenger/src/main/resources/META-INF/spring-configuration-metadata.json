@@ -113,6 +113,18 @@
             "name": "spring.h2.console.enabled",
             "type": "java.lang.Boolean",
             "description": "Habilita la consola de H2. Requerido como workaround para Spring Boot 4.x o configuración manual."
+        },
+        {
+            "name": "app.trash.retention-days",
+            "type": "java.lang.Integer",
+            "description": "Días que un servicio permanece en la papelera antes de ser eliminado permanentemente.",
+            "defaultValue": 60
+        },
+        {
+            "name": "app.trash.cleanup-cron",
+            "type": "java.lang.String",
+            "description": "Expresión cron para el job de limpieza de papelera. Por defecto: diariamente a las 3:00 AM.",
+            "defaultValue": "0 0 3 * * ?"
         }
     ],
     "hints": [
