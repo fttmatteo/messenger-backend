@@ -264,11 +264,11 @@ class UpdateServiceDeliveryTest {
         service.setLockedAt(java.time.LocalDateTime.now().minusHours(50)); // Solo 50 horas
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(2L)).thenReturn(admin);
-        when(serviceDeliveryPort.save(argThat(s -> s.getCurrentStatus() == Status.RESOLVED))).thenReturn(service);
+        when(serviceDeliveryPort.save(argThat(s -> s.getCurrentStatus() == Status.CANCELED))).thenReturn(service);
 
-        updateServiceDelivery.updateStatus(1L, Status.RESOLVED, "Resuelto dentro de ventana", null, null, 2L);
+        updateServiceDelivery.updateStatus(1L, Status.CANCELED, "Cancelado dentro de ventana", null, null, 2L);
 
-        verify(serviceDeliveryPort).save(argThat(s -> s.getCurrentStatus() == Status.RESOLVED));
+        verify(serviceDeliveryPort).save(argThat(s -> s.getCurrentStatus() == Status.CANCELED));
     }
 
     @Test

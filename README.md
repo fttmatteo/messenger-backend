@@ -234,10 +234,10 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 ### Authentication (`/auth`)
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| `POST` | `/auth/login` | Login and receive access + refresh tokens | 🔓 Public |
-| `POST` | `/auth/refresh` | Renew access token with refresh token | 🔓 Public |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/auth/login` | Login and receive access + refresh tokens |
+| `POST` | `/auth/refresh` | Renew access token with refresh token |
 
 **Login Response:**
 ```json
@@ -271,15 +271,15 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 ### Dealerships (`/dealerships`)
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| `POST` | `/dealerships/createDealership` | Create | ADMIN |
-| `GET` | `/dealerships/allDealerships` | List | |
-| `GET` | `/dealerships/findByDealershipId/{id}` | Get by ID | |
-| `GET` | `/dealerships/findByDealershipName/{name}` | Get by Name | |
-| `PUT` | `/dealerships/updateDealership/{id}` | Update | ADMIN |
-| `DELETE` | `/dealerships/deleteDealership/{id}` | Delete | ADMIN |
-| `POST` | `/dealerships/geocodeDealership/{id}` | Geocode | ADMIN |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/dealerships/createDealership` | Create |
+| `GET` | `/dealerships/allDealerships` | List |
+| `GET` | `/dealerships/findByDealershipId/{id}` | Get by ID |
+| `GET` | `/dealerships/findByDealershipName/{name}` | Get by Name |
+| `PUT` | `/dealerships/updateDealership/{id}` | Update |
+| `DELETE` | `/dealerships/deleteDealership/{id}` | Delete |
+| `POST` | `/dealerships/geocodeDealership/{id}` | Geocode |
 
 ---
 
@@ -317,13 +317,13 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 ### Real-Time Tracking (`/tracking`)
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| `POST` | `/tracking/update` | Update location | MESSENGER/ADMIN |
-| `GET` | `/tracking/messenger/{id}` | Last location | ADMIN |
-| `GET` | `/tracking/active` | Active messengers | ADMIN |
-| `GET` | `/tracking/history/{id}` | History by date | MESSENGER/ADMIN |
-| `GET` | `/tracking/service/{id}` | History by service | MESSENGER/ADMIN |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/tracking/update` | Update location |
+| `GET` | `/tracking/messenger/{id}` | Last location |
+| `GET` | `/tracking/active` | Active messengers |
+| `GET` | `/tracking/history/{id}` | History by date |
+| `GET` | `/tracking/service/{id}` | History by service |
 
 ---
 
@@ -454,22 +454,24 @@ GPS tracking system using **Redis** + **WebSocket** for messenger monitoring.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> ASSIGNED: Plate registered (auto)
+    direction LR
     
-    ASSIGNED --> PENDING: Messenger
-    ASSIGNED --> DELIVERED: Messenger
-    ASSIGNED --> RETURNED: Messenger
+    [*] --> ASSIGNED: Auto Register
     
-    PENDING --> CANCELED: Admin only
-    PENDING --> RESOLVED: Admin only
+    state Messenger_Actions {
+        ASSIGNED --> PENDING
+        ASSIGNED --> DELIVERED
+        ASSIGNED --> RETURNED
+        RETURNED --> PENDING
+        RETURNED --> DELIVERED
+    }
     
-    DELIVERED --> CANCELED: Admin (within 72h)
-    DELIVERED --> RESOLVED: Admin (within 72h)
-    
-    CANCELED --> ASSIGNED: Admin reassigns
-    
-    RETURNED --> PENDING: Messenger
-    RETURNED --> DELIVERED: Messenger
+    state Admin_Actions {
+        PENDING --> RESOLVED
+        PENDING --> CANCELED
+        DELIVERED --> CANCELED: 72h Limit
+        CANCELED --> ASSIGNED: Reassign
+    }
 ```
 
 ### Business Rules
@@ -496,9 +498,9 @@ stateDiagram-v2
 | `ASSIGNED` | → `PENDING`, `DELIVERED`, `RETURNED` | → `CANCELED` | ✅ Trash | - |
 | `RETURNED` | → `PENDING`, `DELIVERED` | → `CANCELED` | ✅ Trash | - |
 | `PENDING` | 🔒 **Locked** until admin intervenes | → `CANCELED`, `RESOLVED` | ✅ Trash | - |
-| `DELIVERED` | 🔒 **Locked** | → `CANCELED`, `RESOLVED` (within 72h) | ❌ Protected | ⏱️ 72h window |
-| `CANCELED` | 🔒 Final | Admin can **reassign** → `ASSIGNED` | ✅ Trash | - |
-| `RESOLVED` | 🔒 Final | 🔒 Final (within 72h from DELIVERED) | ✅ Trash | ⏱️ 72h window |
+| `DELIVERED` | **Locks** 🔒 after 72 hours  | → `CANCELED`, `RESOLVED` | ❌ Protected after time expires | ⏱️ 72h |
+| `CANCELED` | | Admin can **reassign** → `ASSIGNED` | ✅ Trash | - |
+| `RESOLVED` |  | **Locks** 🔒 after 72 hours | ❌ Protected after time expires | ⏱️ 72h |
 
 ### Permissions Summary
 
@@ -1040,10 +1042,10 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 ### Autenticación (`/auth`)
 
-| Método | Endpoint | Descripción | Auth |
-|--------|----------|-------------|------|
-| `POST` | `/auth/login` | Iniciar sesión y obtener tokens | 🔓 Público |
-| `POST` | `/auth/refresh` | Renovar access token con refresh token | 🔓 Público |
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `POST` | `/auth/login` | Iniciar sesión y obtener tokens |
+| `POST` | `/auth/refresh` | Renovar access token con refresh token |
 
 **Respuesta de Login:**
 ```json
@@ -1077,15 +1079,15 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 ### Concesionarios (`/dealerships`)
 
-| Método | Endpoint | Descripción | Auth |
-|--------|----------|-------------|------|
-| `POST` | `/dealerships/createDealership` | Crear | ADMIN |
-| `GET` | `/dealerships/allDealerships` | Listar | |
-| `GET` | `/dealerships/findByDealershipId/{id}` | Obtener por ID | |
-| `GET` | `/dealerships/findByDealershipName/{name}` | Obtener por Nombre | |
-| `PUT` | `/dealerships/updateDealership/{id}` | Actualizar | ADMIN |
-| `DELETE` | `/dealerships/deleteDealership/{id}` | Eliminar | ADMIN |
-| `POST` | `/dealerships/geocodeDealership/{id}` | Geocodificar | ADMIN |
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `POST` | `/dealerships/createDealership` | Crear |
+| `GET` | `/dealerships/allDealerships` | Listar |
+| `GET` | `/dealerships/findByDealershipId/{id}` | Obtener por ID |
+| `GET` | `/dealerships/findByDealershipName/{name}` | Obtener por Nombre |
+| `PUT` | `/dealerships/updateDealership/{id}` | Actualizar |
+| `DELETE` | `/dealerships/deleteDealership/{id}` | Eliminar |
+| `POST` | `/dealerships/geocodeDealership/{id}` | Geocodificar |
 
 ---
 
@@ -1123,13 +1125,13 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 ### Tracking en Tiempo Real (`/tracking`)
 
-| Método | Endpoint | Descripción | Auth |
-|--------|----------|-------------|------|
-| `POST` | `/tracking/update` | Actualizar ubicación | MESSENGER/ADMIN |
-| `GET` | `/tracking/messenger/{id}` | Última ubicación | ADMIN |
-| `GET` | `/tracking/active` | Mensajeros activos | ADMIN |
-| `GET` | `/tracking/history/{id}` | Historial por fecha | MESSENGER/ADMIN |
-| `GET` | `/tracking/service/{id}` | Historial por servicio | MESSENGER/ADMIN |
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `POST` | `/tracking/update` | Actualizar ubicación |
+| `GET` | `/tracking/messenger/{id}` | Última ubicación |
+| `GET` | `/tracking/active` | Mensajeros activos |
+| `GET` | `/tracking/history/{id}` | Historial por fecha |
+| `GET` | `/tracking/service/{id}` | Historial por servicio |
 
 ---
 
@@ -1260,22 +1262,24 @@ Sistema de tracking GPS usando **Redis** + **WebSocket** para monitoreo de mensa
 
 ```mermaid
 stateDiagram-v2
-    [*] --> ASSIGNED: Placa registrada (auto)
+    direction LR
     
-    ASSIGNED --> PENDING: Mensajero
-    ASSIGNED --> DELIVERED: Mensajero
-    ASSIGNED --> RETURNED: Mensajero
+    [*] --> ASSIGNED: Auto Registro
     
-    PENDING --> CANCELED: Solo Admin
-    PENDING --> RESOLVED: Solo Admin
+    state Acciones_Mensajero {
+        ASSIGNED --> PENDING
+        ASSIGNED --> DELIVERED
+        ASSIGNED --> RETURNED
+        RETURNED --> PENDING
+        RETURNED --> DELIVERED
+    }
     
-    DELIVERED --> CANCELED: Admin (dentro de 72h)
-    DELIVERED --> RESOLVED: Admin (dentro de 72h)
-    
-    CANCELED --> ASSIGNED: Admin reasigna
-    
-    RETURNED --> PENDING: Mensajero
-    RETURNED --> DELIVERED: Mensajero
+    state Acciones_Admin {
+        PENDING --> RESOLVED
+        PENDING --> CANCELED
+        DELIVERED --> CANCELED: Límite 72h
+        CANCELED --> ASSIGNED: Reasignar
+    }
 ```
 
 ### Reglas de Negocio
@@ -1302,9 +1306,9 @@ stateDiagram-v2
 | `ASSIGNED` | → `PENDING`, `DELIVERED`, `RETURNED` | → `CANCELED` | ✅ Papelera | - |
 | `RETURNED` | → `PENDING`, `DELIVERED` | → `CANCELED` | ✅ Papelera | - |
 | `PENDING` | 🔒 **Bloqueado** hasta intervención admin | → `CANCELED`, `RESOLVED` | ✅ Papelera | - |
-| `DELIVERED` | 🔒 **Bloqueado** | → `CANCELED`, `RESOLVED` (dentro de 72h) | ❌ Protegido | ⏱️ 72h |
-| `CANCELED` | 🔒 Final | Admin puede **reasignar** → `ASSIGNED` | ✅ Papelera | - |
-| `RESOLVED` | 🔒 Final | 🔒 Final (dentro de 72h desde DELIVERED) | ✅ Papelera | ⏱️ 72h |
+| `DELIVERED` | A las 72 horas se 🔒 **Bloquea**  | → `CANCELED`, `RESOLVED` | ❌ Protegido una vez se cumpla el tiempo | ⏱️ 72h |
+| `CANCELED` | | Admin puede **reasignar** → `ASSIGNED` | ✅ Papelera | - |
+| `RESOLVED` |  | A las 72 horas se 🔒 **Bloquea** | ❌ Protegido una vez se cumpla el tiempo | ⏱️ 72h |
 
 ### Resumen de Permisos
 
