@@ -292,6 +292,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `GET` | `/services/allServices` | List all |
 | `GET` | `/services/findByServiceId/{id}` | Get by ID |
 | `DELETE` | `/services/deleteService/{id}` | Delete |
+| `GET` | `/services/stats/daily` | Daily stats by messenger |
 
 ---
 
@@ -492,8 +493,8 @@ stateDiagram-v2
 
 | State | Messenger | Admin | Delete | Edit Lock |
 |-------|-----------|-------|--------|-----------|
-| `ASSIGNED` | → `PENDING`, `DELIVERED`, `RETURNED` | → `CANCELED`, `RESOLVED` | ✅ Trash | - |
-| `RETURNED` | → `PENDING`, `DELIVERED` | → `CANCELED`, `RESOLVED` | ✅ Trash | - |
+| `ASSIGNED` | → `PENDING`, `DELIVERED`, `RETURNED` | → `CANCELED` | ✅ Trash | - |
+| `RETURNED` | → `PENDING`, `DELIVERED` | → `CANCELED` | ✅ Trash | - |
 | `PENDING` | 🔒 **Locked** until admin intervenes | → `CANCELED`, `RESOLVED` | ✅ Trash | - |
 | `DELIVERED` | 🔒 **Locked** | → `CANCELED`, `RESOLVED` (within 72h) | ❌ Protected | ⏱️ 72h window |
 | `CANCELED` | 🔒 Final | Admin can **reassign** → `ASSIGNED` | ✅ Trash | - |
@@ -1097,6 +1098,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `GET` | `/services/allServices` | Listar todos |
 | `GET` | `/services/findByServiceId/{id}` | Obtener por ID |
 | `DELETE` | `/services/deleteService/{id}` | Eliminar |
+| `GET` | `/services/stats/daily` | Estadísticas diarias por mensajero |
 
 ---
 
@@ -1297,8 +1299,8 @@ stateDiagram-v2
 
 | Estado | Mensajero | Admin | Eliminar | Bloqueo |
 |--------|-----------|-------|----------|---------|
-| `ASSIGNED` | → `PENDING`, `DELIVERED`, `RETURNED` | → `CANCELED`, `RESOLVED` | ✅ Papelera | - |
-| `RETURNED` | → `PENDING`, `DELIVERED` | → `CANCELED`, `RESOLVED` | ✅ Papelera | - |
+| `ASSIGNED` | → `PENDING`, `DELIVERED`, `RETURNED` | → `CANCELED` | ✅ Papelera | - |
+| `RETURNED` | → `PENDING`, `DELIVERED` | → `CANCELED` | ✅ Papelera | - |
 | `PENDING` | 🔒 **Bloqueado** hasta intervención admin | → `CANCELED`, `RESOLVED` | ✅ Papelera | - |
 | `DELIVERED` | 🔒 **Bloqueado** | → `CANCELED`, `RESOLVED` (dentro de 72h) | ❌ Protegido | ⏱️ 72h |
 | `CANCELED` | 🔒 Final | Admin puede **reasignar** → `ASSIGNED` | ✅ Papelera | - |
