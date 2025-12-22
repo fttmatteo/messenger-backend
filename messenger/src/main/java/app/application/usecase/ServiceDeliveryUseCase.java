@@ -229,4 +229,15 @@ public class ServiceDeliveryUseCase {
     private void cleanupFiles(List<String> paths) {
         cleanupFiles(paths.toArray(new String[0]));
     }
+
+    /**
+     * Retorna estadísticas diarias de servicios para un mensajero.
+     */
+    @Transactional(readOnly = true)
+    public List<app.domain.model.DailyStatistics> getDailyStats(
+            Long messengerId,
+            java.time.LocalDate from,
+            java.time.LocalDate to) {
+        return searchService.findDailyStatsByMessenger(messengerId, from, to);
+    }
 }

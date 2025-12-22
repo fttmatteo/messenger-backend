@@ -32,4 +32,25 @@ public interface ServiceDeliveryRepository extends JpaRepository<ServiceDelivery
     List<ServiceDeliveryEntity> findByDeletedTrueAndDeletedAtBefore(LocalDateTime date);
 
     List<ServiceDeliveryEntity> findByPlate_PlateNumberAndDeletedFalse(String plateNumber);
+
+    // Query for daily statistics by messenger
+    @org.springframework.data.jpa.repository.Query(value = """
+            SELECT DATE(created_at) as date,
+                   SUM(CASE WHEN current_status = 'ASSIGNED' THEN 1 ELSE 0 END) as assigned,
+                   SUM(CASE WHEN current_status = 'DELIVERED' THEN 1 ELSE 0 END) as delivered,
+                   SUM(CASE WHEN current_status = 'RETURNED' THEN 1 ELSE 0 END) as returned,
+                   SUM(CASE WHEN current_status = 'CANCELED' THEN 1 ELSE 0 END) as canceled,
+                   COUNT(*) as total
+            FROM service_deliveries
+            WHERE messenger_document = :messengerId
+              AND created_at >= :fromDate
+              AND created_at < :toDate
+              AND deleted = false
+            GROUP BY DATE(created_at)
+            ORDER BY date DESC
+            """, nativeQuery = true)
+    List<Object[]> findDailyStatsByMessenger(
+            @org.springframework.data.repository.query.Param("messengerId") Long messengerId,
+            @org.springframework.data.repository.query.Param("fromDate") java.time.LocalDateTime fromDate,
+            @org.springframework.data.repository.query.Param("toDate") java.time.LocalDateTime toDate);
 }

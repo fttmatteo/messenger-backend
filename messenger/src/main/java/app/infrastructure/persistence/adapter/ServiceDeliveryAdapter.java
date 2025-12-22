@@ -89,4 +89,21 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     public void hardDeleteById(Long idServiceDelivery) {
         repository.deleteById(idServiceDelivery);
     }
+
+    @Override
+    public List<app.domain.model.DailyStatistics> findDailyStatsByMessenger(
+            Long messengerId,
+            java.time.LocalDate from,
+            java.time.LocalDate to) {
+        // Convert LocalDate to LocalDateTime for the query
+        LocalDateTime fromDateTime = from.atStartOfDay();
+        LocalDateTime toDateTime = to.plusDays(1).atStartOfDay(); // End of 'to' day
+
+        List<Object[]> rawResults = repository.findDailyStatsByMessenger(
+                messengerId, fromDateTime, toDateTime);
+
+        return rawResults.stream()
+                .map(app.domain.model.DailyStatistics::fromRaw)
+                .collect(Collectors.toList());
+    }
 }

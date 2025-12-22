@@ -29,4 +29,10 @@ public interface ServiceDeliveryPort {
     List<ServiceDelivery> findDeletedExpiredBefore(LocalDateTime date);
 
     void hardDeleteById(Long idServiceDelivery);
+
+    // Estadísticas diarias por mensajero
+    List<app.domain.model.DailyStatistics> findDailyStatsByMessenger(
+            Long messengerId,
+            java.time.LocalDate from,
+            java.time.LocalDate to);
 }

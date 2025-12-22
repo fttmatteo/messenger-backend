@@ -254,4 +254,28 @@ public class ServiceDeliveryController {
 
         return ResponseEntity.ok(responseMapper.toResponse(restored));
     }
+
+    /**
+     * Retorna estadísticas diarias de servicios para un mensajero.
+     */
+    @GetMapping("/stats/daily")
+    public ResponseEntity<List<app.adapter.in.rest.response.DailyStatsResponse>> getDailyStats(
+            @RequestParam Long messengerId,
+            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate from,
+            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate to) {
+
+        List<app.domain.model.DailyStatistics> stats = serviceDeliveryUseCase.getDailyStats(messengerId, from, to);
+
+        List<app.adapter.in.rest.response.DailyStatsResponse> response = stats.stream()
+                .map(s -> new app.adapter.in.rest.response.DailyStatsResponse(
+                        s.date(),
+                        s.assigned(),
+                        s.delivered(),
+                        s.returned(),
+                        s.canceled(),
+                        s.total()))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(response);
+    }
 }

@@ -204,6 +204,13 @@ public class UpdateServiceDelivery {
                         "Como administrador solo puedes cambiar el estado a: CANCELED o RESOLVED. " +
                                 "Para otros estados, el mensajero asignado debe realizar el cambio.");
             }
+
+            // RESOLVED solo se puede aplicar cuando el estado actual es PENDING
+            if (newStatus == Status.RESOLVED && currentStatus != Status.PENDING) {
+                throw new BusinessException(
+                        "Solo puedes marcar como RESUELTO los servicios en estado PENDIENTE. " +
+                                "Estado actual: " + currentStatus);
+            }
         }
     }
 

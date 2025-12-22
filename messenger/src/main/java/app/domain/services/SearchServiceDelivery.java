@@ -67,4 +67,14 @@ public class SearchServiceDelivery {
     public List<ServiceDelivery> findDeleted() {
         return serviceDeliveryPort.findDeleted();
     }
+
+    /**
+     * Retorna estadísticas diarias de servicios para un mensajero.
+     */
+    public List<app.domain.model.DailyStatistics> findDailyStatsByMessenger(
+            Long messengerId,
+            java.time.LocalDate from,
+            java.time.LocalDate to) {
+        return serviceDeliveryPort.findDailyStatsByMessenger(messengerId, from, to);
+    }
 }
