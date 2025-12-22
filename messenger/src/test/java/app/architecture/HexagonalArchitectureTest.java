@@ -1,0 +1,53 @@
+package app.architecture;
+
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+
+import com.tngtech.archunit.core.importer.ImportOption;
+import com.tngtech.archunit.junit.AnalyzeClasses;
+import com.tngtech.archunit.junit.ArchTest;
+import com.tngtech.archunit.lang.ArchRule;
+
+@AnalyzeClasses(packages = "app", importOptions = ImportOption.DoNotIncludeTests.class)
+public class HexagonalArchitectureTest {
+
+    // 1. Domain layer (Ports, Models, Services) should NOT depend on Infrastructure
+    // or Application
+    @ArchTest
+    static final ArchRule domain_should_not_depend_on_infrastructure = noClasses()
+            .that().resideInAPackage("..domain..")
+            .should().dependOnClassesThat().resideInAPackage("..infrastructure..");
+
+    @ArchTest
+    static final ArchRule domain_should_not_depend_on_application = noClasses()
+            .that().resideInAPackage("..domain..")
+            .should().dependOnClassesThat().resideInAPackage("..application..");
+
+    // 2. Application layer (UseCases) should depend on Domain, may depend on Ports
+    // (which are in Domain)
+    // But should NOT depend on Infrastructure detail implementations (Adapters,
+    // Repositories directly if avoidable, though Repos are interfaces so simpler)
+    // Strict Hexagonal: Application depends on Ports (Domain), not Infrastructure
+    // Adapters.
+    @ArchTest
+    static final ArchRule application_should_not_depend_on_infrastructure_implementations = noClasses()
+            .that().resideInAPackage("..application..")
+            .should().dependOnClassesThat().resideInAPackage("..infrastructure.persistence.adapter..");
+
+    // 3. Infrastructure layer (Adapters) should depend on Domain (Ports)
+    @ArchTest
+    static final ArchRule infrastructure_adapters_should_depend_on_domain_ports = classes()
+            .that().resideInAPackage("..infrastructure.persistence.adapter..")
+            .should().dependOnClassesThat().resideInAPackage("..domain.ports..");
+
+    // 4. General naming conventions
+    @ArchTest
+    static final ArchRule service_names_should_end_with_service_or_usecase = classes()
+            .that().resideInAPackage("..application.usecase..")
+            .should().haveSimpleNameEndingWith("UseCase");
+
+    @ArchTest
+    static final ArchRule repository_names_should_end_with_repository = classes()
+            .that().resideInAPackage("..infrastructure.persistence.repository..")
+            .should().haveSimpleNameEndingWith("Repository");
+}

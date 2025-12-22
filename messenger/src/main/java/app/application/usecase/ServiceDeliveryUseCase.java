@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import app.domain.model.DailyStatistics;
 import app.domain.model.Photo;
 import app.domain.model.ServiceDelivery;
 import app.domain.model.Signature;
@@ -155,9 +157,6 @@ public class ServiceDeliveryUseCase {
         }
     }
 
-    /**
-     * Reasigna un servicio a otro mensajero (solo ADMIN, solo si está en CANCELED).
-     */
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "REASSIGN_MESSENGER", description = "Reasignar servicio a otro mensajero")
     public ServiceDelivery reassignMessenger(Long serviceId, Long newMessengerId, Long adminUserId) throws Exception {
@@ -181,34 +180,22 @@ public class ServiceDeliveryUseCase {
         return searchService.findByPlate(plateNumber);
     }
 
-    /**
-     * Mueve un servicio a la papelera (soft delete).
-     */
     public void deleteById(Long id) throws Exception {
         logger.info("Moviendo servicio ID: {} a la papelera", id);
         deleteService.deleteById(id);
     }
 
-    /**
-     * Mueve un servicio a la papelera con registro del usuario.
-     */
     @AuditableAction(action = "DELETE_SERVICE", description = "Mover servicio a papelera")
     public void deleteById(Long id, Long userId) throws Exception {
         logger.info("Moviendo servicio ID: {} a la papelera por usuario ID: {}", id, userId);
         deleteService.deleteById(id, userId);
     }
 
-    /**
-     * Retorna todos los servicios en la papelera.
-     */
     @Transactional(readOnly = true)
     public List<ServiceDelivery> findDeleted() {
         return searchService.findDeleted();
     }
 
-    /**
-     * Restaura un servicio desde la papelera (solo ADMIN).
-     */
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "RESTORE_SERVICE", description = "Restaurar servicio desde papelera")
     public ServiceDelivery restore(Long id, Long userId) throws Exception {
@@ -230,11 +217,8 @@ public class ServiceDeliveryUseCase {
         cleanupFiles(paths.toArray(new String[0]));
     }
 
-    /**
-     * Retorna estadísticas diarias de servicios para un mensajero.
-     */
     @Transactional(readOnly = true)
-    public List<app.domain.model.DailyStatistics> getDailyStats(
+    public List<DailyStatistics> getDailyStats(
             Long messengerId,
             java.time.LocalDate from,
             java.time.LocalDate to) {

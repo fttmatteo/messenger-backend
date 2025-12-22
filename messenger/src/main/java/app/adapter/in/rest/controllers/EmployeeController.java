@@ -63,7 +63,7 @@ public class EmployeeController {
     public ResponseEntity<EmployeeResponse> findById(@PathVariable Long id) {
         Employee employee = employeeUseCase.findById(id);
         if (employee == null) {
-            throw new app.application.exceptions.ResourceNotFoundException("Empleado con ID " + id + " no encontrado");
+            throw new app.domain.exception.ResourceNotFoundException("Empleado con ID " + id + " no encontrado");
         }
         return ResponseEntity.ok(responseMapper.toResponse(employee));
     }

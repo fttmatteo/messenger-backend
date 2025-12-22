@@ -13,9 +13,9 @@ import org.springframework.stereotype.Service;
  * Caso de uso para geocodificar direcciones de concesionarios.
  */
 @Service
-public class GeocodeDealership {
+public class GeocodeDealershipUseCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(GeocodeDealership.class);
+    private static final Logger logger = LoggerFactory.getLogger(GeocodeDealershipUseCase.class);
 
     @Autowired
     private LocationPort locationPort;

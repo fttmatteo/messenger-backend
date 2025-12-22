@@ -19,14 +19,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UpdateLiveTracking Unit Tests")
-class UpdateLiveTrackingTest {
+@DisplayName("UpdateLiveTrackingUseCase Unit Tests")
+class UpdateLiveTrackingUseCaseTest {
 
     @Mock
     private TrackingPort trackingPort;
 
     @InjectMocks
-    private UpdateLiveTracking updateLiveTracking;
+    private UpdateLiveTrackingUseCase updateLiveTracking;
 
     @Test
     @DisplayName("Debe actualizar rastreo y guardar historial con datos completos")

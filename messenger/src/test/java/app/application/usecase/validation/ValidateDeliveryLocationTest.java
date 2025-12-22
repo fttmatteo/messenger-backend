@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import app.application.exceptions.GeolocationException;
+import app.domain.exception.GeolocationException;
 import app.domain.model.Dealership;
 import app.domain.model.Location;
 import app.domain.ports.DealershipPort;
@@ -19,14 +19,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ValidateDeliveryLocation Unit Tests")
-class ValidateDeliveryLocationTest {
+@DisplayName("ValidateDeliveryLocationUseCase Unit Tests")
+class ValidateDeliveryLocationUseCaseTest {
 
     @Mock
     private DealershipPort dealershipPort;
 
     @InjectMocks
-    private ValidateDeliveryLocation validateDeliveryLocation;
+    private ValidateDeliveryLocationUseCase validateDeliveryLocation;
 
     @BeforeEach
     void setUp() {

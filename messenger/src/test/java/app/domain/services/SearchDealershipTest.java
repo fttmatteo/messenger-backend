@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import app.application.exceptions.ResourceNotFoundException;
+import app.domain.exception.ResourceNotFoundException;
 import app.domain.model.Dealership;
 import app.domain.ports.DealershipPort;
 import java.util.Arrays;

@@ -1,6 +1,6 @@
 package app.application.usecase.validation;
 
-import app.application.exceptions.GeolocationException;
+import app.domain.exception.GeolocationException;
 import app.domain.model.Dealership;
 import app.domain.model.Location;
 import app.domain.ports.DealershipPort;
@@ -14,9 +14,9 @@ import org.springframework.stereotype.Service;
  * Caso de uso para validar ubicación de entrega vs concesionario.
  */
 @Service
-public class ValidateDeliveryLocation {
+public class ValidateDeliveryLocationUseCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(ValidateDeliveryLocation.class);
+    private static final Logger logger = LoggerFactory.getLogger(ValidateDeliveryLocationUseCase.class);
 
     @Autowired
     private DealershipPort dealershipPort;

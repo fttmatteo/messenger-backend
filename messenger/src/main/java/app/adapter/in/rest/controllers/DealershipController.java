@@ -10,9 +10,9 @@ import app.adapter.in.builder.DealershipBuilder;
 import app.adapter.in.rest.mapper.DealershipResponseMapper;
 import app.adapter.in.rest.request.DealershipRequest;
 import app.adapter.in.rest.response.DealershipResponse;
-import app.application.exceptions.GeolocationException;
+import app.domain.exception.GeolocationException;
 import app.application.usecase.DealershipUseCase;
-import app.application.usecase.location.GeocodeDealership;
+import app.application.usecase.location.GeocodeDealershipUseCase;
 import app.domain.model.Dealership;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,7 +36,7 @@ public class DealershipController {
     @Autowired
     private DealershipResponseMapper responseMapper;
     @Autowired
-    private GeocodeDealership geocodeDealership;
+    private GeocodeDealershipUseCase geocodeDealership;
 
     @PostMapping("/createDealership")
     @PreAuthorize("hasRole('ADMIN')")

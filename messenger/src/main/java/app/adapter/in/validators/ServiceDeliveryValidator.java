@@ -1,7 +1,7 @@
 package app.adapter.in.validators;
 
 import org.springframework.stereotype.Component;
-import app.application.exceptions.InputsException;
+import app.domain.exception.InputsException;
 import app.domain.model.enums.Status;
 
 /**

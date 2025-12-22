@@ -4,7 +4,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import app.application.exceptions.ResourceNotFoundException;
+import app.domain.exception.ResourceNotFoundException;
 import app.domain.model.Dealership;
 import app.domain.ports.DealershipPort;
 

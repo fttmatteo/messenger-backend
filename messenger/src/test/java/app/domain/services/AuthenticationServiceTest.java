@@ -1,6 +1,6 @@
 package app.domain.services;
 
-import app.application.exceptions.BusinessException;
+import app.domain.exception.BusinessException;
 import app.domain.model.Employee;
 import app.domain.model.auth.AuthCredentials;
 import app.domain.model.auth.TokenResponse;

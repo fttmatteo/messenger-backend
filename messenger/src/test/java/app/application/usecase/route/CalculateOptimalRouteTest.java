@@ -21,8 +21,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("CalculateOptimalRoute Unit Tests")
-class CalculateOptimalRouteTest {
+@DisplayName("CalculateOptimalRouteUseCase Unit Tests")
+class CalculateOptimalRouteUseCaseTest {
 
     @Mock
     private LocationPort locationPort;
@@ -30,11 +30,11 @@ class CalculateOptimalRouteTest {
     private DealershipPort dealershipPort;
 
     @InjectMocks
-    private CalculateOptimalRoute calculateOptimalRoute;
+    private CalculateOptimalRouteUseCase calculateOptimalRoute;
 
     @Test
     @DisplayName("Debe calcular ruta óptima con destinos válidos")
-    void shouldCalculateOptimalRoute() {
+    void shouldCalculateOptimalRouteUseCase() {
         Dealership d1 = new Dealership();
         d1.setIdDealership(1L);
         d1.setIsGeolocated(true);

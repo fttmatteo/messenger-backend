@@ -10,7 +10,7 @@ import java.time.Duration;
  * Servicio para blacklist de tokens JWT usando Redis.
  */
 @Service
-public class TokenBlacklistService {
+public class TokenBlacklistService implements app.domain.ports.TokenBlacklistPort {
 
     private static final String BLACKLIST_PREFIX = "token:blacklist:";
 

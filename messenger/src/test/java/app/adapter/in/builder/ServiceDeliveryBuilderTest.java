@@ -3,7 +3,7 @@ package app.adapter.in.builder;
 import app.adapter.in.rest.request.ServiceDeliveryCreateRequest;
 import app.adapter.in.rest.request.ServiceDeliveryUpdateStatusRequest;
 import app.adapter.in.validators.ServiceDeliveryValidator;
-import app.application.exceptions.InputsException;
+import app.domain.exception.InputsException;
 import app.domain.model.enums.Status;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

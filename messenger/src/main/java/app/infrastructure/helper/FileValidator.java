@@ -1,6 +1,6 @@
 package app.infrastructure.helper;
 
-import app.application.exceptions.InputsException;
+import app.domain.exception.InputsException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;

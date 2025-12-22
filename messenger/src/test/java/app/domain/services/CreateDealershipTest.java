@@ -1,6 +1,6 @@
 package app.domain.services;
 
-import app.application.exceptions.BusinessException;
+import app.domain.exception.BusinessException;
 import app.domain.model.Dealership;
 import app.domain.ports.DealershipPort;
 import org.junit.jupiter.api.BeforeEach;

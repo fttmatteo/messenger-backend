@@ -4,8 +4,8 @@ import app.adapter.in.rest.request.LiveTrackingRequest;
 import app.adapter.in.rest.response.LiveTrackingResponse;
 import app.adapter.in.rest.response.TrackingHistoryResponse;
 import app.adapter.in.rest.mapper.TrackingResponseMapper;
-import app.application.usecase.tracking.GetTrackingHistory;
-import app.application.usecase.tracking.UpdateLiveTracking;
+import app.application.usecase.tracking.GetTrackingHistoryUseCase;
+import app.application.usecase.tracking.UpdateLiveTrackingUseCase;
 import app.domain.model.LiveTracking;
 import app.domain.model.Location;
 import app.domain.model.TrackingHistory;
@@ -34,9 +34,9 @@ public class TrackingController {
     private static final Logger logger = LoggerFactory.getLogger(TrackingController.class);
 
     @Autowired
-    private UpdateLiveTracking updateLiveTracking;
+    private UpdateLiveTrackingUseCase updateLiveTracking;
     @Autowired
-    private GetTrackingHistory getTrackingHistory;
+    private GetTrackingHistoryUseCase getTrackingHistory;
     @Autowired
     private TrackingPort trackingPort;
     @Autowired

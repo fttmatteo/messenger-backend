@@ -1,6 +1,6 @@
 package app.adapter.in.validators;
 
-import app.application.exceptions.InputsException;
+import app.domain.exception.InputsException;
 import app.domain.model.enums.Status;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
