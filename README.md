@@ -10,11 +10,12 @@
 [![Redis](https://img.shields.io/badge/Redis-6.0+-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](./LICENSE)
 
+[![Dependabot Updates](https://github.com/fttmatteo/messenger-backend/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/fttmatteo/messenger-backend/actions/workflows/dependabot/dependabot-updates)
+[![CI Pipeline](https://github.com/fttmatteo/messenger-backend/actions/workflows/maven.yml/badge.svg)](https://github.com/fttmatteo/messenger-backend/actions/workflows/maven.yml)
+
 **Sistema de entregas con reconocimiento automático de placas vehiculares mediante OCR.**
 
 *Delivery management system with automatic license plate recognition via OCR.*
-
-[![Dependabot Updates](https://github.com/fttmatteo/messenger-backend/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/fttmatteo/messenger-backend/actions/workflows/dependabot/dependabot-updates) [![CI Pipeline](https://github.com/fttmatteo/messenger-backend/actions/workflows/maven.yml/badge.svg)](https://github.com/fttmatteo/messenger-backend/actions/workflows/maven.yml)
 
 </div>
 
