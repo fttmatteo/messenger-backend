@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 @RestController
 @RequestMapping("/dealerships")
+@PreAuthorize("isAuthenticated()")
 public class DealershipController {
 
     private static final Logger logger = LoggerFactory.getLogger(DealershipController.class);

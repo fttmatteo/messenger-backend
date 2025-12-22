@@ -45,7 +45,6 @@ public class ServiceDeliveryResponseMapper {
         response.setObservation(service.getObservation());
         response.setCreatedAt(service.getCreatedAt());
 
-        // Campos de bloqueo (ventana de 72 horas)
         response.setLockedAt(service.getLockedAt());
         if (service.getLockedAt() != null) {
             LocalDateTime editDeadline = service.getLockedAt().plusHours(EDIT_WINDOW_HOURS);
@@ -55,7 +54,6 @@ public class ServiceDeliveryResponseMapper {
             response.setLocked(false);
         }
 
-        // Campos de papelera (soft delete)
         response.setDeleted(service.isDeleted());
         response.setDeletedAt(service.getDeletedAt());
 

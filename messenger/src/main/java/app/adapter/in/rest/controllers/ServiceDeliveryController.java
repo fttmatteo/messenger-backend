@@ -1,6 +1,7 @@
 package app.adapter.in.rest.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -10,11 +11,13 @@ import app.adapter.in.builder.ServiceDeliveryBuilder;
 import app.adapter.in.rest.mapper.ServiceDeliveryResponseMapper;
 import app.adapter.in.rest.request.ServiceDeliveryCreateRequest;
 import app.adapter.in.rest.request.ServiceDeliveryUpdateStatusRequest;
+import app.adapter.in.rest.response.DailyStatsResponse;
 import app.adapter.in.rest.response.ServiceDeliveryResponse;
 import app.application.exceptions.InputsException;
 import app.application.exceptions.ResourceNotFoundException;
 import app.application.exceptions.UnauthorizedException;
 import app.application.usecase.ServiceDeliveryUseCase;
+import app.domain.model.DailyStatistics;
 import app.domain.model.Employee;
 import app.domain.model.ServiceDelivery;
 import app.domain.model.enums.Role;
@@ -204,12 +207,8 @@ public class ServiceDeliveryController {
         return ResponseEntity.ok(responses);
     }
 
-    /**
-     * Mueve un servicio a la papelera (soft delete).
-     * El servicio se borrará permanentemente después de 60 días.
-     */
     @DeleteMapping("/deleteService/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MESSENGER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, String>> delete(@PathVariable Long id) throws Exception {
         logger.info("Solicitud eliminación servicio ID: {}", id);
 
@@ -221,13 +220,6 @@ public class ServiceDeliveryController {
                 "El servicio ha sido movido a la papelera. Será eliminado permanentemente después de 60 días."));
     }
 
-    // ================================
-    // Endpoints de Papelera (Trash)
-    // ================================
-
-    /**
-     * Lista todos los servicios en la papelera (solo ADMIN).
-     */
     @GetMapping("/trash")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ServiceDeliveryResponse>> findDeleted() {
@@ -255,19 +247,17 @@ public class ServiceDeliveryController {
         return ResponseEntity.ok(responseMapper.toResponse(restored));
     }
 
-    /**
-     * Retorna estadísticas diarias de servicios para un mensajero.
-     */
     @GetMapping("/stats/daily")
-    public ResponseEntity<List<app.adapter.in.rest.response.DailyStatsResponse>> getDailyStats(
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<DailyStatsResponse>> getDailyStats(
             @RequestParam Long messengerId,
-            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate from,
-            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate to) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate to) {
 
-        List<app.domain.model.DailyStatistics> stats = serviceDeliveryUseCase.getDailyStats(messengerId, from, to);
+        List<DailyStatistics> stats = serviceDeliveryUseCase.getDailyStats(messengerId, from, to);
 
-        List<app.adapter.in.rest.response.DailyStatsResponse> response = stats.stream()
-                .map(s -> new app.adapter.in.rest.response.DailyStatsResponse(
+        List<DailyStatsResponse> response = stats.stream()
+                .map(s -> new DailyStatsResponse(
                         s.date(),
                         s.assigned(),
                         s.delivered(),

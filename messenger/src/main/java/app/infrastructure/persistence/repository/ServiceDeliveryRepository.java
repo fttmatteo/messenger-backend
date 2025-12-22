@@ -24,7 +24,6 @@ public interface ServiceDeliveryRepository extends JpaRepository<ServiceDelivery
 
         List<ServiceDeliveryEntity> findByDealership_IdDealership(Long dealershipId);
 
-        // Métodos para soft delete (papelera)
         List<ServiceDeliveryEntity> findByDeletedFalse();
 
         Optional<ServiceDeliveryEntity> findByIdServiceDeliveryAndDeletedFalse(Long id);
@@ -35,7 +34,6 @@ public interface ServiceDeliveryRepository extends JpaRepository<ServiceDelivery
 
         List<ServiceDeliveryEntity> findByPlate_PlateNumberAndDeletedFalse(String plateNumber);
 
-        // Query for daily statistics by messenger
         @Query(value = """
                         SELECT DATE(created_at) as date,
                                SUM(CASE WHEN current_status = 'ASSIGNED' THEN 1 ELSE 0 END) as assigned,
