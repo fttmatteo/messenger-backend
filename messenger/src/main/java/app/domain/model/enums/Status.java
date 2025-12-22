@@ -9,5 +9,6 @@ public enum Status {
     DELIVERED,
     RETURNED,
     CANCELED,
-    RESOLVED
+    RESOLVED,
+    FAILED
 }

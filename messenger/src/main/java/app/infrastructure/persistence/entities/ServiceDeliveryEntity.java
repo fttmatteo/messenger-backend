@@ -24,7 +24,7 @@ public class ServiceDeliveryEntity {
     @JoinColumn(name = "dealership_id", nullable = false)
     private DealershipEntity dealership;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "messenger_id", nullable = false)
     private EmployeeEntity messenger;
 
