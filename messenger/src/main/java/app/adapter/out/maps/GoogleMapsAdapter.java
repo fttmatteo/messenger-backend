@@ -1,6 +1,6 @@
 package app.adapter.out.maps;
 
-import app.application.exceptions.GeolocationException;
+import app.domain.exception.GeolocationException;
 import app.domain.model.Location;
 import app.domain.model.Route;
 import app.domain.ports.LocationPort;

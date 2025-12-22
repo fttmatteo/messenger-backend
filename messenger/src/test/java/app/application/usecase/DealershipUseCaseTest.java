@@ -1,7 +1,7 @@
 package app.application.usecase;
 
-import app.application.exceptions.BusinessException;
-import app.application.exceptions.ResourceNotFoundException;
+import app.domain.exception.BusinessException;
+import app.domain.exception.ResourceNotFoundException;
 import app.domain.model.Dealership;
 import app.domain.services.CreateDealership;
 import app.domain.services.DeleteDealership;

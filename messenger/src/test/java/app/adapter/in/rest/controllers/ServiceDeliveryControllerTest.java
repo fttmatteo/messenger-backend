@@ -201,9 +201,9 @@ class ServiceDeliveryControllerTest {
         @DisplayName("updateStatus debe propagar excepción de BusinessException")
         void updateStatusShouldPropagateBusinessException() throws Exception {
             when(serviceDeliveryUseCase.updateStatus(anyLong(), any(), anyString(), any(), any(), anyLong()))
-                    .thenThrow(new app.application.exceptions.BusinessException("El servicio está bloqueado"));
+                    .thenThrow(new app.domain.exception.BusinessException("El servicio está bloqueado"));
 
-            assertThrows(app.application.exceptions.BusinessException.class,
+            assertThrows(app.domain.exception.BusinessException.class,
                     () -> serviceDeliveryUseCase.updateStatus(1L, Status.DELIVERED, "obs", null, null, 1L));
         }
 
@@ -211,10 +211,10 @@ class ServiceDeliveryControllerTest {
         @DisplayName("reassign debe fallar si el servicio no está en CANCELED")
         void reassignShouldFailIfNotCanceled() throws Exception {
             when(serviceDeliveryUseCase.reassignMessenger(1L, 3L, 1L))
-                    .thenThrow(new app.application.exceptions.BusinessException(
+                    .thenThrow(new app.domain.exception.BusinessException(
                             "Solo se pueden reasignar servicios en estado CANCELED"));
 
-            assertThrows(app.application.exceptions.BusinessException.class,
+            assertThrows(app.domain.exception.BusinessException.class,
                     () -> serviceDeliveryUseCase.reassignMessenger(1L, 3L, 1L));
         }
 
@@ -222,10 +222,10 @@ class ServiceDeliveryControllerTest {
         @DisplayName("restore debe fallar si el servicio no está en papelera")
         void restoreShouldFailIfNotDeleted() throws Exception {
             when(serviceDeliveryUseCase.restore(1L, 1L))
-                    .thenThrow(new app.application.exceptions.BusinessException(
+                    .thenThrow(new app.domain.exception.BusinessException(
                             "El servicio no está en la papelera"));
 
-            assertThrows(app.application.exceptions.BusinessException.class,
+            assertThrows(app.domain.exception.BusinessException.class,
                     () -> serviceDeliveryUseCase.restore(1L, 1L));
         }
     }

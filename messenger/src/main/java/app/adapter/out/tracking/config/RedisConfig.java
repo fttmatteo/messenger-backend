@@ -1,6 +1,9 @@
 package app.adapter.out.tracking.config;
 
 import app.domain.model.LiveTracking;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.json.JsonMapper;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +11,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
@@ -46,13 +50,11 @@ public class RedisConfig {
         template.setKeySerializer(new StringRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
 
-        // Jackson 3: usa tools.jackson, JSR-310 integrado,
-        // WRITE_DATES_AS_TIMESTAMPS=false por defecto
-        tools.jackson.databind.json.JsonMapper jsonMapper = tools.jackson.databind.json.JsonMapper.builder()
-                .disable(tools.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        JsonMapper jsonMapper = JsonMapper.builder()
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 .build();
 
-        org.springframework.data.redis.serializer.JacksonJsonRedisSerializer<LiveTracking> serializer = new org.springframework.data.redis.serializer.JacksonJsonRedisSerializer<>(
+        JacksonJsonRedisSerializer<LiveTracking> serializer = new JacksonJsonRedisSerializer<>(
                 jsonMapper, LiveTracking.class);
 
         template.setValueSerializer(serializer);

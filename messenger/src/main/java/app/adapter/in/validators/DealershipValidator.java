@@ -1,7 +1,7 @@
 package app.adapter.in.validators;
 
 import org.springframework.stereotype.Component;
-import app.application.exceptions.InputsException;
+import app.domain.exception.InputsException;
 
 /**
  * Validador de inputs para concesionarios.

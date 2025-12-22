@@ -5,14 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import app.application.exceptions.BusinessException;
-import app.application.exceptions.UnauthorizedException;
+import app.domain.exception.BusinessException;
+import app.domain.exception.UnauthorizedException;
 import app.domain.model.Employee;
 import app.domain.model.auth.AuthCredentials;
 import app.domain.model.auth.TokenResponse;
 import app.domain.ports.AuthenticationPort;
 import app.domain.ports.EmployeePort;
-import app.infrastructure.security.TokenBlacklistService;
 
 /**
  * Servicio de autenticación y gestión de tokens JWT.
@@ -29,7 +28,7 @@ public class AuthenticationService {
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
-    private TokenBlacklistService tokenBlacklistService;
+    private app.domain.ports.TokenBlacklistPort tokenBlacklistService;
 
     @Value("${jwt.expiration:1800000}")
     private long jwtExpiration;

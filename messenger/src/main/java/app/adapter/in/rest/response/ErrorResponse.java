@@ -86,12 +86,6 @@ public class ErrorResponse {
         this.details = details;
     }
 
-    /**
-     * Agrega un detalle de error a la lista.
-     * 
-     * @param field   Nombre del campo con error
-     * @param message Mensaje del error
-     */
     public void addDetail(String field, String message) {
         if (this.details == null) {
             this.details = new ArrayList<>();

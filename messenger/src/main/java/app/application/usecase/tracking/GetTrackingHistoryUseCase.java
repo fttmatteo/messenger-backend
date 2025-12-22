@@ -11,7 +11,7 @@ import java.util.List;
  * Caso de uso para consultar historial de tracking de mensajeros.
  */
 @Service
-public class GetTrackingHistory {
+public class GetTrackingHistoryUseCase {
 
     @Autowired
     private TrackingPort trackingPort;

@@ -6,8 +6,8 @@ import app.adapter.in.rest.request.RouteRequest;
 import app.adapter.in.rest.response.DistanceResponse;
 import app.adapter.in.rest.response.LocationResponse;
 import app.adapter.in.rest.response.RouteResponse;
-import app.application.usecase.location.GeocodeDealership;
-import app.application.usecase.route.CalculateOptimalRoute;
+import app.application.usecase.location.GeocodeDealershipUseCase;
+import app.application.usecase.route.CalculateOptimalRouteUseCase;
 import app.domain.model.Location;
 import app.domain.model.Route;
 import app.domain.ports.LocationPort;
@@ -30,9 +30,9 @@ public class LocationController {
     private static final Logger logger = LoggerFactory.getLogger(LocationController.class);
 
     @Autowired
-    private GeocodeDealership geocodeDealership;
+    private GeocodeDealershipUseCase geocodeDealership;
     @Autowired
-    private CalculateOptimalRoute calculateOptimalRoute;
+    private CalculateOptimalRouteUseCase calculateOptimalRoute;
     @Autowired
     private LocationPort locationPort;
     @Autowired

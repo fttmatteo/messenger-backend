@@ -1,7 +1,7 @@
 package app.domain.services;
 
 import org.springframework.stereotype.Service;
-import app.application.exceptions.BusinessException;
+import app.domain.exception.BusinessException;
 import app.domain.model.enums.PlateType;
 import java.util.regex.Pattern;
 

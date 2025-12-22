@@ -18,8 +18,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("GeocodeDealership Unit Tests")
-class GeocodeDealershipTest {
+@DisplayName("GeocodeDealershipUseCase Unit Tests")
+class GeocodeDealershipUseCaseTest {
 
     @Mock
     private LocationPort locationPort;
@@ -27,7 +27,7 @@ class GeocodeDealershipTest {
     private DealershipPort dealershipPort;
 
     @InjectMocks
-    private GeocodeDealership geocodeDealership;
+    private GeocodeDealershipUseCase geocodeDealership;
 
     @Test
     @DisplayName("Debe geocodificar y actualizar concesionario")

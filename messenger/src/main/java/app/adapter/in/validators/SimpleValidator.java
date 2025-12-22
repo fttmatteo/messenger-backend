@@ -1,6 +1,6 @@
 package app.adapter.in.validators;
 
-import app.application.exceptions.InputsException;
+import app.domain.exception.InputsException;
 
 /**
  * Validador base con métodos comunes para validación de tipos.

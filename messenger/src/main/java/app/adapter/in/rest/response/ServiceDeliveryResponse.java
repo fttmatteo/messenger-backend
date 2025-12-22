@@ -19,13 +19,9 @@ public class ServiceDeliveryResponse {
     private List<PhotoResponse> photos = new ArrayList<>();
     private List<StatusHistoryResponse> history = new ArrayList<>();
     private java.time.LocalDateTime createdAt;
-
-    // Campos de bloqueo (ventana de 72 horas)
     private java.time.LocalDateTime lockedAt;
     private java.time.LocalDateTime editDeadline;
     private boolean isLocked;
-
-    // Campos de papelera (soft delete)
     private boolean deleted;
     private java.time.LocalDateTime deletedAt;
 
@@ -152,7 +148,6 @@ public class ServiceDeliveryResponse {
         this.history = history;
     }
 
-    // Nested PlateResponse to avoid circular dependencies
     public static class PlateResponse {
         private Long idPlate;
         private String plateNumber;

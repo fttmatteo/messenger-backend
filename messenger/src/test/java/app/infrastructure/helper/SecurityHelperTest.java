@@ -3,7 +3,7 @@ package app.infrastructure.helper;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import app.application.exceptions.UnauthorizedException;
+import app.domain.exception.UnauthorizedException;
 import app.domain.model.Employee;
 import app.domain.model.enums.Role;
 import app.domain.ports.EmployeePort;

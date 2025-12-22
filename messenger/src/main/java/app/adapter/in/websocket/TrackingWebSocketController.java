@@ -2,7 +2,7 @@ package app.adapter.in.websocket;
 
 import app.adapter.in.rest.request.LiveTrackingRequest;
 import app.adapter.in.rest.response.LiveTrackingResponse;
-import app.application.usecase.tracking.UpdateLiveTracking;
+import app.application.usecase.tracking.UpdateLiveTrackingUseCase;
 import app.domain.model.LiveTracking;
 import app.domain.model.Location;
 
@@ -23,7 +23,7 @@ public class TrackingWebSocketController {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
     @Autowired
-    private UpdateLiveTracking updateLiveTracking;
+    private UpdateLiveTrackingUseCase updateLiveTracking;
 
     @MessageMapping("/tracking/update")
     public void receiveLocationUpdate(LiveTrackingRequest request, Principal principal) {

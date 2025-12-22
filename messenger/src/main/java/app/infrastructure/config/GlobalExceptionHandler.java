@@ -2,12 +2,12 @@ package app.infrastructure.config;
 
 import app.adapter.in.rest.response.ErrorDetail;
 import app.adapter.in.rest.response.ErrorResponse;
-import app.application.exceptions.BusinessException;
-import app.application.exceptions.ExternalServiceException;
-import app.application.exceptions.GeolocationException;
-import app.application.exceptions.InputsException;
-import app.application.exceptions.ResourceNotFoundException;
-import app.application.exceptions.UnauthorizedException;
+import app.domain.exception.BusinessException;
+import app.domain.exception.ExternalServiceException;
+import app.domain.exception.GeolocationException;
+import app.domain.exception.InputsException;
+import app.domain.exception.ResourceNotFoundException;
+import app.domain.exception.UnauthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

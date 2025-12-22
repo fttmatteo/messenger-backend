@@ -5,7 +5,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import app.application.exceptions.BusinessException;
+import app.domain.exception.BusinessException;
 import app.domain.model.Employee;
 import app.domain.model.Plate;
 import app.domain.model.ServiceDelivery;

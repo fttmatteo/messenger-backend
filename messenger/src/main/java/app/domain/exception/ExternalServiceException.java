@@ -1,4 +1,4 @@
-package app.application.exceptions;
+package app.domain.exception;
 
 /**
  * Excepción para errores en servicios externos (APIs, Cloud).

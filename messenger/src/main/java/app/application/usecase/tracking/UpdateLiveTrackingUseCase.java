@@ -15,15 +15,14 @@ import java.time.LocalDateTime;
  * Caso de uso para actualizar ubicación en tiempo real de mensajeros.
  */
 @Service
-public class UpdateLiveTracking {
+public class UpdateLiveTrackingUseCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(UpdateLiveTracking.class);
+    private static final Logger logger = LoggerFactory.getLogger(UpdateLiveTrackingUseCase.class);
 
     @Autowired
     private TrackingPort trackingPort;
 
     public LiveTracking execute(LiveTracking incomingTracking) {
-        // Logging nivel DEBUG para no saturar logs en producción dado el alto volumen
         logger.debug("Actualizando ubicación para mensajero ID: {}", incomingTracking.getMessengerId());
 
         if (incomingTracking.getLastUpdate() == null) {

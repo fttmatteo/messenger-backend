@@ -3,7 +3,7 @@ package app.domain.services;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import app.application.exceptions.BusinessException;
+import app.domain.exception.BusinessException;
 import app.domain.model.ServiceDelivery;
 import app.domain.ports.ServiceDeliveryPort;
 

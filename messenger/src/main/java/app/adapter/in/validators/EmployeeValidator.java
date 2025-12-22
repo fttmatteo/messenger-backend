@@ -1,6 +1,6 @@
 package app.adapter.in.validators;
 
-import app.application.exceptions.InputsException;
+import app.domain.exception.InputsException;
 import app.domain.model.enums.Role;
 
 import org.springframework.stereotype.Component;

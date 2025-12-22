@@ -17,9 +17,9 @@ import java.util.List;
  * Caso de uso para calcular rutas óptimas entre concesionarios.
  */
 @Service
-public class CalculateOptimalRoute {
+public class CalculateOptimalRouteUseCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(CalculateOptimalRoute.class);
+    private static final Logger logger = LoggerFactory.getLogger(CalculateOptimalRouteUseCase.class);
 
     @Autowired
     private LocationPort locationPort;

@@ -16,14 +16,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("GetTrackingHistory Unit Tests")
-class GetTrackingHistoryTest {
+@DisplayName("GetTrackingHistoryUseCase Unit Tests")
+class GetTrackingHistoryUseCaseTest {
 
     @Mock
     private TrackingPort trackingPort;
 
     @InjectMocks
-    private GetTrackingHistory getTrackingHistory;
+    private GetTrackingHistoryUseCase getTrackingHistory;
 
     @Test
     @DisplayName("Debe consultar por mensajero y fecha")

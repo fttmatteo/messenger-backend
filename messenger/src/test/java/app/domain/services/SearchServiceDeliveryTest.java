@@ -3,7 +3,7 @@ package app.domain.services;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-import app.application.exceptions.BusinessException;
+import app.domain.exception.BusinessException;
 import app.domain.model.ServiceDelivery;
 import app.domain.ports.ServiceDeliveryPort;
 import java.util.Arrays;
