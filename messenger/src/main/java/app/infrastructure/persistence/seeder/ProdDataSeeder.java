@@ -72,12 +72,12 @@ public class ProdDataSeeder implements CommandLineRunner {
     }
 
     private void loadEmployees() {
-        if (employeeRepository.count() > 5)
-            return;
-
         logger.info("  -> Generando empleados...");
 
-        // Admin adicional
+        // Admin Principal (El que antes creaba AdminSeeder)
+        createEmployee(1000000000L, "Administrador", "3000000000", "Admin123!", Role.ADMIN);
+
+        // Admin Soporte (El que ya teníamos)
         createEmployee(1000000002L, "Admin Soporte", "3001234567", "Admin123!", Role.ADMIN);
 
         // Mensajeros - Nombres realistas
@@ -108,12 +108,6 @@ public class ProdDataSeeder implements CommandLineRunner {
     }
 
     private void loadDealerships() {
-        if (dealershipRepository.count() >= 10) {
-            logger.info(
-                    "  -> Se encontraron " + dealershipRepository.count() + " concesionarios. Saltando generación.");
-            return;
-        }
-
         logger.info("  -> Generando concesionarios en Bogotá...");
 
         // Datos reales de ubicaciones en Bogotá
@@ -146,9 +140,6 @@ public class ProdDataSeeder implements CommandLineRunner {
     }
 
     private void loadPlates() {
-        if (plateRepository.count() > 10)
-            return;
-
         logger.info("  -> Generando parque automotor...");
 
         for (int i = 0; i < 25; i++) {
@@ -180,9 +171,6 @@ public class ProdDataSeeder implements CommandLineRunner {
     }
 
     private void loadServiceDeliveries() {
-        if (serviceDeliveryRepository.count() > 10)
-            return;
-
         logger.info("  -> Generando historial de servicios (últimos 30 días)...");
 
         List<DealershipEntity> dealerships = dealershipRepository.findAll();

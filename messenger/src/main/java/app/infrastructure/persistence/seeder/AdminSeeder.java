@@ -13,7 +13,7 @@ import app.infrastructure.persistence.repository.EmployeeRepository;
 /**
  * Seeder que crea el usuario administrador inicial al arrancar la aplicación.
  */
-@Component
+// @Component
 public class AdminSeeder implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(AdminSeeder.class);
