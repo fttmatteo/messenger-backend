@@ -108,8 +108,11 @@ public class ProdDataSeeder implements CommandLineRunner {
     }
 
     private void loadDealerships() {
-        if (dealershipRepository.count() >= 10)
+        if (dealershipRepository.count() >= 10) {
+            logger.info(
+                    "  -> Se encontraron " + dealershipRepository.count() + " concesionarios. Saltando generación.");
             return;
+        }
 
         logger.info("  -> Generando concesionarios en Bogotá...");
 
