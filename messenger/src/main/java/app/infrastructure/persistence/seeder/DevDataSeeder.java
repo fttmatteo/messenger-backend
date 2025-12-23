@@ -76,7 +76,10 @@ public class DevDataSeeder implements CommandLineRunner {
 
         logger.info("  -> Generando empleados...");
 
-        // Admin adicional
+        // Admin Principal (El que antes creaba AdminSeeder)
+        createEmployee(1000000000L, "Administrador", "3000000000", "Admin123!", Role.ADMIN);
+
+        // Admin Soporte (El que ya teníamos)
         createEmployee(1000000002L, "Admin Soporte", "3001234567", "Admin123!", Role.ADMIN);
 
         // Mensajeros - Nombres realistas
