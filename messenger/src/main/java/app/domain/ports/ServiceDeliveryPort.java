@@ -19,6 +19,8 @@ public interface ServiceDeliveryPort {
 
     List<ServiceDelivery> findByPlateNumber(String plateNumber);
 
+    List<ServiceDelivery> findByMessengerId(Long messengerId);
+
     // Métodos para soft delete (papelera)
     List<ServiceDelivery> findAllActive();
 
