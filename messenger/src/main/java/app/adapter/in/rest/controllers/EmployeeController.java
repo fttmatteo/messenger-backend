@@ -73,7 +73,7 @@ public class EmployeeController {
     @AuditableAction(action = "UPDATE_EMPLOYEE", description = "Actualizar empleado existente")
     public ResponseEntity<EmployeeResponse> update(@PathVariable Long id, @Valid @RequestBody EmployeeRequest request)
             throws Exception {
-        Employee employee = builder.build(
+        Employee employee = builder.buildForUpdate(
                 request.getDocument(),
                 request.getFullName(),
                 request.getPhone(),

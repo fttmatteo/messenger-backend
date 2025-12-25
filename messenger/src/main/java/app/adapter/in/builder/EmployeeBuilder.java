@@ -24,4 +24,19 @@ public class EmployeeBuilder {
         employee.setRole(validator.roleValidator(role));
         return employee;
     }
+
+    public Employee buildForUpdate(String document, String fullName, String phone, String password, String role)
+            throws Exception {
+        Employee employee = new Employee();
+        employee.setDocument(validator.documentValidator(document));
+        employee.setFullName(validator.fullNameValidator(fullName));
+        employee.setPhone(validator.phoneValidator(phone));
+
+        if (password != null && !password.trim().isEmpty()) {
+            employee.setPassword(validator.passwordValidator(password));
+        }
+
+        employee.setRole(validator.roleValidator(role));
+        return employee;
+    }
 }
