@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import java.time.LocalDate;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
  * Adapter de tracking que usa Redis para ubicación en tiempo real.
  */
 @Component
+@ConditionalOnProperty(name = "redis.enabled", havingValue = "true", matchIfMissing = true)
 public class TrackingAdapter implements TrackingPort {
 
     private static final Logger logger = LoggerFactory.getLogger(TrackingAdapter.class);

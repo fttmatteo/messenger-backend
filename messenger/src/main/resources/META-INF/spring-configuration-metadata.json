@@ -11,6 +11,12 @@
             "description": "Tiempo de expiración del token JWT en milisegundos (default: 1800000 = 30 minutos)."
         },
         {
+            "name": "redis.enabled",
+            "type": "java.lang.Boolean",
+            "description": "Enable or disable Redis components (RedisConfig, TokenBlacklistService, TrackingAdapter). Default is true. Set to false in test environments to run without Redis.",
+            "defaultValue": true
+        },
+        {
             "name": "app.storage.type",
             "type": "java.lang.String",
             "description": "Tipo de almacenamiento de archivos. Valores: 'local' (para dev/test), 'gcs' (para prod/dev cloud).",

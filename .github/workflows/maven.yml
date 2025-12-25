@@ -19,18 +19,6 @@ jobs:
   build:
     name: Build & Test
     runs-on: ubuntu-latest
-
-    # Servicios necesarios para tests de integración
-    services:
-      redis:
-        image: redis:7-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
     
     # Directorio de trabajo por defecto para todos los pasos
     defaults:
@@ -38,19 +26,10 @@ jobs:
         working-directory: messenger
 
     env:
-      # Configuración de base de datos
-      DB_HOST: ${{ secrets.DB_HOST }}
-      DB_PORT: ${{ secrets.DB_PORT }}
-      DB_USERNAME: ${{ secrets.DB_USERNAME }}
-      
-      # Seguridad
+      # Seguridad JWT (REQUERIDO)
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       
-      # Redis (opcional para tests)
-      REDIS_HOST: ${{ secrets.REDIS_HOST }}
-      REDIS_PORT: ${{ secrets.REDIS_PORT }}
-      
-      # Servicios de Google Cloud
+      # Google Cloud Services (REQUERIDOS)
       GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
       GCS_BUCKET_NAME: ${{ secrets.GCS_BUCKET_NAME }}
       GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
@@ -73,12 +52,12 @@ jobs:
           echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}" > $GOOGLE_APPLICATION_CREDENTIALS
         working-directory: ${{ github.workspace }}
 
-      # Compilar y probar
+      # Compilar y probar (usa H2 en memoria para tests)
       - name: 🔨 Compilar con Maven
         run: mvn -B compile -DskipTests
 
       - name: 🧪 Ejecutar tests
-        run: mvn -B test -Dspring.profiles.active=test
+        run: mvn -B test
 
       - name: 📦 Empaquetar aplicación
         run: mvn -B package -DskipTests
