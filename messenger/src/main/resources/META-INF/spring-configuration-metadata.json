@@ -115,6 +115,16 @@
             "description": "Habilita la consola de H2. Requerido como workaround para Spring Boot 4.x o configuración manual."
         },
         {
+            "name": "spring.cloud.gcp.sql.instance-connection-name",
+            "type": "java.lang.String",
+            "description": "Cloud SQL instance connection name in the format: project-id:region:instance-id. Used by the Cloud SQL Socket Factory to establish connections from Cloud Run."
+        },
+        {
+            "name": "spring.cloud.gcp.sql.database-name",
+            "type": "java.lang.String",
+            "description": "Name of the Cloud SQL database to connect to. Typically matches the value of DB_NAME environment variable."
+        },
+        {
             "name": "app.trash.retention-days",
             "type": "java.lang.Integer",
             "description": "Días que un servicio permanece en la papelera antes de ser eliminado permanentemente.",

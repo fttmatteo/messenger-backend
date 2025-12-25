@@ -1,7 +1,4 @@
--- Consolidated Migration V1
--- Includes foundational schema + Soft Delete fields + Lock fields
 
--- 1. Dealerships
 CREATE TABLE dealerships (
     id_dealership BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE,
@@ -13,7 +10,6 @@ CREATE TABLE dealerships (
     is_geolocated BOOLEAN DEFAULT FALSE
 );
 
--- 2. Employees (Note: using full_name, NO user_name column)
 CREATE TABLE employees (
     id_employee BIGINT AUTO_INCREMENT PRIMARY KEY,
     document BIGINT NOT NULL UNIQUE,
@@ -23,7 +19,6 @@ CREATE TABLE employees (
     role VARCHAR(50) NOT NULL
 );
 
--- 3. Plates
 CREATE TABLE plates (
     id_plate BIGINT AUTO_INCREMENT PRIMARY KEY,
     plate_number VARCHAR(255) NOT NULL UNIQUE,
@@ -31,14 +26,12 @@ CREATE TABLE plates (
     upload_date DATETIME(6)
 );
 
--- 4. Signatures
 CREATE TABLE signatures (
     id_signature BIGINT AUTO_INCREMENT PRIMARY KEY,
     signature_path VARCHAR(2048) NOT NULL,
     upload_date DATETIME(6) NOT NULL
 );
 
--- 5. Service Deliveries
 CREATE TABLE service_deliveries (
     id_service_delivery BIGINT AUTO_INCREMENT PRIMARY KEY,
     plate_id BIGINT NOT NULL,
@@ -49,7 +42,6 @@ CREATE TABLE service_deliveries (
     signature_id BIGINT,
     created_at DATETIME(6),
     
-    -- Fields from V2 (Soft Delete + Lock)
     deleted BOOLEAN DEFAULT FALSE,
     deleted_at DATETIME(6) NULL,
     locked_at DATETIME(6) NULL,
@@ -60,11 +52,9 @@ CREATE TABLE service_deliveries (
     FOREIGN KEY (signature_id) REFERENCES signatures(id_signature)
 );
 
--- Indexes from V2
 CREATE INDEX idx_service_deliveries_deleted ON service_deliveries(deleted);
 CREATE INDEX idx_service_deliveries_deleted_at ON service_deliveries(deleted_at);
 
--- 6. Status History
 CREATE TABLE status_history (
     id_status_history BIGINT AUTO_INCREMENT PRIMARY KEY,
     previous_status VARCHAR(50),
@@ -78,7 +68,6 @@ CREATE TABLE status_history (
     FOREIGN KEY (service_delivery_id) REFERENCES service_deliveries(id_service_delivery)
 );
 
--- 7. Photos
 CREATE TABLE photos (
     id_photo BIGINT AUTO_INCREMENT PRIMARY KEY,
     photo_path VARCHAR(2048) NOT NULL,
@@ -90,7 +79,6 @@ CREATE TABLE photos (
     FOREIGN KEY (status_history_id) REFERENCES status_history(id_status_history)
 );
 
--- 8. Tracking History
 CREATE TABLE tracking_history (
     history_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     messenger_id BIGINT NOT NULL,
