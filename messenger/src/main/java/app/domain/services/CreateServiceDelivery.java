@@ -48,6 +48,11 @@ public class CreateServiceDelivery {
 
         String normalizedPlate = plateNumber.trim().toUpperCase();
 
+        if (!serviceDeliveryPort.findByPlateNumber(normalizedPlate).isEmpty()) {
+            throw new BusinessException(
+                    "La placa " + normalizedPlate + " ya tiene un servicio registrado en el sistema.");
+        }
+
         Plate plate = platePort.findByPlateNumber(normalizedPlate);
         if (plate == null) {
             plate = new Plate();

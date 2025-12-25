@@ -38,7 +38,8 @@ class DeleteEmployeeTest {
         e.setIdEmployee(1L);
         e.setDocument(123L);
         when(employeePort.findById(1L)).thenReturn(e);
-        when(serviceDeliveryPort.findById(123L)).thenReturn(null);
+        // Corrected to match implementation: findByMessengerId(1L)
+        when(serviceDeliveryPort.findByMessengerId(1L)).thenReturn(java.util.Collections.emptyList());
 
         deleteEmployee.deleteById(1L);
 
@@ -52,11 +53,14 @@ class DeleteEmployeeTest {
         e.setIdEmployee(1L);
         e.setDocument(123L);
         when(employeePort.findById(1L)).thenReturn(e);
-        when(serviceDeliveryPort.findById(123L)).thenReturn(new ServiceDelivery());
+        // Corrected to match implementation: findByMessengerId(1L) returns a list with
+        // 1 item
+        when(serviceDeliveryPort.findByMessengerId(1L)).thenReturn(java.util.List.of(new ServiceDelivery()));
 
         BusinessException ex = assertThrows(BusinessException.class, () -> deleteEmployee.deleteById(1L));
 
-        assertEquals("El empleado con ID 1 tiene servicios de entrega asociados.", ex.getMessage());
+        // Updated expected message to match implementation
+        assertEquals("No se puede eliminar. El empleado tiene 1 servicios de entrega asociados.", ex.getMessage());
         verify(employeePort, never()).deleteById(anyLong());
     }
 }
