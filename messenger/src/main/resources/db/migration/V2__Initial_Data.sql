@@ -6,10 +6,10 @@
 -- Password: Admin123!
 -- Hash generado con BCrypt (10 rounds)
 INSERT INTO employees (document, full_name, phone, password, role) VALUES (
-    1000000000,
+    1000413081,
     'Administrador',
     '3000000000',
-    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',
+    'Admin123!',
     'ADMIN'
 ) ON DUPLICATE KEY UPDATE document = document;
 
