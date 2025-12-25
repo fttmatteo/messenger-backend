@@ -1,6 +1,7 @@
 package app.infrastructure.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +11,7 @@ import java.time.Duration;
  * Servicio para blacklist de tokens JWT usando Redis.
  */
 @Service
+@ConditionalOnProperty(name = "redis.enabled", havingValue = "true", matchIfMissing = true)
 public class TokenBlacklistService implements app.domain.ports.TokenBlacklistPort {
 
     private static final String BLACKLIST_PREFIX = "token:blacklist:";
