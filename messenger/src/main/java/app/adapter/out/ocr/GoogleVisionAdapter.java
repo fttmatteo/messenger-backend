@@ -162,15 +162,27 @@ public class GoogleVisionAdapter implements OcrPort {
             char c = text.charAt(i);
             if (i < isNumber.length) {
                 if (isNumber[i]) {
-                    if (c == 'O')
+                    if (c == 'O' || c == 'Q' || c == 'D')
                         c = '0';
-                    else if (c == 'I')
+                    else if (c == 'I' || c == 'L')
                         c = '1';
+                    else if (c == 'Z')
+                        c = '2';
+                    else if (c == 'S')
+                        c = '5';
+                    else if (c == 'B')
+                        c = '8';
+                    else if (c == 'G')
+                        c = '6';
                 } else {
                     if (c == '0')
-                        c = 'O';
+                        c = 'Q'; // Prioritize Q over O per user request
                     else if (c == '1')
                         c = 'I';
+                    else if (c == '5')
+                        c = 'S';
+                    else if (c == '8')
+                        c = 'B';
                 }
             }
             corrected.append(c);
