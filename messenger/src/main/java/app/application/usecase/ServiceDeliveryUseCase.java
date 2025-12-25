@@ -203,6 +203,13 @@ public class ServiceDeliveryUseCase {
         return deleteService.restore(id, userId);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @AuditableAction(action = "EMPTY_TRASH", description = "Vaciar papelera completamente")
+    public int emptyTrash(Long userId) {
+        logger.info("Vaciando papelera por usuario ID: {}", userId);
+        return deleteService.emptyTrash();
+    }
+
     private void cleanupFiles(String... paths) {
         for (String path : paths) {
             try {

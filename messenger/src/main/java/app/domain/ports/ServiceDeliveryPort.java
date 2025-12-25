@@ -32,6 +32,8 @@ public interface ServiceDeliveryPort {
 
     void hardDeleteById(Long idServiceDelivery);
 
+    int hardDeleteAllDeleted();
+
     // Estadísticas diarias por mensajero
     List<app.domain.model.DailyStatistics> findDailyStatsByMessenger(
             Long messengerId,

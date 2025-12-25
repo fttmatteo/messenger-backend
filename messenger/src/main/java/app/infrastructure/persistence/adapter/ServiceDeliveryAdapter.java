@@ -98,6 +98,14 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     }
 
     @Override
+    public int hardDeleteAllDeleted() {
+        List<ServiceDeliveryEntity> deletedEntities = repository.findByDeletedTrue();
+        int count = deletedEntities.size();
+        repository.deleteAll(deletedEntities);
+        return count;
+    }
+
+    @Override
     public List<app.domain.model.DailyStatistics> findDailyStatsByMessenger(
             Long messengerId,
             java.time.LocalDate from,
