@@ -68,20 +68,19 @@ class CreateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe crear servicio exitosamente cuando placa ya existe")
-    void shouldCreateServiceWhenPlateExists() throws Exception {
+    @DisplayName("Debe lanzar excepción si la placa ya tiene un servicio registrado")
+    void shouldThrowExceptionIfPlateAlreadyExists() {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
-        when(platePort.findByPlateNumber("ABC123")).thenReturn(plate);
+        // Simula que YA existe un servicio con esa placa
+        when(serviceDeliveryPort.findByPlateNumber("ABC123"))
+                .thenReturn(java.util.List.of(new app.domain.model.ServiceDelivery()));
 
-        createServiceDelivery.create("ABC123", "path/to/photo.jpg", 1L, 12345678L);
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> createServiceDelivery.create("ABC123", "path/to/photo.jpg", 1L, 12345678L));
 
-        verify(serviceDeliveryPort).save(argThat(service -> service.getPlate().getPlateNumber().equals("ABC123") &&
-                service.getDealership().getName().equals("Concesionario Central") &&
-                service.getMessenger().getFullName().equals("Juan Perez") &&
-                service.getCurrentStatus() == Status.ASSIGNED &&
-                service.getPhotos().size() == 1 &&
-                service.getHistory().size() == 1));
+        assertEquals("La placa ABC123 ya tiene un servicio registrado en el sistema.", exception.getMessage());
+        verify(serviceDeliveryPort, never()).save(any());
     }
 
     @Test
