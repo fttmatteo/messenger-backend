@@ -35,6 +35,10 @@ class FileHelperTest {
 
         @Test
         @DisplayName("Debe convertir MultipartFile con extensión en nombre original")
+        /**
+         * Verifica la conversión preservando la extensión si está presente en el nombre
+         * original.
+         */
         void shouldConvertWithOriginalExtension() throws IOException {
             MockMultipartFile multipartFile = new MockMultipartFile(
                     "file",
@@ -53,6 +57,9 @@ class FileHelperTest {
 
         @Test
         @DisplayName("Debe detectar extensión por Content-Type cuando no hay nombre")
+        /**
+         * Verifica la deducción de extensión basada en el tipo MIME.
+         */
         void shouldDetectExtensionByContentType() throws IOException {
             MockMultipartFile multipartFile = new MockMultipartFile(
                     "file",
@@ -71,6 +78,10 @@ class FileHelperTest {
 
         @Test
         @DisplayName("Debe detectar PNG por magic bytes")
+        /**
+         * Verifica detección de contenido real (PNG) inspeccionando bytes si metadatos
+         * faltan.
+         */
         void shouldDetectPngByMagicBytes() throws IOException {
             byte[] pngHeader = new byte[] { (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
             MockMultipartFile multipartFile = new MockMultipartFile(
@@ -147,6 +158,9 @@ class FileHelperTest {
 
         @Test
         @DisplayName("Debe eliminar lista de archivos temporales")
+        /**
+         * Verifica la limpieza correcta de múltiples archivos temporales.
+         */
         void shouldCleanupTempFiles() throws IOException {
             File file1 = File.createTempFile("test1-", ".tmp");
             File file2 = File.createTempFile("test2-", ".tmp");

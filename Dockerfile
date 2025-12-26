@@ -1,6 +1,6 @@
 # ETAPA 1: BUILD (Construcción)
-# Usa una imagen oficial de Maven con JDK 21 para compilar el proyecto.
-FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
+# Usa una imagen oficial de Maven con JDK 17 para compilar el proyecto.
+FROM maven:3.9.6-eclipse-temurin-17-alpine AS build
 WORKDIR /app
 
 # Copiar primero el pom.xml para aprovechar la caché de capas de Docker
@@ -16,7 +16,7 @@ RUN mvn clean package -DskipTests
 # ETAPA 2: RUN (Ejecución)
 # Usa una imagen ligera (JRE) solo para correr la app, sin herramientas de compilación.
 # Esto reduce el tamaño de la imagen final y mejora la seguridad.
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
 # Crear un usuario no root por seguridad (mejor práctica profesional)

@@ -36,6 +36,10 @@ class DealershipAdapterTest {
 
     @Test
     @DisplayName("Debe guardar y recuperar un concesionario")
+    /**
+     * Verifica que el adaptador persista y recupere correctamente un concesionario
+     * usando el repositorio y mapper.
+     */
     void shouldSaveAndRetrieveDealership() {
         Dealership dealership = new Dealership();
         dealership.setName("Test Dealer");
@@ -65,6 +69,9 @@ class DealershipAdapterTest {
 
     @Test
     @DisplayName("Debe buscar por nombre")
+    /**
+     * Verifica la búsqueda por nombre a nivel de adaptador.
+     */
     void shouldFindByName() {
         DealershipEntity entity = new DealershipEntity();
         entity.setName("Unique Name");
@@ -84,6 +91,10 @@ class DealershipAdapterTest {
 
     @Test
     @DisplayName("Debe listar todos")
+    /**
+     * Verifica que el adaptador devuelva la lista completa de concesionarios
+     * mapeados al dominio.
+     */
     void shouldFindAll() {
         DealershipEntity e1 = new DealershipEntity();
         e1.setName("D1");

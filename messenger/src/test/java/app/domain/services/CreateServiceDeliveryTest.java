@@ -69,6 +69,9 @@ class CreateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si la placa ya tiene un servicio registrado")
+    /**
+     * Verifica validación de servicio duplicado para una misma placa.
+     */
     void shouldThrowExceptionIfPlateAlreadyExists() {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
@@ -85,6 +88,10 @@ class CreateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe crear servicio y nueva placa cuando placa no existe")
+    /**
+     * Verifica que se cree una nueva placa y el servicio asociado si la placa es
+     * nueva.
+     */
     void shouldCreateServiceAndNewPlateWhenPlateDoesNotExist() throws Exception {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
@@ -102,6 +109,9 @@ class CreateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si mensajero no existe")
+    /**
+     * Verifica validación de existencia del mensajero.
+     */
     void shouldThrowExceptionIfMessengerNotFound() {
         when(employeePort.findById(anyLong())).thenReturn(null);
 
@@ -140,6 +150,9 @@ class CreateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe agregar foto de detección si se proporciona path")
+    /**
+     * Verifica que si se provee path de foto, esta se adjunte al servicio inicial.
+     */
     void shouldAddDetectionPhotoIfPathProvided() throws Exception {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);

@@ -27,6 +27,9 @@ class ServiceDeliveryValidatorTest {
 
         @Test
         @DisplayName("Debe validar ID numérico válido")
+        /**
+         * Verifica que un string numérico válido sea aceptado como ID.
+         */
         void shouldValidateValidId() throws InputsException {
             Long result = validator.idValidator("123");
             assertEquals(123L, result);
@@ -51,6 +54,9 @@ class ServiceDeliveryValidatorTest {
 
         @Test
         @DisplayName("Debe validar documento válido")
+        /**
+         * Verifica validación de formato de documento de identidad.
+         */
         void shouldValidateValidDocument() throws InputsException {
             Long result = validator.documentValidator("123456789");
             assertEquals(123456789L, result);
@@ -76,6 +82,9 @@ class ServiceDeliveryValidatorTest {
         @ParameterizedTest
         @ValueSource(strings = { "ASSIGNED", "DELIVERED", "PENDING", "RETURNED", "CANCELED" })
         @DisplayName("Debe validar estados válidos")
+        /**
+         * Verifica que los estados de negocio permitidos sean aceptados.
+         */
         void shouldValidateValidStatuses(String status) throws InputsException {
             Status result = validator.statusValidator(status);
             assertNotNull(result);
@@ -140,6 +149,9 @@ class ServiceDeliveryValidatorTest {
             @ParameterizedTest
             @ValueSource(strings = { "ABC123", "abc123", "AbC123", "XYZ789" })
             @DisplayName("Debe validar placas de carro válidas")
+            /**
+             * Verifica formatos válidos para placas de automóviles.
+             */
             void shouldValidateValidCarPlates(String plate) throws InputsException {
                 String result = validator.plateNumberValidator(plate);
                 assertTrue(result.matches("^[A-Z]{3}[0-9]{3}$"));

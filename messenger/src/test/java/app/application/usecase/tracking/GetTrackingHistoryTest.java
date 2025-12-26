@@ -27,6 +27,9 @@ class GetTrackingHistoryUseCaseTest {
 
     @Test
     @DisplayName("Debe consultar por mensajero y fecha")
+    /**
+     * Verifica recuperación de historial filtrado por mensajero y fecha.
+     */
     void shouldGetByMessengerAndDate() {
         Long messengerId = 1L;
         LocalDate date = LocalDate.now();
@@ -41,6 +44,9 @@ class GetTrackingHistoryUseCaseTest {
 
     @Test
     @DisplayName("Debe consultar por servicio")
+    /**
+     * Verifica recuperación de historial asociado a un servicio específico.
+     */
     void shouldGetByService() {
         Long serviceId = 100L;
         List<TrackingHistory> expected = Collections.emptyList();

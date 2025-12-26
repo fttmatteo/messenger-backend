@@ -13,6 +13,10 @@
 
 [🇺🇸 English Version](./README.md)
 
+### 📚 Documentación
+- [🔐 **Secretos de GitHub**](./.github/SECRETS.md)
+- [🛡️ **Política de Seguridad**](./.github/SECURITY.md)
+
 </div>
 
 ---

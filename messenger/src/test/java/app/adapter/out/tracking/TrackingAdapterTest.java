@@ -46,6 +46,9 @@ class TrackingAdapterTest {
 
     @Test
     @DisplayName("Debe guardar ubicación en vivo en Redis")
+    /**
+     * Verifica que la ubicación en tiempo real se guarde en caché (Redis).
+     */
     void shouldSaveLiveLocation() {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
@@ -62,6 +65,9 @@ class TrackingAdapterTest {
 
     @Test
     @DisplayName("Debe obtener última ubicación de Redis")
+    /**
+     * Verifica la recuperación de la última ubicación conocida desde caché.
+     */
     void shouldGetLastLocation() {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
@@ -78,6 +84,9 @@ class TrackingAdapterTest {
 
     @Test
     @DisplayName("Debe guardar historial de tracking")
+    /**
+     * Verifica la persistencia histórica de ubicaciones en base de datos.
+     */
     void shouldSaveTrackingHistory() {
         Location location = new Location(4.6097, -74.0817);
         TrackingHistory history = new TrackingHistory(1L, location, TrackingSource.GPS);

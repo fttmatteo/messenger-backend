@@ -51,6 +51,9 @@ class DealershipControllerIntegrationTest {
     @Test
     @DisplayName("GET /dealerships/allDealerships should return 200 for authenticated user")
     @WithMockUser(roles = "MESSENGER")
+    /**
+     * Verifica que un usuario autenticado pueda listar condesionarios.
+     */
     void shouldReturnAllDealerships() throws Exception {
         DealershipEntity d = new DealershipEntity();
         d.setName("Test Dealer");
@@ -69,6 +72,9 @@ class DealershipControllerIntegrationTest {
     @Test
     @DisplayName("POST /dealerships/createDealership should return 403 for MESSENGER")
     @WithMockUser(roles = "MESSENGER")
+    /**
+     * Verifica que un rol MESSENGER no tenga permiso para crear concesionarios.
+     */
     void shouldDenyCreateForMessenger() throws Exception {
         DealershipRequest request = new DealershipRequest();
         request.setName("Forbidden Dealer");
@@ -82,6 +88,9 @@ class DealershipControllerIntegrationTest {
     @Test
     @DisplayName("POST /dealerships/createDealership should return 201 for ADMIN")
     @WithMockUser(roles = "ADMIN")
+    /**
+     * Verifica que un rol ADMIN pueda crear concesionarios exitosamente.
+     */
     void shouldCreateDealershipForAdmin() throws Exception {
         DealershipRequest request = new DealershipRequest();
         request.setName("New Admin Dealer");
@@ -99,6 +108,9 @@ class DealershipControllerIntegrationTest {
     @Test
     @DisplayName("DELETE /dealerships/deleteDealership/{id} should delete dealership if ADMIN")
     @WithMockUser(roles = "ADMIN")
+    /**
+     * Verifica que un rol ADMIN pueda eliminar concesionarios.
+     */
     void shouldDeleteDealership() throws Exception {
         DealershipEntity d = new DealershipEntity();
         d.setName("Dealer to Delete");

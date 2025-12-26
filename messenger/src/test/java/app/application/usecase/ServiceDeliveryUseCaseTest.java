@@ -72,6 +72,10 @@ class ServiceDeliveryUseCaseTest {
 
         @Test
         @DisplayName("Debe crear servicio con placa detectada por OCR")
+        /**
+         * Verifica el flujo completo de creación usando una imagen: OCR -> Guardar
+         * imagen -> Crear servicio.
+         */
         void shouldCreateServiceFromOcrDetection() throws Exception {
             when(ocrPort.extractText(mockImageFile)).thenReturn("ABC123");
             when(storagePort.save(eq(mockImageFile), eq("detections"), anyString()))
@@ -105,6 +109,10 @@ class ServiceDeliveryUseCaseTest {
 
         @Test
         @DisplayName("Debe crear servicio con placa manual")
+        /**
+         * Verifica la creación de servicio cuando la placa se ingresa manualmente
+         * (bypass OCR).
+         */
         void shouldCreateServiceWithManualPlate() throws Exception {
             when(storagePort.save(eq(mockImageFile), eq("detections"), anyString()))
                     .thenReturn("/path/to/saved/image.png");
@@ -126,6 +134,9 @@ class ServiceDeliveryUseCaseTest {
 
         @Test
         @DisplayName("Debe actualizar estado con firma y fotos")
+        /**
+         * Verifica la actualización de estado incluyendo evidencias (firma y fotos).
+         */
         void shouldUpdateStatusWithSignatureAndPhotos() throws Exception {
             Signature signature = new Signature();
             signature.setSignaturePath("/path/signature.png");
@@ -159,6 +170,9 @@ class ServiceDeliveryUseCaseTest {
 
         @Test
         @DisplayName("Debe buscar por ID")
+        /**
+         * Verifica la búsqueda por ID delegada al servicio de dominio.
+         */
         void shouldFindById() throws Exception {
             when(searchService.findById(1L)).thenReturn(sampleService);
 
@@ -195,6 +209,9 @@ class ServiceDeliveryUseCaseTest {
 
         @Test
         @DisplayName("Debe mover servicio a papelera por ID")
+        /**
+         * Verifica la eliminación lógica (soft delete).
+         */
         void shouldSoftDeleteById() throws Exception {
             serviceDeliveryUseCase.deleteById(1L);
 
@@ -216,6 +233,9 @@ class ServiceDeliveryUseCaseTest {
 
         @Test
         @DisplayName("Debe listar servicios en papelera")
+        /**
+         * Verifica que se puedan recuperar los servicios eliminados.
+         */
         void shouldFindDeleted() {
             ServiceDelivery deletedService = new ServiceDelivery();
             deletedService.setIdServiceDelivery(2L);
@@ -231,6 +251,9 @@ class ServiceDeliveryUseCaseTest {
 
         @Test
         @DisplayName("Debe restaurar servicio desde papelera")
+        /**
+         * Verifica la restauración de un servicio eliminado.
+         */
         void shouldRestoreFromTrash() throws Exception {
             ServiceDelivery restoredService = new ServiceDelivery();
             restoredService.setIdServiceDelivery(1L);
@@ -251,6 +274,9 @@ class ServiceDeliveryUseCaseTest {
 
         @Test
         @DisplayName("Debe reasignar servicio a nuevo mensajero")
+        /**
+         * Verifica la reasignación de un servicio a otro empleado.
+         */
         void shouldReassignMessenger() throws Exception {
             ServiceDelivery reassignedService = new ServiceDelivery();
             reassignedService.setIdServiceDelivery(1L);

@@ -11,6 +11,9 @@ class StatusHistoryTest {
 
     @Test
     @DisplayName("Debe convertir Lat/Lng a Location correctamente")
+    /**
+     * Verifica la conversión de coordenadas planas a objeto Location.
+     */
     void shouldConvertWhenLatLongArePresent() {
         StatusHistory history = new StatusHistory();
         history.setDeliveryLatitude(4.0);

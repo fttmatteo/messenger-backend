@@ -28,6 +28,9 @@ class SearchServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe buscar servicio activo por ID")
+    /**
+     * Verifica recuperación de servicio activo (no eliminado) por ID.
+     */
     void shouldFindActiveById() {
         ServiceDelivery s = new ServiceDelivery();
         s.setIdServiceDelivery(1L);
@@ -51,6 +54,9 @@ class SearchServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe buscar todos los servicios activos (excluyendo eliminados)")
+    /**
+     * Verifica que findAll solo retorne servicios que no han sido eliminados.
+     */
     void shouldFindAllActive() {
         when(serviceDeliveryPort.findAllActive()).thenReturn(Arrays.asList(new ServiceDelivery()));
 
@@ -61,6 +67,9 @@ class SearchServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe buscar todos los servicios incluyendo eliminados")
+    /**
+     * Verifica que findAllIncludingDeleted retorne tanto activos como eliminados.
+     */
     void shouldFindAllIncludingDeleted() {
         ServiceDelivery active = new ServiceDelivery();
         active.setIdServiceDelivery(1L);
@@ -87,6 +96,9 @@ class SearchServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe retornar servicios eliminados (papelera)")
+    /**
+     * Verifica que se retornen solo los servicios marcados como eliminados.
+     */
     void shouldFindDeleted() {
         ServiceDelivery deleted = new ServiceDelivery();
         deleted.setIdServiceDelivery(1L);

@@ -64,6 +64,9 @@ class AuthenticationServiceTest {
 
         @Test
         @DisplayName("Debe autenticar con credenciales válidas")
+        /**
+         * Verifica la autenticación exitosa cuando las credenciales son correctas.
+         */
         void shouldAuthenticateWithValidCredentials() throws Exception {
             when(employeePort.findByDocument(123456789L)).thenReturn(sampleEmployee);
             when(passwordEncoder.matches("correctPassword", sampleEmployee.getPassword())).thenReturn(true);
@@ -79,6 +82,9 @@ class AuthenticationServiceTest {
 
         @Test
         @DisplayName("Debe incluir rol correcto en token")
+        /**
+         * Verifica que el token generado contenga el rol del usuario autenticado.
+         */
         void shouldIncludeCorrectRoleInToken() throws Exception {
             sampleEmployee.setRole(Role.ADMIN);
             TokenResponse adminToken = new TokenResponse();
@@ -102,6 +108,9 @@ class AuthenticationServiceTest {
 
         @Test
         @DisplayName("Debe lanzar excepción si usuario no existe")
+        /**
+         * Verifica que se lance excepción si el usuario no es encontrado.
+         */
         void shouldThrowExceptionIfUserNotFound() {
             when(employeePort.findByDocument(999999999L)).thenReturn(null);
 
@@ -138,6 +147,10 @@ class AuthenticationServiceTest {
 
         @Test
         @DisplayName("Debe migrar contraseña plana a BCrypt")
+        /**
+         * Verifica la migración automática de contraseñas de texto plano a hash seguro
+         * al autenticarse.
+         */
         void shouldMigratePlainPasswordToBcrypt() throws Exception {
             sampleEmployee.setPassword("plainTextPassword");
 

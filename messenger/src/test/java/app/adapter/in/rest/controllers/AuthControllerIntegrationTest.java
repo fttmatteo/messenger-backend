@@ -53,6 +53,10 @@ class AuthControllerIntegrationTest {
 
     @Test
     @DisplayName("POST /auth/login should return 200 and tokens for valid credentials")
+    /**
+     * Verifica que el endpoint de login retorne tokens (access y refresh) cuando
+     * las credenciales son correctas.
+     */
     void shouldLoginSuccessfully() throws Exception {
         // Given
         EmployeeEntity admin = new EmployeeEntity();
@@ -79,6 +83,9 @@ class AuthControllerIntegrationTest {
 
     @Test
     @DisplayName("POST /auth/login should return 400 or 401 for invalid password")
+    /**
+     * Verifica que el endpoint rechace el login con contraseña incorrecta.
+     */
     void shouldReturnUnauthorizedForInvalidPassword() throws Exception {
         // Given
         EmployeeEntity admin = new EmployeeEntity();
@@ -103,6 +110,9 @@ class AuthControllerIntegrationTest {
 
     @Test
     @DisplayName("POST /auth/refresh should return new tokens for valid refresh token")
+    /**
+     * Verifica la rotación de tokens mediante el refreshToken.
+     */
     void shouldRefreshTokenSuccessfully() throws Exception {
         // Given: Create user and get refresh token
         EmployeeEntity admin = new EmployeeEntity();

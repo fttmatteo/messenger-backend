@@ -17,6 +17,9 @@ class GoogleVisionAdapterTest {
 
     @Test
     @DisplayName("Debe existir el adapter")
+    /**
+     * Prueba básica de existencia e inyección del componente de visión.
+     */
     void shouldExist() {
         assertNotNull(googleVisionAdapter);
     }

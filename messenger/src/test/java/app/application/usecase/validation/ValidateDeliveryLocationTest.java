@@ -36,6 +36,10 @@ class ValidateDeliveryLocationUseCaseTest {
 
     @Test
     @DisplayName("Debe permitir si concesionario no está geolocalizado")
+    /**
+     * Verifica que la validación pase si el concesionario destino no tiene
+     * coordenadas.
+     */
     void shouldAllowIfDealershipNotGeolocated() {
         Dealership d = new Dealership();
         d.setIsGeolocated(false);
@@ -48,6 +52,9 @@ class ValidateDeliveryLocationUseCaseTest {
 
     @Test
     @DisplayName("Debe permitir si está dentro del rango")
+    /**
+     * Verifica que la validación pase si la entrega está cerca del concesionario.
+     */
     void shouldAllowIfWithinRange() {
         Dealership d = new Dealership();
         d.setIsGeolocated(true);
@@ -63,6 +70,10 @@ class ValidateDeliveryLocationUseCaseTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si está fuera de rango")
+    /**
+     * Verifica que se lance GeolocationException si la entrega es muy lejos del
+     * destino.
+     */
     void shouldThrowIfOutOfRange() {
         Dealership d = new Dealership();
         d.setIsGeolocated(true);

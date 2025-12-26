@@ -35,6 +35,10 @@ class DeleteServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe mover servicio a papelera (soft delete)")
+    /**
+     * Verifica que el servicio se marque como eliminado (soft delete) y se registre
+     * la fecha.
+     */
     void shouldSoftDeleteService() throws Exception {
         ServiceDelivery service = new ServiceDelivery();
         service.setIdServiceDelivery(1L);
@@ -64,6 +68,9 @@ class DeleteServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe restaurar servicio desde papelera solo por ADMIN")
+    /**
+     * Verifica que un administrador pueda restaurar un servicio eliminado.
+     */
     void shouldRestoreServiceFromTrashByAdmin() throws Exception {
         ServiceDelivery service = new ServiceDelivery();
         service.setIdServiceDelivery(1L);
@@ -121,6 +128,10 @@ class DeleteServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe eliminar permanentemente servicio en papelera (hard delete)")
+    /**
+     * Verifica que se pueda eliminar físicamente un servicio que ya está en la
+     * papelera.
+     */
     void shouldHardDeleteServiceInTrash() throws Exception {
         ServiceDelivery service = new ServiceDelivery();
         service.setIdServiceDelivery(1L);

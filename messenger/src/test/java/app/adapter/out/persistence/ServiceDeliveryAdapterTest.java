@@ -37,6 +37,10 @@ class ServiceDeliveryAdapterTest {
 
     @Test
     @DisplayName("Debe guardar y recuperar un servicio de entrega")
+    /**
+     * Verifica que el adaptador guarde y recupere servicios de entrega, manteniendo
+     * el estado correcto.
+     */
     void shouldSaveAndRetrieveServiceDelivery() {
         ServiceDelivery delivery = new ServiceDelivery();
         delivery.setCurrentStatus(Status.PENDING);
@@ -65,6 +69,9 @@ class ServiceDeliveryAdapterTest {
 
     @Test
     @DisplayName("Debe listar todos")
+    /**
+     * Verifica listado de todos los servicios.
+     */
     void shouldFindAll() {
         ServiceDeliveryEntity e1 = new ServiceDeliveryEntity();
         ServiceDeliveryEntity e2 = new ServiceDeliveryEntity();

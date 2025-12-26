@@ -32,6 +32,10 @@ class ServiceDeliveryBuilderTest {
 
         @Test
         @DisplayName("Debe construir datos de creación válidos")
+        /**
+         * Verifica que el builder transforme correctamente un request de creación
+         * validado.
+         */
         void shouldBuildValidCreateData() throws Exception {
             ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest();
             request.setDealershipId("1");
@@ -81,6 +85,9 @@ class ServiceDeliveryBuilderTest {
 
         @Test
         @DisplayName("Debe construir datos de actualización válidos")
+        /**
+         * Verifica la construcción de datos para actualización de estado.
+         */
         void shouldBuildValidUpdateData() throws Exception {
             ServiceDeliveryUpdateStatusRequest request = new ServiceDeliveryUpdateStatusRequest();
             request.setStatus("DELIVERED");
