@@ -18,6 +18,10 @@ public class UpdateEmployee {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    /**
+     * Actualiza la información de un empleado, controlando duplicidad de documento
+     * y encriptación de password.
+     */
     public Employee update(Long id, Employee incomingData) throws Exception {
         Employee existingEmployee = employeePort.findById(id);
         if (existingEmployee == null) {

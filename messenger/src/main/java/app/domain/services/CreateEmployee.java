@@ -18,6 +18,10 @@ public class CreateEmployee {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    /**
+     * Registra un nuevo empleado, validando duplicidad de documento y encriptando
+     * contraseña.
+     */
     public Employee create(Employee employee) throws Exception {
         validateDocumentIsUnique(employee.getDocument());
 

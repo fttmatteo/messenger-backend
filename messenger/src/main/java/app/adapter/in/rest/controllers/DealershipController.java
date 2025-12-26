@@ -38,6 +38,9 @@ public class DealershipController {
     @Autowired
     private GeocodeDealershipUseCase geocodeDealership;
 
+    /**
+     * Crea un nuevo concesionario (solo ADMIN).
+     */
     @PostMapping("/createDealership")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DealershipResponse> create(@Valid @RequestBody DealershipRequest request) throws Exception {
@@ -47,6 +50,9 @@ public class DealershipController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseMapper.toResponse(created));
     }
 
+    /**
+     * Obtiene todos los concesionarios registrados.
+     */
     @GetMapping("/allDealerships")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<DealershipResponse>> findAll() {
@@ -56,6 +62,9 @@ public class DealershipController {
         return ResponseEntity.ok(responses);
     }
 
+    /**
+     * Busca un concesionario por su ID.
+     */
     @GetMapping("/findByDealershipId/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DealershipResponse> findById(@PathVariable Long id) throws Exception {
@@ -63,6 +72,9 @@ public class DealershipController {
         return ResponseEntity.ok(responseMapper.toResponse(dealership));
     }
 
+    /**
+     * Actualiza los datos de un concesionario (solo ADMIN).
+     */
     @PutMapping("/updateDealership/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DealershipResponse> update(@PathVariable Long id,
@@ -73,6 +85,9 @@ public class DealershipController {
         return ResponseEntity.ok(responseMapper.toResponse(updated));
     }
 
+    /**
+     * Elimina un concesionario por su ID (solo ADMIN).
+     */
     @DeleteMapping("/deleteDealership/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) throws Exception {
@@ -81,6 +96,10 @@ public class DealershipController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Geocodifica la dirección de un concesionario para obtener sus coordenadas
+     * (solo ADMIN).
+     */
     @PostMapping("/geocodeDealership/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DealershipResponse> geocodeDealership(@PathVariable Long id)
@@ -89,6 +108,9 @@ public class DealershipController {
         return ResponseEntity.ok(responseMapper.toResponse(dealership));
     }
 
+    /**
+     * Busca un concesionario por nombre (coincidencia parcial).
+     */
     @GetMapping("/findByDealershipName/{name}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DealershipResponse> findByName(@PathVariable String name) throws Exception {

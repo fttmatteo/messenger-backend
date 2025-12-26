@@ -31,6 +31,9 @@ public class GoogleVisionAdapter implements OcrPort {
         return ImageAnnotatorClient.create(settings);
     }
 
+    /**
+     * Extrae texto de una imagen utilizando Google Cloud Vision API.
+     */
     @Override
     public String extractText(File imageFile) {
         logger.info("Iniciando extracción de texto OCR para archivo: {}", imageFile.getName());
@@ -65,6 +68,9 @@ public class GoogleVisionAdapter implements OcrPort {
         }
     }
 
+    /**
+     * Extrae texto directamente desde un array de bytes.
+     */
     public String extractTextFromBytes(byte[] imageBytes) throws IOException {
         ByteString imgBytes = ByteString.copyFrom(imageBytes);
 
@@ -89,6 +95,9 @@ public class GoogleVisionAdapter implements OcrPort {
         }
     }
 
+    /**
+     * Detecta etiquetas (labels) en una imagen para clasificación.
+     */
     public List<String> detectLabels(String imagePath) throws IOException {
         List<String> labels = new ArrayList<>();
         ByteString imgBytes = ByteString.readFrom(new FileInputStream(imagePath));
@@ -117,6 +126,12 @@ public class GoogleVisionAdapter implements OcrPort {
         return labels;
     }
 
+    /**
+     * Limpia y formatea el texto extraído para ajustarlo a formatos de placa
+     * válidos.
+     * Aplica heurísticas de corrección inteligente de caracteres (ej. O -> 0, I ->
+     * 1).
+     */
     private String cleanPlateNumber(String rawPlate) {
         if (rawPlate == null || rawPlate.isEmpty()) {
             return "";

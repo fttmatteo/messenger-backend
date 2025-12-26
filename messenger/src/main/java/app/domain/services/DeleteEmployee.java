@@ -18,6 +18,9 @@ public class DeleteEmployee {
     @Autowired
     private ServiceDeliveryPort serviceDeliveryPort;
 
+    /**
+     * Elimina un empleado validando que no tenga servicios asignados.
+     */
     public void deleteById(Long id) throws Exception {
         Employee employee = employeePort.findById(id);
         if (employee == null) {

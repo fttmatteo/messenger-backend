@@ -27,6 +27,9 @@ public class SearchDealership {
         return dealerships;
     }
 
+    /**
+     * Busca un concesionario por su ID.
+     */
     public Dealership findById(Long id) {
         Dealership dealership = dealershipPort.findById(id);
         if (dealership == null) {
@@ -36,6 +39,9 @@ public class SearchDealership {
         return dealership;
     }
 
+    /**
+     * Busca un concesionario por su nombre exacto.
+     */
     public Dealership findByName(String name) {
         Dealership dealership = dealershipPort.findByName(name);
         if (dealership == null) {

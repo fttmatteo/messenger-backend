@@ -19,6 +19,9 @@ public class LoginUseCase {
     @Autowired
     private AuthenticationService authenticationService;
 
+    /**
+     * Autentica a un usuario verificando sus credenciales (documento y password).
+     */
     @app.infrastructure.audit.AuditableAction(action = "USER_LOGIN", description = "Inicio de sesión de usuario")
     public TokenResponse login(AuthCredentials credentials) throws Exception {
         logger.info("Intento de login para documento: {}", credentials.getDocument());

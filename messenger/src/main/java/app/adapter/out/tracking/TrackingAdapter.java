@@ -42,6 +42,10 @@ public class TrackingAdapter implements TrackingPort {
     @Autowired
     private TrackingMapper mapper;
 
+    /**
+     * Guarda la ubicación en tiempo real en Redis con un TTL (tiempo de vida)
+     * definido.
+     */
     @Override
     public void saveLiveLocation(LiveTracking tracking) {
         if (tracking == null || tracking.getMessengerId() == null) {
@@ -67,6 +71,9 @@ public class TrackingAdapter implements TrackingPort {
         }
     }
 
+    /**
+     * Obtiene la última ubicación almacenada en Redis para un mensajero.
+     */
     @Override
     public LiveTracking getLastLocation(Long messengerId) {
         if (messengerId == null) {
@@ -82,6 +89,9 @@ public class TrackingAdapter implements TrackingPort {
         }
     }
 
+    /**
+     * Retorna una lista con todos los mensajeros que tienen datos activos en Redis.
+     */
     @Override
     public List<LiveTracking> getAllActiveMessengers() {
         List<LiveTracking> activeMessengers = new ArrayList<>();
@@ -115,6 +125,9 @@ public class TrackingAdapter implements TrackingPort {
         return activeMessengers;
     }
 
+    /**
+     * Persiste el historial de seguimiento en la base de datos relacional.
+     */
     @Override
     public TrackingHistory saveTrackingHistory(TrackingHistory history) {
         if (history == null) {
@@ -126,6 +139,9 @@ public class TrackingAdapter implements TrackingPort {
         return mapper.toDomain(saved);
     }
 
+    /**
+     * Consulta el historial de un mensajero en una fecha específica desde la BD.
+     */
     @Override
     public List<TrackingHistory> getHistoryByMessenger(Long messengerId, LocalDate date) {
         if (messengerId == null || date == null) {
@@ -142,6 +158,9 @@ public class TrackingAdapter implements TrackingPort {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Consulta el historial asociado a un servicio de entrega específico.
+     */
     @Override
     public List<TrackingHistory> getHistoryByService(Long serviceDeliveryId) {
         if (serviceDeliveryId == null) {

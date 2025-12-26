@@ -8,7 +8,13 @@ import java.io.IOException;
  */
 public interface StoragePort {
 
+    /**
+     * Guarda un archivo en el sistema de almacenamiento.
+     */
     String save(File file, String subDirectory, String customFileName) throws IOException;
 
+    /**
+     * Obtiene un archivo del sistema de almacenamiento.
+     */
     File get(String path);
 }

@@ -15,6 +15,9 @@ public class UpdateDealership {
     @Autowired
     private DealershipPort dealershipPort;
 
+    /**
+     * Actualiza la información de un concesionario, validando unicidad de nombre.
+     */
     public Dealership update(Long id, Dealership incomingData) throws Exception {
         Dealership existingDealership = dealershipPort.findById(id);
         if (existingDealership == null) {

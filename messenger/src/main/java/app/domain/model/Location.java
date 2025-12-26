@@ -46,6 +46,10 @@ public class Location {
         }
     }
 
+    /**
+     * Calcula la distancia en metros hacia otra ubicación usando la fórmula de
+     * Haversine.
+     */
     public Double distanceTo(Location other) {
         if (other == null) {
             return null;
@@ -65,6 +69,10 @@ public class Location {
         return EARTH_RADIUS_METERS * c;
     }
 
+    /**
+     * Verifica si esta ubicación está dentro del radio (en metros) de un punto
+     * central.
+     */
     public boolean isWithinRadius(Location center, Double radiusMeters) {
         if (center == null || radiusMeters == null) {
             return false;

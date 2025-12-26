@@ -35,6 +35,9 @@ public class EmployeeController {
     @Autowired
     private EmployeeResponseMapper responseMapper;
 
+    /**
+     * Crea un nuevo empleado (solo ADMIN).
+     */
     @PostMapping("/createEmployee")
     @PreAuthorize("hasRole('ADMIN')")
     @AuditableAction(action = "CREATE_EMPLOYEE", description = "Crear nuevo empleado")
@@ -49,6 +52,9 @@ public class EmployeeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseMapper.toResponse(created));
     }
 
+    /**
+     * Obtiene todos los empleados registrados (solo ADMIN).
+     */
     @GetMapping("/allEmployees")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<EmployeeResponse>> findAll() {
@@ -58,6 +64,9 @@ public class EmployeeController {
         return ResponseEntity.ok(responses);
     }
 
+    /**
+     * Busca un empleado por su ID (solo ADMIN).
+     */
     @GetMapping("/findByEmployeeId/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EmployeeResponse> findById(@PathVariable Long id) {
@@ -68,6 +77,9 @@ public class EmployeeController {
         return ResponseEntity.ok(responseMapper.toResponse(employee));
     }
 
+    /**
+     * Actualiza los datos de un empleado (solo ADMIN).
+     */
     @PutMapping("/updateEmployee/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @AuditableAction(action = "UPDATE_EMPLOYEE", description = "Actualizar empleado existente")
@@ -83,6 +95,9 @@ public class EmployeeController {
         return ResponseEntity.ok(responseMapper.toResponse(updated));
     }
 
+    /**
+     * Elimina un empleado por su ID (solo ADMIN).
+     */
     @DeleteMapping("/deleteEmployee/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @AuditableAction(action = "DELETE_EMPLOYEE", description = "Eliminar empleado")

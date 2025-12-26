@@ -12,7 +12,7 @@ public class Dealership {
     private String zone;
     private Double latitude;
     private Double longitude;
-    private Boolean isGeolocated = false;
+    private Boolean isGeolocated = false; // Indica si las coordenadas han sido establecidas
 
     public Long getIdDealership() {
         return idDealership;

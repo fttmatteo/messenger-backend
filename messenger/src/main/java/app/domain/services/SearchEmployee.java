@@ -15,10 +15,16 @@ public class SearchEmployee {
     @Autowired
     private EmployeePort employeePort;
 
+    /**
+     * Recupera todos los empleados registrados.
+     */
     public List<Employee> findAll() {
         return employeePort.findAll();
     }
 
+    /**
+     * Busca un empleado por su ID interno.
+     */
     public Employee findById(Long id) {
         Employee employee = employeePort.findById(id);
         if (employee == null) {
@@ -27,6 +33,9 @@ public class SearchEmployee {
         return employee;
     }
 
+    /**
+     * Busca un empleado por su número de documento.
+     */
     public Employee findByDocument(Long document) {
         Employee employee = employeePort.findByDocument(document);
         if (employee == null) {

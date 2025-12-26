@@ -33,6 +33,11 @@ public class AuthenticationService {
     @Value("${jwt.expiration:1800000}")
     private long jwtExpiration;
 
+    /**
+     * Autentica un usuario verificando credenciales y generando tokens.
+     * Si la contraseña es correcta pero no está encriptada, la actualiza
+     * automáticamente.
+     */
     public TokenResponse authenticate(AuthCredentials credentials) throws Exception {
         Employee employee = employeePort.findByDocument(credentials.getDocument());
         if (employee == null) {
@@ -65,6 +70,11 @@ public class AuthenticationService {
         return BCRYPT_PATTERN.matcher(normalized).matches();
     }
 
+    /**
+     * Renueva el token de acceso utilizando un refresh token válido.
+     * Invalida el refresh token usado y genera uno nuevo (Rotación de Refresh
+     * Tokens).
+     */
     public TokenResponse refreshToken(String refreshToken) throws Exception {
         if (tokenBlacklistService.isBlacklisted(refreshToken)) {
             throw new UnauthorizedException("Token revocado. Por seguridad, vuelva a iniciar sesión.");

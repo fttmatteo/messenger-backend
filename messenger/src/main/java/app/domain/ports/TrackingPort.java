@@ -10,15 +10,33 @@ import java.util.List;
  */
 public interface TrackingPort {
 
+    /**
+     * Actualiza la ubicación en tiempo real de un mensajero.
+     */
     void saveLiveLocation(LiveTracking tracking);
 
+    /**
+     * Obtiene la última ubicación conocida de un mensajero.
+     */
     LiveTracking getLastLocation(Long messengerId);
 
+    /**
+     * Obtiene la ubicación actual de todos los mensajeros activos.
+     */
     List<LiveTracking> getAllActiveMessengers();
 
+    /**
+     * Guarda un registro en el historial de ubicaciones persistente.
+     */
     TrackingHistory saveTrackingHistory(TrackingHistory history);
 
+    /**
+     * Consulta el historial de ubicaciones de un mensajero en una fecha específica.
+     */
     List<TrackingHistory> getHistoryByMessenger(Long messengerId, LocalDate date);
 
+    /**
+     * Consulta el historial de ubicaciones asociado a un servicio de entrega.
+     */
     List<TrackingHistory> getHistoryByService(Long serviceDeliveryId);
 }

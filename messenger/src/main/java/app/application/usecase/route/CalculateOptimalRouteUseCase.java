@@ -26,6 +26,9 @@ public class CalculateOptimalRouteUseCase {
     @Autowired
     private DealershipPort dealershipPort;
 
+    /**
+     * Calcula la ruta óptima desde un origen visitando múltiples concesionarios.
+     */
     public Route execute(Double originLat, Double originLng, List<Long> dealershipIds) {
         logger.info("Calculando ruta óptima desde {},{} para {} destinos", originLat, originLng, dealershipIds.size());
 
@@ -49,10 +52,16 @@ public class CalculateOptimalRouteUseCase {
         return locationPort.calculateOptimalRoute(origin, destinations);
     }
 
+    /**
+     * Calcula una ruta simple entre dos puntos.
+     */
     public Route calculateSimpleRoute(Location origin, Location destination) {
         return locationPort.calculateRoute(origin, destination);
     }
 
+    /**
+     * Calcula la distancia entre dos ubicaciones.
+     */
     public Double calculateDistance(Location from, Location to) {
         return locationPort.calculateDistance(from, to);
     }

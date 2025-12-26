@@ -57,6 +57,9 @@ public class ServiceDeliveryUseCase {
     @Autowired
     private OcrPort ocrPort;
 
+    /**
+     * Crea un servicio a partir de una imagen de placa procesada por OCR.
+     */
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "CREATE_SERVICE", description = "Crear servicio desde imagen OCR")
     public ServiceDelivery createServiceFromImage(File imageFile, Long dealershipId, Long messengerId)
@@ -81,6 +84,9 @@ public class ServiceDeliveryUseCase {
         }
     }
 
+    /**
+     * Crea un servicio utilizando un número de placa ingresado manualmente.
+     */
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "CREATE_SERVICE_MANUAL", description = "Crear servicio con placa manual")
     public ServiceDelivery createServiceWithManualPlate(File imageFile, String manualPlateNumber, Long dealershipId,
@@ -103,6 +109,9 @@ public class ServiceDeliveryUseCase {
         }
     }
 
+    /**
+     * Actualiza el estado de un servicio existente.
+     */
     @AuditableAction(action = "UPDATE_STATUS", description = "Actualizar estado de servicio")
     public ServiceDelivery updateStatus(Long serviceId, Status newStatus, String observation,
             Signature signature, List<Photo> photos, Long userId) throws Exception {
@@ -110,6 +119,10 @@ public class ServiceDeliveryUseCase {
         return updateService.updateStatus(serviceId, newStatus, observation, signature, photos, userId);
     }
 
+    /**
+     * Actualiza el estado de un servicio incluyendo la carga de archivos (fotos,
+     * firmas).
+     */
     public ServiceDelivery updateStatusWithFiles(Long serviceId, Status newStatus, String observation,
             File signatureFile, List<File> photoFiles, Long userId) throws Exception {
         logger.info("Actualizando estado con archivos. ServiceID: {}, NuevoEstado: {}", serviceId, newStatus);
@@ -157,6 +170,9 @@ public class ServiceDeliveryUseCase {
         }
     }
 
+    /**
+     * Reasigna un servicio cancelado a un nuevo mensajero (solo admin).
+     */
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "REASSIGN_MESSENGER", description = "Reasignar servicio a otro mensajero")
     public ServiceDelivery reassignMessenger(Long serviceId, Long newMessengerId, Long adminUserId) throws Exception {
@@ -165,37 +181,59 @@ public class ServiceDeliveryUseCase {
         return updateService.reassignMessenger(serviceId, newMessengerId, adminUserId);
     }
 
+    /**
+     * Busca un servicio por su ID (versión de solo lectura).
+     */
     @Transactional(readOnly = true)
     public ServiceDelivery findById(Long id) throws Exception {
         return searchService.findById(id);
     }
 
+    /**
+     * Recupera todos los servicios registrados.
+     */
     @Transactional(readOnly = true)
     public List<ServiceDelivery> findAll() {
         return searchService.findAll();
     }
 
+    /**
+     * Busca servicios asociados a un número de placa específico.
+     */
     @Transactional(readOnly = true)
     public List<ServiceDelivery> findByPlate(String plateNumber) {
         return searchService.findByPlate(plateNumber);
     }
 
+    /**
+     * Mueve un servicio a la papelera (método simple sin auditoría de usuario
+     * explícito).
+     */
     public void deleteById(Long id) throws Exception {
         logger.info("Moviendo servicio ID: {} a la papelera", id);
         deleteService.deleteById(id);
     }
 
+    /**
+     * Mueve un servicio a la papelera (Soft Delete).
+     */
     @AuditableAction(action = "DELETE_SERVICE", description = "Mover servicio a papelera")
     public void deleteById(Long id, Long userId) throws Exception {
         logger.info("Moviendo servicio ID: {} a la papelera por usuario ID: {}", id, userId);
         deleteService.deleteById(id, userId);
     }
 
+    /**
+     * Recupera todos los servicios que han sido movidos a la papelera.
+     */
     @Transactional(readOnly = true)
     public List<ServiceDelivery> findDeleted() {
         return searchService.findDeleted();
     }
 
+    /**
+     * Restaura un servicio previamente eliminado de la papelera.
+     */
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "RESTORE_SERVICE", description = "Restaurar servicio desde papelera")
     public ServiceDelivery restore(Long id, Long userId) throws Exception {
@@ -224,6 +262,10 @@ public class ServiceDeliveryUseCase {
         cleanupFiles(paths.toArray(new String[0]));
     }
 
+    /**
+     * Genera estadísticas diarias de entregas para un mensajero en un rango de
+     * fechas.
+     */
     @Transactional(readOnly = true)
     public List<DailyStatistics> getDailyStats(
             Long messengerId,

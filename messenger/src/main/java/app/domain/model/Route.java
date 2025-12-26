@@ -11,10 +11,10 @@ import java.util.Collections;
 public class Route {
     private final Location origin;
     private final Location destination;
-    private final List<Location> waypoints;
+    private final List<Location> waypoints; // Puntos intermedios de paso
     private final Double distanceMeters;
     private final Long durationSeconds;
-    private final String polyline;
+    private final String polyline; // Geometría codificada de la ruta
 
     public Route(Location origin, Location destination, List<Location> waypoints,
             Double distanceMeters, Long durationSeconds, String polyline) {

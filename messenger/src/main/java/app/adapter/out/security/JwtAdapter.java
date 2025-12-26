@@ -42,6 +42,9 @@ public class JwtAdapter implements AuthenticationPort {
         this.refreshExpirationTime = expiration * 24; // 24 times the access token expiration
     }
 
+    /**
+     * Genera un token de acceso para un usuario autenticado.
+     */
     @Override
     public TokenResponse authenticate(AuthCredentials credentials, String role, Long userId) {
         String token = this.generateToken(credentials.getDocument().toString(), role, userId);
@@ -51,6 +54,9 @@ public class JwtAdapter implements AuthenticationPort {
         return response;
     }
 
+    /**
+     * Valida si un token JWT es auténtico y no ha expirado.
+     */
     @Override
     public boolean validateToken(String token) {
         try {
@@ -69,12 +75,18 @@ public class JwtAdapter implements AuthenticationPort {
         }
     }
 
+    /**
+     * Extrae el nombre de usuario (subject) del token.
+     */
     @Override
     public String extractUsername(String token) {
         Claims claims = this.getClaims(token);
         return claims.getSubject();
     }
 
+    /**
+     * Extrae el rol del usuario del token.
+     */
     @Override
     public String extractRole(String token) {
         Claims claims = this.getClaims(token);
@@ -97,6 +109,9 @@ public class JwtAdapter implements AuthenticationPort {
         return token;
     }
 
+    /**
+     * Genera un refresh token de larga duración.
+     */
     @Override
     public String generateRefreshToken(AuthCredentials credentials) {
         Date now = new Date();
@@ -110,6 +125,9 @@ public class JwtAdapter implements AuthenticationPort {
                 .compact();
     }
 
+    /**
+     * Valida la integridad y vigencia de un refresh token.
+     */
     @Override
     public boolean validateRefreshToken(String token) {
         return validateToken(token);

@@ -25,6 +25,10 @@ public class TrackingWebSocketController {
     @Autowired
     private UpdateLiveTrackingUseCase updateLiveTracking;
 
+    /**
+     * Recibe actualizaciones de ubicación en tiempo real de los mensajeros.
+     * Procesa los datos y los retransmite a los suscriptores.
+     */
     @MessageMapping("/tracking/update")
     public void receiveLocationUpdate(LiveTrackingRequest request, Principal principal) {
         LiveTracking domainTracking = new LiveTracking();
@@ -55,6 +59,10 @@ public class TrackingWebSocketController {
         messagingTemplate.convertAndSend("/topic/tracking/all", response);
     }
 
+    /**
+     * Permite a los clientes (admin) suscribirse a todas las actualizaciones de
+     * tracking.
+     */
     @MessageMapping("/tracking/subscribe/all")
     @SendTo("/topic/tracking/all")
     public String subscribeToAll() {

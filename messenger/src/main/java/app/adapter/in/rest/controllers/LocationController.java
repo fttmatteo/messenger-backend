@@ -38,6 +38,9 @@ public class LocationController {
     @Autowired
     private LocationResponseMapper responseMapper;
 
+    /**
+     * Geocodifica una dirección para obtener sus coordenadas.
+     */
     @PostMapping("/geocode")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<LocationResponse> geocodeAddress(
@@ -48,6 +51,9 @@ public class LocationController {
         return ResponseEntity.ok(responseMapper.toLocationResponse(location, formattedAddress));
     }
 
+    /**
+     * Calcula la ruta óptima visitando múltiples concesionarios desde un origen.
+     */
     @PostMapping("/route")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<RouteResponse> calculateRoute(
@@ -60,6 +66,9 @@ public class LocationController {
         return ResponseEntity.ok(responseMapper.toRouteResponse(route));
     }
 
+    /**
+     * Calcula la distancia y tiempo estimado entre dos puntos geográficos.
+     */
     @GetMapping("/distance")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DistanceResponse> calculateDistance(
@@ -77,6 +86,10 @@ public class LocationController {
         return ResponseEntity.ok(new DistanceResponse(distanceMeters, durationSeconds));
     }
 
+    /**
+     * Convierte coordenadas geográficas en una dirección legible (Geocodificación
+     * inversa).
+     */
     @GetMapping("/reverse")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<LocationResponse> reverseGeocode(

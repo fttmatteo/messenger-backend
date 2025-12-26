@@ -29,6 +29,9 @@ public class EmployeeUseCase {
     @Autowired
     private DeleteEmployee deleteEmployee;
 
+    /**
+     * Crea un nuevo empleado.
+     */
     @AuditableAction(action = "CREATE_EMPLOYEE", description = "Crear nuevo empleado")
     public Employee create(Employee employee) throws Exception {
         logger.info("Creando empleado con documento: {}, rol: {}", employee.getDocument(), employee.getRole());
@@ -37,6 +40,9 @@ public class EmployeeUseCase {
         return created;
     }
 
+    /**
+     * Actualiza los datos de un empleado existente.
+     */
     @AuditableAction(action = "UPDATE_EMPLOYEE", description = "Actualizar empleado")
     public Employee update(Long id, Employee employee) throws Exception {
         logger.info("Actualizando empleado ID: {}", id);
@@ -45,18 +51,30 @@ public class EmployeeUseCase {
         return updated;
     }
 
+    /**
+     * Busca un empleado por su ID.
+     */
     public Employee findById(Long id) {
         return searchEmployee.findById(id);
     }
 
+    /**
+     * Busca un empleado por su número de documento.
+     */
     public Employee findByDocument(Long document) throws Exception {
         return searchEmployee.findByDocument(document);
     }
 
+    /**
+     * Lista todos los empleados registrados.
+     */
     public List<Employee> findAll() {
         return searchEmployee.findAll();
     }
 
+    /**
+     * Elimina un empleado del sistema.
+     */
     @AuditableAction(action = "DELETE_EMPLOYEE", description = "Eliminar empleado")
     public void deleteById(Long id) throws Exception {
         logger.warn("Eliminando empleado ID: {}", id);

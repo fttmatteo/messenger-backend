@@ -22,6 +22,10 @@ public class UpdateLiveTrackingUseCase {
     @Autowired
     private TrackingPort trackingPort;
 
+    /**
+     * Procesa y guarda una actualización de ubicación en tiempo real.
+     * También registra el historial si hay coordenadas válidas.
+     */
     public LiveTracking execute(LiveTracking incomingTracking) {
         logger.debug("Actualizando ubicación para mensajero ID: {}", incomingTracking.getMessengerId());
 

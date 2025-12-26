@@ -22,6 +22,9 @@ public class NoOpTrackingAdapter implements TrackingPort {
 
     private static final Logger logger = LoggerFactory.getLogger(NoOpTrackingAdapter.class);
 
+    /**
+     * Implementación vacía (No-Op) para cuando Redis está deshabilitado.
+     */
     @Override
     public void saveLiveLocation(LiveTracking tracking) {
         logger.debug("NoOp: saveLiveLocation called (Redis disabled)");

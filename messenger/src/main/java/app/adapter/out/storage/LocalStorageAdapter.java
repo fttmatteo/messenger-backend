@@ -26,6 +26,9 @@ public class LocalStorageAdapter implements StoragePort {
         Files.createDirectories(this.storagePath);
     }
 
+    /**
+     * Guarda un archivo en el sistema de archivos local.
+     */
     @Override
     public String save(File file, String subDirectory, String customFileName) throws IOException {
         Path subDirPath = storagePath.resolve(subDirectory);
@@ -38,6 +41,9 @@ public class LocalStorageAdapter implements StoragePort {
         return relativePath;
     }
 
+    /**
+     * Recupera un archivo del almacenamiento local.
+     */
     @Override
     public File get(String path) {
         Path filePath = storagePath.resolve(path);
@@ -50,6 +56,9 @@ public class LocalStorageAdapter implements StoragePort {
         return null;
     }
 
+    /**
+     * Elimina un archivo del almacenamiento local.
+     */
     public boolean delete(String path) {
         try {
             Path filePath = storagePath.resolve(path);
