@@ -4,7 +4,7 @@
 
 # 🚀 Messenger Backend API
 
-[![Java](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
+[![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.1-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Redis](https://img.shields.io/badge/Redis-6.0+-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
@@ -90,7 +90,7 @@ graph LR
 | Componente | Tecnología |
 |------------|------------|
 | **Framework** | Spring Boot 4.0.1 |
-| **Lenguaje** | Java 21 |
+| **Lenguaje** | Java 17 |
 | **Base de Datos** | MySQL 8.0+ |
 | **Migraciones** | Flyway |
 | **Cache/Streaming** | Redis |
@@ -690,7 +690,7 @@ AUDIT | timestamp | documento_usuario | accion | metodo | parametros | estado | 
 
 | Requisito | Versión |
 |-----------|---------|
-| Java | 21+ |
+| Java | 17+ |
 | MySQL | 8.0+ |
 | Redis | 6.0+ |
 | Maven | 3.9+ |
@@ -762,7 +762,7 @@ on:
 
 | Feature | Descripción |
 |---------|-------------|
-| ✅ Build automático | Java 21 + Maven |
+| ✅ Build automático | Java 17 + Maven |
 | ✅ Caché de dependencias | Builds más rápidos |
 | ✅ Secrets seguros | Inyección de credenciales |
 | ✅ Testing | Profile `test` con H2 |
@@ -770,13 +770,11 @@ on:
 ### Secrets de GitHub Requeridos
 
 ```
-DB_HOST, DB_PORT, DB_USERNAME
-JWT_SECRET
-REDIS_HOST, REDIS_PORT
-GCP_PROJECT_ID, GCS_BUCKET_NAME
-GOOGLE_MAPS_API_KEY
 GOOGLE_APPLICATION_CREDENTIALS_JSON
 ```
+
+> [!NOTE]
+> Los secrets de base de datos y APIs ya no son necesarios para el pipeline de CI, ya que utiliza un ambiente H2 aislado con servicios simulados (mocks).
 
 ---
 

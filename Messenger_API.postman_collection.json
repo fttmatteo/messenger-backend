@@ -148,7 +148,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"document\": \"1234567890\",\n    \"fullName\": \"Juan P\u00e9rez\",\n    \"phone\": \"3001234567\",\n    \"userName\": \"jperez\",\n    \"password\": \"password123\",\n    \"role\": \"MESSENGER\"\n}"
+                            "raw": "{\n    \"document\": \"1234567890\",\n    \"fullName\": \"Juan P\u00e9rez\",\n    \"phone\": \"3001234567\",\n    \"password\": \"password123\",\n    \"role\": \"MESSENGER\"\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/employees/createEmployee",
@@ -242,7 +242,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"document\": \"1234567890\",\n    \"fullName\": \"Juan P\u00e9rez Updated\",\n    \"phone\": \"3009876543\",\n    \"userName\": \"jperez\",\n    \"password\": \"newpassword123\",\n    \"role\": \"MESSENGER\"\n}"
+                            "raw": "{\n    \"document\": \"1234567890\",\n    \"fullName\": \"Juan P\u00e9rez Updated\",\n    \"phone\": \"3009876543\",\n    \"password\": \"newpassword123\",\n    \"role\": \"MESSENGER\"\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/employees/updateEmployee/1",
@@ -694,7 +694,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"messengerId\": 1,\n    \"latitude\": 6.217,\n    \"longitude\": -75.567,\n    \"accuracy\": 10.5,\n    \"speed\": 35.0,\n    \"heading\": 90.0,\n    \"status\": \"ONLINE\",\n    \"deviceId\": \"android-device-123\"\n}"
+                            "raw": "{\n    \"messengerId\": 1,\n    \"latitude\": 6.217,\n    \"longitude\": -75.567,\n    \"accuracy\": 10.5,\n    \"speed\": 35.0,\n    \"heading\": 90.0,\n    \"status\": \"ACTIVE\",\n    \"deviceId\": \"android-device-123\"\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/tracking/update",
@@ -861,10 +861,10 @@
                                     "description": "Dealership ID (required)"
                                 },
                                 {
-                                    "key": "messengerDocument",
+                                    "key": "messengerId",
                                     "value": "1234567890",
                                     "type": "text",
-                                    "description": "Messenger document"
+                                    "description": "Messenger ID"
                                 }
                             ]
                         },
@@ -911,10 +911,10 @@
                                     "description": "Dealership ID (required)"
                                 },
                                 {
-                                    "key": "messengerDocument",
+                                    "key": "messengerId",
                                     "value": "1234567890",
                                     "type": "text",
-                                    "description": "Messenger document"
+                                    "description": "Messenger ID"
                                 },
                                 {
                                     "key": "manualPlateNumber",
@@ -980,13 +980,13 @@
                             ]
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/services/updateServiceStatus/1",
+                            "raw": "{{baseUrl}}/services/updateService/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "services",
-                                "updateServiceStatus",
+                                "updateService",
                                 "1"
                             ]
                         },
@@ -1172,6 +1172,78 @@
                             ]
                         },
                         "description": "Restore a service from trash. **Requires ADMIN role.**"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Empty Trash",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "url": {
+                            "raw": "{{baseUrl}}/services/trash/empty",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "trash",
+                                "empty"
+                            ]
+                        },
+                        "description": "Permanently delete all services in trash. **Requires ADMIN role.**"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Daily Stats",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/services/stats/daily?messengerId=1&from=2025-12-01&to=2025-12-31",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "stats",
+                                "daily"
+                            ],
+                            "query": [
+                                {
+                                    "key": "messengerId",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "from",
+                                    "value": "2025-12-01"
+                                },
+                                {
+                                    "key": "to",
+                                    "value": "2025-12-31"
+                                }
+                            ]
+                        },
+                        "description": "Get daily service statistics for a messenger in a date range."
                     },
                     "response": []
                 }
