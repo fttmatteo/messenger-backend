@@ -175,14 +175,16 @@ public class GoogleVisionAdapter implements OcrPort {
                     else if (c == 'G')
                         c = '6';
                 } else {
-                    if (c == '0')
-                        c = 'Q'; // Prioritize Q over O per user request
-                    else if (c == '1')
+                    // Letters
+                    if (c == '0') {
+                        c = 'Q'; // 0 is invalid in letters, likely Q
+                    } else if (c == '1') {
                         c = 'I';
-                    else if (c == '5')
+                    } else if (c == '5') {
                         c = 'S';
-                    else if (c == '8')
+                    } else if (c == '8') {
                         c = 'B';
+                    }
                 }
             }
             corrected.append(c);
