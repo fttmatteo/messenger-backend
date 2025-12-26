@@ -20,7 +20,6 @@ jobs:
     name: Build & Test
     runs-on: ubuntu-latest
     
-    # Directorio de trabajo por defecto para todos los pasos
     defaults:
       run:
         working-directory: messenger
@@ -29,7 +28,6 @@ jobs:
       GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/google-credentials.json
 
     steps:
-      # Configuración inicial
       - name: 📥 Clonar repositorio
         uses: actions/checkout@v4
 
@@ -45,7 +43,6 @@ jobs:
           echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}" > $GOOGLE_APPLICATION_CREDENTIALS
         working-directory: ${{ github.workspace }}
 
-      # Compilar y probar (usa H2 en memoria para tests)
       - name: 🔨 Compilar con Maven
         run: mvn -B compile -DskipTests
 
@@ -55,7 +52,6 @@ jobs:
       - name: 📦 Empaquetar aplicación
         run: mvn -B package -DskipTests
 
-      # Artefactos (opcional: subir JAR para inspección)
       - name: 📤 Subir artefacto JAR
         uses: actions/upload-artifact@v4
         if: github.ref == 'refs/heads/main'
