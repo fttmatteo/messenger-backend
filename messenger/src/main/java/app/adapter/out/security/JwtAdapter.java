@@ -33,6 +33,7 @@ public class JwtAdapter implements AuthenticationPort {
         if (secret == null || secret.length() < 32) {
             throw new IllegalArgumentException(
                     "SEGURIDAD: JWT_SECRET debe tener al menos 32 caracteres (256 bits) para ser seguro. " +
+                            "El valor actual tiene " + (secret == null ? 0 : secret.length()) + " caracteres. " +
                             "Genere uno con: openssl rand -base64 64");
         }
 
