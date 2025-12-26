@@ -16,7 +16,7 @@ public class SignatureEntity {
     private Long idSignature;
 
     @Column(name = "signature_path", nullable = false, length = 2048)
-    private String signaturePath;
+    private String signaturePath; // Ruta del archivo de firma
 
     @Column(name = "upload_date", nullable = false)
     private LocalDateTime uploadDate;

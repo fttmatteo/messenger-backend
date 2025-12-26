@@ -23,6 +23,9 @@ public class EmployeeAdapter implements EmployeePort {
     private EmployeeMapper mapper;
 
     @Override
+    /**
+     * Persiste un empleado transformándolo a entidad JPA.
+     */
     public Employee save(Employee employee) {
         EmployeeEntity entity = mapper.toEntity(employee);
         EmployeeEntity savedEntity = repository.save(entity);
@@ -30,6 +33,9 @@ public class EmployeeAdapter implements EmployeePort {
     }
 
     @Override
+    /**
+     * Busca empleado por ID.
+     */
     public Employee findById(Long idEmployee) {
         Optional<EmployeeEntity> entity = repository.findById(idEmployee);
         if (entity.isPresent()) {
@@ -39,6 +45,9 @@ public class EmployeeAdapter implements EmployeePort {
     }
 
     @Override
+    /**
+     * Busca empleado por número de documento.
+     */
     public Employee findByDocument(Long document) {
         EmployeeEntity entity = repository.findByDocument(document);
         if (entity != null) {

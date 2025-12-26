@@ -23,6 +23,9 @@ public class PlateAdapter implements PlatePort {
     private PlateMapper mapper;
 
     @Override
+    /**
+     * Guarda la información de la placa.
+     */
     public void save(Plate plate) {
         PlateEntity entity = mapper.toEntity(plate);
         PlateEntity savedEntity = repository.save(entity);
@@ -39,6 +42,9 @@ public class PlateAdapter implements PlatePort {
     }
 
     @Override
+    /**
+     * Busca una placa por su cadena alfanumérica.
+     */
     public Plate findByPlateNumber(String plateNumber) {
         PlateEntity entity = repository.findByPlateNumber(plateNumber);
         if (entity != null) {

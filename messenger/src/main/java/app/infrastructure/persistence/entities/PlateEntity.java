@@ -17,7 +17,7 @@ public class PlateEntity {
     private Long idPlate;
 
     @Column(name = "plate_number", unique = true, nullable = false)
-    private String plateNumber;
+    private String plateNumber; // Formato AAA111 o AAA11A
 
     @Enumerated(EnumType.STRING)
     @Column(name = "plate_type", nullable = false)

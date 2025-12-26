@@ -23,6 +23,10 @@ public class DealershipAdapter implements DealershipPort {
     private DealershipMapper mapper;
 
     @Override
+    /**
+     * Guarda la entidad mapeada desde el dominio y devuelve el resultado mapeado de
+     * nuevo.
+     */
     public Dealership save(Dealership dealership) {
         DealershipEntity entity = mapper.toEntity(dealership);
         DealershipEntity savedEntity = repository.save(entity);
@@ -30,6 +34,9 @@ public class DealershipAdapter implements DealershipPort {
     }
 
     @Override
+    /**
+     * Busca por ID delegando al repositorio JPA.
+     */
     public Dealership findById(Long id) {
         Optional<DealershipEntity> entity = repository.findById(id);
         if (entity.isPresent()) {
@@ -51,6 +58,9 @@ public class DealershipAdapter implements DealershipPort {
     }
 
     @Override
+    /**
+     * Busca por nombre delegando al repositorio JPA.
+     */
     public Dealership findByName(String name) {
         DealershipEntity entity = repository.findByName(name);
         if (entity != null) {

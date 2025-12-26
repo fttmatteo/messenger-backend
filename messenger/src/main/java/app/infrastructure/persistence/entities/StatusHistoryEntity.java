@@ -27,7 +27,7 @@ public class StatusHistoryEntity {
     private Status newStatus;
 
     @Column(name = "change_date", nullable = false)
-    private LocalDateTime changeDate;
+    private LocalDateTime changeDate; // Momento exacto del cambio de estado
 
     @ManyToOne
     @JoinColumn(name = "changed_by_employee_id")
@@ -38,7 +38,7 @@ public class StatusHistoryEntity {
     private ServiceDeliveryEntity serviceDelivery;
 
     @Column(name = "delivery_latitude")
-    private Double deliveryLatitude;
+    private Double deliveryLatitude; // Geolocalización al momento del cambio
 
     @Column(name = "delivery_longitude")
     private Double deliveryLongitude;

@@ -10,10 +10,10 @@
 
 ## Supported Versions
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.4.0   | :white_check_mark: |
-| < 1.0.0 | :x:                |
+| Version         | Supported          |
+| --------------- | ------------------ |
+| 0.0.1-SNAPSHOT  | :white_check_mark: |
+| < 0.0.1         | :x:                |
 
 ## Reporting a Vulnerability
 
@@ -62,10 +62,10 @@ This project implements:
 
 ## Versiones Soportadas
 
-| Versión | Soportada          |
-| ------- | ------------------ |
-| 1.4.0   | :white_check_mark: |
-| < 1.0.0 | :x:                |
+| Versión         | Soportada          |
+| --------------- | ------------------ |
+| 0.0.1-SNAPSHOT  | :white_check_mark: |
+| < 0.0.1         | :x:                |
 
 ## Reportar una Vulnerabilidad
 
