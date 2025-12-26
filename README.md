@@ -494,8 +494,8 @@ stateDiagram-v2
 | `RETURNED` | → `PENDING`, `DELIVERED` | → `CANCELED` | ✅ Trash | - |
 | `PENDING` | 🔒 **Locked** until admin intervenes | → `CANCELED`, `RESOLVED` | ✅ Trash | - |
 | `DELIVERED` | 🔒 **Locked** until admin intervenes | → `CANCELED`, `RESOLVED` | ❌ Protected after 72h | ⏱️ 72h |
-| `CANCELED` | | Admin can **reassign** → `ASSIGNED` | ✅ Trash | - |
-| `RESOLVED` | | 🔒 **Immutable** (Final State) | ❌ Protected after 72h | ⏱️ 72h |
+| `CANCELED` | - | Admin can **reassign** → `ASSIGNED` | ✅ Trash | - |
+| `RESOLVED` | - | 🔒 **Immutable** (Final State) | ❌ Protected after 72h | ⏱️ 72h |
 
 ### Permissions Summary
 
