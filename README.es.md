@@ -13,10 +13,6 @@
 
 [🇺🇸 English Version](./README.md)
 
-### 📚 Documentación
-- [🔐 **Secretos de GitHub**](./.github/SECRETS.md)
-- [🛡️ **Política de Seguridad**](./.github/SECURITY.md)
-
 </div>
 
 ---
@@ -826,6 +822,10 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 **Documentación Oficial:**
 - [Documentación de Spring Boot](https://spring.io/projects/spring-boot)
 - [Google Cloud Run](https://cloud.google.com/run/docs)
+
+### 📚 Documentación
+- [🔐 **Secretos de GitHub**](./.github/SECRETS.md)
+- [🛡️ **Política de Seguridad**](./.github/SECURITY.md)
 
 **Proyecto Específico:**
 - Repositorio: `messenger-backend`
