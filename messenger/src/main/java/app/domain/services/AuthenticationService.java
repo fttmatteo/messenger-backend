@@ -71,7 +71,7 @@ public class AuthenticationService {
         }
 
         if (!authenticationPort.validateRefreshToken(refreshToken)) {
-            throw new BusinessException("Refresh token inválido o expirado");
+            throw new UnauthorizedException("Refresh token inválido o expirado");
         }
 
         String documentStr = authenticationPort.extractUsername(refreshToken);

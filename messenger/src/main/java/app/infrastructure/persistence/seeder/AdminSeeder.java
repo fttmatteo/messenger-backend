@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import app.domain.model.enums.Role;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import app.infrastructure.persistence.entities.EmployeeEntity;
 import app.infrastructure.persistence.repository.EmployeeRepository;
@@ -15,7 +14,6 @@ import app.infrastructure.persistence.repository.EmployeeRepository;
  * Seeder que crea el usuario administrador inicial al arrancar la aplicación.
  */
 @Component
-@Profile("dev")
 public class AdminSeeder implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(AdminSeeder.class);

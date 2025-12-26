@@ -24,9 +24,11 @@ public class DeleteEmployee {
             throw new BusinessException("El empleado con ID " + id + " no existe.");
         }
 
-        var deliveries = serviceDeliveryPort.findById(employee.getDocument());
-        if (deliveries != null) {
-            throw new BusinessException("El empleado con ID " + id + " tiene servicios de entrega asociados.");
+        // Check if this employee (as messenger) has any associated service deliveries
+        var deliveries = serviceDeliveryPort.findByMessengerId(id);
+        if (deliveries != null && !deliveries.isEmpty()) {
+            throw new BusinessException("No se puede eliminar. El empleado tiene " + deliveries.size()
+                    + " servicios de entrega asociados.");
         }
 
         employeePort.deleteById(id);

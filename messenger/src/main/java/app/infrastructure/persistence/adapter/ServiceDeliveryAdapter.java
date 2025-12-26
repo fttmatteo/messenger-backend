@@ -59,6 +59,13 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     }
 
     @Override
+    public List<ServiceDelivery> findByMessengerId(Long messengerId) {
+        return repository.findByMessenger_IdEmployee(messengerId).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<ServiceDelivery> findAllActive() {
         return repository.findByDeletedFalse().stream()
                 .map(mapper::toDomain)
@@ -88,6 +95,14 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     @Override
     public void hardDeleteById(Long idServiceDelivery) {
         repository.deleteById(idServiceDelivery);
+    }
+
+    @Override
+    public int hardDeleteAllDeleted() {
+        List<ServiceDeliveryEntity> deletedEntities = repository.findByDeletedTrue();
+        int count = deletedEntities.size();
+        repository.deleteAll(deletedEntities);
+        return count;
     }
 
     @Override

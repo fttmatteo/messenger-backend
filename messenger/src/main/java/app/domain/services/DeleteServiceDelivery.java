@@ -121,4 +121,13 @@ public class DeleteServiceDelivery {
 
         serviceDeliveryPort.hardDeleteById(id);
     }
+
+    /**
+     * Vacía la papelera eliminando permanentemente todos los servicios eliminados.
+     * 
+     * @return número de servicios eliminados permanentemente
+     */
+    public int emptyTrash() {
+        return serviceDeliveryPort.hardDeleteAllDeleted();
+    }
 }

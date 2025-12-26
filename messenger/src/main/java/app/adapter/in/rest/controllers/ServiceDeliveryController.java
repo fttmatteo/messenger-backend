@@ -247,6 +247,23 @@ public class ServiceDeliveryController {
         return ResponseEntity.ok(responseMapper.toResponse(restored));
     }
 
+    /**
+     * Vacía la papelera eliminando permanentemente todos los servicios (solo
+     * ADMIN).
+     */
+    @DeleteMapping("/trash/empty")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> emptyTrash() {
+        logger.info("Solicitud vaciar papelera");
+
+        Employee currentUser = securityHelper.getCurrentUser();
+        int deletedCount = serviceDeliveryUseCase.emptyTrash(currentUser.getIdEmployee());
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Papelera vaciada correctamente",
+                "deletedCount", deletedCount));
+    }
+
     @GetMapping("/stats/daily")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<DailyStatsResponse>> getDailyStats(

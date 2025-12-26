@@ -171,6 +171,13 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleGlobalException(
                         Exception ex,
                         HttpServletRequest request) {
+
+                // Intenta desenvolver la excepción si es una BusinessException envuelta
+                Throwable cause = ex.getCause();
+                if (cause instanceof BusinessException) {
+                        return handleBusinessException((BusinessException) cause, request);
+                }
+
                 // LOGGING CRÍTICO: Registra el stack trace completo para depuración
                 logger.error("ERROR NO CONTROLADO: {} en URI: {}", ex.getMessage(), request.getRequestURI(), ex);
 

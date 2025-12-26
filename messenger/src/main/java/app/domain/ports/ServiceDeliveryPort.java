@@ -19,6 +19,8 @@ public interface ServiceDeliveryPort {
 
     List<ServiceDelivery> findByPlateNumber(String plateNumber);
 
+    List<ServiceDelivery> findByMessengerId(Long messengerId);
+
     // Métodos para soft delete (papelera)
     List<ServiceDelivery> findAllActive();
 
@@ -29,6 +31,8 @@ public interface ServiceDeliveryPort {
     List<ServiceDelivery> findDeletedExpiredBefore(LocalDateTime date);
 
     void hardDeleteById(Long idServiceDelivery);
+
+    int hardDeleteAllDeleted();
 
     // Estadísticas diarias por mensajero
     List<app.domain.model.DailyStatistics> findDailyStatsByMessenger(
