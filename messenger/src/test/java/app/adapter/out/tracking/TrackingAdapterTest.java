@@ -1,7 +1,8 @@
 package app.adapter.out.tracking;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -76,10 +77,10 @@ class TrackingAdapterTest {
 
         when(valueOperations.get(anyString())).thenReturn(tracking);
 
-        LiveTracking result = trackingAdapter.getLastLocation(1L);
+        Optional<LiveTracking> result = trackingAdapter.getLastLocation(1L);
 
-        assertNotNull(result);
-        assertEquals(1L, result.getMessengerId());
+        assertTrue(result.isPresent());
+        assertEquals(1L, result.get().getMessengerId());
     }
 
     @Test

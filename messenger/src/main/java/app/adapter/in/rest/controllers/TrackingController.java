@@ -79,7 +79,7 @@ public class TrackingController {
             @PathVariable Long messengerId) {
 
         logger.debug("Solicitud última ubicación mensajero ID: {}", messengerId);
-        LiveTracking tracking = trackingPort.getLastLocation(messengerId);
+        LiveTracking tracking = trackingPort.getLastLocation(messengerId).orElse(null);
 
         if (tracking == null) {
             return ResponseEntity.notFound().build();

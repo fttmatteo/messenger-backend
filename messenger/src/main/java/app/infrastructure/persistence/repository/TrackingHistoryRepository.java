@@ -21,6 +21,8 @@ public interface TrackingHistoryRepository extends CrudRepository<TrackingHistor
 
         List<TrackingHistoryEntity> findTop10ByMessengerIdOrderByRecordedAtDesc(Long messengerId);
 
+        TrackingHistoryEntity findFirstByMessengerIdOrderByRecordedAtDesc(Long messengerId);
+
         long countByMessengerIdAndRecordedAtBetween(
                         Long messengerId,
                         LocalDateTime start,

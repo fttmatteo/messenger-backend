@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Mock implementation of TrackingPort for test environments without Redis.
@@ -32,9 +33,9 @@ public class NoOpTrackingAdapter implements TrackingPort {
     }
 
     @Override
-    public LiveTracking getLastLocation(Long messengerId) {
+    public Optional<LiveTracking> getLastLocation(Long messengerId) {
         logger.debug("NoOp: getLastLocation called for messenger {} (Redis disabled)", messengerId);
-        return null; // No live tracking data without Redis
+        return Optional.empty(); // No live tracking data without Redis
     }
 
     @Override

@@ -5,6 +5,8 @@ import app.domain.model.TrackingHistory;
 import java.time.LocalDate;
 import java.util.List;
 
+import java.util.Optional;
+
 /**
  * Puerto de salida para rastreo GPS de mensajeros en tiempo real.
  */
@@ -18,7 +20,7 @@ public interface TrackingPort {
     /**
      * Obtiene la última ubicación conocida de un mensajero.
      */
-    LiveTracking getLastLocation(Long messengerId);
+    Optional<LiveTracking> getLastLocation(Long messengerId);
 
     /**
      * Obtiene la ubicación actual de todos los mensajeros activos.

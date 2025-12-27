@@ -2,6 +2,7 @@ package app.adapter.out.tracking;
 
 import app.domain.model.LiveTracking;
 import app.domain.model.TrackingHistory;
+import app.domain.model.Location;
 import app.domain.model.enums.TrackingStatus;
 import app.domain.ports.TrackingPort;
 import app.infrastructure.persistence.entities.TrackingHistoryEntity;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -75,18 +77,51 @@ public class TrackingAdapter implements TrackingPort {
      * Obtiene la última ubicación almacenada en Redis para un mensajero.
      */
     @Override
-    public LiveTracking getLastLocation(Long messengerId) {
+    public Optional<LiveTracking> getLastLocation(Long messengerId) {
         if (messengerId == null) {
-            return null;
+            return Optional.empty();
         }
 
+        // 1. Intenta obtener de Redis (Caché caliente)
         try {
             String key = TRACKING_KEY_PREFIX + messengerId;
-            return redisTemplate.opsForValue().get(key);
+            LiveTracking tracking = redisTemplate.opsForValue().get(key);
+            if (tracking != null) {
+                return Optional.of(tracking);
+            }
         } catch (Exception e) {
-            throw new RuntimeException(
-                    "Error al obtener de Redis para mensajero " + messengerId + ": " + e.getMessage());
+            logger.warn("Error leyendo de Redis para mensajero {}: {}", messengerId, e.getMessage());
+            // No rethrow, proceed to fallback
         }
+
+        // 2. Fallback: Buscar última ubicación conocida en Base de Datos (Caché fría)
+        try {
+            TrackingHistoryEntity lastEntity = historyRepository
+                    .findFirstByMessengerIdOrderByRecordedAtDesc(messengerId);
+            if (lastEntity != null) {
+                LiveTracking historyTracking = new LiveTracking();
+                historyTracking.setMessengerId(lastEntity.getMessengerId());
+                // Construir location
+                Location loc = new Location(
+                        lastEntity.getLatitude(),
+                        lastEntity.getLongitude(),
+                        lastEntity.getRecordedAt(),
+                        null);
+                historyTracking.setCurrentLocation(loc);
+
+                historyTracking.setLastUpdate(lastEntity.getRecordedAt());
+                historyTracking.setSpeed(lastEntity.getSpeed());
+                historyTracking.setHeading(0.0); // Historial no suele tener heading a menos que se guarde
+                historyTracking.setStatus(TrackingStatus.OFFLINE); // Si no está en Redis, asumimos desconectado
+
+                return Optional.of(historyTracking);
+            }
+        } catch (Exception e) {
+            logger.error("Error buscando historial en DB para mensajero {}: {}", messengerId, e.getMessage());
+            // No rethrow, return empty optional
+        }
+
+        return Optional.empty();
     }
 
     /**
