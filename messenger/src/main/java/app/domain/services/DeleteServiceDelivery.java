@@ -73,7 +73,7 @@ public class DeleteServiceDelivery {
         // Registrar en el historial quien eliminó el servicio
         StatusHistory history = new StatusHistory();
         history.setPreviousStatus(previousStatus);
-        history.setNewStatus(previousStatus); // El estado no cambia, solo se marca como eliminado
+        history.setNewStatus(Status.DELETED); // El estado no cambia, solo se marca como eliminado
         history.setChangeDate(LocalDateTime.now());
         history.setChangedBy(user);
         service.addHistory(history);
@@ -113,6 +113,14 @@ public class DeleteServiceDelivery {
 
         service.setDeleted(false);
         service.setDeletedAt(null);
+
+        // Registrar restauración en el historial
+        StatusHistory history = new StatusHistory();
+        history.setPreviousStatus(Status.DELETED);
+        history.setNewStatus(service.getCurrentStatus());
+        history.setChangeDate(LocalDateTime.now());
+        history.setChangedBy(user);
+        service.addHistory(history);
 
         return serviceDeliveryPort.save(service);
     }
