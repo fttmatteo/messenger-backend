@@ -14,23 +14,16 @@ import app.domain.ports.ServiceDeliveryPort;
 
 /**
  * Servicio para eliminar (soft delete) servicios de entrega.
- * 
- * Los servicios eliminados van a una papelera y se borran permanentemente
- * después de 60 días.
  */
 @Service
 public class DeleteServiceDelivery {
 
     @Autowired
     private ServiceDeliveryPort serviceDeliveryPort;
+
     @Autowired
     private EmployeePort employeePort;
 
-    /**
-     * Mueve un servicio a la papelera (soft delete).
-     * El servicio permanecerá en la papelera por 60 días antes de ser eliminado
-     * permanentemente.
-     */
     /**
      * Mueve un servicio a la papelera (soft delete).
      * El servicio permanecerá en la papelera por 60 días antes de ser eliminado
@@ -52,9 +45,6 @@ public class DeleteServiceDelivery {
 
     /**
      * Mueve un servicio a la papelera con registro de quién lo eliminó.
-     */
-    /**
-     * Mueve un servicio a la papelera registrando el usuario que realizó la acción.
      */
     public void deleteById(Long id, Long userId) throws Exception {
         ServiceDelivery service = serviceDeliveryPort.findByIdActive(id);
@@ -85,9 +75,6 @@ public class DeleteServiceDelivery {
         serviceDeliveryPort.save(service);
     }
 
-    /**
-     * Restaura un servicio desde la papelera.
-     */
     /**
      * Restaura un servicio previamente eliminado de la papelera.
      * Solo permitido para administradores.
@@ -126,10 +113,6 @@ public class DeleteServiceDelivery {
     }
 
     /**
-     * Elimina permanentemente un servicio de la papelera.
-     * Solo para uso administrativo o por el job de limpieza.
-     */
-    /**
      * Elimina permanentemente un servicio de la papelera (Hard Delete).
      */
     public void hardDelete(Long id) throws Exception {
@@ -145,11 +128,6 @@ public class DeleteServiceDelivery {
         serviceDeliveryPort.hardDeleteById(id);
     }
 
-    /**
-     * Vacía la papelera eliminando permanentemente todos los servicios eliminados.
-     * 
-     * @return número de servicios eliminados permanentemente
-     */
     /**
      * Vacía la papelera eliminando permanentemente todos los elementos.
      */
