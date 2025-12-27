@@ -40,6 +40,22 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
+			<!-- Resolución de conflictos detectados por el Enforcer (OpenCensus) -->
+			<dependency>
+				<groupId>io.opencensus</groupId>
+				<artifactId>opencensus-api</artifactId>
+				<version>0.31.1</version>
+			</dependency>
+			<dependency>
+				<groupId>io.opencensus</groupId>
+				<artifactId>opencensus-contrib-http-util</artifactId>
+				<version>0.31.1</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.errorprone</groupId>
+				<artifactId>error_prone_annotations</artifactId>
+				<version>2.42.0</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -261,6 +277,27 @@
 						<suppressionFile>dependency-check-suppressions.xml</suppressionFile>
 					</suppressionFiles>
 				</configuration>
+			</plugin>
+
+			<!-- Enforcer: Evita conflictos de versiones de dependencias transitivas -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.5.0</version>
+				<executions>
+					<execution>
+						<id>enforce-dependency-convergence</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<dependencyConvergence/>
+							</rules>
+							<fail>true</fail>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
