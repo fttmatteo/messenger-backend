@@ -32,7 +32,7 @@ public class TrackingAdapter implements TrackingPort {
     private static final Logger logger = LoggerFactory.getLogger(TrackingAdapter.class);
 
     private static final String TRACKING_KEY_PREFIX = "tracking:messenger:";
-    private static final long TRACKING_TTL_MINUTES = 5; // Expira después de 5 minutos sin actualizar
+    private static final long TRACKING_TTL_SECONDS = 30; // Expira después de 30 segundos sin actualizar
 
     @Autowired
     @Qualifier("liveTrackingRedisTemplate")
@@ -62,9 +62,9 @@ public class TrackingAdapter implements TrackingPort {
                 return;
             }
 
-            redisTemplate.opsForValue().set(key, tracking, TRACKING_TTL_MINUTES, TimeUnit.MINUTES);
-            logger.debug("Guardado tracking en Redis para mensajero {}: {} (TTL: {} min)",
-                    tracking.getMessengerId(), tracking.getCurrentLocation(), TRACKING_TTL_MINUTES);
+            redisTemplate.opsForValue().set(key, tracking, TRACKING_TTL_SECONDS, TimeUnit.SECONDS);
+            logger.debug("Guardado tracking en Redis para mensajero {}: {} (TTL: {} seg)",
+                    tracking.getMessengerId(), tracking.getCurrentLocation(), TRACKING_TTL_SECONDS);
         } catch (Exception e) {
             logger.error("Error guardando tracking en Redis: {}", e.getMessage());
             throw new RuntimeException("Error al guardar en Redis: " + e.getMessage());
