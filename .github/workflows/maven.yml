@@ -28,9 +28,11 @@ jobs:
       GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/google-credentials.json
 
     steps:
+      # 1. Clonar el código fuente del repositorio
       - name: 📥 Clonar repositorio
         uses: actions/checkout@v4
 
+      # 2. Instalar Java 17 (Temurin) y configurar caché de Maven
       - name: ☕ Configurar JDK 17
         uses: actions/setup-java@v4
         with:
@@ -38,20 +40,25 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      # 3. Generar archivo de credenciales de Google desde secretos
       - name: 🔐 Crear archivo de credenciales de Google
         run: |
           echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}" > $GOOGLE_APPLICATION_CREDENTIALS
         working-directory: ${{ github.workspace }}
 
+      # 4. Compilar código fuente sin ejecutar pruebas (fail-fast)
       - name: 🔨 Compilar con Maven
         run: mvn -B compile -DskipTests
 
+      # 5. Ejecutar suite de pruebas unitarias e integración
       - name: 🧪 Ejecutar tests
         run: mvn -B test
 
+      # 6. Empaquetar el JAR ejecutable (skip tests para ahorrar tiempo)
       - name: 📦 Empaquetar aplicación
         run: mvn -B package -DskipTests
 
+      # 7. Subir el artefacto compilado (solo en rama main)
       - name: 📤 Subir artefacto JAR
         uses: actions/upload-artifact@v4
         if: github.ref == 'refs/heads/main'

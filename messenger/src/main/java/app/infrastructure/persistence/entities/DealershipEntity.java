@@ -29,7 +29,7 @@ public class DealershipEntity {
     private Double longitude;
 
     @Column(name = "is_geolocated")
-    private Boolean isGeolocated = false;
+    private Boolean isGeolocated = false; // Indica si tiene coordenadas válidas
 
     public Long getIdDealership() {
         return idDealership;

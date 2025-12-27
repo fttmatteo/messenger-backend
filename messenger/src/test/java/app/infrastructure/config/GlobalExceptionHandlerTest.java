@@ -30,6 +30,9 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    /**
+     * Verifica que InputsException retorne 400 Bad Request.
+     */
     void handleInputsException_ShouldReturn400() {
         InputsException exception = new InputsException("Dato inválido");
 
@@ -43,6 +46,9 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    /**
+     * Verifica que BusinessException retorne 409 Conflict.
+     */
     void handleBusinessException_ShouldReturn409() {
         BusinessException exception = new BusinessException("Regla de negocio violada");
 
@@ -129,6 +135,10 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    /**
+     * Verifica el manejo de errores de validación de argumentos (@Valid),
+     * retornando detalles de campos.
+     */
     void handleValidationExceptions_ShouldReturn400WithDetails() {
         BindingResult mockBindingResult = mock(BindingResult.class);
         FieldError fieldError1 = new FieldError("object", "document", "debe ser numérico");

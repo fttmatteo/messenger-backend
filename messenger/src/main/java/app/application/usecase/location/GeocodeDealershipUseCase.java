@@ -22,6 +22,9 @@ public class GeocodeDealershipUseCase {
     @Autowired
     private DealershipPort dealershipPort;
 
+    /**
+     * Ejecuta la geocodificación de un concesionario y actualiza su ubicación.
+     */
     public Dealership execute(Long dealershipId) {
         logger.info("Geocodificando concesionario ID: {}", dealershipId);
         Dealership dealership = dealershipPort.findById(dealershipId);
@@ -43,6 +46,10 @@ public class GeocodeDealershipUseCase {
         }
     }
 
+    /**
+     * Obtiene coordenadas para una dirección arbitraria (no vinculada a un
+     * concesionario).
+     */
     public Location geocodeAddress(String address) {
         return locationPort.geocodeAddress(address);
     }

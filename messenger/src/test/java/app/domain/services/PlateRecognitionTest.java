@@ -28,6 +28,9 @@ class PlateRecognitionTest {
         @ParameterizedTest
         @ValueSource(strings = { "ABC123", "ABC 123", "abc123", "Xyz789", "XYZ 789" })
         @DisplayName("Debe reconocer placas de carro válidas")
+        /**
+         * Verifica reconocimiento de patrones de placas de carro estándar.
+         */
         void shouldRecognizeValidCarPlates(String plate) {
             PlateType result = plateRecognition.determinePlateType(plate);
             assertEquals(PlateType.CAR, result);
@@ -48,6 +51,9 @@ class PlateRecognitionTest {
         @ParameterizedTest
         @ValueSource(strings = { "ABC12D", "ABC 12D", "abc12d", "XYZ99A", "XYZ 99A" })
         @DisplayName("Debe reconocer placas de moto válidas")
+        /**
+         * Verifica reconocimiento de patrones de placas de motocicleta.
+         */
         void shouldRecognizeValidMotorcyclePlates(String plate) {
             PlateType result = plateRecognition.determinePlateType(plate);
             assertEquals(PlateType.MOTORCYCLE, result);
@@ -115,6 +121,9 @@ class PlateRecognitionTest {
 
         @Test
         @DisplayName("Debe formatear placa de carro correctamente")
+        /**
+         * Verifica el formateo estándar para almacenamiento de placas de carro.
+         */
         void shouldFormatCarPlate() {
             String result = plateRecognition.formatPlateForStorage("ABC123", PlateType.CAR);
             assertEquals("ABC 123", result);

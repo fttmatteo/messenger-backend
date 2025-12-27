@@ -15,6 +15,9 @@ public class CreateDealership {
     @Autowired
     private DealershipPort dealershipPort;
 
+    /**
+     * Crea un nuevo concesionario, validando que el nombre sea único.
+     */
     public Dealership create(Dealership dealership) throws Exception {
         Dealership existing = dealershipPort.findByName(dealership.getName());
         if (existing != null) {

@@ -16,7 +16,7 @@ public class EmployeeEntity {
     private Long idEmployee;
 
     @Column(unique = true, nullable = false)
-    private Long document;
+    private Long document; // Número de identificación del empleado
 
     @Column(name = "full_name", nullable = false)
     private String fullName;
@@ -29,7 +29,7 @@ public class EmployeeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
+    private Role role; // ADMIN, MESSENGER
 
     public Long getIdEmployee() {
         return idEmployee;

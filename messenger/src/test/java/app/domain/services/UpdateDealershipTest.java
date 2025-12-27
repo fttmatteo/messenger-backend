@@ -42,6 +42,10 @@ class UpdateDealershipTest {
 
     @Test
     @DisplayName("Debe actualizar campos exitosamente")
+    /**
+     * Verifica que los campos del concesionario se actualicen correctamente si las
+     * validaciones pasan.
+     */
     void shouldUpdateFieldsSuccessfully() throws Exception {
         Dealership newData = new Dealership();
         newData.setName("New Name");
@@ -63,6 +67,9 @@ class UpdateDealershipTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si ID no existe")
+    /**
+     * Verifica que no se pueda actualizar un concesionario inexistente.
+     */
     void shouldThrowExceptionIfIdNotFound() {
         when(dealershipPort.findById(1L)).thenReturn(null);
 
@@ -74,6 +81,9 @@ class UpdateDealershipTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si nuevo nombre ya existe")
+    /**
+     * Verifica la validación de nombre único durante la actualización.
+     */
     void shouldThrowExceptionIfNewNameExists() {
         Dealership newData = new Dealership();
         newData.setName("Existing Name");

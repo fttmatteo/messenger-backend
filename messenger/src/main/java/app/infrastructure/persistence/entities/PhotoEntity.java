@@ -17,14 +17,14 @@ public class PhotoEntity {
     private Long idPhoto;
 
     @Column(name = "photo_path", nullable = false, length = 2048)
-    private String photoPath;
+    private String photoPath; // Ruta relativa en el sistema de archivos o URL bucket
 
     @Column(name = "upload_date")
     private LocalDateTime uploadDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "photo_type")
-    private PhotoType photoType;
+    private PhotoType photoType; // Tipo de evidencia (Placa, Entrega, etc)
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "service_delivery_id")

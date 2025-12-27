@@ -63,6 +63,10 @@ class SecurityHelperTest {
 
     @Test
     @DisplayName("getCurrentUser - Debe retornar empleado cuando autenticación es válida")
+    /**
+     * Verifica recuperación del usuario actual autenticado desde el contexto de
+     * seguridad.
+     */
     void getCurrentUser_shouldReturnEmployeeWhenAuthIsValid() {
         mockAuthenticatedUser("123456");
         when(employeePort.findByDocument(123456L)).thenReturn(adminUser);
@@ -76,6 +80,9 @@ class SecurityHelperTest {
 
     @Test
     @DisplayName("getCurrentUser - Debe lanzar excepción cuando no hay autenticación")
+    /**
+     * Verifica manejo de error cuando no existe sesión activa.
+     */
     void getCurrentUser_shouldThrowWhenNoAuthentication() {
         UnauthorizedException ex = assertThrows(UnauthorizedException.class,
                 () -> securityHelper.getCurrentUser());
@@ -130,6 +137,9 @@ class SecurityHelperTest {
 
     @Test
     @DisplayName("isCurrentUserAdmin - Debe retornar true para usuario ADMIN")
+    /**
+     * Verifica utilidad de chequeo de rol de administrador.
+     */
     void isCurrentUserAdmin_shouldReturnTrueForAdmin() {
         mockAuthenticatedUser("123456");
         when(employeePort.findByDocument(123456L)).thenReturn(adminUser);

@@ -1,7 +1,8 @@
 package app.adapter.out.tracking;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -46,6 +47,9 @@ class TrackingAdapterTest {
 
     @Test
     @DisplayName("Debe guardar ubicación en vivo en Redis")
+    /**
+     * Verifica que la ubicación en tiempo real se guarde en caché (Redis).
+     */
     void shouldSaveLiveLocation() {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
@@ -57,11 +61,14 @@ class TrackingAdapterTest {
 
         trackingAdapter.saveLiveLocation(tracking);
 
-        verify(valueOperations).set(anyString(), eq(tracking), eq(5L), eq(TimeUnit.MINUTES));
+        verify(valueOperations).set(anyString(), eq(tracking), eq(30L), eq(TimeUnit.SECONDS));
     }
 
     @Test
     @DisplayName("Debe obtener última ubicación de Redis")
+    /**
+     * Verifica la recuperación de la última ubicación conocida desde caché.
+     */
     void shouldGetLastLocation() {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
@@ -70,14 +77,17 @@ class TrackingAdapterTest {
 
         when(valueOperations.get(anyString())).thenReturn(tracking);
 
-        LiveTracking result = trackingAdapter.getLastLocation(1L);
+        Optional<LiveTracking> result = trackingAdapter.getLastLocation(1L);
 
-        assertNotNull(result);
-        assertEquals(1L, result.getMessengerId());
+        assertTrue(result.isPresent());
+        assertEquals(1L, result.get().getMessengerId());
     }
 
     @Test
     @DisplayName("Debe guardar historial de tracking")
+    /**
+     * Verifica la persistencia histórica de ubicaciones en base de datos.
+     */
     void shouldSaveTrackingHistory() {
         Location location = new Location(4.6097, -74.0817);
         TrackingHistory history = new TrackingHistory(1L, location, TrackingSource.GPS);

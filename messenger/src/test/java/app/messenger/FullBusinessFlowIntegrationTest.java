@@ -55,6 +55,13 @@ class FullBusinessFlowIntegrationTest {
 
         @Test
         @DisplayName("Complete happy path for a service delivery cycle")
+        /**
+         * Prueba de integración E2E que simula el flujo completo de negocio:
+         * 1. Creación de datos maestros (Admin, Mensajero, Concesionario).
+         * 2. Creación de un servicio.
+         * 3. Actualización de estado por parte del mensajero.
+         * 4. Verificación final de historial.
+         */
         void shouldCompleteFullBusinessCycle() throws Exception {
                 // 1. Setup Admin User directly in DB to start the process
                 EmployeeEntity adminEntity = new EmployeeEntity();

@@ -82,6 +82,9 @@ public class StatusHistory {
         this.deliveryLongitude = deliveryLongitude;
     }
 
+    /**
+     * Reconstruye el objeto Location a partir de la latitud y longitud almacenadas.
+     */
     public Location getDeliveryLocation() {
         if (deliveryLatitude == null || deliveryLongitude == null) {
             return null;

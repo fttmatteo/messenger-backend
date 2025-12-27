@@ -15,6 +15,9 @@ public class DeleteDealership {
     @Autowired
     private DealershipPort dealershipPort;
 
+    /**
+     * Elimina un concesionario por su ID, verificando previamente su existencia.
+     */
     public void deleteById(Long id) throws Exception {
         Dealership existing = dealershipPort.findById(id);
         if (existing == null) {

@@ -29,6 +29,9 @@ public class RedisConfig {
     @Value("${spring.data.redis.password:}")
     private String redisPassword;
 
+    /**
+     * Crea la factoría de conexiones a Redis (Lettuce).
+     */
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
@@ -42,6 +45,10 @@ public class RedisConfig {
         return new LettuceConnectionFactory(config);
     }
 
+    /**
+     * Configura el template de Redis para manejar objetos LiveTracking con
+     * serialización JSON.
+     */
     @Bean
     public RedisTemplate<String, LiveTracking> liveTrackingRedisTemplate(
             RedisConnectionFactory connectionFactory) {

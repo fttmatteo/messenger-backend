@@ -43,6 +43,10 @@ public class UpdateServiceDelivery {
     @Autowired
     private EmployeePort employeePort;
 
+    /**
+     * Actualiza el estado de un servicio, validando privilegios, transiciones y
+     * evidencias.
+     */
     public ServiceDelivery updateStatus(Long serviceId, Status newStatus, String observation,
             Signature signature, List<Photo> photos, Long userId) throws Exception {
 
@@ -151,6 +155,10 @@ public class UpdateServiceDelivery {
         return serviceDeliveryPort.save(service);
     }
 
+    /**
+     * Verifica que no haya expirado la ventana de tiempo (72h) para editar un
+     * servicio finalizado.
+     */
     private void validateEditWindow(ServiceDelivery service) throws BusinessException {
         if (service.getLockedAt() != null) {
             LocalDateTime editDeadline = service.getLockedAt().plusHours(EDIT_WINDOW_HOURS);
@@ -163,6 +171,10 @@ public class UpdateServiceDelivery {
         }
     }
 
+    /**
+     * Valida si el cambio de estado es permitido según el rol del usuario y el
+     * estado actual.
+     */
     private void validateStateTransitionByRole(Status currentStatus, Status newStatus, Role userRole)
             throws BusinessException {
 
@@ -214,6 +226,10 @@ public class UpdateServiceDelivery {
         }
     }
 
+    /**
+     * Valida que se adjunten las evidencias (firma, fotos) requeridas para el nuevo
+     * estado.
+     */
     private void validateEvidence(Status status, Signature signature, List<Photo> photos, String observation)
             throws BusinessException {
 

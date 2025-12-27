@@ -21,6 +21,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Autowired
     private WebSocketAuthChannelInterceptor authChannelInterceptor;
 
+    /**
+     * Habilita un broker de mensajes en memoria simple.
+     * Configura los prefijos para destinos de aplicación y usuario.
+     */
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/topic", "/queue");
@@ -28,11 +32,18 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.setUserDestinationPrefix("/user");
     }
 
+    /**
+     * Registra el interceptor de autenticación para canales de entrada.
+     */
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(authChannelInterceptor);
     }
 
+    /**
+     * Registra el endpoint STOMP para conexiones WebSocket.
+     * Configura CORS basado en propiedades de aplicación.
+     */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         String[] origins = allowedOrigins.split(",");

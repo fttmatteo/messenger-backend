@@ -59,6 +59,10 @@ public class ServiceDeliveryController {
     @Autowired
     private FileHelper fileHelper;
 
+    /**
+     * Crea un nuevo servicio de entrega.
+     * Soporta creación manual o mediante OCR de imagen.
+     */
     @PostMapping("/createService")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ServiceDeliveryResponse> createService(
@@ -103,6 +107,10 @@ public class ServiceDeliveryController {
         });
     }
 
+    /**
+     * Actualiza el estado de un servicio.
+     * Permite adjuntar evidencia (firma, fotos) si es necesario.
+     */
     @PutMapping("/updateService/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ServiceDeliveryResponse> updateStatus(
@@ -146,6 +154,10 @@ public class ServiceDeliveryController {
      * Reasigna un servicio a otro mensajero.
      * Solo disponible para ADMIN y solo cuando el servicio está en CANCELED.
      */
+    /**
+     * Reasigna un servicio a otro mensajero.
+     * Solo disponible para ADMIN y solo cuando el servicio está en CANCELED.
+     */
     @PutMapping("/reassign/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ServiceDeliveryResponse> reassignMessenger(
@@ -166,6 +178,9 @@ public class ServiceDeliveryController {
         return ResponseEntity.ok(responseMapper.toResponse(reassigned));
     }
 
+    /**
+     * Busca un servicio por su ID.
+     */
     @GetMapping("/findByServiceId/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ServiceDeliveryResponse> findById(@PathVariable Long id) throws Exception {
@@ -186,6 +201,10 @@ public class ServiceDeliveryController {
         return ResponseEntity.ok(responseMapper.toResponse(service));
     }
 
+    /**
+     * Obtiene todos los servicios.
+     * Los mensajeros solo ven sus propios servicios asignados.
+     */
     @GetMapping("/allServices")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ServiceDeliveryResponse>> findAll() {
@@ -207,6 +226,9 @@ public class ServiceDeliveryController {
         return ResponseEntity.ok(responses);
     }
 
+    /**
+     * Mueve un servicio a la papelera (Soft Delete).
+     */
     @DeleteMapping("/deleteService/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, String>> delete(@PathVariable Long id) throws Exception {
@@ -220,6 +242,9 @@ public class ServiceDeliveryController {
                 "El servicio ha sido movido a la papelera. Será eliminado permanentemente después de 60 días."));
     }
 
+    /**
+     * Lista los servicios que están en la papelera.
+     */
     @GetMapping("/trash")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ServiceDeliveryResponse>> findDeleted() {
@@ -233,6 +258,9 @@ public class ServiceDeliveryController {
         return ResponseEntity.ok(responses);
     }
 
+    /**
+     * Restaura un servicio desde la papelera (solo ADMIN).
+     */
     /**
      * Restaura un servicio desde la papelera (solo ADMIN).
      */
@@ -251,6 +279,10 @@ public class ServiceDeliveryController {
      * Vacía la papelera eliminando permanentemente todos los servicios (solo
      * ADMIN).
      */
+    /**
+     * Vacía la papelera eliminando permanentemente todos los servicios (solo
+     * ADMIN).
+     */
     @DeleteMapping("/trash/empty")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> emptyTrash() {
@@ -264,6 +296,23 @@ public class ServiceDeliveryController {
                 "deletedCount", deletedCount));
     }
 
+    /**
+     * Elimina permanentemente un servicio individual de la papelera (solo ADMIN).
+     */
+    @DeleteMapping("/trash/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, String>> permanentDeleteFromTrash(@PathVariable Long id) throws Exception {
+        logger.info("Solicitud eliminar permanentemente servicio ID: {} de papelera", id);
+
+        Employee currentUser = securityHelper.getCurrentUser();
+        serviceDeliveryUseCase.permanentDeleteById(id, currentUser.getIdEmployee());
+
+        return ResponseEntity.ok(Map.of("message", "Servicio eliminado permanentemente"));
+    }
+
+    /**
+     * Obtiene estadísticas diarias de servicios para un mensajero.
+     */
     @GetMapping("/stats/daily")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<DailyStatsResponse>> getDailyStats(

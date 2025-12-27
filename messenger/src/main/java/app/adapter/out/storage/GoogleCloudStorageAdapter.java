@@ -53,6 +53,10 @@ public class GoogleCloudStorageAdapter implements StoragePort {
                 .getService();
     }
 
+    /**
+     * Sube un archivo al bucket de Google Cloud Storage.
+     * Retorna el nombre del objeto almacenado.
+     */
     @Override
     public String save(File file, String subDirectory, String customFileName) throws IOException {
         String originalName = file.getName();
@@ -83,6 +87,9 @@ public class GoogleCloudStorageAdapter implements StoragePort {
         return objectName;
     }
 
+    /**
+     * Genera una nueva URL firmada con expiración renovada.
+     */
     public String regenerateSignedUrl(String objectName, int expirationHours) {
         return regenerateSignedUrl(objectName, expirationHours, this.credentials);
     }
@@ -182,6 +189,9 @@ public class GoogleCloudStorageAdapter implements StoragePort {
                 "Para GCS con URLs firmadas, usa directamente la URL almacenada en la base de datos.");
     }
 
+    /**
+     * Elimina un objeto del bucket.
+     */
     public boolean delete(String objectName) {
         logger.info("Eliminando objeto de GCS: {}", objectName);
         BlobId blobId = BlobId.of(bucketName, objectName);

@@ -27,6 +27,10 @@ class RefreshTokenUseCaseTest {
 
     @Test
     @DisplayName("Debe delegar refresh al servicio")
+    /**
+     * Verifica que la solicitud de refresco de token se pase al servicio de
+     * autenticación.
+     */
     void shouldDelegateRefresh() throws Exception {
         RefreshTokenRequest request = new RefreshTokenRequest();
         request.setRefreshToken("oldRefresh");

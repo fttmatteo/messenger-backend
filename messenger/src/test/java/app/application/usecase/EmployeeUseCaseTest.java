@@ -59,6 +59,9 @@ class EmployeeUseCaseTest {
 
         @Test
         @DisplayName("Debe crear empleado exitosamente")
+        /**
+         * Verifica la orquestación para crear un nuevo empleado.
+         */
         void shouldCreateEmployeeSuccessfully() throws Exception {
             when(createEmployee.create(sampleEmployee)).thenReturn(sampleEmployee);
 
@@ -127,6 +130,9 @@ class EmployeeUseCaseTest {
 
         @Test
         @DisplayName("Debe actualizar empleado exitosamente")
+        /**
+         * Verifica la actualización de datos del empleado a través del caso de uso.
+         */
         void shouldUpdateEmployeeSuccessfully() throws Exception {
             sampleEmployee.setFullName("Juan García");
 
@@ -152,6 +158,10 @@ class EmployeeUseCaseTest {
 
         @Test
         @DisplayName("Debe eliminar empleado por ID sin servicios activos")
+        /**
+         * Verifica que se permita eliminar empleado si cumple las condiciones del
+         * negocio.
+         */
         void shouldDeleteEmployeeByIdWithoutActiveServices() throws Exception {
             employeeUseCase.deleteById(1L);
 

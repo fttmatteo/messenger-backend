@@ -34,6 +34,10 @@ class TrashCleanupSchedulerTest {
 
     @Test
     @DisplayName("Debe eliminar permanentemente servicios expirados en papelera")
+    /**
+     * Verifica que el scheduler llame al hardDelete para items caducados en la
+     * papelera.
+     */
     void shouldHardDeleteExpiredServices() {
         ServiceDelivery expiredService1 = new ServiceDelivery();
         expiredService1.setIdServiceDelivery(1L);
@@ -68,6 +72,10 @@ class TrashCleanupSchedulerTest {
 
     @Test
     @DisplayName("Debe continuar con otros servicios si uno falla")
+    /**
+     * Verifica robustez: el fallo en eliminar un item no debe detener el procesado
+     * de los demás.
+     */
     void shouldContinueIfOneFails() {
         ServiceDelivery service1 = new ServiceDelivery();
         service1.setIdServiceDelivery(1L);

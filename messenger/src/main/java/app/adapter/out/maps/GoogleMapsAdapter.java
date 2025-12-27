@@ -32,6 +32,9 @@ public class GoogleMapsAdapter implements LocationPort {
     @Autowired
     private GoogleMapsMapper mapper;
 
+    /**
+     * Geocodifica una dirección utilizando la API de Google Maps.
+     */
     @Override
     public Location geocodeAddress(String address) {
         logger.info("Geocodificando dirección: {}", address);
@@ -59,6 +62,9 @@ public class GoogleMapsAdapter implements LocationPort {
         }
     }
 
+    /**
+     * Calcula una ruta directa entre dos puntos.
+     */
     @Override
     public Route calculateRoute(Location origin, Location destination) {
         logger.info("Calculando ruta simple. Origen: {},{} -> Destino: {},{}",
@@ -88,6 +94,9 @@ public class GoogleMapsAdapter implements LocationPort {
         }
     }
 
+    /**
+     * Calcula una ruta optimizada con múltiples paradas (waypoints).
+     */
     @Override
     public Route calculateOptimalRoute(Location origin, List<Location> stops) {
         if (stops == null || stops.isEmpty()) {
@@ -126,6 +135,10 @@ public class GoogleMapsAdapter implements LocationPort {
         }
     }
 
+    /**
+     * Calcula la distancia en metros entre dos ubicaciones utilizando Distance
+     * Matrix API.
+     */
     @Override
     public Double calculateDistance(Location from, Location to) {
         try {
@@ -152,6 +165,10 @@ public class GoogleMapsAdapter implements LocationPort {
         }
     }
 
+    /**
+     * Obtiene la dirección legible a partir de coordenadas (geocodificación
+     * inversa).
+     */
     @Override
     public String reverseGeocode(Location location) {
         try {

@@ -9,6 +9,9 @@ import org.springframework.test.context.ActiveProfiles;
 class MessengerApplicationTests {
 
 	@Test
+	/**
+	 * Verifica que el contexto de Spring Boot cargue correctamente sin errores.
+	 */
 	void contextLoads() {
 	}
 

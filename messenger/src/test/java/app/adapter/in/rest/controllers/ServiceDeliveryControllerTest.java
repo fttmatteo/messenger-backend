@@ -89,6 +89,10 @@ class ServiceDeliveryControllerTest {
 
         @Test
         @DisplayName("findAll debe llamar al UseCase")
+        /**
+         * Verifica que el controller delegue la búsqueda de todos los servicios al caso
+         * de uso.
+         */
         void findAllShouldCallUseCase() {
             when(serviceDeliveryUseCase.findAll()).thenReturn(Arrays.asList(sampleService));
 
@@ -100,6 +104,9 @@ class ServiceDeliveryControllerTest {
 
         @Test
         @DisplayName("findById debe llamar al UseCase")
+        /**
+         * Verifica delegación de búsqueda por ID.
+         */
         void findByIdShouldCallUseCase() throws Exception {
             when(serviceDeliveryUseCase.findById(1L)).thenReturn(sampleService);
 

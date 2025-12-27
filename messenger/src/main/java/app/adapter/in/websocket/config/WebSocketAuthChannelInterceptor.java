@@ -22,6 +22,11 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
     @Autowired
     private JwtAdapter jwtAdapter;
 
+    /**
+     * Intercepta mensajes entrantes para validar el token JWT en la conexión
+     * inicial (CONNECT).
+     * Establece la autenticación en el contexto de seguridad del WebSocket.
+     */
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);

@@ -4,7 +4,7 @@
 
 # 🚀 Messenger Backend API
 
-[![Java](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
+[![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.1-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Redis](https://img.shields.io/badge/Redis-6.0+-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
@@ -90,7 +90,7 @@ graph LR
 | Component | Technology |
 |-----------|------------|
 | **Framework** | Spring Boot 4.0.1 |
-| **Language** | Java 21 |
+| **Language** | Java 17 |
 | **Database** | MySQL 8.0+ |
 | **Migrations** | Flyway |
 | **Cache/Streaming** | Redis |
@@ -490,8 +490,8 @@ stateDiagram-v2
 | `RETURNED` | → `PENDING`, `DELIVERED` | → `CANCELED` | ✅ Trash | - |
 | `PENDING` | 🔒 **Locked** until admin intervenes | → `CANCELED`, `RESOLVED` | ✅ Trash | - |
 | `DELIVERED` | 🔒 **Locked** until admin intervenes | → `CANCELED`, `RESOLVED` | ❌ Protected after 72h | ⏱️ 72h |
-| `CANCELED` | | Admin can **reassign** → `ASSIGNED` | ✅ Trash | - |
-| `RESOLVED` | | 🔒 **Immutable** (Final State) | ❌ Protected after 72h | ⏱️ 72h |
+| `CANCELED` | - | Admin can **reassign** → `ASSIGNED` | ✅ Trash | - |
+| `RESOLVED` | - | 🔒 **Immutable** (Final State) | ❌ Protected after 72h | ⏱️ 72h |
 
 ### Permissions Summary
 
@@ -691,7 +691,7 @@ AUDIT | timestamp | user_document | action | method | params | status | duration
 
 | Requirement | Version |
 |-------------|---------|
-| Java | 21+ |
+| Java | 17+ |
 | MySQL | 8.0+ |
 | Redis | 6.0+ |
 | Maven | 3.9+ |
@@ -763,7 +763,7 @@ on:
 
 | Feature | Description |
 |---------|-------------|
-| ✅ Automated build | Java 21 + Maven |
+| ✅ Automated build | Java 17 + Maven |
 | ✅ Dependency caching | Faster builds |
 | ✅ Secure secrets | Credential injection |
 | ✅ Testing | `test` profile with H2 |
@@ -771,13 +771,11 @@ on:
 ### Required GitHub Secrets
 
 ```
-DB_HOST, DB_PORT, DB_USERNAME
-JWT_SECRET
-REDIS_HOST, REDIS_PORT
-GCP_PROJECT_ID, GCS_BUCKET_NAME
-GOOGLE_MAPS_API_KEY
 GOOGLE_APPLICATION_CREDENTIALS_JSON
 ```
+
+> [!NOTE]
+> Database and API secrets are no longer required for the CI pipeline as it uses an isolated H2 environment with mocked services.
 
 ---
 
@@ -825,6 +823,10 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 **Official Documentation:**
 - [Spring Boot Documentation](https://spring.io/projects/spring-boot)
 - [Google Cloud Run](https://cloud.google.com/run/docs)
+
+### 📚 Documentation
+- [🔐 **GitHub Secrets Guide**](./.github/SECRETS.md)
+- [🛡️ **Security Policy**](./.github/SECURITY.md)
 
 **Project Specific:**
 - Repository: `messenger-backend`

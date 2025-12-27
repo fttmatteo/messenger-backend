@@ -7,5 +7,8 @@ import java.io.File;
  */
 public interface OcrPort {
 
+    /**
+     * Procesa una imagen para extraer el texto legible (ej. placa vehicular).
+     */
     String extractText(File imageFile);
 }

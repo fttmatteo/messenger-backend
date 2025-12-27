@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
  */
 public class Signature {
     private Long idSignature;
-    private String signaturePath;
+    private String signaturePath; // Ruta relativa del archivo de firma
     private LocalDateTime uploadDate;
 
     public Long getIdSignature() {

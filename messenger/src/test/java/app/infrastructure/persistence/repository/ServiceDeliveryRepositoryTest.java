@@ -33,6 +33,10 @@ class ServiceDeliveryRepositoryTest {
 
     @Test
     @DisplayName("Should correctly calculate daily statistics")
+    /**
+     * Verifica que la query de estadísticas diarias agrupe y cuente correctamente
+     * por estado.
+     */
     void shouldCalculateDailyStatsCorrectly() {
         // Given
         EmployeeEntity messenger = createEmployee("999999", "Test Messenger");

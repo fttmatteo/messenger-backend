@@ -42,6 +42,9 @@ public class TrackingController {
     @Autowired
     private TrackingResponseMapper responseMapper;
 
+    /**
+     * Actualiza la ubicación en tiempo real de un mensajero.
+     */
     @PostMapping("/update")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<LiveTrackingResponse> updateLocation(
@@ -67,13 +70,16 @@ public class TrackingController {
         return ResponseEntity.ok(responseMapper.toResponse(tracking));
     }
 
+    /**
+     * Obtiene la última ubicación conocida de un mensajero (solo ADMIN).
+     */
     @GetMapping("/messenger/{messengerId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<LiveTrackingResponse> getLastLocation(
             @PathVariable Long messengerId) {
 
         logger.debug("Solicitud última ubicación mensajero ID: {}", messengerId);
-        LiveTracking tracking = trackingPort.getLastLocation(messengerId);
+        LiveTracking tracking = trackingPort.getLastLocation(messengerId).orElse(null);
 
         if (tracking == null) {
             return ResponseEntity.notFound().build();
@@ -82,6 +88,9 @@ public class TrackingController {
         return ResponseEntity.ok(responseMapper.toResponse(tracking));
     }
 
+    /**
+     * Obtiene la ubicación de todos los mensajeros activos (solo ADMIN).
+     */
     @GetMapping("/active")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<LiveTrackingResponse>> getAllActive() {
@@ -93,6 +102,9 @@ public class TrackingController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Obtiene el historial de ubicaciones de un mensajero en una fecha específica.
+     */
     @GetMapping("/history/{messengerId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<TrackingHistoryResponse>> getHistory(
@@ -108,6 +120,9 @@ public class TrackingController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Obtiene el historial de rastreo asociado a un servicio específico.
+     */
     @GetMapping("/service/{serviceId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<TrackingHistoryResponse>> getHistoryByService(

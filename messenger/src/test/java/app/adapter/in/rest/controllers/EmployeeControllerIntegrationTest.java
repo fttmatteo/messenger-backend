@@ -52,6 +52,9 @@ class EmployeeControllerIntegrationTest {
     @Test
     @DisplayName("GET /employees/allEmployees should return 200 for ADMIN")
     @WithMockUser(roles = "ADMIN")
+    /**
+     * Verifica que un admin pueda listar todos los empleados.
+     */
     void shouldReturnAllEmployeesForAdmin() throws Exception {
         EmployeeEntity emp = new EmployeeEntity();
         emp.setDocument(999L);
@@ -69,6 +72,9 @@ class EmployeeControllerIntegrationTest {
     @Test
     @DisplayName("GET /employees/allEmployees should return 403 for MESSENGER")
     @WithMockUser(roles = "MESSENGER")
+    /**
+     * Verifica control de acceso: un mensajero no debe listar empleados.
+     */
     void shouldDenyAccessToMessenger() throws Exception {
         mockMvc.perform(get("/employees/allEmployees"))
                 .andExpect(status().isForbidden());
@@ -77,6 +83,9 @@ class EmployeeControllerIntegrationTest {
     @Test
     @DisplayName("POST /employees/createEmployee should create new employee")
     @WithMockUser(roles = "ADMIN")
+    /**
+     * Verifica creación de empleado por un admin.
+     */
     void shouldCreateEmployee() throws Exception {
         EmployeeRequest request = new EmployeeRequest();
         request.setDocument("101010");
@@ -95,6 +104,9 @@ class EmployeeControllerIntegrationTest {
     @Test
     @DisplayName("DELETE /employees/deleteEmployee/{id} should delete employee")
     @WithMockUser(roles = "ADMIN")
+    /**
+     * Verifica eliminación de empleado por un admin.
+     */
     void shouldDeleteEmployee() throws Exception {
         EmployeeEntity emp = new EmployeeEntity();
         emp.setDocument(202020L);

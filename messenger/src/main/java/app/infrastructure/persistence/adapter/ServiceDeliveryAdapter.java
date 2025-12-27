@@ -24,6 +24,9 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     private ServiceDeliveryMapper mapper;
 
     @Override
+    /**
+     * Guarda el servicio convirtiéndolo a entidad.
+     */
     public ServiceDelivery save(ServiceDelivery serviceDelivery) {
         ServiceDeliveryEntity entity = mapper.toEntity(serviceDelivery);
         ServiceDeliveryEntity savedEntity = repository.save(entity);
@@ -73,6 +76,9 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     }
 
     @Override
+    /**
+     * Busca servicio activo (no eliminado).
+     */
     public ServiceDelivery findByIdActive(Long idServiceDelivery) {
         Optional<ServiceDeliveryEntity> entity = repository.findByIdServiceDeliveryAndDeletedFalse(idServiceDelivery);
         return entity.map(mapper::toDomain).orElse(null);
@@ -86,6 +92,9 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     }
 
     @Override
+    /**
+     * Busca servicios en la papelera que hayan expirado antes de la fecha dada.
+     */
     public List<ServiceDelivery> findDeletedExpiredBefore(LocalDateTime date) {
         return repository.findByDeletedTrueAndDeletedAtBefore(date).stream()
                 .map(mapper::toDomain)
@@ -110,6 +119,9 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
             Long messengerId,
             java.time.LocalDate from,
             java.time.LocalDate to) {
+        /**
+         * Obtiene estadísticas diarias delegando a la consulta nativa del repositorio.
+         */
         // Convert LocalDate to LocalDateTime for the query
         LocalDateTime fromDateTime = from.atStartOfDay();
         LocalDateTime toDateTime = to.plusDays(1).atStartOfDay(); // End of 'to' day

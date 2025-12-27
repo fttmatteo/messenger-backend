@@ -33,6 +33,10 @@ public class CreateServiceDelivery {
     @Autowired
     private PlateRecognition plateRecognition;
 
+    /**
+     * Crea un nuevo servicio de entrega, asocia la placa (creándola si no existe)
+     * y asigna el servicio al mensajero y concesionario indicados.
+     */
     public ServiceDelivery create(String plateNumber, String photoPath, Long dealershipId, Long messengerId)
             throws Exception {
 

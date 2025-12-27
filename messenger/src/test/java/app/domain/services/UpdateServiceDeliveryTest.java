@@ -72,6 +72,9 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe actualizar estado a PENDING con evidencias completas")
+    /**
+     * Verifica transición exitosa a PENDING cuando se provee firma y evidencias.
+     */
     void shouldUpdateStatusToPendingWhenEvidenceComplete() throws Exception {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(1L)).thenReturn(messenger);
@@ -98,6 +101,9 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si falta firma para estado PENDING")
+    /**
+     * Verifica obligatoriedad de la firma para pasar a estado PENDING.
+     */
     void shouldThrowExceptionIfSignatureMissingForPending() {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(1L)).thenReturn(messenger);
@@ -110,6 +116,9 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si falta foto para estado RETURNED")
+    /**
+     * Verifica obligatoriedad de evidencia fotográfica para marcar como RETURNED.
+     */
     void shouldThrowExceptionIfPhotoMissingForReturned() {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(1L)).thenReturn(messenger);
@@ -122,6 +131,9 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe permitir ADMIN cambiar a CANCELED desde ASSIGNED")
+    /**
+     * Verifica que un ADMIN pueda cancelar un servicio desde estado ASSIGNED.
+     */
     void shouldAllowCanceledOnlyForAdminFromAssigned() throws Exception {
         service.setCurrentStatus(Status.ASSIGNED);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -150,6 +162,10 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe impedir MESSENGER actualizar desde PENDING (bloqueado)")
+    /**
+     * Verifica que el mensajero no pueda mover el servicio una vez está en PENDING
+     * (requiere acción admin).
+     */
     void shouldBlockMessengerFromPending() {
         service.setCurrentStatus(Status.PENDING);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -321,6 +337,10 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe impedir reasignación si no es ADMIN")
+    /**
+     * Verifica que solo los administradores tengan permiso para reasignar
+     * servicios.
+     */
     void shouldForbidReassignIfNotAdmin() {
         service.setCurrentStatus(Status.CANCELED);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);

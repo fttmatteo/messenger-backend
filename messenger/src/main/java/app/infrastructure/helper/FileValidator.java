@@ -19,10 +19,17 @@ public class FileValidator {
             "jpg", "jpeg", "png");
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
 
+    /**
+     * Valida que el archivo sea una imagen permitida (JPG, PNG) y no exceda el
+     * tamaño máximo.
+     */
     public static void validateImage(MultipartFile file) {
         validateFile(file, ALLOWED_IMAGE_TYPES, ALLOWED_IMAGE_EXTENSIONS, MAX_FILE_SIZE);
     }
 
+    /**
+     * Validación genérica de archivos por tipo MIME, extensión y tamaño.
+     */
     public static void validateFile(MultipartFile file,
             List<String> allowedMimeTypes,
             List<String> allowedExtensions,

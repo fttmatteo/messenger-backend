@@ -43,6 +43,10 @@ class CreateDealershipTest {
 
         @Test
         @DisplayName("Debe crear concesionario cuando nombre es único")
+        /**
+         * Verifica la creación exitosa de un concesionario cuando el nombre no está
+         * duplicado.
+         */
         void shouldCreateDealershipWhenNameIsUnique() throws Exception {
             when(dealershipPort.findByName("Concesionario Test")).thenReturn(null);
             when(dealershipPort.save(newDealership)).thenReturn(newDealership);
@@ -54,6 +58,10 @@ class CreateDealershipTest {
 
         @Test
         @DisplayName("Debe buscar por nombre antes de crear")
+        /**
+         * Verifica que el servicio busque si el nombre existe antes de intentar
+         * guardar.
+         */
         void shouldSearchByNameBeforeCreating() throws Exception {
             when(dealershipPort.findByName(anyString())).thenReturn(null);
             when(dealershipPort.save(any())).thenReturn(newDealership);
@@ -71,6 +79,10 @@ class CreateDealershipTest {
 
         @Test
         @DisplayName("Debe lanzar excepción si nombre ya existe")
+        /**
+         * Verifica que se lance BusinessException si se intenta crear un concesionario
+         * con nombre duplicado.
+         */
         void shouldThrowExceptionIfNameExists() {
             Dealership existingDealership = new Dealership();
             existingDealership.setName("Concesionario Test");

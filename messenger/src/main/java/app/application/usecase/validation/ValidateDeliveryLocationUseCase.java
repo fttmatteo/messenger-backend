@@ -24,6 +24,11 @@ public class ValidateDeliveryLocationUseCase {
     @Value("${tracking.max.distance.validation:200}")
     private Double maxDistanceMeters;
 
+    /**
+     * Valida si la ubicación de entrega está dentro del rango permitido del
+     * concesionario.
+     * Lanza excepción si la distancia excede el máximo configurado.
+     */
     public boolean execute(Location deliveryLocation, Long dealershipId) {
         Dealership dealership = dealershipPort.findById(dealershipId);
 
@@ -53,6 +58,10 @@ public class ValidateDeliveryLocationUseCase {
         return true;
     }
 
+    /**
+     * Versión "silenciosa" de la validación que retorna false en lugar de lanzar
+     * excepción.
+     */
     public boolean isWithinRange(Location deliveryLocation, Long dealershipId) {
         try {
             return execute(deliveryLocation, dealershipId);

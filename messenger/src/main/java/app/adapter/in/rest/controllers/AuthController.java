@@ -29,6 +29,9 @@ public class AuthController {
     @Autowired
     private LoginUseCase loginUseCase;
 
+    /**
+     * Inicia sesión de usuario y genera tokens de acceso.
+     */
     @PostMapping("/login")
     @AuditableAction(action = "LOGIN", description = "Inicio de sesión de usuario")
     public ResponseEntity<TokenResponse> login(@Valid @RequestBody AuthCredentials credentials) throws Exception {
@@ -37,6 +40,9 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Renueva el token de acceso utilizando un refresh token válido.
+     */
     @PostMapping("/refresh")
     @AuditableAction(action = "TOKEN_REFRESH", description = "Renovación de token de acceso")
     public ResponseEntity<TokenResponse> refresh(@Valid @RequestBody app.domain.model.auth.RefreshTokenRequest request)

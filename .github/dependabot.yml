@@ -11,7 +11,7 @@ updates:
     schedule:
       interval: "daily"
       time: "08:00"
-      timezone: "America/Bogota"
+      timezone: "America/Bogota" # Hora local del equipo
     commit-message:
       prefix: "ci(deps)"
     labels:
@@ -25,7 +25,7 @@ updates:
     schedule:
       interval: "daily"
       time: "08:00"
-      timezone: "America/Bogota"
+      timezone: "America/Bogota" # Sincronizado con CI de actions
     commit-message:
       prefix: "build(deps)"
     labels:
@@ -34,17 +34,20 @@ updates:
     open-pull-requests-limit: 10
     # Agrupar actualizaciones menores y de parche
     groups:
+      # Agrupar actualizaciones del framework Spring
       spring:
         patterns:
           - "org.springframework*"
         update-types:
           - "minor"
           - "patch"
+      # Agrupar librerías de testing (JUnit, Mockito, etc.)
       testing:
         patterns:
           - "org.junit*"
           - "org.mockito*"
           - "org.assertj*"
+      # Agrupar actualizaciones críticas de seguridad
       security:
         patterns:
           - "io.jsonwebtoken*"

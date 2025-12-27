@@ -12,6 +12,9 @@ import java.io.File;
 @ConditionalOnProperty(name = "app.ocr.mode", havingValue = "mock", matchIfMissing = true)
 public class MockOcrAdapter implements OcrPort {
 
+    /**
+     * Simula la extracción de texto devolviendo una placa fija para pruebas.
+     */
     @Override
     public String extractText(File imageFile) {
         String mockPlate = "ABC123";

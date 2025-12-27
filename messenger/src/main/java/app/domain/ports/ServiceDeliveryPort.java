@@ -9,32 +9,73 @@ import java.util.List;
  */
 public interface ServiceDeliveryPort {
 
+    /**
+     * Guarda o actualiza un servicio de entrega.
+     */
     ServiceDelivery save(ServiceDelivery serviceDelivery);
 
+    /**
+     * Mueve un servicio a la papelera (Soft delete).
+     */
     void deleteById(Long idServiceDelivery);
 
+    /**
+     * Busca un servicio por ID (incluyendo eliminados).
+     */
     ServiceDelivery findById(Long idServiceDelivery);
 
+    /**
+     * Recupera todos los servicios (incluyendo eliminados).
+     */
     List<ServiceDelivery> findAll();
 
+    /**
+     * Busca servicios activos asociados a una placa.
+     */
     List<ServiceDelivery> findByPlateNumber(String plateNumber);
 
+    /**
+     * Busca servicios asignados a un mensajero.
+     */
     List<ServiceDelivery> findByMessengerId(Long messengerId);
 
     // Métodos para soft delete (papelera)
+
+    /**
+     * Recupera todos los servicios activos.
+     */
     List<ServiceDelivery> findAllActive();
 
+    /**
+     * Busca un servicio activo por ID.
+     */
     ServiceDelivery findByIdActive(Long idServiceDelivery);
 
+    /**
+     * Recupera todos los servicios marcados como eliminados.
+     */
     List<ServiceDelivery> findDeleted();
 
+    /**
+     * Busca servicios eliminados hace más tiempo que la fecha indicada.
+     */
     List<ServiceDelivery> findDeletedExpiredBefore(LocalDateTime date);
 
+    /**
+     * Elimina físicamente un servicio de la base de datos.
+     */
     void hardDeleteById(Long idServiceDelivery);
 
+    /**
+     * Elimina físicamente todos los servicios en la papelera.
+     */
     int hardDeleteAllDeleted();
 
     // Estadísticas diarias por mensajero
+
+    /**
+     * Obtiene estadísticas diarias de un mensajero en un rango de fechas.
+     */
     List<app.domain.model.DailyStatistics> findDailyStatsByMessenger(
             Long messengerId,
             java.time.LocalDate from,

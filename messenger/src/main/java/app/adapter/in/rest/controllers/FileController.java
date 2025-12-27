@@ -33,6 +33,10 @@ public class FileController {
 
     private final String[] subDirectories = { "detections", "signatures", "evidence" };
 
+    /**
+     * Recupera un archivo almacenado (foto, firma) por su nombre.
+     * Incluye validaciones de seguridad para evitar Path Traversal.
+     */
     @GetMapping("/{filename:.+}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Resource> getFile(@PathVariable String filename) throws Exception {

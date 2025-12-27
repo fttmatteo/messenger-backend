@@ -2,6 +2,7 @@ package app.adapter.out.tracking;
 
 import app.domain.model.LiveTracking;
 import app.domain.model.TrackingHistory;
+import app.domain.model.Location;
 import app.domain.model.enums.TrackingStatus;
 import app.domain.ports.TrackingPort;
 import app.infrastructure.persistence.entities.TrackingHistoryEntity;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -32,7 +34,7 @@ public class TrackingAdapter implements TrackingPort {
     private static final Logger logger = LoggerFactory.getLogger(TrackingAdapter.class);
 
     private static final String TRACKING_KEY_PREFIX = "tracking:messenger:";
-    private static final long TRACKING_TTL_MINUTES = 5; // Expira después de 5 minutos sin actualizar
+    private static final long TRACKING_TTL_SECONDS = 30; // Expira después de 30 segundos sin actualizar
 
     @Autowired
     @Qualifier("liveTrackingRedisTemplate")
@@ -42,6 +44,10 @@ public class TrackingAdapter implements TrackingPort {
     @Autowired
     private TrackingMapper mapper;
 
+    /**
+     * Guarda la ubicación en tiempo real en Redis con un TTL (tiempo de vida)
+     * definido.
+     */
     @Override
     public void saveLiveLocation(LiveTracking tracking) {
         if (tracking == null || tracking.getMessengerId() == null) {
@@ -58,30 +64,69 @@ public class TrackingAdapter implements TrackingPort {
                 return;
             }
 
-            redisTemplate.opsForValue().set(key, tracking, TRACKING_TTL_MINUTES, TimeUnit.MINUTES);
-            logger.debug("Guardado tracking en Redis para mensajero {}: {} (TTL: {} min)",
-                    tracking.getMessengerId(), tracking.getCurrentLocation(), TRACKING_TTL_MINUTES);
+            redisTemplate.opsForValue().set(key, tracking, TRACKING_TTL_SECONDS, TimeUnit.SECONDS);
+            logger.debug("Guardado tracking en Redis para mensajero {}: {} (TTL: {} seg)",
+                    tracking.getMessengerId(), tracking.getCurrentLocation(), TRACKING_TTL_SECONDS);
         } catch (Exception e) {
             logger.error("Error guardando tracking en Redis: {}", e.getMessage());
             throw new RuntimeException("Error al guardar en Redis: " + e.getMessage());
         }
     }
 
+    /**
+     * Obtiene la última ubicación almacenada en Redis para un mensajero.
+     */
     @Override
-    public LiveTracking getLastLocation(Long messengerId) {
+    public Optional<LiveTracking> getLastLocation(Long messengerId) {
         if (messengerId == null) {
-            return null;
+            return Optional.empty();
         }
 
+        // 1. Intenta obtener de Redis (Caché caliente)
         try {
             String key = TRACKING_KEY_PREFIX + messengerId;
-            return redisTemplate.opsForValue().get(key);
+            LiveTracking tracking = redisTemplate.opsForValue().get(key);
+            if (tracking != null) {
+                return Optional.of(tracking);
+            }
         } catch (Exception e) {
-            throw new RuntimeException(
-                    "Error al obtener de Redis para mensajero " + messengerId + ": " + e.getMessage());
+            logger.warn("Error leyendo de Redis para mensajero {}: {}", messengerId, e.getMessage());
+            // No rethrow, proceed to fallback
         }
+
+        // 2. Fallback: Buscar última ubicación conocida en Base de Datos (Caché fría)
+        try {
+            TrackingHistoryEntity lastEntity = historyRepository
+                    .findFirstByMessengerIdOrderByRecordedAtDesc(messengerId);
+            if (lastEntity != null) {
+                LiveTracking historyTracking = new LiveTracking();
+                historyTracking.setMessengerId(lastEntity.getMessengerId());
+                // Construir location
+                Location loc = new Location(
+                        lastEntity.getLatitude(),
+                        lastEntity.getLongitude(),
+                        lastEntity.getRecordedAt(),
+                        null);
+                historyTracking.setCurrentLocation(loc);
+
+                historyTracking.setLastUpdate(lastEntity.getRecordedAt());
+                historyTracking.setSpeed(lastEntity.getSpeed());
+                historyTracking.setHeading(0.0); // Historial no suele tener heading a menos que se guarde
+                historyTracking.setStatus(TrackingStatus.OFFLINE); // Si no está en Redis, asumimos desconectado
+
+                return Optional.of(historyTracking);
+            }
+        } catch (Exception e) {
+            logger.error("Error buscando historial en DB para mensajero {}: {}", messengerId, e.getMessage());
+            // No rethrow, return empty optional
+        }
+
+        return Optional.empty();
     }
 
+    /**
+     * Retorna una lista con todos los mensajeros que tienen datos activos en Redis.
+     */
     @Override
     public List<LiveTracking> getAllActiveMessengers() {
         List<LiveTracking> activeMessengers = new ArrayList<>();
@@ -115,6 +160,9 @@ public class TrackingAdapter implements TrackingPort {
         return activeMessengers;
     }
 
+    /**
+     * Persiste el historial de seguimiento en la base de datos relacional.
+     */
     @Override
     public TrackingHistory saveTrackingHistory(TrackingHistory history) {
         if (history == null) {
@@ -126,6 +174,9 @@ public class TrackingAdapter implements TrackingPort {
         return mapper.toDomain(saved);
     }
 
+    /**
+     * Consulta el historial de un mensajero en una fecha específica desde la BD.
+     */
     @Override
     public List<TrackingHistory> getHistoryByMessenger(Long messengerId, LocalDate date) {
         if (messengerId == null || date == null) {
@@ -142,6 +193,9 @@ public class TrackingAdapter implements TrackingPort {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Consulta el historial asociado a un servicio de entrega específico.
+     */
     @Override
     public List<TrackingHistory> getHistoryByService(Long serviceDeliveryId) {
         if (serviceDeliveryId == null) {

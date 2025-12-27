@@ -14,6 +14,9 @@ public class SearchPlate {
     @Autowired
     private PlatePort platePort;
 
+    /**
+     * Busca una placa por su ID.
+     */
     public Plate findById(Long idPlate) {
         Plate plate = platePort.findById(idPlate);
         if (plate == null) {
@@ -22,6 +25,9 @@ public class SearchPlate {
         return plate;
     }
 
+    /**
+     * Busca una placa por su número alfanumérico.
+     */
     public Plate findByPlateNumber(String plateNumber) {
         Plate plate = platePort.findByPlateNumber(plateNumber);
         if (plate == null) {

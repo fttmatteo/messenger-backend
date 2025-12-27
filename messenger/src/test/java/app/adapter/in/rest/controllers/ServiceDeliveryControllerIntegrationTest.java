@@ -51,6 +51,10 @@ class ServiceDeliveryControllerIntegrationTest {
     @Test
     @DisplayName("GET /services/stats/daily should return 200 and correct JSON structure")
     @WithMockUser // Simulates an authenticated user
+    /**
+     * Verifica que el endpoint de estadísticas diarias retorne datos correctos y
+     * completos.
+     */
     void shouldReturnDailyStats() throws Exception {
         // Given: Prepare data in H2
         EmployeeEntity messenger = createEmployee("888888", "Integration Messenger");
@@ -81,6 +85,9 @@ class ServiceDeliveryControllerIntegrationTest {
 
     @Test
     @DisplayName("GET /services/stats/daily should return 401 if unauthenticated")
+    /**
+     * Verifica que se requiera autenticación para acceder a las estadísticas.
+     */
     void shouldReturn401IfUnauthenticated() throws Exception {
         LocalDateTime now = LocalDateTime.now();
         mockMvc.perform(get("/services/stats/daily")

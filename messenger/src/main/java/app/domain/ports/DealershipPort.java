@@ -8,13 +8,28 @@ import java.util.List;
  */
 public interface DealershipPort {
 
+    /**
+     * Guarda o actualiza un concesionario.
+     */
     Dealership save(Dealership dealership);
 
+    /**
+     * Elimina un concesionario por su ID.
+     */
     void deleteById(Long idDealership);
 
+    /**
+     * Busca un concesionario por su ID.
+     */
     Dealership findById(Long idDealership);
 
+    /**
+     * Busca un concesionario por su nombre exacto.
+     */
     Dealership findByName(String name);
 
+    /**
+     * Recupera todos los concesionarios registrados.
+     */
     List<Dealership> findAll();
 }

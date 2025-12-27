@@ -325,7 +325,7 @@ gcloud builds submit \
 **What does Cloud Build do?**
 1. Uploads source code to Cloud Storage
 2. Executes `Dockerfile` multi-stage build
-3. Compiles with Maven (Java 21)
+3. Compiles with Maven (Java 17)
 4. Creates optimized image with Alpine Linux
 5. Uploads image to Artifact Registry
 
@@ -517,12 +517,12 @@ gcloud run services update messenger-backend \
 
 - ✅ **Hibernate in validation mode** - Only validates schema, doesn't modify
 - ✅ **Existing tables** - Previously created
-- ⚠️ **Flyway not auto-executed** - Configured but not active in Spring Boot 4.0
+- ✅ **Flyway auto-executed** - Configured to run migrations on startup (`spring.flyway.enabled=true`)
 
 **For future migrations:**
-1. Run SQL scripts manually in Aiven
-2. Update JPA entities
-3. Rebuild and redeploy
+1. Create new SQL script in `src/main/resources/db/migration` (e.g., `V2__Add_Column.sql`)
+2. Build and deploy
+3. Cloud Run instance will automatically apply the migration on startup
 
 ### Logging
 
@@ -1132,12 +1132,12 @@ gcloud run services update messenger-backend \
 
 - ✅ **Hibernate en modo validación** - Solo valida esquema, no modifica
 - ✅ **Tablas existentes** - Creadas previamente
-- ⚠️ **Flyway no auto-ejecutado** - Configurado pero no activo en Spring Boot 4.0
+- ✅ **Flyway activo** - Ejecuta migraciones automáticamente (`spring.flyway.enabled=true`)
 
 **Para futuras migraciones:**
-1. Ejecutar scripts SQL manualmente en Aiven
-2. Actualizar entidades JPA
-3. Rebuild y redeploy
+1. Crear nuevo script SQL en `src/main/resources/db/migration` (ej: `V2__Add_Column.sql`)
+2. Build y deploy
+3. Cloud Run aplicará la migración automáticamente al iniciar
 
 ### Logging
 

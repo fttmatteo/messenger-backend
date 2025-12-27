@@ -14,7 +14,7 @@ public class LiveTracking {
     private Location currentLocation;
     private LocalDateTime lastUpdate;
     private String deviceId;
-    private TrackingStatus status;
+    private TrackingStatus status; // ACTIVE, INACTIVE, DISCONNECTED
     private Double speed; // km/h
     private Double heading; // Dirección en grados (0-360, donde 0 = Norte)
 

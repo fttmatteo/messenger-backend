@@ -27,6 +27,9 @@ class LoginUseCaseTest {
 
     @Test
     @DisplayName("Debe delegar login al servicio de autenticación")
+    /**
+     * Verifica que el caso de uso llame correctamente al servicio de autenticación.
+     */
     void shouldDelegateLogin() throws Exception {
         AuthCredentials credentials = new AuthCredentials();
         credentials.setDocument(123456789L);

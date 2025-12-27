@@ -16,6 +16,10 @@ public class PlateRecognition {
     private static final Pattern MOTO_PATTERN = Pattern.compile("^[A-Z]{3}\\s*\\d{2}[A-Z]$");
     private static final Pattern MOTOCARRO_PATTERN = Pattern.compile("^\\d{3}\\s*[A-Z]{3}$");
 
+    /**
+     * Determina el tipo de vehículo basado en el formato de la placa.
+     * Soportados: Carro (AAA111), Moto (AAA11A), Motocarro (111AAA).
+     */
     public PlateType determinePlateType(String plateNumber) throws BusinessException {
         if (plateNumber == null || plateNumber.trim().isEmpty()) {
             throw new BusinessException("El número de placa no puede estar vacío.");
@@ -34,6 +38,10 @@ public class PlateRecognition {
         }
     }
 
+    /**
+     * Formatea una placa para su almacenamiento estandarizado (con espacios si
+     * aplica).
+     */
     public String formatPlateForStorage(String plateNumber, PlateType type) {
         String clean = plateNumber.replaceAll("\\s+", "").toUpperCase();
         switch (type) {

@@ -30,6 +30,10 @@ class UpdateLiveTrackingUseCaseTest {
 
     @Test
     @DisplayName("Should save live location and history when location provides data")
+    /**
+     * Verifica que se guarde ubicación en tiempo real e historial cuando hay datos
+     * GPS.
+     */
     void shouldSaveLiveLocationAndHistory() {
         // Given
         LiveTracking incoming = new LiveTracking();
@@ -51,6 +55,10 @@ class UpdateLiveTrackingUseCaseTest {
 
     @Test
     @DisplayName("Should save only live location if location is missing (keep alive ping)")
+    /**
+     * Verifica que solo se actualice el estado "online" (sin guardar historial) si
+     * no llega ubicación.
+     */
     void shouldSaveOnlyLiveLocationIfLocationMissing() {
         // Given
         LiveTracking incoming = new LiveTracking();

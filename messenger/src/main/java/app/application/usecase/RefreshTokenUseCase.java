@@ -15,6 +15,9 @@ public class RefreshTokenUseCase {
     @Autowired
     private AuthenticationService authenticationService;
 
+    /**
+     * Renueva un token de acceso utilizando un refresh token válido.
+     */
     public TokenResponse refreshToken(RefreshTokenRequest request) throws Exception {
         return authenticationService.refreshToken(request.getRefreshToken());
     }

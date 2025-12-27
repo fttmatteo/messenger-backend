@@ -18,7 +18,7 @@ public class ServiceDeliveryEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "plate_id", nullable = false)
-    private PlateEntity plate;
+    private PlateEntity plate; // Placa del vehículo del servicio
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "dealership_id", nullable = false)
@@ -30,13 +30,13 @@ public class ServiceDeliveryEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "current_status", nullable = false)
-    private Status currentStatus;
+    private Status currentStatus; // Estado actual del servicio
 
     private String observation;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "signature_id", referencedColumnName = "id_signature")
-    private SignatureEntity signature;
+    private SignatureEntity signature; // Firma digital de la entrega
 
     @OneToMany(mappedBy = "serviceDelivery", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PhotoEntity> photos = new ArrayList<>();

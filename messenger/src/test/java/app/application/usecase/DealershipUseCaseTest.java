@@ -57,6 +57,10 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe crear concesionario exitosamente")
+        /**
+         * Verifica que el caso de uso delegue correctamente la creación al servicio de
+         * dominio.
+         */
         void shouldCreateDealershipSuccessfully() throws Exception {
             when(createDealership.create(sampleDealership)).thenReturn(sampleDealership);
             dealershipUseCase.create(sampleDealership);
@@ -81,6 +85,10 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe retornar todos los concesionarios")
+        /**
+         * Verifica que se listen todos los concesionarios utilizando el servicio de
+         * búsqueda.
+         */
         void shouldReturnAllDealerships() {
             Dealership dealership2 = new Dealership();
             dealership2.setIdDealership(2L);
@@ -143,6 +151,9 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe actualizar concesionario exitosamente")
+        /**
+         * Verifica la delegación de actualización al servicio correspondiente.
+         */
         void shouldUpdateDealershipSuccessfully() throws Exception {
             sampleDealership.setAddress("Nueva dirección");
 
@@ -168,6 +179,9 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe eliminar concesionario por ID sin servicios")
+        /**
+         * Verifica la eliminación lógica o física delegada al servicio de dominio.
+         */
         void shouldDeleteDealershipByIdWithoutServices() throws Exception {
             dealershipUseCase.deleteById(1L);
 

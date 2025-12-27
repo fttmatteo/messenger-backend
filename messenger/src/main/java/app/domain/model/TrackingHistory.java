@@ -13,7 +13,7 @@ public class TrackingHistory {
     private Location location;
     private LocalDateTime recordedAt;
     private Long serviceDeliveryId; // Servicio activo en ese momento (puede ser null)
-    private TrackingSource source;
+    private TrackingSource source; // Fuente del dato (GPS, MANUAL, etc.)
     private Double speed; // km/h en el momento del registro
 
     public TrackingHistory() {

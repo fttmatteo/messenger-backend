@@ -26,6 +26,9 @@ class DeleteDealershipTest {
 
     @Test
     @DisplayName("Debe eliminar concesionario por ID si no tiene servicios")
+    /**
+     * Verifica que se elimine el concesionario si no tiene servicios asociados.
+     */
     void shouldDeleteByIdIfNoServices() throws Exception {
         Dealership d = new Dealership();
         d.setIdDealership(1L);

@@ -48,6 +48,9 @@ class CreateEmployeeTest {
 
         @Test
         @DisplayName("Debe crear empleado con contraseña encriptada")
+        /**
+         * Verifica que la contraseña del empleado sea encriptada antes de guardar.
+         */
         void shouldCreateEmployeeWithEncodedPassword() throws Exception {
             when(employeePort.findByDocument(123456789L)).thenReturn(null);
             when(passwordEncoder.encode("plainPassword123")).thenReturn("$2a$10$encodedHash");
@@ -61,6 +64,9 @@ class CreateEmployeeTest {
 
         @Test
         @DisplayName("Debe guardar empleado en el puerto")
+        /**
+         * Verifica la interacción correcta con el puerto de persistencia.
+         */
         void shouldSaveEmployeeToPort() throws Exception {
             when(employeePort.findByDocument(anyLong())).thenReturn(null);
             when(passwordEncoder.encode(anyString())).thenReturn("encoded");
@@ -91,6 +97,10 @@ class CreateEmployeeTest {
 
         @Test
         @DisplayName("Debe lanzar excepción si documento ya existe")
+        /**
+         * Verifica que se lance excepción si el documento de identidad ya está
+         * registrado.
+         */
         void shouldThrowExceptionIfDocumentExists() {
             Employee existingEmployee = new Employee();
             existingEmployee.setDocument(123456789L);

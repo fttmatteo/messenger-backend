@@ -14,15 +14,13 @@ import app.domain.ports.ServiceDeliveryPort;
 
 /**
  * Servicio para eliminar (soft delete) servicios de entrega.
- * 
- * Los servicios eliminados van a una papelera y se borran permanentemente
- * después de 60 días.
  */
 @Service
 public class DeleteServiceDelivery {
 
     @Autowired
     private ServiceDeliveryPort serviceDeliveryPort;
+
     @Autowired
     private EmployeePort employeePort;
 
@@ -65,7 +63,7 @@ public class DeleteServiceDelivery {
         // Registrar en el historial quien eliminó el servicio
         StatusHistory history = new StatusHistory();
         history.setPreviousStatus(previousStatus);
-        history.setNewStatus(previousStatus); // El estado no cambia, solo se marca como eliminado
+        history.setNewStatus(Status.DELETED); // El estado no cambia, solo se marca como eliminado
         history.setChangeDate(LocalDateTime.now());
         history.setChangedBy(user);
         service.addHistory(history);
@@ -78,7 +76,8 @@ public class DeleteServiceDelivery {
     }
 
     /**
-     * Restaura un servicio desde la papelera.
+     * Restaura un servicio previamente eliminado de la papelera.
+     * Solo permitido para administradores.
      */
     public ServiceDelivery restore(Long id, Long userId) throws Exception {
         ServiceDelivery service = serviceDeliveryPort.findById(id);
@@ -102,12 +101,19 @@ public class DeleteServiceDelivery {
         service.setDeleted(false);
         service.setDeletedAt(null);
 
+        // Registrar restauración en el historial
+        StatusHistory history = new StatusHistory();
+        history.setPreviousStatus(Status.DELETED);
+        history.setNewStatus(service.getCurrentStatus());
+        history.setChangeDate(LocalDateTime.now());
+        history.setChangedBy(user);
+        service.addHistory(history);
+
         return serviceDeliveryPort.save(service);
     }
 
     /**
-     * Elimina permanentemente un servicio de la papelera.
-     * Solo para uso administrativo o por el job de limpieza.
+     * Elimina permanentemente un servicio de la papelera (Hard Delete).
      */
     public void hardDelete(Long id) throws Exception {
         ServiceDelivery service = serviceDeliveryPort.findById(id);
@@ -123,9 +129,7 @@ public class DeleteServiceDelivery {
     }
 
     /**
-     * Vacía la papelera eliminando permanentemente todos los servicios eliminados.
-     * 
-     * @return número de servicios eliminados permanentemente
+     * Vacía la papelera eliminando permanentemente todos los elementos.
      */
     public int emptyTrash() {
         return serviceDeliveryPort.hardDeleteAllDeleted();
