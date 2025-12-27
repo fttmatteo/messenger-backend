@@ -297,6 +297,20 @@ public class ServiceDeliveryController {
     }
 
     /**
+     * Elimina permanentemente un servicio individual de la papelera (solo ADMIN).
+     */
+    @DeleteMapping("/trash/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, String>> permanentDeleteFromTrash(@PathVariable Long id) throws Exception {
+        logger.info("Solicitud eliminar permanentemente servicio ID: {} de papelera", id);
+
+        Employee currentUser = securityHelper.getCurrentUser();
+        serviceDeliveryUseCase.permanentDeleteById(id, currentUser.getIdEmployee());
+
+        return ResponseEntity.ok(Map.of("message", "Servicio eliminado permanentemente"));
+    }
+
+    /**
      * Obtiene estadísticas diarias de servicios para un mensajero.
      */
     @GetMapping("/stats/daily")

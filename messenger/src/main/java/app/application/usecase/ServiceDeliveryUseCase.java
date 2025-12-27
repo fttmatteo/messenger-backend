@@ -248,6 +248,13 @@ public class ServiceDeliveryUseCase {
         return deleteService.emptyTrash();
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @AuditableAction(action = "PERMANENT_DELETE", description = "Eliminar permanentemente un servicio de la papelera")
+    public void permanentDeleteById(Long id, Long userId) throws Exception {
+        logger.info("Eliminando permanentemente servicio ID: {} por usuario ID: {}", id, userId);
+        deleteService.hardDelete(id);
+    }
+
     private void cleanupFiles(String... paths) {
         for (String path : paths) {
             try {
