@@ -60,7 +60,7 @@ class TrackingAdapterTest {
 
         trackingAdapter.saveLiveLocation(tracking);
 
-        verify(valueOperations).set(anyString(), eq(tracking), eq(5L), eq(TimeUnit.MINUTES));
+        verify(valueOperations).set(anyString(), eq(tracking), eq(30L), eq(TimeUnit.SECONDS));
     }
 
     @Test
