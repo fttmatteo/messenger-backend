@@ -69,7 +69,9 @@ public class ServiceDeliveryController {
             @RequestParam("image") MultipartFile image,
             @RequestParam("dealershipId") String dealershipId,
             @RequestParam(value = "messengerId", required = false) String messengerId,
-            @RequestParam(value = "manualPlateNumber", required = false) String manualPlateNumber) throws Exception {
+            @RequestParam(value = "manualPlateNumber", required = false) String manualPlateNumber,
+            @RequestParam(value = "latitude", required = false) Double latitude,
+            @RequestParam(value = "longitude", required = false) Double longitude) throws Exception {
 
         logger.info("Solicitud creación servicio. DealershipId: {}", dealershipId);
 
@@ -86,6 +88,8 @@ public class ServiceDeliveryController {
 
         ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest(dealershipId, finalMessengerId);
         request.setManualPlateNumber(manualPlateNumber);
+        request.setLatitude(latitude);
+        request.setLongitude(longitude);
 
         ServiceDeliveryBuilder.ServiceDeliveryCreateData data = builder.buildCreateData(request);
 
