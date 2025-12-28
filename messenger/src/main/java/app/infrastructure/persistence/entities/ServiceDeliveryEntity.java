@@ -132,8 +132,10 @@ public class ServiceDeliveryEntity {
     private java.time.LocalDateTime deletedAt;
 
     /**
-     * Fecha y hora en que el servicio fue bloqueado (DELIVERED/RESOLVED). Ventana
-     * de 72h para edición.
+     * @deprecated Este campo ya no se utiliza. Anteriormente marcaba cuando un
+     *             servicio
+     *             entraba en ventana de 72h para edición (estados
+     *             DELIVERED/RESOLVED).
      */
     @Column(name = "locked_at")
     private java.time.LocalDateTime lockedAt;

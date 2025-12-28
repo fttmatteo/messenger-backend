@@ -36,9 +36,8 @@ import org.slf4j.LoggerFactory;
  * 
  * Reglas de negocio:
  * - Mensajero: solo puede usar PENDING, DELIVERED, RETURNED
- * - Admin: solo puede usar CANCELED, RESOLVED y reasignar mensajero
- * - PENDING bloquea al mensajero hasta que admin use CANCELED/RESOLVED
- * - DELIVERED/RESOLVED: 72h para editar, después bloqueado
+ * - Admin: solo puede usar CANCELED, RESOLVED y reasignar mensajero (cuando
+ * está CANCELED)
  * - Eliminación va a papelera (60 días para borrado permanente)
  */
 @RestController

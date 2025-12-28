@@ -445,14 +445,23 @@ stateDiagram-v2
         ASSIGNED --> PENDING
         ASSIGNED --> DELIVERED
         ASSIGNED --> RETURNED
+        PENDING --> DELIVERED
+        PENDING --> RETURNED
         RETURNED --> PENDING
         RETURNED --> DELIVERED
+        DELIVERED --> PENDING
+        DELIVERED --> RETURNED
     }
     
     state Admin_Actions {
+        ASSIGNED --> RESOLVED
+        ASSIGNED --> CANCELED
         PENDING --> RESOLVED
         PENDING --> CANCELED
-        DELIVERED --> CANCELED: 72h Limit
+        DELIVERED --> CANCELED
+        DELIVERED --> RESOLVED
+        RETURNED --> CANCELED
+        RETURNED --> RESOLVED
         CANCELED --> ASSIGNED: Reassign
     }
 ```
@@ -463,13 +472,8 @@ stateDiagram-v2
 > **Role-Based Status Transitions**
 > - **MESSENGER** can only use: `PENDING`, `DELIVERED`, `RETURNED`.
 > - **ADMIN** can only use: `CANCELED`, `RESOLVED`.
-> - **RESOLVED** state can ONLY be reached from **PENDING**.
-> - **CANCELED** state can be reached from any state (except final states).
-
-> [!WARNING]
-> **Edit Lock (72-Hour Window)**
-> When a service is updated to `DELIVERED` or `RESOLVED`, a **72-hour window** starts. 
-> After this period, the service becomes **immutable** (no status or data changes allowed).
+> - Services can be modified at any time regardless of their current state.
+> - Admins can reassign **CANCELED** services to another messenger.
 
 > [!NOTE]
 > **Evidence Requirements**
@@ -484,21 +488,21 @@ stateDiagram-v2
 
 ### State Rules
 
-| State | Messenger | Admin | Delete | Edit Lock |
-|-------|-----------|-------|--------|-----------|
-| `ASSIGNED` | → `PENDING`, `DELIVERED`, `RETURNED` | → `CANCELED` | ✅ Trash | - |
-| `RETURNED` | → `PENDING`, `DELIVERED` | → `CANCELED` | ✅ Trash | - |
-| `PENDING` | 🔒 **Locked** until admin intervenes | → `CANCELED`, `RESOLVED` | ✅ Trash | - |
-| `DELIVERED` | 🔒 **Locked** until admin intervenes | → `CANCELED`, `RESOLVED` | ❌ Protected after 72h | ⏱️ 72h |
-| `CANCELED` | - | Admin can **reassign** → `ASSIGNED` | ✅ Trash | - |
-| `RESOLVED` | - | 🔒 **Immutable** (Final State) | ❌ Protected after 72h | ⏱️ 72h |
+| State | Messenger | Admin | Delete |
+|-------|-----------|-------|--------|
+| `ASSIGNED` | → `PENDING`, `DELIVERED`, `RETURNED` | → `CANCELED`, `RESOLVED` | ✅ Trash |
+| `RETURNED` | → `PENDING`, `DELIVERED` | → `CANCELED`, `RESOLVED` | ✅ Trash |
+| `PENDING` | → `DELIVERED`, `RETURNED` | → `CANCELED`, `RESOLVED` | ✅ Trash |
+| `DELIVERED` | → `PENDING`, `RETURNED` | → `CANCELED`, `RESOLVED` | ✅ Trash |
+| `CANCELED` | - | Admin can **reassign** → `ASSIGNED` | ✅ Trash |
+| `RESOLVED` | - | - | ✅ Trash |
 
 ### Permissions Summary
 
 | Role | Available States | Special Actions | Notes |
 |------|------------------|-----------------|-------|
-| **MESSENGER** | `PENDING`, `DELIVERED`, `RETURNED` | - | Blocked after using `PENDING` or `DELIVERED` until admin intervenes |
-| **ADMIN** | `CANCELED`, `RESOLVED` | **Reassign messenger** (from `CANCELED` only) | Can unlock blocked services or solve pending issues |
+| **MESSENGER** | `PENDING`, `DELIVERED`, `RETURNED` | - | Can change services to any allowed state at any time |
+| **ADMIN** | `CANCELED`, `RESOLVED` | **Reassign messenger** (from `CANCELED` only) | Can change services to admin states from any current state |
 
 ### Reassignment Flow
 
@@ -507,7 +511,6 @@ flowchart LR
     A[Service in CANCELED] --> B{Admin reassigns}
     B --> C[New messenger assigned]
     C --> D[Status → ASSIGNED]
-    D --> E[72h lock reset]
 ```
 
 ### Trash Management (Soft Delete)

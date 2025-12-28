@@ -33,9 +33,6 @@ import app.infrastructure.audit.AuditableAction;
  * - Creación automática con estado ASSIGNED al mensajero autenticado
  * - Mensajero: solo puede usar PENDING, DELIVERED, RETURNED
  * - Admin: solo puede usar CANCELED, RESOLVED y reasignar mensajero
- * - Cuando mensajero usa PENDING → bloqueado hasta que admin use
- * CANCELED/RESOLVED
- * - DELIVERED/RESOLVED → 72 horas para cambiar estado, después bloqueado
  * - Eliminación → Papelera (soft delete) con borrado definitivo a los 60 días
  */
 @Service
