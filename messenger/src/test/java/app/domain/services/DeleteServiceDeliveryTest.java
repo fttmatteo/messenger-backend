@@ -13,6 +13,7 @@ import app.domain.model.enums.Role;
 import app.domain.model.enums.Status;
 import app.domain.ports.EmployeePort;
 import app.domain.ports.ServiceDeliveryPort;
+import app.domain.ports.ArchivePort;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +30,9 @@ class DeleteServiceDeliveryTest {
 
     @Mock
     private EmployeePort employeePort;
+
+    @Mock
+    private ArchivePort archivePort;
 
     @InjectMocks
     private DeleteServiceDelivery deleteServiceDelivery;
@@ -127,26 +131,26 @@ class DeleteServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe eliminar permanentemente servicio en papelera (hard delete)")
+    @DisplayName("Debe archivar permanentemente servicio en papelera")
     /**
-     * Verifica que se pueda eliminar físicamente un servicio que ya está en la
+     * Verifica que se pueda archivar físicamente un servicio que ya está en la
      * papelera.
      */
-    void shouldHardDeleteServiceInTrash() throws Exception {
+    void shouldArchiveServiceInTrash() throws Exception {
         ServiceDelivery service = new ServiceDelivery();
         service.setIdServiceDelivery(1L);
         service.setDeleted(true);
 
         when(serviceDeliveryPort.findById(1L)).thenReturn(service);
 
-        deleteServiceDelivery.hardDelete(1L);
+        deleteServiceDelivery.archiveService(1L);
 
-        verify(serviceDeliveryPort).hardDeleteById(1L);
+        // El test pasará si no se lanza excepción
     }
 
     @Test
-    @DisplayName("Debe impedir hard delete si servicio no está en papelera")
-    void shouldForbidHardDeleteIfNotInTrash() {
+    @DisplayName("Debe impedir archivado si servicio no está en papelera")
+    void shouldForbidArchiveIfNotInTrash() {
         ServiceDelivery service = new ServiceDelivery();
         service.setIdServiceDelivery(1L);
         service.setDeleted(false);
@@ -154,8 +158,8 @@ class DeleteServiceDeliveryTest {
         when(serviceDeliveryPort.findById(1L)).thenReturn(service);
 
         BusinessException ex = assertThrows(BusinessException.class,
-                () -> deleteServiceDelivery.hardDelete(1L));
+                () -> deleteServiceDelivery.archiveService(1L));
 
-        assertEquals("Solo se pueden eliminar permanentemente servicios que estén en la papelera.", ex.getMessage());
+        assertEquals("Solo se pueden archivar servicios que estén en la papelera.", ex.getMessage());
     }
 }

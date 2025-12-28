@@ -20,7 +20,11 @@ public class ServiceDeliveryBuilder {
         Long dealershipId = validator.idValidator(request.getDealershipId());
         Long messengerId = validator.idValidator(request.getMessengerId());
 
-        return new ServiceDeliveryCreateData(dealershipId, messengerId);
+        ServiceDeliveryCreateData data = new ServiceDeliveryCreateData(dealershipId, messengerId);
+        if (request.getLatitude() != null && request.getLongitude() != null) {
+            data.setLocation(request.getLatitude(), request.getLongitude());
+        }
+        return data;
     }
 
     public ServiceDeliveryUpdateData buildUpdateStatusData(ServiceDeliveryUpdateStatusRequest request)
@@ -29,16 +33,27 @@ public class ServiceDeliveryBuilder {
         String observation = validator.observationValidator(request.getObservation());
         Long userId = validator.idValidator(request.getUserId());
 
-        return new ServiceDeliveryUpdateData(status, observation, userId);
+        ServiceDeliveryUpdateData data = new ServiceDeliveryUpdateData(status, observation, userId);
+        if (request.getLatitude() != null && request.getLongitude() != null) {
+            data.setLocation(request.getLatitude(), request.getLongitude());
+        }
+        return data;
     }
 
     public static class ServiceDeliveryCreateData {
         private final Long dealershipId;
         private final Long messengerId;
+        private Double latitude;
+        private Double longitude;
 
         public ServiceDeliveryCreateData(Long dealershipId, Long messengerId) {
             this.dealershipId = dealershipId;
             this.messengerId = messengerId;
+        }
+
+        public void setLocation(Double latitude, Double longitude) {
+            this.latitude = latitude;
+            this.longitude = longitude;
         }
 
         public Long getDealershipId() {
@@ -47,6 +62,14 @@ public class ServiceDeliveryBuilder {
 
         public Long getMessengerId() {
             return messengerId;
+        }
+
+        public Double getLatitude() {
+            return latitude;
+        }
+
+        public Double getLongitude() {
+            return longitude;
         }
     }
 
@@ -71,6 +94,22 @@ public class ServiceDeliveryBuilder {
 
         public Long getUserId() {
             return userId;
+        }
+
+        private Double latitude;
+        private Double longitude;
+
+        public void setLocation(Double latitude, Double longitude) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+        }
+
+        public Double getLatitude() {
+            return latitude;
+        }
+
+        public Double getLongitude() {
+            return longitude;
         }
     }
 }

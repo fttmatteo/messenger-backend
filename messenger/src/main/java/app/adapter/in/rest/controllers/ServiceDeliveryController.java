@@ -36,9 +36,8 @@ import org.slf4j.LoggerFactory;
  * 
  * Reglas de negocio:
  * - Mensajero: solo puede usar PENDING, DELIVERED, RETURNED
- * - Admin: solo puede usar CANCELED, RESOLVED y reasignar mensajero
- * - PENDING bloquea al mensajero hasta que admin use CANCELED/RESOLVED
- * - DELIVERED/RESOLVED: 72h para editar, después bloqueado
+ * - Admin: solo puede usar CANCELED, RESOLVED y reasignar mensajero (cuando
+ * está CANCELED)
  * - Eliminación va a papelera (60 días para borrado permanente)
  */
 @RestController
@@ -69,7 +68,9 @@ public class ServiceDeliveryController {
             @RequestParam("image") MultipartFile image,
             @RequestParam("dealershipId") String dealershipId,
             @RequestParam(value = "messengerId", required = false) String messengerId,
-            @RequestParam(value = "manualPlateNumber", required = false) String manualPlateNumber) throws Exception {
+            @RequestParam(value = "manualPlateNumber", required = false) String manualPlateNumber,
+            @RequestParam(value = "latitude", required = false) Double latitude,
+            @RequestParam(value = "longitude", required = false) Double longitude) throws Exception {
 
         logger.info("Solicitud creación servicio. DealershipId: {}", dealershipId);
 
@@ -86,6 +87,8 @@ public class ServiceDeliveryController {
 
         ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest(dealershipId, finalMessengerId);
         request.setManualPlateNumber(manualPlateNumber);
+        request.setLatitude(latitude);
+        request.setLongitude(longitude);
 
         ServiceDeliveryBuilder.ServiceDeliveryCreateData data = builder.buildCreateData(request);
 
@@ -96,12 +99,16 @@ public class ServiceDeliveryController {
                         imageFile,
                         manualPlateNumber,
                         data.getDealershipId(),
-                        data.getMessengerId());
+                        data.getMessengerId(),
+                        data.getLatitude(),
+                        data.getLongitude());
             } else {
                 created = serviceDeliveryUseCase.createServiceFromImage(
                         imageFile,
                         data.getDealershipId(),
-                        data.getMessengerId());
+                        data.getMessengerId(),
+                        data.getLatitude(),
+                        data.getLongitude());
             }
             return ResponseEntity.status(HttpStatus.CREATED).body(responseMapper.toResponse(created));
         });
@@ -118,7 +125,9 @@ public class ServiceDeliveryController {
             @RequestParam("status") String status,
             @RequestParam(value = "observation", required = false) String observation,
             @RequestParam(value = "signature", required = false) MultipartFile signature,
-            @RequestParam(value = "photos", required = false) List<MultipartFile> photos) throws Exception {
+            @RequestParam(value = "photos", required = false) List<MultipartFile> photos,
+            @RequestParam(value = "latitude", required = false) Double latitude,
+            @RequestParam(value = "longitude", required = false) Double longitude) throws Exception {
 
         logger.info("Solicitud actualización servicio ID: {} a status: {}", id, status);
 
@@ -129,6 +138,9 @@ public class ServiceDeliveryController {
 
             ServiceDeliveryUpdateStatusRequest request = new ServiceDeliveryUpdateStatusRequest(status, observation,
                     userId);
+            request.setLatitude(latitude);
+            request.setLongitude(longitude);
+
             ServiceDeliveryBuilder.ServiceDeliveryUpdateData data = builder.buildUpdateStatusData(request);
 
             File signatureFile = null;
@@ -142,7 +154,7 @@ public class ServiceDeliveryController {
 
             ServiceDelivery updated = serviceDeliveryUseCase.updateStatusWithFiles(id, data.getStatus(),
                     data.getObservation(),
-                    signatureFile, photoFiles, data.getUserId());
+                    signatureFile, photoFiles, data.getUserId(), data.getLatitude(), data.getLongitude());
 
             return ResponseEntity.ok(responseMapper.toResponse(updated));
         } finally {

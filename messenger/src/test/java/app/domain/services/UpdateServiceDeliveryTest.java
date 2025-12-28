@@ -72,9 +72,6 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe actualizar estado a PENDING con evidencias completas")
-    /**
-     * Verifica transición exitosa a PENDING cuando se provee firma y evidencias.
-     */
     void shouldUpdateStatusToPendingWhenEvidenceComplete() throws Exception {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(1L)).thenReturn(messenger);
@@ -101,9 +98,6 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si falta firma para estado PENDING")
-    /**
-     * Verifica obligatoriedad de la firma para pasar a estado PENDING.
-     */
     void shouldThrowExceptionIfSignatureMissingForPending() {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(1L)).thenReturn(messenger);
@@ -116,9 +110,6 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si falta foto para estado RETURNED")
-    /**
-     * Verifica obligatoriedad de evidencia fotográfica para marcar como RETURNED.
-     */
     void shouldThrowExceptionIfPhotoMissingForReturned() {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(1L)).thenReturn(messenger);
@@ -130,11 +121,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe permitir ADMIN cambiar a CANCELED desde ASSIGNED")
-    /**
-     * Verifica que un ADMIN pueda cancelar un servicio desde estado ASSIGNED.
-     */
-    void shouldAllowCanceledOnlyForAdminFromAssigned() throws Exception {
+    @DisplayName("Debe permitir ADMIN cambiar a CANCELED desde cualquier estado")
+    void shouldAllowCanceledForAdminFromAnyState() throws Exception {
         service.setCurrentStatus(Status.ASSIGNED);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(2L)).thenReturn(admin);
@@ -161,66 +149,23 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe impedir MESSENGER actualizar desde PENDING (bloqueado)")
-    /**
-     * Verifica que el mensajero no pueda mover el servicio una vez está en PENDING
-     * (requiere acción admin).
-     */
-    void shouldBlockMessengerFromPending() {
+    @DisplayName("Debe permitir MESSENGER actualizar desde cualquier estado no final")
+    void shouldAllowMessengerToUpdateFromAnyNonFinalState() throws Exception {
+        // Con las nuevas reglas simplificadas, el mensajero puede cambiar desde
+        // cualquier estado no final
         service.setCurrentStatus(Status.PENDING);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(1L)).thenReturn(messenger);
+        when(serviceDeliveryPort.save(argThat(s -> s.getCurrentStatus() == Status.DELIVERED))).thenReturn(service);
 
-        BusinessException ex = assertThrows(BusinessException.class,
-                () -> updateServiceDelivery.updateStatus(1L, Status.DELIVERED, "Obs", signature, null, 1L));
+        updateServiceDelivery.updateStatus(1L, Status.DELIVERED, "Entrega completada", signature, null, 1L);
 
-        assertEquals("El servicio está en estado PENDING. Solo un administrador puede cambiarlo a CANCELED o RESOLVED.",
-                ex.getMessage());
+        verify(serviceDeliveryPort).save(argThat(s -> s.getCurrentStatus() == Status.DELIVERED));
     }
 
     @Test
-    @DisplayName("Debe impedir MESSENGER actualizar desde DELIVERED (bloqueado)")
-    void shouldBlockMessengerFromDelivered() {
-        service.setCurrentStatus(Status.DELIVERED);
-        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
-        when(employeePort.findById(1L)).thenReturn(messenger);
-
-        BusinessException ex = assertThrows(BusinessException.class,
-                () -> updateServiceDelivery.updateStatus(1L, Status.RETURNED, "Obs", signature, photos, 1L));
-
-        assertEquals("El servicio ya fue marcado como ENTREGADO. Solo un administrador puede modificar su estado.",
-                ex.getMessage());
-    }
-
-    @Test
-    @DisplayName("Debe impedir cambio desde estado CANCELED (final)")
-    void shouldForbidTransitionFromCanceled() {
-        service.setCurrentStatus(Status.CANCELED);
-        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
-        when(employeePort.findById(2L)).thenReturn(admin);
-
-        BusinessException ex = assertThrows(BusinessException.class,
-                () -> updateServiceDelivery.updateStatus(1L, Status.RESOLVED, "Obs", null, null, 2L));
-
-        assertEquals("El servicio está en estado final CANCELED y no se puede modificar.", ex.getMessage());
-    }
-
-    @Test
-    @DisplayName("Debe impedir cambio desde estado RESOLVED (final)")
-    void shouldForbidTransitionFromResolved() {
-        service.setCurrentStatus(Status.RESOLVED);
-        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
-        when(employeePort.findById(2L)).thenReturn(admin);
-
-        BusinessException ex = assertThrows(BusinessException.class,
-                () -> updateServiceDelivery.updateStatus(1L, Status.CANCELED, "Obs", null, null, 2L));
-
-        assertEquals("El servicio está en estado final RESOLVED y no se puede modificar.", ex.getMessage());
-    }
-
-    @Test
-    @DisplayName("Debe permitir ADMIN cambiar a RESOLVED desde PENDING")
-    void shouldAllowResolvedOnlyForAdminFromPending() throws Exception {
+    @DisplayName("Debe permitir ADMIN cambiar a RESOLVED desde cualquier estado")
+    void shouldAllowResolvedForAdminFromAnyState() throws Exception {
         service.setCurrentStatus(Status.PENDING);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(2L)).thenReturn(admin);
@@ -260,45 +205,17 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe bloquear edición después de 72 horas")
-    void shouldBlockEditAfter72Hours() {
+    @DisplayName("Debe permitir cambiar estado DELIVERED sin restricción de tiempo")
+    void shouldAllowDeliveredUpdateWithoutTimeRestriction() throws Exception {
+        // Con las nuevas reglas simplificadas, no hay restricción de 72 horas
         service.setCurrentStatus(Status.DELIVERED);
-        service.setLockedAt(java.time.LocalDateTime.now().minusHours(73)); // Pasaron 73 horas
-        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
-        when(employeePort.findById(2L)).thenReturn(admin);
-
-        BusinessException ex = assertThrows(BusinessException.class,
-                () -> updateServiceDelivery.updateStatus(1L, Status.RESOLVED, "Obs", null, null, 2L));
-
-        assertTrue(ex.getMessage().contains("El período de edición de 72 horas ha expirado"));
-    }
-
-    @Test
-    @DisplayName("Debe permitir edición dentro de 72 horas")
-    void shouldAllowEditWithin72Hours() throws Exception {
-        service.setCurrentStatus(Status.DELIVERED);
-        service.setLockedAt(java.time.LocalDateTime.now().minusHours(50)); // Solo 50 horas
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(2L)).thenReturn(admin);
         when(serviceDeliveryPort.save(argThat(s -> s.getCurrentStatus() == Status.CANCELED))).thenReturn(service);
 
-        updateServiceDelivery.updateStatus(1L, Status.CANCELED, "Cancelado dentro de ventana", null, null, 2L);
+        updateServiceDelivery.updateStatus(1L, Status.CANCELED, "Cancelado sin límite de tiempo", null, null, 2L);
 
         verify(serviceDeliveryPort).save(argThat(s -> s.getCurrentStatus() == Status.CANCELED));
-    }
-
-    @Test
-    @DisplayName("Debe establecer lockedAt al cambiar a DELIVERED")
-    void shouldSetLockedAtWhenDelivered() throws Exception {
-        service.setCurrentStatus(Status.ASSIGNED);
-        when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
-        when(employeePort.findById(1L)).thenReturn(messenger);
-        when(serviceDeliveryPort.save(argThat(s -> s.getLockedAt() != null))).thenReturn(service);
-
-        updateServiceDelivery.updateStatus(1L, Status.DELIVERED, null, signature, null, 1L);
-
-        verify(serviceDeliveryPort)
-                .save(argThat(s -> s.getCurrentStatus() == Status.DELIVERED && s.getLockedAt() != null));
     }
 
     @Test
@@ -337,10 +254,6 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe impedir reasignación si no es ADMIN")
-    /**
-     * Verifica que solo los administradores tengan permiso para reasignar
-     * servicios.
-     */
     void shouldForbidReassignIfNotAdmin() {
         service.setCurrentStatus(Status.CANCELED);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -350,9 +263,5 @@ class UpdateServiceDeliveryTest {
                 () -> updateServiceDelivery.reassignMessenger(1L, 3L, 1L));
 
         assertEquals("Solo los administradores pueden reasignar servicios.", ex.getMessage());
-    }
-
-    private static void assertTrue(boolean condition) {
-        org.junit.jupiter.api.Assertions.assertTrue(condition);
     }
 }

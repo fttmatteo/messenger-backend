@@ -33,9 +33,6 @@ import app.infrastructure.audit.AuditableAction;
  * - Creación automática con estado ASSIGNED al mensajero autenticado
  * - Mensajero: solo puede usar PENDING, DELIVERED, RETURNED
  * - Admin: solo puede usar CANCELED, RESOLVED y reasignar mensajero
- * - Cuando mensajero usa PENDING → bloqueado hasta que admin use
- * CANCELED/RESOLVED
- * - DELIVERED/RESOLVED → 72 horas para cambiar estado, después bloqueado
  * - Eliminación → Papelera (soft delete) con borrado definitivo a los 60 días
  */
 @Service
@@ -62,7 +59,8 @@ public class ServiceDeliveryUseCase {
      */
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "CREATE_SERVICE", description = "Crear servicio desde imagen OCR")
-    public ServiceDelivery createServiceFromImage(File imageFile, Long dealershipId, Long messengerId)
+    public ServiceDelivery createServiceFromImage(File imageFile, Long dealershipId, Long messengerId, Double latitude,
+            Double longitude)
             throws Exception {
         logger.info("Iniciando creación de servicio desde imagen. DealershipId: {}, MessengerId: {}", dealershipId,
                 messengerId);
@@ -74,7 +72,8 @@ public class ServiceDeliveryUseCase {
         String savedPath = storagePort.save(imageFile, "detections", fileName);
 
         try {
-            ServiceDelivery service = createService.create(extractedText, savedPath, dealershipId, messengerId);
+            ServiceDelivery service = createService.create(extractedText, savedPath, dealershipId, messengerId,
+                    latitude, longitude);
             logger.info("Servicio creado exitosamente con ID: {}", service.getIdServiceDelivery());
             return service;
         } catch (Exception e) {
@@ -90,7 +89,7 @@ public class ServiceDeliveryUseCase {
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "CREATE_SERVICE_MANUAL", description = "Crear servicio con placa manual")
     public ServiceDelivery createServiceWithManualPlate(File imageFile, String manualPlateNumber, Long dealershipId,
-            Long messengerId) throws Exception {
+            Long messengerId, Double latitude, Double longitude) throws Exception {
         logger.info("Iniciando creación de servicio manual. Placa: {}, DealershipId: {}, MessengerId: {}",
                 manualPlateNumber, dealershipId, messengerId);
         String timestamp = LocalDateTime.now().format(DATE_FORMAT);
@@ -99,7 +98,8 @@ public class ServiceDeliveryUseCase {
         String savedPath = storagePort.save(imageFile, "detections", fileName);
 
         try {
-            ServiceDelivery service = createService.create(manualPlateNumber, savedPath, dealershipId, messengerId);
+            ServiceDelivery service = createService.create(manualPlateNumber, savedPath, dealershipId, messengerId,
+                    latitude, longitude);
             logger.info("Servicio manual creado exitosamente con ID: {}", service.getIdServiceDelivery());
             return service;
         } catch (Exception e) {
@@ -110,13 +110,22 @@ public class ServiceDeliveryUseCase {
     }
 
     /**
+     * Actualiza el estado de un servicio existente (Sobrecarga compatible).
+     */
+    public ServiceDelivery updateStatus(Long serviceId, Status newStatus, String observation,
+            Signature signature, List<Photo> photos, Long userId) throws Exception {
+        return updateStatus(serviceId, newStatus, observation, signature, photos, userId, null, null);
+    }
+
+    /**
      * Actualiza el estado de un servicio existente.
      */
     @AuditableAction(action = "UPDATE_STATUS", description = "Actualizar estado de servicio")
     public ServiceDelivery updateStatus(Long serviceId, Status newStatus, String observation,
-            Signature signature, List<Photo> photos, Long userId) throws Exception {
+            Signature signature, List<Photo> photos, Long userId, Double latitude, Double longitude) throws Exception {
         logger.info("Actualizando estado de servicio ID: {} a {}", serviceId, newStatus);
-        return updateService.updateStatus(serviceId, newStatus, observation, signature, photos, userId);
+        return updateService.updateStatus(serviceId, newStatus, observation, signature, photos, userId, latitude,
+                longitude);
     }
 
     /**
@@ -124,7 +133,8 @@ public class ServiceDeliveryUseCase {
      * firmas).
      */
     public ServiceDelivery updateStatusWithFiles(Long serviceId, Status newStatus, String observation,
-            File signatureFile, List<File> photoFiles, Long userId) throws Exception {
+            File signatureFile, List<File> photoFiles, Long userId, Double latitude, Double longitude)
+            throws Exception {
         logger.info("Actualizando estado con archivos. ServiceID: {}, NuevoEstado: {}", serviceId, newStatus);
 
         ServiceDelivery service = searchService.findById(serviceId);
@@ -160,7 +170,7 @@ public class ServiceDeliveryUseCase {
 
         try {
             ServiceDelivery updated = updateService.updateStatus(serviceId, newStatus, observation, signature, photos,
-                    userId);
+                    userId, latitude, longitude);
             logger.info("Estado actualizado exitosamente para servicio ID: {}", serviceId);
             return updated;
         } catch (Exception e) {
@@ -249,10 +259,10 @@ public class ServiceDeliveryUseCase {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    @AuditableAction(action = "PERMANENT_DELETE", description = "Eliminar permanentemente un servicio de la papelera")
+    @AuditableAction(action = "ARCHIVE_SERVICE", description = "Archivar permanentemente un servicio de la papelera")
     public void permanentDeleteById(Long id, Long userId) throws Exception {
-        logger.info("Eliminando permanentemente servicio ID: {} por usuario ID: {}", id, userId);
-        deleteService.hardDelete(id);
+        logger.info("Archivando permanentemente servicio ID: {} por usuario ID: {}", id, userId);
+        deleteService.archiveService(id);
     }
 
     private void cleanupFiles(String... paths) {
