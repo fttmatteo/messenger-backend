@@ -13,6 +13,7 @@ import app.domain.model.enums.Role;
 import app.domain.model.enums.Status;
 import app.domain.ports.EmployeePort;
 import app.domain.ports.ServiceDeliveryPort;
+import app.domain.ports.ArchivePort;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +32,7 @@ class DeleteServiceDeliveryTest {
     private EmployeePort employeePort;
 
     @Mock
-    private ArchiveServiceService archiveServiceService;
+    private ArchivePort archivePort;
 
     @InjectMocks
     private DeleteServiceDelivery deleteServiceDelivery;

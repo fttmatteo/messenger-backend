@@ -9,6 +9,7 @@ import app.domain.model.ServiceDelivery;
 import app.domain.model.StatusHistory;
 import app.domain.model.enums.Role;
 import app.domain.model.enums.Status;
+import app.domain.ports.ArchivePort;
 import app.domain.ports.EmployeePort;
 import app.domain.ports.ServiceDeliveryPort;
 
@@ -25,7 +26,7 @@ public class DeleteServiceDelivery {
     private EmployeePort employeePort;
 
     @Autowired
-    private ArchiveServiceService archiveServiceService;
+    private ArchivePort archivePort;
 
     /**
      * Mueve un servicio a la papelera (soft delete).
@@ -129,7 +130,7 @@ public class DeleteServiceDelivery {
             throw new BusinessException("Solo se pueden archivar servicios que estén en la papelera.");
         }
 
-        archiveServiceService.archiveService(service, null, "Manual archive");
+        archivePort.archiveService(service, null, "Manual archive");
     }
 
     /**
@@ -147,7 +148,7 @@ public class DeleteServiceDelivery {
         // Archivar cada servicio (en lugar de borrar)
         for (ServiceDelivery service : deletedServices) {
             try {
-                archiveServiceService.archiveService(service, null, "Manual trash empty");
+                archivePort.archiveService(service, null, "Manual trash empty");
             } catch (Exception e) {
                 // Log error pero continuar con el siguiente
                 System.err

@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import app.domain.model.ServiceDelivery;
 import app.domain.ports.ServiceDeliveryPort;
-import app.domain.services.ArchiveServiceService;
+import app.infrastructure.service.ArchiveServiceService;
 
 /**
  * Job programado para archivar servicios de la papelera después de 60 días.

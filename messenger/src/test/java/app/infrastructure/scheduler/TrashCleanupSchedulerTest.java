@@ -1,99 +1,103 @@
 package app.infrastructure.scheduler;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-import app.domain.model.ServiceDelivery;
-import app.domain.ports.ServiceDeliveryPort;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+
+import app.domain.model.ServiceDelivery;
+import app.domain.ports.ServiceDeliveryPort;
+import app.infrastructure.service.ArchiveServiceService;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("TrashCleanupScheduler Unit Tests")
 class TrashCleanupSchedulerTest {
 
-    @Mock
-    private ServiceDeliveryPort serviceDeliveryPort;
+        @Mock
+        private ServiceDeliveryPort serviceDeliveryPort;
 
-    @InjectMocks
-    private TrashCleanupScheduler trashCleanupScheduler;
+        @Mock
+        private ArchiveServiceService archiveServiceService;
 
-    @BeforeEach
-    void setUp() {
-        ReflectionTestUtils.setField(trashCleanupScheduler, "retentionDays", 60);
-    }
+        @InjectMocks
+        private TrashCleanupScheduler scheduler;
 
-    @Test
-    @DisplayName("Debe eliminar permanentemente servicios expirados en papelera")
-    /**
-     * Verifica que el scheduler llame al hardDelete para items caducados en la
-     * papelera.
-     */
-    void shouldHardDeleteExpiredServices() {
-        ServiceDelivery expiredService1 = new ServiceDelivery();
-        expiredService1.setIdServiceDelivery(1L);
-        expiredService1.setDeleted(true);
-        expiredService1.setDeletedAt(LocalDateTime.now().minusDays(70));
+        @Test
+        @DisplayName("Should archive expired services from trash")
+        void shouldArchiveExpiredServices() {
+                // Given
+                ServiceDelivery service1 = new ServiceDelivery();
+                service1.setIdServiceDelivery(1L);
+                service1.setDeleted(true);
+                service1.setDeletedAt(LocalDateTime.now().minusDays(65));
 
-        ServiceDelivery expiredService2 = new ServiceDelivery();
-        expiredService2.setIdServiceDelivery(2L);
-        expiredService2.setDeleted(true);
-        expiredService2.setDeletedAt(LocalDateTime.now().minusDays(65));
+                ServiceDelivery service2 = new ServiceDelivery();
+                service2.setIdServiceDelivery(2L);
+                service2.setDeleted(true);
+                service2.setDeletedAt(LocalDateTime.now().minusDays(70));
 
-        when(serviceDeliveryPort.findDeletedExpiredBefore(any(LocalDateTime.class)))
-                .thenReturn(Arrays.asList(expiredService1, expiredService2));
+                when(serviceDeliveryPort.findDeletedExpiredBefore(any(LocalDateTime.class)))
+                                .thenReturn(Arrays.asList(service1, service2));
 
-        trashCleanupScheduler.cleanupExpiredTrash();
+                // When
+                scheduler.cleanupExpiredTrash();
 
-        verify(serviceDeliveryPort).hardDeleteById(1L);
-        verify(serviceDeliveryPort).hardDeleteById(2L);
-        verify(serviceDeliveryPort, times(2)).hardDeleteById(anyLong());
-    }
+                // Then
+                verify(archiveServiceService, times(2)).archiveService(
+                                any(ServiceDelivery.class),
+                                eq(null),
+                                anyString());
+        }
 
-    @Test
-    @DisplayName("No debe hacer nada si no hay servicios expirados")
-    void shouldDoNothingIfNoExpiredServices() {
-        when(serviceDeliveryPort.findDeletedExpiredBefore(any(LocalDateTime.class)))
-                .thenReturn(Collections.emptyList());
+        @Test
+        @DisplayName("Should do nothing when no expired services")
+        void shouldDoNothingWhenNoExpiredServices() {
+                // Given
+                when(serviceDeliveryPort.findDeletedExpiredBefore(any(LocalDateTime.class)))
+                                .thenReturn(Collections.emptyList());
 
-        trashCleanupScheduler.cleanupExpiredTrash();
+                // When
+                scheduler.cleanupExpiredTrash();
 
-        verify(serviceDeliveryPort, never()).hardDeleteById(anyLong());
-    }
+                // Then
+                verify(archiveServiceService, never()).archiveService(any(), any(), any());
+        }
 
-    @Test
-    @DisplayName("Debe continuar con otros servicios si uno falla")
-    /**
-     * Verifica robustez: el fallo en eliminar un item no debe detener el procesado
-     * de los demás.
-     */
-    void shouldContinueIfOneFails() {
-        ServiceDelivery service1 = new ServiceDelivery();
-        service1.setIdServiceDelivery(1L);
-        service1.setDeleted(true);
+        @Test
+        @DisplayName("Should continue archiving if one fails")
+        void shouldContinueIfOneFails() {
+                // Given
+                ServiceDelivery service1 = new ServiceDelivery();
+                service1.setIdServiceDelivery(1L);
+                service1.setDeleted(true);
 
-        ServiceDelivery service2 = new ServiceDelivery();
-        service2.setIdServiceDelivery(2L);
-        service2.setDeleted(true);
+                ServiceDelivery service2 = new ServiceDelivery();
+                service2.setIdServiceDelivery(2L);
+                service2.setDeleted(true);
 
-        when(serviceDeliveryPort.findDeletedExpiredBefore(any(LocalDateTime.class)))
-                .thenReturn(Arrays.asList(service1, service2));
+                when(serviceDeliveryPort.findDeletedExpiredBefore(any(LocalDateTime.class)))
+                                .thenReturn(Arrays.asList(service1, service2));
 
-        doThrow(new RuntimeException("Error de BD")).when(serviceDeliveryPort).hardDeleteById(1L);
-        doNothing().when(serviceDeliveryPort).hardDeleteById(2L);
+                // Simular que el primero falla
+                doThrow(new RuntimeException("Archive error"))
+                                .when(archiveServiceService).archiveService(eq(service1), any(), any());
 
-        trashCleanupScheduler.cleanupExpiredTrash();
+                // When
+                scheduler.cleanupExpiredTrash();
 
-        verify(serviceDeliveryPort).hardDeleteById(1L);
-        verify(serviceDeliveryPort).hardDeleteById(2L);
-    }
+                // Then - El segundo debe procesarse a pesar del error en el primero
+                verify(archiveServiceService).archiveService(eq(service1), any(), any());
+                verify(archiveServiceService).archiveService(eq(service2), any(), any());
+        }
 }

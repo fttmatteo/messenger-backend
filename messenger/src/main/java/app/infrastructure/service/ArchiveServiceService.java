@@ -1,6 +1,7 @@
-package app.domain.services;
+package app.infrastructure.service;
 
 import app.domain.model.ServiceDelivery;
+import app.domain.ports.ArchivePort;
 import app.infrastructure.persistence.entities.*;
 import app.infrastructure.persistence.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +13,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Servicio de dominio para archivar servicios eliminados.
+ * Servicio de infraestructura para archivar servicios eliminados.
  * Mueve servicios de la papelera al archivo permanente preservando todos los
  * datos.
  */
 @Service
-public class ArchiveServiceService {
+public class ArchiveServiceService implements ArchivePort {
 
     @Autowired
     private DeletedServiceRepository deletedServiceRepository;
@@ -45,7 +46,7 @@ public class ArchiveServiceService {
      * Copia todos los datos relacionados al archivo y luego borra físicamente el
      * servicio original.
      *
-     * @param service             Servicio a archivar (debe estar en papelera:
+     * @param service             Servicio a archivar(debe estar en papelera:
      *                            deleted=true)
      * @param deletedByEmployeeId ID del empleado que realizó el archivado (puede
      *                            ser null para auto-archive)
