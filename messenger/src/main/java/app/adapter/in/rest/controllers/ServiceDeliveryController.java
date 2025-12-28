@@ -118,7 +118,9 @@ public class ServiceDeliveryController {
             @RequestParam("status") String status,
             @RequestParam(value = "observation", required = false) String observation,
             @RequestParam(value = "signature", required = false) MultipartFile signature,
-            @RequestParam(value = "photos", required = false) List<MultipartFile> photos) throws Exception {
+            @RequestParam(value = "photos", required = false) List<MultipartFile> photos,
+            @RequestParam(value = "latitude", required = false) Double latitude,
+            @RequestParam(value = "longitude", required = false) Double longitude) throws Exception {
 
         logger.info("Solicitud actualización servicio ID: {} a status: {}", id, status);
 
@@ -129,6 +131,9 @@ public class ServiceDeliveryController {
 
             ServiceDeliveryUpdateStatusRequest request = new ServiceDeliveryUpdateStatusRequest(status, observation,
                     userId);
+            request.setLatitude(latitude);
+            request.setLongitude(longitude);
+
             ServiceDeliveryBuilder.ServiceDeliveryUpdateData data = builder.buildUpdateStatusData(request);
 
             File signatureFile = null;
@@ -142,7 +147,7 @@ public class ServiceDeliveryController {
 
             ServiceDelivery updated = serviceDeliveryUseCase.updateStatusWithFiles(id, data.getStatus(),
                     data.getObservation(),
-                    signatureFile, photoFiles, data.getUserId());
+                    signatureFile, photoFiles, data.getUserId(), data.getLatitude(), data.getLongitude());
 
             return ResponseEntity.ok(responseMapper.toResponse(updated));
         } finally {

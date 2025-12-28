@@ -29,7 +29,11 @@ public class ServiceDeliveryBuilder {
         String observation = validator.observationValidator(request.getObservation());
         Long userId = validator.idValidator(request.getUserId());
 
-        return new ServiceDeliveryUpdateData(status, observation, userId);
+        ServiceDeliveryUpdateData data = new ServiceDeliveryUpdateData(status, observation, userId);
+        if (request.getLatitude() != null && request.getLongitude() != null) {
+            data.setLocation(request.getLatitude(), request.getLongitude());
+        }
+        return data;
     }
 
     public static class ServiceDeliveryCreateData {
@@ -71,6 +75,22 @@ public class ServiceDeliveryBuilder {
 
         public Long getUserId() {
             return userId;
+        }
+
+        private Double latitude;
+        private Double longitude;
+
+        public void setLocation(Double latitude, Double longitude) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+        }
+
+        public Double getLatitude() {
+            return latitude;
+        }
+
+        public Double getLongitude() {
+            return longitude;
         }
     }
 }

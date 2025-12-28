@@ -110,13 +110,22 @@ public class ServiceDeliveryUseCase {
     }
 
     /**
+     * Actualiza el estado de un servicio existente (Sobrecarga compatible).
+     */
+    public ServiceDelivery updateStatus(Long serviceId, Status newStatus, String observation,
+            Signature signature, List<Photo> photos, Long userId) throws Exception {
+        return updateStatus(serviceId, newStatus, observation, signature, photos, userId, null, null);
+    }
+
+    /**
      * Actualiza el estado de un servicio existente.
      */
     @AuditableAction(action = "UPDATE_STATUS", description = "Actualizar estado de servicio")
     public ServiceDelivery updateStatus(Long serviceId, Status newStatus, String observation,
-            Signature signature, List<Photo> photos, Long userId) throws Exception {
+            Signature signature, List<Photo> photos, Long userId, Double latitude, Double longitude) throws Exception {
         logger.info("Actualizando estado de servicio ID: {} a {}", serviceId, newStatus);
-        return updateService.updateStatus(serviceId, newStatus, observation, signature, photos, userId);
+        return updateService.updateStatus(serviceId, newStatus, observation, signature, photos, userId, latitude,
+                longitude);
     }
 
     /**
@@ -124,7 +133,8 @@ public class ServiceDeliveryUseCase {
      * firmas).
      */
     public ServiceDelivery updateStatusWithFiles(Long serviceId, Status newStatus, String observation,
-            File signatureFile, List<File> photoFiles, Long userId) throws Exception {
+            File signatureFile, List<File> photoFiles, Long userId, Double latitude, Double longitude)
+            throws Exception {
         logger.info("Actualizando estado con archivos. ServiceID: {}, NuevoEstado: {}", serviceId, newStatus);
 
         ServiceDelivery service = searchService.findById(serviceId);
@@ -160,7 +170,7 @@ public class ServiceDeliveryUseCase {
 
         try {
             ServiceDelivery updated = updateService.updateStatus(serviceId, newStatus, observation, signature, photos,
-                    userId);
+                    userId, latitude, longitude);
             logger.info("Estado actualizado exitosamente para servicio ID: {}", serviceId);
             return updated;
         } catch (Exception e) {

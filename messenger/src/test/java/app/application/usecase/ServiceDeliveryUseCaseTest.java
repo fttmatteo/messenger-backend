@@ -149,7 +149,7 @@ class ServiceDeliveryUseCaseTest {
 
             verify(updateService).updateStatus(
                     eq(1L), eq(Status.DELIVERED), eq("Entregado OK"),
-                    eq(signature), anyList(), eq(123456L));
+                    eq(signature), anyList(), eq(123456L), isNull(), isNull());
         }
 
         @Test
@@ -160,7 +160,7 @@ class ServiceDeliveryUseCaseTest {
 
             verify(updateService).updateStatus(
                     eq(1L), eq(Status.CANCELED), eq("Cancelado por cliente"),
-                    isNull(), isNull(), eq(123456L));
+                    isNull(), isNull(), eq(123456L), isNull(), isNull());
         }
     }
 

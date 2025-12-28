@@ -42,13 +42,24 @@ public class UpdateServiceDelivery {
     private ServiceDeliveryPort serviceDeliveryPort;
     @Autowired
     private EmployeePort employeePort;
+    @Autowired
+    private app.domain.ports.TrackingPort trackingPort;
+
+    /**
+     * Actualiza el estado de un servicio (Sobrecarga para compatibilidad sin
+     * ubicación).
+     */
+    public ServiceDelivery updateStatus(Long serviceId, Status newStatus, String observation,
+            Signature signature, List<Photo> photos, Long userId) throws Exception {
+        return updateStatus(serviceId, newStatus, observation, signature, photos, userId, null, null);
+    }
 
     /**
      * Actualiza el estado de un servicio, validando privilegios, transiciones y
      * evidencias.
      */
     public ServiceDelivery updateStatus(Long serviceId, Status newStatus, String observation,
-            Signature signature, List<Photo> photos, Long userId) throws Exception {
+            Signature signature, List<Photo> photos, Long userId, Double latitude, Double longitude) throws Exception {
 
         ServiceDelivery service = serviceDeliveryPort.findByIdActive(serviceId);
         if (service == null) {
@@ -107,6 +118,16 @@ public class UpdateServiceDelivery {
         }
 
         service.addHistory(history);
+
+        // Save location history if provided
+        if (latitude != null && longitude != null) {
+            app.domain.model.TrackingHistory tracking = new app.domain.model.TrackingHistory(
+                    userId,
+                    new app.domain.model.Location(latitude, longitude),
+                    app.domain.model.enums.TrackingSource.MANUAL);
+            tracking.setServiceDeliveryId(serviceId);
+            trackingPort.saveTrackingHistory(tracking);
+        }
 
         return serviceDeliveryPort.save(service);
     }
