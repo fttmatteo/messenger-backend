@@ -513,14 +513,18 @@ flowchart LR
     C --> D[Status → ASSIGNED]
 ```
 
-### Trash Management (Soft Delete)
+
+### Trash Management (Soft Delete & Archive)
 
 | Action | Endpoint | Description |
 |--------|----------|-------------|
 | Delete → Trash | `DELETE /services/{id}` | Moves to trash (soft delete) |
 | View Trash | `GET /services/trash` | Lists deleted services (ADMIN) |
 | Restore | `POST /services/trash/restore/{id}` | Restores from trash (ADMIN) |
-| Auto-Cleanup | Scheduled job | Permanent deletion after 60 days |
+| Empty Trash | `POST /services/trash/empty` | Archives all trash items (ADMIN) |
+| Auto-Archive | Scheduled job (3 AM daily) | Archives services after 60 days |
+
+**Archive System**: Services are permanently archived to dedicated tables (`deleted_services`, `deleted_status_history`, `deleted_photos`, `deleted_tracking_history`, `deleted_signatures`) instead of being deleted. All historical data is preserved for auditing and analytics.
 
 
 ---

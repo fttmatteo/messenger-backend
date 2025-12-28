@@ -10,9 +10,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import app.domain.model.ServiceDelivery;
 import app.domain.ports.ServiceDeliveryPort;
+import app.domain.services.ArchiveServiceService;
 
 /**
- * Job programado para limpiar servicios de la papelera después de 60 días.
+ * Job programado para archivar servicios de la papelera después de 60 días.
+ * Los servicios se mueven al archivo permanente en lugar de ser borrados.
  * 
  * Se ejecuta diariamente a las 3:00 AM.
  */
@@ -27,10 +29,13 @@ public class TrashCleanupScheduler {
     @Autowired
     private ServiceDeliveryPort serviceDeliveryPort;
 
+    @Autowired
+    private ArchiveServiceService archiveServiceService;
+
     @Scheduled(cron = "${app.trash.cleanup-cron:0 0 3 * * ?}")
     public void cleanupExpiredTrash() {
         logger.info(
-                "Iniciando limpieza de papelera. Servicios eliminados hace más de {} días serán borrados permanentemente.",
+                "Iniciando archivado de servicios en papelera. Servicios eliminados hace más de {} días serán archivados permanentemente.",
                 retentionDays);
 
         LocalDateTime expirationDate = LocalDateTime.now().minusDays(retentionDays);
@@ -43,20 +48,20 @@ public class TrashCleanupScheduler {
 
         logger.info("Encontrados {} servicios expirados en la papelera.", expiredServices.size());
 
-        int deletedCount = 0;
+        int archivedCount = 0;
         int errorCount = 0;
 
         for (ServiceDelivery service : expiredServices) {
             try {
-                serviceDeliveryPort.hardDeleteById(service.getIdServiceDelivery());
-                deletedCount++;
-                logger.debug("Eliminado permanentemente servicio ID: {}", service.getIdServiceDelivery());
+                archiveServiceService.archiveService(service, null, "Auto-archive after " + retentionDays + " days");
+                archivedCount++;
+                logger.debug("Archivado permanentemente servicio ID: {}", service.getIdServiceDelivery());
             } catch (Exception e) {
                 errorCount++;
-                logger.error("Error eliminando servicio ID: {}: {}", service.getIdServiceDelivery(), e.getMessage());
+                logger.error("Error archivando servicio ID: {}: {}", service.getIdServiceDelivery(), e.getMessage());
             }
         }
 
-        logger.info("Limpieza de papelera completada. Eliminados: {}, Errores: {}", deletedCount, errorCount);
+        logger.info("Archivado de papelera completado. Archivados: {}, Errores: {}", archivedCount, errorCount);
     }
 }

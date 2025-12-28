@@ -510,14 +510,18 @@ flowchart LR
     D --> E[Bloqueo 72h reiniciado]
 ```
 
-### Gestión de Papelera (Soft Delete)
+### Gestión de Papelera (Soft Delete y Archivo)
 
 | Acción | Endpoint | Descripción |
 |--------|----------|-------------|
 | Eliminar → Papelera | `DELETE /services/{id}` | Mueve a papelera (soft delete) |
 | Ver Papelera | `GET /services/trash` | Lista servicios eliminados (ADMIN) |
 | Restaurar | `POST /services/trash/restore/{id}` | Restaura desde papelera (ADMIN) |
-| Limpieza Automática | Job programado | Eliminación permanente después de 60 días |
+| Vaciar Papelera | `POST /services/trash/empty` | Archiva todos los elementos de la papelera (ADMIN) |
+| Archivo Automático | Job programado (3 AM diario) | Archiva servicios después de 60 días |
+
+**Sistema de Archivo**: Los servicios se archivan permanentemente en tablas dedicadas (`deleted_services`, `deleted_status_history`, `deleted_photos`, `deleted_tracking_history`, `deleted_signatures`) en lugar de ser eliminados. Todos los datos históricos se preservan para auditoría y análisis.
+
 
 ---
 

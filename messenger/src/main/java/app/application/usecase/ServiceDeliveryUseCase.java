@@ -259,10 +259,10 @@ public class ServiceDeliveryUseCase {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    @AuditableAction(action = "PERMANENT_DELETE", description = "Eliminar permanentemente un servicio de la papelera")
+    @AuditableAction(action = "ARCHIVE_SERVICE", description = "Archivar permanentemente un servicio de la papelera")
     public void permanentDeleteById(Long id, Long userId) throws Exception {
-        logger.info("Eliminando permanentemente servicio ID: {} por usuario ID: {}", id, userId);
-        deleteService.hardDelete(id);
+        logger.info("Archivando permanentemente servicio ID: {} por usuario ID: {}", id, userId);
+        deleteService.archiveService(id);
     }
 
     private void cleanupFiles(String... paths) {

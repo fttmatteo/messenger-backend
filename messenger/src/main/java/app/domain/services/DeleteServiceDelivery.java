@@ -24,9 +24,12 @@ public class DeleteServiceDelivery {
     @Autowired
     private EmployeePort employeePort;
 
+    @Autowired
+    private ArchiveServiceService archiveServiceService;
+
     /**
      * Mueve un servicio a la papelera (soft delete).
-     * El servicio permanecerá en la papelera por 60 días antes de ser eliminado
+     * El servicio permanecerá en la papelera por 60 días antes de ser archivado
      * permanentemente.
      */
     public void deleteById(Long id) throws Exception {
@@ -113,25 +116,45 @@ public class DeleteServiceDelivery {
     }
 
     /**
-     * Elimina permanentemente un servicio de la papelera (Hard Delete).
+     * Archiva permanentemente un servicio de la papelera.
+     * El servicio se mueve a la tabla de archivo en lugar de ser borrado.
      */
-    public void hardDelete(Long id) throws Exception {
+    public void archiveService(Long id) throws Exception {
         ServiceDelivery service = serviceDeliveryPort.findById(id);
         if (service == null) {
             throw new BusinessException("El servicio de entrega no existe.");
         }
 
         if (!service.isDeleted()) {
-            throw new BusinessException("Solo se pueden eliminar permanentemente servicios que estén en la papelera.");
+            throw new BusinessException("Solo se pueden archivar servicios que estén en la papelera.");
         }
 
-        serviceDeliveryPort.hardDeleteById(id);
+        archiveServiceService.archiveService(service, null, "Manual archive");
     }
 
     /**
-     * Vacía la papelera eliminando permanentemente todos los elementos.
+     * Vacía la papelera archivando permanentemente todos los elementos.
+     * Los servicios se mueven al archivo permanente en lugar de ser borrados.
      */
     public int emptyTrash() {
-        return serviceDeliveryPort.hardDeleteAllDeleted();
+        // Obtener todos los servicios marcados como eliminados
+        java.util.List<ServiceDelivery> deletedServices = serviceDeliveryPort.findDeleted();
+
+        if (deletedServices.isEmpty()) {
+            return 0;
+        }
+
+        // Archivar cada servicio (en lugar de borrar)
+        for (ServiceDelivery service : deletedServices) {
+            try {
+                archiveServiceService.archiveService(service, null, "Manual trash empty");
+            } catch (Exception e) {
+                // Log error pero continuar con el siguiente
+                System.err
+                        .println("Error archivando servicio " + service.getIdServiceDelivery() + ": " + e.getMessage());
+            }
+        }
+
+        return deletedServices.size();
     }
 }
