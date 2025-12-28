@@ -43,6 +43,9 @@ class CreateServiceDeliveryTest {
     @Mock
     private PlateRecognition plateRecognition;
 
+    @Mock
+    private app.domain.ports.TrackingPort trackingPort;
+
     @InjectMocks
     private CreateServiceDelivery createServiceDelivery;
 
@@ -80,7 +83,7 @@ class CreateServiceDeliveryTest {
                 .thenReturn(java.util.List.of(new app.domain.model.ServiceDelivery()));
 
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> createServiceDelivery.create("ABC123", "path/to/photo.jpg", 1L, 12345678L));
+                () -> createServiceDelivery.create("ABC123", "path/to/photo.jpg", 1L, 12345678L, null, null));
 
         assertEquals("La placa ABC123 ya tiene un servicio registrado en el sistema.", exception.getMessage());
         verify(serviceDeliveryPort, never()).save(any());
@@ -98,7 +101,15 @@ class CreateServiceDeliveryTest {
         when(platePort.findByPlateNumber("NNN999")).thenReturn(null);
         when(plateRecognition.determinePlateType("NNN999")).thenReturn(PlateType.MOTORCYCLE);
 
-        createServiceDelivery.create("NNN999", null, 1L, 12345678L);
+        app.domain.model.ServiceDelivery savedService = new app.domain.model.ServiceDelivery();
+        savedService.setIdServiceDelivery(100L);
+        savedService.setPlate(new Plate());
+        savedService.getPlate().setPlateNumber("NNN999");
+        savedService.setCurrentStatus(Status.ASSIGNED);
+
+        when(serviceDeliveryPort.save(any())).thenReturn(savedService);
+
+        createServiceDelivery.create("NNN999", null, 1L, 12345678L, null, null);
 
         verify(platePort).save(argThat(newPlate -> newPlate.getPlateNumber().equals("NNN999") &&
                 newPlate.getPlateType() == PlateType.MOTORCYCLE));
@@ -116,7 +127,7 @@ class CreateServiceDeliveryTest {
         when(employeePort.findById(anyLong())).thenReturn(null);
 
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> createServiceDelivery.create("ABC123", null, 1L, 99999L));
+                () -> createServiceDelivery.create("ABC123", null, 1L, 99999L, null, null));
 
         assertEquals("El mensajero no existe.", exception.getMessage());
         verify(serviceDeliveryPort, never()).save(any());
@@ -129,7 +140,7 @@ class CreateServiceDeliveryTest {
         when(dealershipPort.findById(999L)).thenReturn(null);
 
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> createServiceDelivery.create("ABC123", null, 999L, 12345678L));
+                () -> createServiceDelivery.create("ABC123", null, 999L, 12345678L, null, null));
 
         assertEquals("El concesionario indicado no existe.", exception.getMessage());
         verify(serviceDeliveryPort, never()).save(any());
@@ -143,7 +154,11 @@ class CreateServiceDeliveryTest {
         // Stub for the NORMALIZED value that the service should produce
         when(platePort.findByPlateNumber("ABC123")).thenReturn(plate);
 
-        createServiceDelivery.create("abc123", null, 1L, 12345678L);
+        app.domain.model.ServiceDelivery savedService = new app.domain.model.ServiceDelivery();
+        savedService.setIdServiceDelivery(100L);
+        when(serviceDeliveryPort.save(any())).thenReturn(savedService);
+
+        createServiceDelivery.create("abc123", null, 1L, 12345678L, null, null);
 
         verify(platePort).findByPlateNumber("ABC123");
     }
@@ -158,10 +173,34 @@ class CreateServiceDeliveryTest {
         when(dealershipPort.findById(1L)).thenReturn(dealership);
         when(platePort.findByPlateNumber("ABC123")).thenReturn(plate);
 
-        createServiceDelivery.create("ABC123", "uploads/plate.jpg", 1L, 12345678L);
+        app.domain.model.ServiceDelivery savedService = new app.domain.model.ServiceDelivery();
+        savedService.setIdServiceDelivery(100L);
+        when(serviceDeliveryPort.save(any())).thenReturn(savedService);
+
+        createServiceDelivery.create("ABC123", "uploads/plate.jpg", 1L, 12345678L, null, null);
 
         verify(serviceDeliveryPort)
                 .save(argThat(service -> service.getPhotos().get(0).getPhotoPath().equals("uploads/plate.jpg") &&
                         service.getPhotos().get(0).getPhotoType() == PhotoType.PLATE_DETECTION));
+    }
+
+    @Test
+    @DisplayName("Debe guardar historial de rastreo inicial si se proporciona ubicación")
+    void shouldSaveTrackingHistoryWhenLocationIsProvided() throws Exception {
+        when(employeePort.findById(12345678L)).thenReturn(messenger);
+        when(dealershipPort.findById(1L)).thenReturn(dealership);
+        when(platePort.findByPlateNumber("ABC123")).thenReturn(plate);
+
+        app.domain.model.ServiceDelivery savedService = new app.domain.model.ServiceDelivery();
+        savedService.setIdServiceDelivery(100L);
+        when(serviceDeliveryPort.save(any())).thenReturn(savedService);
+
+        createServiceDelivery.create("ABC123", null, 1L, 12345678L, 6.2442, -75.5812);
+
+        verify(trackingPort).saveTrackingHistory(argThat(tracking -> tracking.getMessengerId().equals(1L) &&
+                tracking.getServiceDeliveryId().equals(100L) &&
+                tracking.getLocation().getLatitude().equals(6.2442) &&
+                tracking.getLocation().getLongitude().equals(-75.5812) &&
+                tracking.getSource() == app.domain.model.enums.TrackingSource.MANUAL));
     }
 }

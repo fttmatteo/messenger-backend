@@ -32,12 +32,15 @@ public class CreateServiceDelivery {
     private EmployeePort employeePort;
     @Autowired
     private PlateRecognition plateRecognition;
+    @Autowired
+    private app.domain.ports.TrackingPort trackingPort;
 
     /**
      * Crea un nuevo servicio de entrega, asocia la placa (creándola si no existe)
      * y asigna el servicio al mensajero y concesionario indicados.
      */
-    public ServiceDelivery create(String plateNumber, String photoPath, Long dealershipId, Long messengerId)
+    public ServiceDelivery create(String plateNumber, String photoPath, Long dealershipId, Long messengerId,
+            Double latitude, Double longitude)
             throws Exception {
 
         Employee messenger = employeePort.findById(messengerId);
@@ -90,6 +93,26 @@ public class CreateServiceDelivery {
         service.addHistory(history);
 
         ServiceDelivery saved = serviceDeliveryPort.save(service);
+
+        // Save initial tracking location if provided
+        if (latitude != null && longitude != null) {
+            app.domain.model.TrackingHistory tracking = new app.domain.model.TrackingHistory();
+            tracking.setMessengerId(messenger.getIdEmployee());
+            tracking.setServiceDeliveryId(saved.getIdServiceDelivery());
+
+            app.domain.model.Location location = new app.domain.model.Location(
+                    latitude,
+                    longitude,
+                    LocalDateTime.now(),
+                    0.0 // accuracy default
+            );
+            tracking.setLocation(location);
+
+            tracking.setRecordedAt(LocalDateTime.now());
+            tracking.setSource(app.domain.model.enums.TrackingSource.MANUAL);
+            trackingPort.saveTrackingHistory(tracking);
+        }
+
         return saved;
     }
 }

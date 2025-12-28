@@ -96,12 +96,16 @@ public class ServiceDeliveryController {
                         imageFile,
                         manualPlateNumber,
                         data.getDealershipId(),
-                        data.getMessengerId());
+                        data.getMessengerId(),
+                        data.getLatitude(),
+                        data.getLongitude());
             } else {
                 created = serviceDeliveryUseCase.createServiceFromImage(
                         imageFile,
                         data.getDealershipId(),
-                        data.getMessengerId());
+                        data.getMessengerId(),
+                        data.getLatitude(),
+                        data.getLongitude());
             }
             return ResponseEntity.status(HttpStatus.CREATED).body(responseMapper.toResponse(created));
         });

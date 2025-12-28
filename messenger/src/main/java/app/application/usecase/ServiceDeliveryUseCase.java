@@ -62,7 +62,8 @@ public class ServiceDeliveryUseCase {
      */
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "CREATE_SERVICE", description = "Crear servicio desde imagen OCR")
-    public ServiceDelivery createServiceFromImage(File imageFile, Long dealershipId, Long messengerId)
+    public ServiceDelivery createServiceFromImage(File imageFile, Long dealershipId, Long messengerId, Double latitude,
+            Double longitude)
             throws Exception {
         logger.info("Iniciando creación de servicio desde imagen. DealershipId: {}, MessengerId: {}", dealershipId,
                 messengerId);
@@ -74,7 +75,8 @@ public class ServiceDeliveryUseCase {
         String savedPath = storagePort.save(imageFile, "detections", fileName);
 
         try {
-            ServiceDelivery service = createService.create(extractedText, savedPath, dealershipId, messengerId);
+            ServiceDelivery service = createService.create(extractedText, savedPath, dealershipId, messengerId,
+                    latitude, longitude);
             logger.info("Servicio creado exitosamente con ID: {}", service.getIdServiceDelivery());
             return service;
         } catch (Exception e) {
@@ -90,7 +92,7 @@ public class ServiceDeliveryUseCase {
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "CREATE_SERVICE_MANUAL", description = "Crear servicio con placa manual")
     public ServiceDelivery createServiceWithManualPlate(File imageFile, String manualPlateNumber, Long dealershipId,
-            Long messengerId) throws Exception {
+            Long messengerId, Double latitude, Double longitude) throws Exception {
         logger.info("Iniciando creación de servicio manual. Placa: {}, DealershipId: {}, MessengerId: {}",
                 manualPlateNumber, dealershipId, messengerId);
         String timestamp = LocalDateTime.now().format(DATE_FORMAT);
@@ -99,7 +101,8 @@ public class ServiceDeliveryUseCase {
         String savedPath = storagePort.save(imageFile, "detections", fileName);
 
         try {
-            ServiceDelivery service = createService.create(manualPlateNumber, savedPath, dealershipId, messengerId);
+            ServiceDelivery service = createService.create(manualPlateNumber, savedPath, dealershipId, messengerId,
+                    latitude, longitude);
             logger.info("Servicio manual creado exitosamente con ID: {}", service.getIdServiceDelivery());
             return service;
         } catch (Exception e) {

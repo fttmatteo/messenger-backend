@@ -81,14 +81,14 @@ class ServiceDeliveryUseCaseTest {
             when(storagePort.save(eq(mockImageFile), eq("detections"), anyString()))
                     .thenReturn("/path/to/saved/image.png");
 
-            when(createService.create(eq("ABC123"), anyString(), eq(1L), eq(123456L)))
+            when(createService.create(eq("ABC123"), anyString(), eq(1L), eq(123456L), isNull(), isNull()))
                     .thenReturn(sampleService);
 
-            serviceDeliveryUseCase.createServiceFromImage(mockImageFile, 1L, 123456L);
+            serviceDeliveryUseCase.createServiceFromImage(mockImageFile, 1L, 123456L, null, null);
 
             verify(ocrPort).extractText(mockImageFile);
             verify(storagePort).save(eq(mockImageFile), eq("detections"), contains("ABC123"));
-            verify(createService).create(eq("ABC123"), anyString(), eq(1L), eq(123456L));
+            verify(createService).create(eq("ABC123"), anyString(), eq(1L), eq(123456L), isNull(), isNull());
         }
 
         @Test
@@ -97,9 +97,9 @@ class ServiceDeliveryUseCaseTest {
             when(ocrPort.extractText(mockImageFile)).thenThrow(new RuntimeException("Error en OCR"));
 
             assertThrows(RuntimeException.class,
-                    () -> serviceDeliveryUseCase.createServiceFromImage(mockImageFile, 1L, 123456L));
+                    () -> serviceDeliveryUseCase.createServiceFromImage(mockImageFile, 1L, 123456L, null, null));
 
-            verify(createService, never()).create(anyString(), anyString(), anyLong(), anyLong());
+            verify(createService, never()).create(anyString(), anyString(), anyLong(), anyLong(), any(), any());
         }
     }
 
@@ -117,14 +117,14 @@ class ServiceDeliveryUseCaseTest {
             when(storagePort.save(eq(mockImageFile), eq("detections"), anyString()))
                     .thenReturn("/path/to/saved/image.png");
 
-            when(createService.create(eq("XYZ789"), anyString(), eq(1L), eq(123456L)))
+            when(createService.create(eq("XYZ789"), anyString(), eq(1L), eq(123456L), isNull(), isNull()))
                     .thenReturn(sampleService);
 
-            serviceDeliveryUseCase.createServiceWithManualPlate(mockImageFile, "XYZ789", 1L, 123456L);
+            serviceDeliveryUseCase.createServiceWithManualPlate(mockImageFile, "XYZ789", 1L, 123456L, null, null);
 
             verify(ocrPort, never()).extractText(any());
             verify(storagePort).save(eq(mockImageFile), eq("detections"), contains("XYZ789"));
-            verify(createService).create(eq("XYZ789"), anyString(), eq(1L), eq(123456L));
+            verify(createService).create(eq("XYZ789"), anyString(), eq(1L), eq(123456L), isNull(), isNull());
         }
     }
 
