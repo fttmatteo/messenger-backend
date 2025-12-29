@@ -2,6 +2,8 @@ package app.domain.services;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import app.domain.exception.BusinessException;
 import app.domain.model.ServiceDelivery;
@@ -59,6 +61,21 @@ public class SearchServiceDelivery {
     public List<ServiceDelivery> findByPlate(String plateNumber) {
         String normalized = plateNumber.trim().toUpperCase();
         return serviceDeliveryPort.findByPlateNumber(normalized);
+    }
+
+    /**
+     * Retorna todos los servicios con paginación.
+     */
+    public Page<ServiceDelivery> findAllPaginated(String keyword, Boolean deleted, Pageable pageable) {
+        return serviceDeliveryPort.findAllPaginated(keyword, deleted, pageable);
+    }
+
+    /**
+     * Retorna servicios de un mensajero específico con paginación.
+     */
+    public Page<ServiceDelivery> findByMessengerPaginated(Long messengerId, String keyword, Boolean deleted,
+            Pageable pageable) {
+        return serviceDeliveryPort.findByMessengerPaginated(messengerId, keyword, deleted, pageable);
     }
 
     /**

@@ -2,6 +2,8 @@ package app.infrastructure.persistence.repository;
 
 import app.domain.model.enums.Status;
 import app.infrastructure.persistence.entities.ServiceDeliveryEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -31,6 +33,42 @@ public interface ServiceDeliveryRepository extends JpaRepository<ServiceDelivery
   Optional<ServiceDeliveryEntity> findByIdServiceDeliveryAndDeletedFalse(Long id);
 
   List<ServiceDeliveryEntity> findByDeletedTrue();
+
+  // Paginated Methods
+  /**
+   * Encuentra servicios con paginación filtrado por estado de eliminación
+   */
+  Page<ServiceDeliveryEntity> findByDeleted(Boolean deleted, Pageable pageable);
+
+  /**
+   * Encuentra servicios de un mensajero específico con paginación
+   */
+  Page<ServiceDeliveryEntity> findByMessenger_IdEmployeeAndDeleted(Long messengerId, Boolean deleted,
+      Pageable pageable);
+
+  // Search Methods
+  /**
+   * Busca servicios por keyword en múltiples campos (ID, placa, concesionario,
+   * mensajero)
+   */
+  @Query("SELECT s FROM ServiceDeliveryEntity s WHERE s.deleted = :deleted AND (" +
+      "CAST(s.idServiceDelivery AS string) LIKE %:keyword% OR " +
+      "LOWER(s.plate.plateNumber) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+      "LOWER(s.dealership.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+      "LOWER(s.messenger.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+  Page<ServiceDeliveryEntity> searchAll(@Param("keyword") String keyword, @Param("deleted") Boolean deleted,
+      Pageable pageable);
+
+  /**
+   * Busca servicios de un mensajero específico por keyword
+   */
+  @Query("SELECT s FROM ServiceDeliveryEntity s WHERE s.messenger.idEmployee = :messengerId AND s.deleted = :deleted AND ("
+      +
+      "CAST(s.idServiceDelivery AS string) LIKE %:keyword% OR " +
+      "LOWER(s.plate.plateNumber) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+      "LOWER(s.dealership.name) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+  Page<ServiceDeliveryEntity> searchByMessenger(@Param("messengerId") Long messengerId,
+      @Param("keyword") String keyword, @Param("deleted") Boolean deleted, Pageable pageable);
 
   List<ServiceDeliveryEntity> findByDeletedTrueAndDeletedAtBefore(LocalDateTime date);
 

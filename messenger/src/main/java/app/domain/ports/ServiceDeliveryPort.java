@@ -3,6 +3,8 @@ package app.domain.ports;
 import app.domain.model.ServiceDelivery;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Puerto de salida para persistencia de servicios de entrega.
@@ -55,6 +57,31 @@ public interface ServiceDeliveryPort {
      * Recupera todos los servicios marcados como eliminados.
      */
     List<ServiceDelivery> findDeleted();
+
+    // Páginas paginadas
+
+    /**
+     * Recupera servicios con paginación.
+     * 
+     * @param keyword  Término de búsqueda opcional
+     * @param deleted  Filtro por estado de eliminación (false = activos, true =
+     *                 papelera)
+     * @param pageable Configuración de paginación y ordenamiento
+     * @return Página de servicios
+     */
+    Page<ServiceDelivery> findAllPaginated(String keyword, Boolean deleted, Pageable pageable);
+
+    /**
+     * Recupera servicios de un mensajero específico con paginación.
+     * 
+     * @param messengerId ID del mensajero
+     * @param keyword     Término de búsqueda opcional
+     * @param deleted     Filtro por estado de eliminación
+     * @param pageable    Configuración de paginación y ordenamiento
+     * @return Página de servicios del mensajero
+     */
+    Page<ServiceDelivery> findByMessengerPaginated(Long messengerId, String keyword, Boolean deleted,
+            Pageable pageable);
 
     /**
      * Busca servicios eliminados hace más tiempo que la fecha indicada.
