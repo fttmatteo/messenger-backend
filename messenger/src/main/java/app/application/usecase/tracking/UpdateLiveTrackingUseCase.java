@@ -34,9 +34,8 @@ public class UpdateLiveTrackingUseCase {
     public LiveTracking execute(LiveTracking incomingTracking) {
         logger.debug("Actualizando ubicación para mensajero ID: {}", incomingTracking.getMessengerId());
 
-        if (incomingTracking.getLastUpdate() == null) {
-            incomingTracking.setLastUpdate(LocalDateTime.now());
-        }
+        // Forzar siempre la hora del servidor sincronizada para rastreo en vivo
+        incomingTracking.setLastUpdate(LocalDateTime.now());
 
         if (incomingTracking.getStatus() == null) {
             incomingTracking.setStatus(TrackingStatus.ACTIVE);
