@@ -66,6 +66,7 @@ class ServiceDeliveryControllerIntegrationTest {
         PlateEntity plate = createPlate("INT001");
         entityManager.persist(plate);
 
+        // Use current date/time for the test
         LocalDateTime now = LocalDateTime.now();
         createAndPersistService(messenger, dealership, plate, Status.DELIVERED, now);
 

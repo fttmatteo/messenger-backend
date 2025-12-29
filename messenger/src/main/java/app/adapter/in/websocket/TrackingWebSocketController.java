@@ -38,7 +38,7 @@ public class TrackingWebSocketController {
             Location location = new Location(
                     request.getLatitude(),
                     request.getLongitude(),
-                    LocalDateTime.now(),
+                    LocalDateTime.now(), // Hora sincronizada del servidor
                     request.getAccuracy());
             domainTracking.setCurrentLocation(location);
         }
