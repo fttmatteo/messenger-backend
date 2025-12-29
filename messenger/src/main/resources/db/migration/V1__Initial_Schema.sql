@@ -53,11 +53,11 @@ CREATE TABLE IF NOT EXISTS service_deliveries (
     FOREIGN KEY (plate_id) REFERENCES plates(id_plate),
     FOREIGN KEY (dealership_id) REFERENCES dealerships(id_dealership),
     FOREIGN KEY (messenger_id) REFERENCES employees(id_employee),
-    FOREIGN KEY (signature_id) REFERENCES signatures(id_signature)
-);
+    FOREIGN KEY (signature_id) REFERENCES signatures(id_signature),
 
-CREATE INDEX idx_service_deliveries_deleted ON service_deliveries(deleted);
-CREATE INDEX idx_service_deliveries_deleted_at ON service_deliveries(deleted_at);
+    INDEX idx_service_deliveries_deleted (deleted),
+    INDEX idx_service_deliveries_deleted_at (deleted_at)
+);
 
 CREATE TABLE IF NOT EXISTS status_history (
     id_status_history BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -91,8 +91,8 @@ CREATE TABLE IF NOT EXISTS tracking_history (
     recorded_at DATETIME(6) NOT NULL,
     service_delivery_id BIGINT,
     source VARCHAR(50) NOT NULL,
-    speed DOUBLE
-);
+    speed DOUBLE,
 
-CREATE INDEX idx_messenger_date ON tracking_history(messenger_id, recorded_at);
-CREATE INDEX idx_service ON tracking_history(service_delivery_id);
+    INDEX idx_messenger_date (messenger_id, recorded_at),
+    INDEX idx_service (service_delivery_id)
+);
