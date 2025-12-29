@@ -1,6 +1,6 @@
 
 -- Tabla principal de Concesionarios
-CREATE TABLE dealerships (
+CREATE TABLE IF NOT EXISTS dealerships (
     id_dealership BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE,
     address VARCHAR(100) NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE dealerships (
 );
 
 -- Tabla de Empleados (Mensajeros y Administradores)
-CREATE TABLE employees (
+CREATE TABLE IF NOT EXISTS employees (
     id_employee BIGINT AUTO_INCREMENT PRIMARY KEY,
     document BIGINT NOT NULL UNIQUE,
     full_name VARCHAR(255) NOT NULL,
@@ -21,21 +21,21 @@ CREATE TABLE employees (
     role VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE plates (
+CREATE TABLE IF NOT EXISTS plates (
     id_plate BIGINT AUTO_INCREMENT PRIMARY KEY,
     plate_number VARCHAR(255) NOT NULL UNIQUE,
     plate_type VARCHAR(50) NOT NULL,
     upload_date DATETIME(6)
 );
 
-CREATE TABLE signatures (
+CREATE TABLE IF NOT EXISTS signatures (
     id_signature BIGINT AUTO_INCREMENT PRIMARY KEY,
     signature_path VARCHAR(2048) NOT NULL,
     upload_date DATETIME(6) NOT NULL
 );
 
 -- Tabla central de Servicios de Entrega
-CREATE TABLE service_deliveries (
+CREATE TABLE IF NOT EXISTS service_deliveries (
     id_service_delivery BIGINT AUTO_INCREMENT PRIMARY KEY,
     plate_id BIGINT NOT NULL,
     dealership_id BIGINT NOT NULL,
@@ -59,7 +59,7 @@ CREATE TABLE service_deliveries (
 CREATE INDEX idx_service_deliveries_deleted ON service_deliveries(deleted);
 CREATE INDEX idx_service_deliveries_deleted_at ON service_deliveries(deleted_at);
 
-CREATE TABLE status_history (
+CREATE TABLE IF NOT EXISTS status_history (
     id_status_history BIGINT AUTO_INCREMENT PRIMARY KEY,
     previous_status VARCHAR(50),
     new_status VARCHAR(50) NOT NULL,
@@ -72,7 +72,7 @@ CREATE TABLE status_history (
     FOREIGN KEY (service_delivery_id) REFERENCES service_deliveries(id_service_delivery)
 );
 
-CREATE TABLE photos (
+CREATE TABLE IF NOT EXISTS photos (
     id_photo BIGINT AUTO_INCREMENT PRIMARY KEY,
     photo_path VARCHAR(2048) NOT NULL,
     upload_date DATETIME(6),
@@ -83,7 +83,7 @@ CREATE TABLE photos (
     FOREIGN KEY (status_history_id) REFERENCES status_history(id_status_history)
 );
 
-CREATE TABLE tracking_history (
+CREATE TABLE IF NOT EXISTS tracking_history (
     history_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     messenger_id BIGINT NOT NULL,
     latitude DOUBLE NOT NULL,

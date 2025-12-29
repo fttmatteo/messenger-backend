@@ -9,7 +9,7 @@
 -- Table: deleted_services
 -- Purpose: Archive of services moved from trash bin
 -- -----------------------------------------------------------------------------
-CREATE TABLE deleted_services (
+CREATE TABLE IF NOT EXISTS deleted_services (
     -- Original service fields (mirror of service_deliveries)
     id_service_delivery BIGINT PRIMARY KEY,
     current_status VARCHAR(20) NOT NULL,
@@ -52,7 +52,7 @@ COMMENT='Permanent archive of deleted services with denormalized data for audit 
 -- Table: deleted_status_history
 -- Purpose: Archive of status change history for deleted services
 -- -----------------------------------------------------------------------------
-CREATE TABLE deleted_status_history (
+CREATE TABLE IF NOT EXISTS deleted_status_history (
     id_status_history BIGINT PRIMARY KEY,
     service_delivery_id BIGINT NOT NULL,
     previous_status VARCHAR(20),
@@ -76,7 +76,7 @@ COMMENT='Status change history for archived services';
 -- Purpose: Archive of photo metadata for deleted services
 -- Note: Actual photo files remain in Google Cloud Storage
 -- -----------------------------------------------------------------------------
-CREATE TABLE deleted_photos (
+CREATE TABLE IF NOT EXISTS deleted_photos (
     id_photo BIGINT PRIMARY KEY,
     service_delivery_id BIGINT NOT NULL,
     status_history_id BIGINT COMMENT 'Which status change this photo was attached to',
@@ -94,7 +94,7 @@ COMMENT='Photo metadata for archived services';
 -- Table: deleted_tracking_history
 -- Purpose: Archive of GPS tracking data for deleted services
 -- -----------------------------------------------------------------------------
-CREATE TABLE deleted_tracking_history (
+CREATE TABLE IF NOT EXISTS deleted_tracking_history (
     history_id BIGINT PRIMARY KEY,
     service_delivery_id BIGINT NOT NULL,
     messenger_id BIGINT NOT NULL,
@@ -117,7 +117,7 @@ COMMENT='GPS tracking history for archived services';
 -- Purpose: Archive of signature metadata for deleted services
 -- Note: Actual signature files remain in Google Cloud Storage
 -- -----------------------------------------------------------------------------
-CREATE TABLE deleted_signatures (
+CREATE TABLE IF NOT EXISTS deleted_signatures (
     id_signature BIGINT PRIMARY KEY,
     service_delivery_id BIGINT NOT NULL,
     signature_path VARCHAR(500) NOT NULL COMMENT 'Path in Google Cloud Storage',
