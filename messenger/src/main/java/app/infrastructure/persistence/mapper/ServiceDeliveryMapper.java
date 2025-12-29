@@ -66,6 +66,8 @@ public class ServiceDeliveryMapper {
                 hEntity.setNewStatus(h.getNewStatus());
                 hEntity.setChangeDate(h.getChangeDate());
                 hEntity.setChangedBy(employeeMapper.toEntity(h.getChangedBy()));
+                hEntity.setDeliveryLatitude(h.getDeliveryLatitude());
+                hEntity.setDeliveryLongitude(h.getDeliveryLongitude());
                 hEntity.setServiceDelivery(entity);
 
                 if (h.getPhotos() != null) {
@@ -145,6 +147,8 @@ public class ServiceDeliveryMapper {
                 history.setNewStatus(h.getNewStatus());
                 history.setChangeDate(h.getChangeDate());
                 history.setChangedBy(employeeMapper.toDomain(h.getChangedBy()));
+                history.setDeliveryLatitude(h.getDeliveryLatitude());
+                history.setDeliveryLongitude(h.getDeliveryLongitude());
                 if (h.getPhotos() != null) {
                     history.setPhotos(h.getPhotos().stream()
                             .map(this::mapPhotoToDomain)

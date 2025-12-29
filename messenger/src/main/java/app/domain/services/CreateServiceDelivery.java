@@ -89,6 +89,8 @@ public class CreateServiceDelivery {
         history.setNewStatus(Status.ASSIGNED);
         history.setChangeDate(LocalDateTime.now());
         history.setChangedBy(messenger);
+        history.setDeliveryLatitude(latitude);
+        history.setDeliveryLongitude(longitude);
 
         service.addHistory(history);
 
