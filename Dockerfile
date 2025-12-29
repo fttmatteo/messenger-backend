@@ -30,8 +30,12 @@ COPY --from=build /app/target/*.jar app.jar
 # Configurar variables de entorno por defecto (pueden sobreescribirse al ejecutar)
 ENV SPRING_PROFILES_ACTIVE=prod
 
+# Forzar timezone de Colombia en el contenedor y JVM
+ENV TZ=America/Bogota
+ENV JAVA_OPTS="-Duser.timezone=America/Bogota"
+
 # Exponer el puerto de la aplicación
 EXPOSE 8080
 
-# Comando de inicio
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Comando de inicio con timezone configurado
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
