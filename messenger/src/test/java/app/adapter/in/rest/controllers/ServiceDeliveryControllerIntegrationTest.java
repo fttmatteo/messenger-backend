@@ -13,8 +13,6 @@ import app.infrastructure.persistence.entities.PlateEntity;
 import app.infrastructure.persistence.entities.ServiceDeliveryEntity;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
-import java.util.TimeZone;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,12 +40,6 @@ class ServiceDeliveryControllerIntegrationTest {
     @Autowired
     private EntityManager entityManager;
 
-    @BeforeAll
-    static void setupTimezone() {
-        // Force timezone to match production setup
-        TimeZone.setDefault(TimeZone.getTimeZone("America/Bogota"));
-    }
-
     @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders
@@ -74,22 +66,22 @@ class ServiceDeliveryControllerIntegrationTest {
         PlateEntity plate = createPlate("INT001");
         entityManager.persist(plate);
 
-        // Use today's date at noon to avoid timezone edge cases
-        LocalDateTime testDate = LocalDateTime.now().withHour(12).withMinute(0).withSecond(0).withNano(0);
-        createAndPersistService(messenger, dealership, plate, Status.DELIVERED, testDate);
+        // Use current date/time for the test
+        LocalDateTime now = LocalDateTime.now();
+        createAndPersistService(messenger, dealership, plate, Status.DELIVERED, now);
 
         entityManager.flush();
 
         // When/Then: Call API
         mockMvc.perform(get("/services/stats/daily")
                 .param("messengerId", messenger.getIdEmployee().toString())
-                .param("from", testDate.toLocalDate().toString())
-                .param("to", testDate.toLocalDate().toString()))
+                .param("from", now.toLocalDate().toString())
+                .param("to", now.toLocalDate().toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].total", is(1)))
                 .andExpect(jsonPath("$[0].delivered", is(1)))
-                .andExpect(jsonPath("$[0].date", is(testDate.toLocalDate().toString())));
+                .andExpect(jsonPath("$[0].date", is(now.toLocalDate().toString())));
     }
 
     @Test
