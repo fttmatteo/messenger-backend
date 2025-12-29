@@ -256,10 +256,11 @@ public class ServiceDeliveryController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortDirection) {
+            @RequestParam(defaultValue = "desc") String sortDirection,
+            @RequestParam(required = false) String search) {
 
-        logger.info("Consultando servicios paginados - page: {}, size: {}, sortBy: {}, sortDirection: {}",
-                page, size, sortBy, sortDirection);
+        logger.info("Consultando servicios paginados - page: {}, size: {}, sortBy: {}, sortDirection: {}, search: {}",
+                page, size, sortBy, sortDirection, search);
 
         Employee currentUser = securityHelper.getCurrentUser();
 
@@ -268,10 +269,10 @@ public class ServiceDeliveryController {
         if (currentUser.getRole() == Role.MESSENGER) {
             Long messengerId = currentUser.getIdEmployee();
             servicePage = serviceDeliveryUseCase.findByMessengerPaginated(
-                    messengerId, page, size, sortBy, sortDirection);
+                    messengerId, page, size, sortBy, sortDirection, search);
         } else {
             servicePage = serviceDeliveryUseCase.findAllPaginated(
-                    page, size, sortBy, sortDirection);
+                    page, size, sortBy, sortDirection, search);
         }
 
         // Convert domain Page to PageResponse with DTOs

@@ -46,6 +46,30 @@ public interface ServiceDeliveryRepository extends JpaRepository<ServiceDelivery
   Page<ServiceDeliveryEntity> findByMessenger_IdEmployeeAndDeleted(Long messengerId, Boolean deleted,
       Pageable pageable);
 
+  // Search Methods
+  /**
+   * Busca servicios por keyword en múltiples campos (ID, placa, concesionario,
+   * mensajero)
+   */
+  @Query("SELECT s FROM ServiceDeliveryEntity s WHERE s.deleted = :deleted AND (" +
+      "CAST(s.idServiceDelivery AS string) LIKE %:keyword% OR " +
+      "LOWER(s.plate.plateNumber) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+      "LOWER(s.dealership.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+      "LOWER(s.messenger.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+  Page<ServiceDeliveryEntity> searchAll(@Param("keyword") String keyword, @Param("deleted") Boolean deleted,
+      Pageable pageable);
+
+  /**
+   * Busca servicios de un mensajero específico por keyword
+   */
+  @Query("SELECT s FROM ServiceDeliveryEntity s WHERE s.messenger.idEmployee = :messengerId AND s.deleted = :deleted AND ("
+      +
+      "CAST(s.idServiceDelivery AS string) LIKE %:keyword% OR " +
+      "LOWER(s.plate.plateNumber) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+      "LOWER(s.dealership.name) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+  Page<ServiceDeliveryEntity> searchByMessenger(@Param("messengerId") Long messengerId,
+      @Param("keyword") String keyword, @Param("deleted") Boolean deleted, Pageable pageable);
+
   List<ServiceDeliveryEntity> findByDeletedTrueAndDeletedAtBefore(LocalDateTime date);
 
   List<ServiceDeliveryEntity> findByPlate_PlateNumberAndDeletedFalse(String plateNumber);

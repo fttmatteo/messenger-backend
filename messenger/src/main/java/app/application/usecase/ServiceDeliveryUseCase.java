@@ -221,10 +221,11 @@ public class ServiceDeliveryUseCase {
      * @return Página de servicios
      */
     @Transactional(readOnly = true)
-    public Page<ServiceDelivery> findAllPaginated(int page, int size, String sortBy, String sortDirection) {
+    public Page<ServiceDelivery> findAllPaginated(int page, int size, String sortBy, String sortDirection,
+            String search) {
         Sort.Direction direction = sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
-        return searchService.findAllPaginated(false, pageable);
+        return searchService.findAllPaginated(search, false, pageable);
     }
 
     /**
@@ -239,10 +240,10 @@ public class ServiceDeliveryUseCase {
      */
     @Transactional(readOnly = true)
     public Page<ServiceDelivery> findByMessengerPaginated(Long messengerId, int page, int size, String sortBy,
-            String sortDirection) {
+            String sortDirection, String search) {
         Sort.Direction direction = sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
-        return searchService.findByMessengerPaginated(messengerId, false, pageable);
+        return searchService.findByMessengerPaginated(messengerId, search, false, pageable);
     }
 
     /**

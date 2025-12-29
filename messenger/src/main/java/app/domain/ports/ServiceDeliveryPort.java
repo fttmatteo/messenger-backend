@@ -63,22 +63,25 @@ public interface ServiceDeliveryPort {
     /**
      * Recupera servicios con paginación.
      * 
+     * @param keyword  Término de búsqueda opcional
      * @param deleted  Filtro por estado de eliminación (false = activos, true =
      *                 papelera)
      * @param pageable Configuración de paginación y ordenamiento
      * @return Página de servicios
      */
-    Page<ServiceDelivery> findAllPaginated(Boolean deleted, Pageable pageable);
+    Page<ServiceDelivery> findAllPaginated(String keyword, Boolean deleted, Pageable pageable);
 
     /**
      * Recupera servicios de un mensajero específico con paginación.
      * 
      * @param messengerId ID del mensajero
+     * @param keyword     Término de búsqueda opcional
      * @param deleted     Filtro por estado de eliminación
      * @param pageable    Configuración de paginación y ordenamiento
      * @return Página de servicios del mensajero
      */
-    Page<ServiceDelivery> findByMessengerPaginated(Long messengerId, Boolean deleted, Pageable pageable);
+    Page<ServiceDelivery> findByMessengerPaginated(Long messengerId, String keyword, Boolean deleted,
+            Pageable pageable);
 
     /**
      * Busca servicios eliminados hace más tiempo que la fecha indicada.

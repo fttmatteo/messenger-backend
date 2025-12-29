@@ -94,15 +94,26 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     }
 
     @Override
-    public Page<ServiceDelivery> findAllPaginated(Boolean deleted, Pageable pageable) {
-        Page<ServiceDeliveryEntity> entityPage = repository.findByDeleted(deleted, pageable);
+    public Page<ServiceDelivery> findAllPaginated(String keyword, Boolean deleted, Pageable pageable) {
+        Page<ServiceDeliveryEntity> entityPage;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            entityPage = repository.searchAll(keyword, deleted, pageable);
+        } else {
+            entityPage = repository.findByDeleted(deleted, pageable);
+        }
         return entityPage.map(mapper::toDomain);
     }
 
     @Override
-    public Page<ServiceDelivery> findByMessengerPaginated(Long messengerId, Boolean deleted, Pageable pageable) {
-        Page<ServiceDeliveryEntity> entityPage = repository.findByMessenger_IdEmployeeAndDeleted(messengerId, deleted,
-                pageable);
+    public Page<ServiceDelivery> findByMessengerPaginated(Long messengerId, String keyword, Boolean deleted,
+            Pageable pageable) {
+        Page<ServiceDeliveryEntity> entityPage;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            entityPage = repository.searchByMessenger(messengerId, keyword, deleted, pageable);
+        } else {
+            entityPage = repository.findByMessenger_IdEmployeeAndDeleted(messengerId, deleted,
+                    pageable);
+        }
         return entityPage.map(mapper::toDomain);
     }
 
