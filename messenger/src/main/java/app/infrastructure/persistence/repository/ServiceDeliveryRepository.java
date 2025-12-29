@@ -2,6 +2,8 @@ package app.infrastructure.persistence.repository;
 
 import app.domain.model.enums.Status;
 import app.infrastructure.persistence.entities.ServiceDeliveryEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -31,6 +33,18 @@ public interface ServiceDeliveryRepository extends JpaRepository<ServiceDelivery
   Optional<ServiceDeliveryEntity> findByIdServiceDeliveryAndDeletedFalse(Long id);
 
   List<ServiceDeliveryEntity> findByDeletedTrue();
+
+  // Paginated Methods
+  /**
+   * Encuentra servicios con paginación filtrado por estado de eliminación
+   */
+  Page<ServiceDeliveryEntity> findByDeleted(Boolean deleted, Pageable pageable);
+
+  /**
+   * Encuentra servicios de un mensajero específico con paginación
+   */
+  Page<ServiceDeliveryEntity> findByMessenger_IdEmployeeAndDeleted(Long messengerId, Boolean deleted,
+      Pageable pageable);
 
   List<ServiceDeliveryEntity> findByDeletedTrueAndDeletedAtBefore(LocalDateTime date);
 

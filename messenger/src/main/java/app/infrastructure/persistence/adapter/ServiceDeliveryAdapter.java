@@ -6,6 +6,8 @@ import app.infrastructure.persistence.entities.ServiceDeliveryEntity;
 import app.infrastructure.persistence.mapper.ServiceDeliveryMapper;
 import app.infrastructure.persistence.repository.ServiceDeliveryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -89,6 +91,19 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
         return repository.findByDeletedTrue().stream()
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<ServiceDelivery> findAllPaginated(Boolean deleted, Pageable pageable) {
+        Page<ServiceDeliveryEntity> entityPage = repository.findByDeleted(deleted, pageable);
+        return entityPage.map(mapper::toDomain);
+    }
+
+    @Override
+    public Page<ServiceDelivery> findByMessengerPaginated(Long messengerId, Boolean deleted, Pageable pageable) {
+        Page<ServiceDeliveryEntity> entityPage = repository.findByMessenger_IdEmployeeAndDeleted(messengerId, deleted,
+                pageable);
+        return entityPage.map(mapper::toDomain);
     }
 
     @Override

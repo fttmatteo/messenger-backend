@@ -12,6 +12,7 @@ import app.adapter.in.rest.mapper.ServiceDeliveryResponseMapper;
 import app.adapter.in.rest.request.ServiceDeliveryCreateRequest;
 import app.adapter.in.rest.request.ServiceDeliveryUpdateStatusRequest;
 import app.adapter.in.rest.response.DailyStatsResponse;
+import app.adapter.in.rest.response.PageResponse;
 import app.adapter.in.rest.response.ServiceDeliveryResponse;
 import app.domain.exception.InputsException;
 import app.domain.exception.ResourceNotFoundException;
@@ -30,6 +31,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 
 /**
  * Controlador REST para gestión de servicios de entrega.
@@ -236,6 +238,47 @@ public class ServiceDeliveryController {
                 .map(responseMapper::toResponse)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(responses);
+    }
+
+    /**
+     * Obtiene todos los servicios con paginación.
+     * Los mensajeros solo ven sus propios servicios asignados.
+     * 
+     * @param page          Número de página (0-indexed)
+     * @param size          Tamaño de página (por defecto 10)
+     * @param sortBy        Campo para ordenar (por defecto "createdAt")
+     * @param sortDirection Dirección de ordenamiento (por defecto "desc")
+     * @return Respuesta paginada de servicios
+     */
+    @GetMapping("/allServicesPageable")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<PageResponse<ServiceDeliveryResponse>> findAllPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDirection) {
+
+        logger.info("Consultando servicios paginados - page: {}, size: {}, sortBy: {}, sortDirection: {}",
+                page, size, sortBy, sortDirection);
+
+        Employee currentUser = securityHelper.getCurrentUser();
+
+        Page<ServiceDelivery> servicePage;
+
+        if (currentUser.getRole() == Role.MESSENGER) {
+            Long messengerId = currentUser.getIdEmployee();
+            servicePage = serviceDeliveryUseCase.findByMessengerPaginated(
+                    messengerId, page, size, sortBy, sortDirection);
+        } else {
+            servicePage = serviceDeliveryUseCase.findAllPaginated(
+                    page, size, sortBy, sortDirection);
+        }
+
+        // Convert domain Page to PageResponse with DTOs
+        Page<ServiceDeliveryResponse> responsePage = servicePage.map(responseMapper::toResponse);
+        PageResponse<ServiceDeliveryResponse> pageResponse = PageResponse.from(responsePage);
+
+        return ResponseEntity.ok(pageResponse);
     }
 
     /**

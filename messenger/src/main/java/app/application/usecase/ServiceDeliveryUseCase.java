@@ -10,6 +10,10 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -205,6 +209,40 @@ public class ServiceDeliveryUseCase {
     @Transactional(readOnly = true)
     public List<ServiceDelivery> findAll() {
         return searchService.findAll();
+    }
+
+    /**
+     * Recupera todos los servicios con paginación y ordenamiento.
+     * 
+     * @param page          Número de página (0-based)
+     * @param size          Tamaño de página
+     * @param sortBy        Campo por el cual ordenar (ej. "createdAt")
+     * @param sortDirection Dirección de ordenamiento ("asc" o "desc")
+     * @return Página de servicios
+     */
+    @Transactional(readOnly = true)
+    public Page<ServiceDelivery> findAllPaginated(int page, int size, String sortBy, String sortDirection) {
+        Sort.Direction direction = sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        return searchService.findAllPaginated(false, pageable);
+    }
+
+    /**
+     * Recupera servicios de un mensajero específico con paginación.
+     * 
+     * @param messengerId   ID del mensajero
+     * @param page          Número de página (0-based)
+     * @param size          Tamaño de página
+     * @param sortBy        Campo por el cual ordenar
+     * @param sortDirection Dirección de ordenamiento
+     * @return Página de servicios del mensajero
+     */
+    @Transactional(readOnly = true)
+    public Page<ServiceDelivery> findByMessengerPaginated(Long messengerId, int page, int size, String sortBy,
+            String sortDirection) {
+        Sort.Direction direction = sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        return searchService.findByMessengerPaginated(messengerId, false, pageable);
     }
 
     /**
