@@ -49,6 +49,7 @@ public class TrackingWebSocketController {
         if (request.getStatus() != null) {
             domainTracking.setStatus(request.getStatus());
         }
+        domainTracking.setLastUpdate(request.getLastUpdate());
 
         LiveTracking tracking = updateLiveTracking.execute(domainTracking);
         LiveTrackingResponse response = mapToResponse(tracking);

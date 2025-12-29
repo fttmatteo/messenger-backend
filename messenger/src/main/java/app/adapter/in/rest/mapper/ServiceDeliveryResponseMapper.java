@@ -86,7 +86,9 @@ public class ServiceDeliveryResponseMapper {
                                 h.getPreviousStatus(),
                                 h.getNewStatus(),
                                 h.getChangeDate(),
-                                employeeMapper.toResponse(h.getChangedBy()));
+                                employeeMapper.toResponse(h.getChangedBy()),
+                                h.getDeliveryLatitude(),
+                                h.getDeliveryLongitude());
 
                         if (h.getPhotos() != null) {
                             historyResponse.setPhotos(h.getPhotos().stream()

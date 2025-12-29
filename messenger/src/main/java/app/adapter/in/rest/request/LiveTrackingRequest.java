@@ -1,6 +1,7 @@
 package app.adapter.in.rest.request;
 
 import app.domain.model.enums.TrackingStatus;
+import java.time.LocalDateTime;
 
 /**
  * DTO para actualizar ubicación en tiempo real de mensajero.
@@ -14,6 +15,7 @@ public class LiveTrackingRequest {
     private Double heading;
     private TrackingStatus status;
     private String deviceId;
+    private LocalDateTime lastUpdate;
 
     public LiveTrackingRequest() {
     }
@@ -80,5 +82,13 @@ public class LiveTrackingRequest {
 
     public void setDeviceId(String deviceId) {
         this.deviceId = deviceId;
+    }
+
+    public LocalDateTime getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(LocalDateTime lastUpdate) {
+        this.lastUpdate = lastUpdate;
     }
 }

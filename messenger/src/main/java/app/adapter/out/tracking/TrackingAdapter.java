@@ -56,7 +56,9 @@ public class TrackingAdapter implements TrackingPort {
 
         try {
             String key = TRACKING_KEY_PREFIX + tracking.getMessengerId();
-            tracking.setLastUpdate(LocalDateTime.now());
+            if (tracking.getLastUpdate() == null) {
+                tracking.setLastUpdate(LocalDateTime.now());
+            }
 
             if (tracking.getStatus() == TrackingStatus.OFFLINE) {
                 logger.debug("Mensajero {} offline, eliminando tracking", tracking.getMessengerId());

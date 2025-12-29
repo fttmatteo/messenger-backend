@@ -99,6 +99,8 @@ public class UpdateServiceDelivery {
         history.setNewStatus(newStatus);
         history.setChangeDate(LocalDateTime.now());
         history.setChangedBy(user);
+        history.setDeliveryLatitude(latitude);
+        history.setDeliveryLongitude(longitude);
 
         if (photos != null && !photos.isEmpty()) {
             history.setPhotos(new ArrayList<>(photos));

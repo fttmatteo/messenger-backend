@@ -66,10 +66,31 @@ public class ArchiveServiceService implements ArchivePort {
         archivedService.setDeletedAt(service.getDeletedAt());
         archivedService.setLockedAt(service.getLockedAt());
 
-        // Foreign key IDs (para referencia)
-        archivedService.setPlateId(service.getPlate().getIdPlate());
-        archivedService.setDealershipId(service.getDealership().getIdDealership());
-        archivedService.setMessengerId(service.getMessenger().getIdEmployee());
+        // Foreign key IDs (para referencia) - with null checks
+        if (service.getPlate() != null) {
+            archivedService.setPlateId(service.getPlate().getIdPlate());
+            archivedService.setPlateNumber(service.getPlate().getPlateNumber());
+            archivedService.setPlateType(service.getPlate().getPlateType() != null
+                    ? service.getPlate().getPlateType().name()
+                    : "UNKNOWN");
+        }
+
+        if (service.getDealership() != null) {
+            archivedService.setDealershipId(service.getDealership().getIdDealership());
+            archivedService.setDealershipName(service.getDealership().getName());
+            archivedService.setDealershipAddress(service.getDealership().getAddress());
+            archivedService.setDealershipZone(service.getDealership().getZone());
+        }
+
+        if (service.getMessenger() != null) {
+            archivedService.setMessengerId(service.getMessenger().getIdEmployee());
+            archivedService.setMessengerName(service.getMessenger().getFullName());
+            archivedService.setMessengerDocument(service.getMessenger().getDocument() != null
+                    ? service.getMessenger().getDocument().toString()
+                    : null);
+            archivedService.setMessengerPhone(service.getMessenger().getPhone());
+        }
+
         if (service.getSignature() != null) {
             archivedService.setSignatureId(service.getSignature().getIdSignature());
         }
@@ -78,19 +99,6 @@ public class ArchiveServiceService implements ArchivePort {
         archivedService.setPermanentlyDeletedAt(LocalDateTime.now());
         archivedService.setPermanentlyDeletedBy(deletedByEmployeeId);
         archivedService.setDeletionReason(deletionReason);
-
-        // Datos desnormalizados (preservados incluso si se borran las entidades
-        // relacionadas)
-        archivedService.setMessengerName(service.getMessenger().getFullName());
-        archivedService.setMessengerDocument(service.getMessenger().getDocument().toString());
-        archivedService.setMessengerPhone(service.getMessenger().getPhone());
-
-        archivedService.setDealershipName(service.getDealership().getName());
-        archivedService.setDealershipAddress(service.getDealership().getAddress());
-        archivedService.setDealershipZone(service.getDealership().getZone());
-
-        archivedService.setPlateNumber(service.getPlate().getPlateNumber());
-        archivedService.setPlateType(service.getPlate().getPlateType().name());
 
         deletedServiceRepository.save(archivedService);
 

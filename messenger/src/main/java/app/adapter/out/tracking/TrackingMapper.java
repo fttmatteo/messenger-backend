@@ -67,7 +67,7 @@ public class TrackingMapper {
         TrackingHistory history = new TrackingHistory();
         history.setMessengerId(live.getMessengerId());
         history.setLocation(live.getCurrentLocation());
-        history.setRecordedAt(LocalDateTime.now());
+        history.setRecordedAt(live.getLastUpdate() != null ? live.getLastUpdate() : LocalDateTime.now());
         history.setSpeed(live.getSpeed());
         history.setSource(source != null ? source : TrackingSource.GPS);
 
