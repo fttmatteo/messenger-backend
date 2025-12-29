@@ -13,7 +13,7 @@ public class SystemSettingController {
     @Autowired
     private SystemSettingUseCase systemSettingUseCase;
 
-    @GetMapping("/status-colors")
+    @GetMapping(value = "/status-colors", produces = "application/json")
     public ResponseEntity<String> getStatusColors() {
         return ResponseEntity.ok(systemSettingUseCase.getStatusColors());
     }
