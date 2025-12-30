@@ -73,8 +73,8 @@ class ServiceDeliveryControllerIntegrationTest {
         PlateEntity plate = createPlate("INT001");
         entityManager.persist(plate);
 
-        // Use current date/time for the test
-        LocalDateTime now = LocalDateTime.now();
+        // Use middle of the day to avoid timezone/midnight shifts
+        LocalDateTime now = LocalDateTime.now().withHour(12).withMinute(0).withSecond(0).withNano(0);
         createAndPersistService(messenger, dealership, plate, Status.DELIVERED, now);
 
         entityManager.flush();
@@ -97,7 +97,7 @@ class ServiceDeliveryControllerIntegrationTest {
      * Verifica que se requiera autenticación para acceder a las estadísticas.
      */
     void shouldReturn401IfUnauthenticated() throws Exception {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now().withHour(12).withMinute(0).withSecond(0).withNano(0);
         mockMvc.perform(get("/services/stats/daily")
                 .param("messengerId", "1")
                 .param("from", now.toLocalDate().toString())

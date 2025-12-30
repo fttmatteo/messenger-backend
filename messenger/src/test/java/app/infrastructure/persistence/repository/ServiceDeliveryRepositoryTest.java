@@ -55,9 +55,8 @@ class ServiceDeliveryRepositoryTest {
         PlateEntity plate = createPlate("TEST001");
         entityManager.persist(plate);
 
-        // Usage of NOW is critical because ServiceDeliveryEntity @PrePersist sets
-        // created_at to now()
-        LocalDateTime fixedDate = LocalDateTime.now();
+        // Use middle of the day to avoid timezone/midnight shifts
+        LocalDateTime fixedDate = LocalDateTime.now().withHour(12).withMinute(0).withSecond(0).withNano(0);
 
         // Created 4 services for this messenger on the same day
         createAndPersistService(messenger, dealership, plate, Status.ASSIGNED, fixedDate);

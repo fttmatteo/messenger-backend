@@ -95,13 +95,13 @@ graph LR
     SEC --> REDIS
 
     %% Estilos
-    style CORE fill:#f8f9fa,stroke:#343a40,stroke-width:2px
-    style DOMAIN fill:#ffffff,stroke:#343a40,stroke-dasharray: 5 5
-    style APP fill:#e9ecef,stroke:#495057
-    style IN fill:#e7f5ff,stroke:#228be6
-    style OUT fill:#fff4e6,stroke:#fd7e14
+    style CORE fill:#0d1117,stroke:#30363d,stroke-width:2px,color:#c9d1d9
+    style DOMAIN fill:#161b22,stroke:#58a6ff,stroke-dasharray: 5 5,color:#c9d1d9
+    style APP fill:#161b22,stroke:#30363d,color:#c9d1d9
+    style IN fill:#051d33,stroke:#1f6feb,color:#c9d1d9
+    style OUT fill:#2d1a05,stroke:#f0883e,color:#c9d1d9
     
-    classDef actor fill:#fff,stroke:#333,stroke-width:2px
+    classDef actor fill:#21262d,stroke:#8b949e,color:#c9d1d9
     class USER,MAPS,GCS,DB,REDIS actor
 ```
 
@@ -480,55 +480,6 @@ Sistema de tracking GPS usando **Redis** + **WebSocket** para monitoreo de mensa
 - **Reverse Geocoding**: Coordenadas → Dirección
 
 ---
-
-## 🔄 Flujo de Estados
-
-```mermaid
-flowchart TD
-    %% Entrada
-    S(( )) --> ASSIGNED([ASSIGNED])
-
-    %% Ciclo Operativo (Azul)
-    subgraph OPERATIVO [Ciclo del Mensajero]
-        direction LR
-        PENDING[PENDING]
-        DELIVERED[DELIVERED]
-        RETURNED[RETURNED]
-        
-        PENDING <--> DELIVERED
-        DELIVERED <--> RETURNED
-        RETURNED <--> PENDING
-    end
-
-    %% Transiciones Administrativas (Rojo/Verde)
-    CANCELED[/CANCELED/]
-    RESOLVED[[RESOLVED]]
-
-    %% Flujos Principales
-    ASSIGNED -- "Mensajero" --> OPERATIVO
-    
-    %% Flechas de Salida (Solo Admin)
-    ASSIGNED -- "Admin" --> CANCELED
-    ASSIGNED -- "Admin" --> RESOLVED
-    
-    OPERATIVO -- "Admin" --> CANCELED
-    OPERATIVO -- "Admin" --> RESOLVED
-
-    %% Reasignación
-    CANCELED -- "Admin: Reasignar" --> ASSIGNED
-
-    %% Estilos
-    style OPERATIVO fill:#f0f7ff,stroke:#0052cc,stroke-dasharray: 5 5
-    classDef messenger fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
-    classDef cancel fill:#ffebee,stroke:#c62828,color:#b71c1c
-    classDef resolve fill:#f1f8e9,stroke:#558b2f,color:#33691e
-    classDef initial fill:#fafafa,stroke:#333
-    
-    class PENDING,DELIVERED,RETURNED messenger
-    class CANCELED cancel
-    class RESOLVED resolve
-    class ASSIGNED initial
-```
 
 ### Reglas de Negocio
 
