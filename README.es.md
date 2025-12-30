@@ -42,52 +42,67 @@
 El proyecto implementa **Arquitectura Hexagonal (Ports & Adapters)** para mantener el dominio aislado de las dependencias externas.
 
 ```mermaid
-flowchart TD
-    subgraph IA ["Adaptadores de Entrada (Inbound)"]
+graph LR
+    %% Actores Externos
+    USER((👤 Usuario/App))
+    MAPS{{G-Maps}}
+    GCS{{GCS}}
+    DB[(MySQL)]
+    REDIS[(Redis)]
+
+    subgraph IN [Adaptadores de Entrada]
         direction TB
-        REST["REST Controllers<br/>(API Endpoints)"]
-        BUILD["Builders &<br/>Validators"]
+        REST[🌐 REST API]
+        SOC[🔌 WebSockets]
     end
 
-    subgraph APP ["Capa de Aplicación"]
+    subgraph CORE [Capa Core / Aplicación]
         direction TB
-        UC["Casos de Uso<br/>(Lógica de Aplicación)"]
-        EXC["Excepciones de<br/>Negocio"]
+        subgraph APP [Capa de Aplicación]
+            UC[⚙️ Casos de Uso]
+        end
+        subgraph DOMAIN [Capa de Dominio]
+            SVC[🛠️ Servicios de Dominio]
+            PORTS[🎯 Puertos]
+            MODEL[💎 Modelos de Dominio]
+        end
     end
 
-    subgraph DOMAIN ["Capa de Dominio (Core)"]
+    subgraph OUT [Adaptadores de Salida]
         direction TB
-        SVC["Servicios de Dominio"]
-        PORTS["Puertos<br/>(Interfaces)"]
-        MOD["Modelos &<br/>Enums"]
+        PERS[💾 Persistencia]
+        CLD[☁️ Servicios Cloud]
+        SEC[🔐 Seguridad]
     end
 
-    subgraph OA ["Adaptadores de Salida (Outbound)"]
-        direction TB
-        PERS["Persistencia<br/>(MySQL + Flyway)"]
-        SEC["Adaptador de Seguridad<br/>(JWT + BCrypt)"]
-        TRACK["Tracking Tiempo Real<br/>(Redis + WebSocket)"]
-        EXT["APIs Externas<br/>(OCR, Maps, GCS)"]
-    end
+    %% Flujo de Entrada
+    USER --> REST & SOC
+    REST & SOC --> UC
 
-    %% Relaciones
-    REST --> UC
-    BUILD -.-> REST
+    %% Lógica de Aplicación
     UC --> SVC
     UC --> PORTS
-    SVC --> MOD
-    
-    %% Inversión de Dependencia (Adaptadores implementan Puertos)
+    SVC --> MODEL
+
+    %% Flujo de Salida (Inversión de Dependencia)
     PERS -.-> PORTS
+    CLD -.-> PORTS
     SEC -.-> PORTS
-    TRACK -.-> PORTS
-    EXT -.-> PORTS
+
+    %% Conexiones de Infraestructura
+    PERS --> DB
+    CLD --> GCS & MAPS
+    SEC --> REDIS
 
     %% Estilos
-    style DOMAIN fill:#f5f5f5,stroke:#333,stroke-width:3px
-    style APP fill:#e1f5fe,stroke:#01579b,stroke-width:1px
-    style IA fill:#f1f8e9,stroke:#33691e,stroke-width:1px
-    style OA fill:#fff3e0,stroke:#e65100,stroke-width:1px
+    style CORE fill:#f8f9fa,stroke:#343a40,stroke-width:2px
+    style DOMAIN fill:#ffffff,stroke:#343a40,stroke-dasharray: 5 5
+    style APP fill:#e9ecef,stroke:#495057
+    style IN fill:#e7f5ff,stroke:#228be6
+    style OUT fill:#fff4e6,stroke:#fd7e14
+    
+    classDef actor fill:#fff,stroke:#333,stroke-width:2px
+    class USER,MAPS,GCS,DB,REDIS actor
 ```
 
 ---
@@ -470,38 +485,49 @@ Sistema de tracking GPS usando **Redis** + **WebSocket** para monitoreo de mensa
 
 ```mermaid
 flowchart TD
-    START(( )) --> ASSIGNED[ASSIGNED]
-    
-    subgraph MENSAJERO ["Acciones del Mensajero"]
-        ASSIGNED --> PENDING[PENDING]
-        ASSIGNED --> DELIVERED[DELIVERED]
-        ASSIGNED --> RETURNED[RETURNED]
+    %% Entrada
+    S(( )) --> ASSIGNED([ASSIGNED])
+
+    %% Ciclo Operativo (Azul)
+    subgraph OPERATIVO [Ciclo del Mensajero]
+        direction LR
+        PENDING[PENDING]
+        DELIVERED[DELIVERED]
+        RETURNED[RETURNED]
         
-        PENDING <--> RETURNED
         PENDING <--> DELIVERED
-        RETURNED <--> DELIVERED
+        DELIVERED <--> RETURNED
+        RETURNED <--> PENDING
     end
 
-    subgraph ADMIN ["Acciones del Administrador"]
-        PENDING --> RESOLVED[RESOLVED]
-        DELIVERED --> RESOLVED
-        RETURNED --> RESOLVED
-        ASSIGNED --> RESOLVED
-        
-        ANY[Cualquier Estado] --> CANCELED[CANCELED]
-        CANCELED -->|Reasignar| ASSIGNED
-    end
+    %% Transiciones Administrativas (Rojo/Verde)
+    CANCELED[/CANCELED/]
+    RESOLVED[[RESOLVED]]
+
+    %% Flujos Principales
+    ASSIGNED -- "Mensajero" --> OPERATIVO
+    
+    %% Flechas de Salida (Solo Admin)
+    ASSIGNED -- "Admin" --> CANCELED
+    ASSIGNED -- "Admin" --> RESOLVED
+    
+    OPERATIVO -- "Admin" --> CANCELED
+    OPERATIVO -- "Admin" --> RESOLVED
+
+    %% Reasignación
+    CANCELED -- "Admin: Reasignar" --> ASSIGNED
 
     %% Estilos
-    classDef initial fill:#f5f5f5,stroke:#333,stroke-dasharray: 5 5
-    classDef messenger fill:#e1f5fe,stroke:#01579b
-    classDef admin fill:#f1f8e9,stroke:#33691e
-    classDef final fill:#fff3e0,stroke:#e65100
+    style OPERATIVO fill:#f0f7ff,stroke:#0052cc,stroke-dasharray: 5 5
+    classDef messenger fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
+    classDef cancel fill:#ffebee,stroke:#c62828,color:#b71c1c
+    classDef resolve fill:#f1f8e9,stroke:#558b2f,color:#33691e
+    classDef initial fill:#fafafa,stroke:#333
     
-    class ASSIGNED initial
     class PENDING,DELIVERED,RETURNED messenger
-    class CANCELED admin
-    class RESOLVED final
+    class CANCELED cancel
+    class RESOLVED resolve
+    class ASSIGNED initial
 ```
 
 ### Reglas de Negocio

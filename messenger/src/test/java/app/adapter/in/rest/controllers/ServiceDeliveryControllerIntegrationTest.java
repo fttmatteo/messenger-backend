@@ -13,6 +13,8 @@ import app.infrastructure.persistence.entities.PlateEntity;
 import app.infrastructure.persistence.entities.ServiceDeliveryEntity;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
+import java.util.TimeZone;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,6 +41,11 @@ class ServiceDeliveryControllerIntegrationTest {
 
     @Autowired
     private EntityManager entityManager;
+
+    @BeforeAll
+    static void setupTimezone() {
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Bogota"));
+    }
 
     @BeforeEach
     public void setup() {

@@ -42,52 +42,67 @@
 The project implements **Hexagonal Architecture (Ports & Adapters)** to keep the domain isolated from external dependencies.
 
 ```mermaid
-flowchart TD
-    subgraph IA ["Input Adapters (Inbound)"]
+graph LR
+    %% External Actors
+    USER((👤 User/App))
+    MAPS{{G-Maps}}
+    GCS{{GCS}}
+    DB[(MySQL)]
+    REDIS[(Redis)]
+
+    subgraph IN [Input Adapters]
         direction TB
-        REST["REST Controllers<br/>(API Endpoints)"]
-        BUILD["Builders &<br/>Validators"]
+        REST[🌐 REST API]
+        SOC[🔌 WebSockets]
     end
 
-    subgraph APP ["Application Layer"]
+    subgraph CORE [Application Core]
         direction TB
-        UC["Use Cases<br/>(Application Logic)"]
-        EXC["Business<br/>Exceptions"]
+        subgraph APP [Application Layer]
+            UC[⚙️ Use Cases]
+        end
+        subgraph DOMAIN [Domain Layer]
+            SVC[🛠️ Domain Services]
+            PORTS[🎯 Ports]
+            MODEL[💎 Domain Models]
+        end
     end
 
-    subgraph DOMAIN ["Domain Layer (Core)"]
+    subgraph OUT [Output Adapters]
         direction TB
-        SVC["Domain Services"]
-        PORTS["Ports<br/>(Interfaces)"]
-        MOD["Models &<br/>Enums"]
+        PERS[💾 Persistence]
+        CLD[☁️ Cloud Services]
+        SEC[🔐 Security]
     end
 
-    subgraph OA ["Output Adapters (Outbound)"]
-        direction TB
-        PERS["Persistence<br/>(MySQL + Flyway)"]
-        SEC["Security Adapter<br/>(JWT + BCrypt)"]
-        TRACK["Real-Time Tracking<br/>(Redis + WebSocket)"]
-        EXT["External APIs<br/>(OCR, Maps, GCS)"]
-    end
+    %% Inbound Flow
+    USER --> REST & SOC
+    REST & SOC --> UC
 
-    %% Relations
-    REST --> UC
-    BUILD -.-> REST
+    %% Application Logic
     UC --> SVC
     UC --> PORTS
-    SVC --> MOD
-    
-    %% Dependency Inversion (Adapters implement Ports)
+    SVC --> MODEL
+
+    %% Outbound Flow (Dependency Inversion)
     PERS -.-> PORTS
+    CLD -.-> PORTS
     SEC -.-> PORTS
-    TRACK -.-> PORTS
-    EXT -.-> PORTS
+
+    %% Infrastructure Connections
+    PERS --> DB
+    CLD --> GCS & MAPS
+    SEC --> REDIS
 
     %% Styling
-    style DOMAIN fill:#f5f5f5,stroke:#333,stroke-width:3px
-    style APP fill:#e1f5fe,stroke:#01579b,stroke-width:1px
-    style IA fill:#f1f8e9,stroke:#33691e,stroke-width:1px
-    style OA fill:#fff3e0,stroke:#e65100,stroke-width:1px
+    style CORE fill:#f8f9fa,stroke:#343a40,stroke-width:2px
+    style DOMAIN fill:#ffffff,stroke:#343a40,stroke-dasharray: 5 5
+    style APP fill:#e9ecef,stroke:#495057
+    style IN fill:#e7f5ff,stroke:#228be6
+    style OUT fill:#fff4e6,stroke:#fd7e14
+    
+    classDef actor fill:#fff,stroke:#333,stroke-width:2px
+    class USER,MAPS,GCS,DB,REDIS actor
 ```
 
 ---
@@ -470,38 +485,49 @@ GPS tracking system using **Redis** + **WebSocket** for messenger monitoring.
 
 ```mermaid
 flowchart TD
-    START(( )) --> ASSIGNED[ASSIGNED]
-    
-    subgraph MESSENGER ["Messenger Actions"]
-        ASSIGNED --> PENDING[PENDING]
-        ASSIGNED --> DELIVERED[DELIVERED]
-        ASSIGNED --> RETURNED[RETURNED]
+    %% Entry
+    S(( )) --> ASSIGNED([ASSIGNED])
+
+    %% Operational Loop (Blue)
+    subgraph OPERATIONAL [Messenger Loop]
+        direction LR
+        PENDING[PENDING]
+        DELIVERED[DELIVERED]
+        RETURNED[RETURNED]
         
-        PENDING <--> RETURNED
         PENDING <--> DELIVERED
-        RETURNED <--> DELIVERED
+        DELIVERED <--> RETURNED
+        RETURNED <--> PENDING
     end
 
-    subgraph ADMIN ["Administrator Actions"]
-        PENDING --> RESOLVED[RESOLVED]
-        DELIVERED --> RESOLVED
-        RETURNED --> RESOLVED
-        ASSIGNED --> RESOLVED
-        
-        ANY[Any State] --> CANCELED[CANCELED]
-        CANCELED -->|Reassign| ASSIGNED
-    end
+    %% Administrative Transitions (Red/Green)
+    CANCELED[/CANCELED/]
+    RESOLVED[[RESOLVED]]
 
-    %% Documentation Links
-    classDef initial fill:#f5f5f5,stroke:#333,stroke-dasharray: 5 5
-    classDef messenger fill:#e1f5fe,stroke:#01579b
-    classDef admin fill:#f1f8e9,stroke:#33691e
-    classDef final fill:#fff3e0,stroke:#e65100
+    %% Primary Flows
+    ASSIGNED -- "Messenger" --> OPERATIONAL
     
-    class ASSIGNED initial
+    %% Exit arrows (Admin Only)
+    ASSIGNED -- "Admin" --> CANCELED
+    ASSIGNED -- "Admin" --> RESOLVED
+    
+    OPERATIONAL -- "Admin" --> CANCELED
+    OPERATIONAL -- "Admin" --> RESOLVED
+
+    %% Reassign Path
+    CANCELED -- "Admin: Reassign" --> ASSIGNED
+
+    %% Styling
+    style OPERATIONAL fill:#f0f7ff,stroke:#0052cc,stroke-dasharray: 5 5
+    classDef messenger fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
+    classDef cancel fill:#ffebee,stroke:#c62828,color:#b71c1c
+    classDef resolve fill:#f1f8e9,stroke:#558b2f,color:#33691e
+    classDef initial fill:#fafafa,stroke:#333
+    
     class PENDING,DELIVERED,RETURNED messenger
-    class CANCELED admin
-    class RESOLVED final
+    class CANCELED cancel
+    class RESOLVED resolve
+    class ASSIGNED initial
 ```
 
 ### Business Rules
