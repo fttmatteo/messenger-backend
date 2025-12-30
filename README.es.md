@@ -42,45 +42,52 @@
 El proyecto implementa **Arquitectura Hexagonal (Ports & Adapters)** para mantener el dominio aislado de las dependencias externas.
 
 ```mermaid
-graph LR
-    subgraph InputAdapters ["Input Adapters"]
+flowchart TD
+    subgraph IA ["Adaptadores de Entrada (Inbound)"]
         direction TB
-        REST[REST Controllers]
-        VAL[Validators]
-        BUILD[Builders]
+        REST["REST Controllers<br/>(API Endpoints)"]
+        BUILD["Builders &<br/>Validators"]
     end
 
-    subgraph ApplicationLayer ["Application Layer"]
+    subgraph APP ["Capa de Aplicación"]
         direction TB
-        UC[Use Cases]
-        EXC[Exceptions]
+        UC["Casos de Uso<br/>(Lógica de Aplicación)"]
+        EXC["Excepciones de<br/>Negocio"]
     end
 
-    subgraph DomainLayer ["Domain Layer"]
+    subgraph DOMAIN ["Capa de Dominio (Core)"]
         direction TB
-        PORTS[Ports]
-        SVC[Domain Services]
-        MOD[Models]
+        SVC["Servicios de Dominio"]
+        PORTS["Puertos<br/>(Interfaces)"]
+        MOD["Modelos &<br/>Enums"]
     end
 
-    subgraph OutputAdapters ["Output Adapters"]
+    subgraph OA ["Adaptadores de Salida (Outbound)"]
         direction TB
-        OCR[Google Vision OCR]
-        STORAGE[Google Cloud Storage]
-        SEC[JWT Security]
-        MAPS[Google Maps]
-        TRACKING[Location Tracking]
+        PERS["Persistencia<br/>(MySQL + Flyway)"]
+        SEC["Adaptador de Seguridad<br/>(JWT + BCrypt)"]
+        TRACK["Tracking Tiempo Real<br/>(Redis + WebSocket)"]
+        EXT["APIs Externas<br/>(OCR, Maps, GCS)"]
     end
 
+    %% Relaciones
     REST --> UC
-    UC --> PORTS
-    PORTS --> OCR
-    PORTS --> STORAGE
-    PORTS --> SEC
-    PORTS --> MAPS
-    PORTS --> TRACKING
+    BUILD -.-> REST
     UC --> SVC
+    UC --> PORTS
     SVC --> MOD
+    
+    %% Inversión de Dependencia (Adaptadores implementan Puertos)
+    PERS -.-> PORTS
+    SEC -.-> PORTS
+    TRACK -.-> PORTS
+    EXT -.-> PORTS
+
+    %% Estilos
+    style DOMAIN fill:#f5f5f5,stroke:#333,stroke-width:3px
+    style APP fill:#e1f5fe,stroke:#01579b,stroke-width:1px
+    style IA fill:#f1f8e9,stroke:#33691e,stroke-width:1px
+    style OA fill:#fff3e0,stroke:#e65100,stroke-width:1px
 ```
 
 ---
@@ -89,7 +96,7 @@ graph LR
 
 | Componente | Tecnología |
 |------------|------------|
-| **Framework** | Spring Boot 4.0.1 |
+| **Framework** | Spring Boot 4.x |
 | **Lenguaje** | Java 17 |
 | **Base de Datos** | MySQL 8.0+ |
 | **Migraciones** | Flyway |
@@ -105,6 +112,7 @@ graph LR
 | **Auditoría** | JPA Callbacks + AOP (Aspect Oriented Programming) |
 | **CI/CD** | GitHub Actions |
 | **Tests de Arquitectura** | ArchUnit |
+| **Rendimiento** | Índices de Base de Datos (Optimización para paginación) |
 
 ---
 
@@ -118,7 +126,7 @@ messenger/
 │   │   ├── in/                          # Adaptadores de entrada
 │   │   │   ├── builder/                 # Constructores de objetos
 │   │   │   ├── rest/
-│   │   │   │   ├── controllers/         # 7 REST Controllers
+│   │   │   │   ├── controllers/         # 9 REST Controllers
 │   │   │   │   ├── mapper/              # Mappers Request/Response
 │   │   │   │   ├── request/             # DTOs de entrada
 │   │   │   │   └── response/            # DTOs de salida
@@ -131,7 +139,7 @@ messenger/
 │   │       └── tracking/                # Location Tracking
 │   ├── application/
 │   │   ├── exceptions/                  # BusinessException, InputsException
-│   │   └── usecase/                     # 9 Casos de Uso (Location, Route, Tracking...)
+│   │   └── usecase/                     # 11 Casos de Uso (Monitoring, Settings, Location...)
 │   ├── domain/
 │   │   ├── model/                       # 12+ Modelos + 7 Enums + Auth
 │   │   ├── ports/                       # 10 Puertos (interfaces)
@@ -271,11 +279,22 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `PUT` | `/services/reassign/{id}` | Reasignar a otro mensajero (ADMIN/CANCELED) |
 | `GET` | `/services/findByServiceId/{id}` | Obtener servicio por ID |
 | `GET` | `/services/allServices` | Listar servicios (filtrado por rol) |
+| `GET` | `/services/allServicesPageable` | Listar servicios con **paginación y búsqueda** |
 | `GET` | `/services/stats/daily` | Estadísticas diarias (requiere messengerId, from, to) |
 | `DELETE` | `/services/deleteService/{id}` | Mover a papelera (ADMIN) |
 | `GET` | `/services/trash` | Listar servicios eliminados (ADMIN) |
 | `POST` | `/services/trash/restore/{id}` | Restaurar desde papelera (ADMIN) |
 | `DELETE` | `/services/trash/empty` | Vaciar papelera permanentemente (ADMIN) |
+| `DELETE` | `/services/trash/{id}` | Eliminación individual permanente (ADMIN) |
+
+---
+
+### Configuraciones del Sistema (`/settings`) - Solo ADMIN
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/settings/status-colors` | Obtener configuración de colores de estados |
+| `PUT` | `/settings/status-colors` | Actualizar configuración de colores de estados |
 
 ---
 
@@ -307,6 +326,14 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `GET` | `/tracking/active` | Listar todos los mensajeros activos (ADMIN) |
 | `GET` | `/tracking/history/{id}` | Obtener historial por fecha (`?date=YYYY-MM-DD`) |
 | `GET` | `/tracking/service/{id}` | Obtener historial para un servicio específico |
+
+---
+
+### Monitoreo (`/monitoring`) - Solo ADMIN
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/monitoring/messenger/{id}/activity` | Línea de tiempo y estadísticas diarias de un mensajero |
 
 ---
 
@@ -385,6 +412,12 @@ erDiagram
         LocalDateTime recorded_at
     }
     
+    system_settings {
+        String setting_key PK
+        String setting_value
+        LocalDateTime updated_at
+    }
+    
     employees ||--o{ service_deliveries : "delivers"
     dealerships ||--o{ service_deliveries : "receives"
     plates ||--o{ service_deliveries : "has"
@@ -436,40 +469,49 @@ Sistema de tracking GPS usando **Redis** + **WebSocket** para monitoreo de mensa
 ## 🔄 Flujo de Estados
 
 ```mermaid
-stateDiagram-v2
-    direction LR
+flowchart TD
+    START(( )) --> ASSIGNED[ASSIGNED]
     
-    [*] --> ASSIGNED: Auto Registro
+    subgraph MENSAJERO ["Acciones del Mensajero"]
+        ASSIGNED --> PENDING[PENDING]
+        ASSIGNED --> DELIVERED[DELIVERED]
+        ASSIGNED --> RETURNED[RETURNED]
+        
+        PENDING <--> RETURNED
+        PENDING <--> DELIVERED
+        RETURNED <--> DELIVERED
+    end
+
+    subgraph ADMIN ["Acciones del Administrador"]
+        PENDING --> RESOLVED[RESOLVED]
+        DELIVERED --> RESOLVED
+        RETURNED --> RESOLVED
+        ASSIGNED --> RESOLVED
+        
+        ANY[Cualquier Estado] --> CANCELED[CANCELED]
+        CANCELED -->|Reasignar| ASSIGNED
+    end
+
+    %% Estilos
+    classDef initial fill:#f5f5f5,stroke:#333,stroke-dasharray: 5 5
+    classDef messenger fill:#e1f5fe,stroke:#01579b
+    classDef admin fill:#f1f8e9,stroke:#33691e
+    classDef final fill:#fff3e0,stroke:#e65100
     
-    state Acciones_Mensajero {
-        ASSIGNED --> PENDING
-        ASSIGNED --> DELIVERED
-        ASSIGNED --> RETURNED
-        RETURNED --> PENDING
-        RETURNED --> DELIVERED
-    }
-    
-    state Acciones_Admin {
-        PENDING --> RESOLVED
-        PENDING --> CANCELED
-        DELIVERED --> CANCELED: Límite 72h
-        CANCELED --> ASSIGNED: Reasignar
-    }
+    class ASSIGNED initial
+    class PENDING,DELIVERED,RETURNED messenger
+    class CANCELED admin
+    class RESOLVED final
 ```
 
 ### Reglas de Negocio
 
 > [!IMPORTANT]
 > **Transiciones de Estado por Rol**
-> - **MENSAJERO** solo puede usar: `PENDING`, `DELIVERED`, `RETURNED`.
-> - **ADMIN** solo puede usar: `CANCELED`, `RESOLVED`.
-> - El estado **RESOLVED** solo se puede alcanzar desde **PENDING**.
-> - El estado **CANCELED** se puede alcanzar desde cualquier estado (excepto estados finales).
-
-> [!WARNING]
-> **Bloqueo de Edición (Ventana de 72 Horas)**
-> Cuando un servicio se actualiza a `DELIVERED` o `RESOLVED`, inicia una **ventana de 72 horas**.
-> Después de este período, el servicio se vuelve **inmutable** (no se permiten cambios de estado ni datos).
+> - **MENSAJERO** solo puede trabajar con: `PENDING`, `DELIVERED`, `RETURNED`.
+> - **ADMIN** solo puede trabajar con: `CANCELED`, `RESOLVED`.
+> - Los servicios pueden ser modificados en cualquier momento sin importar su estado actual.
+> - Los administradores pueden reasignar servicios en estado **CANCELED** a otro mensajero.
 
 > [!NOTE]
 > **Requisitos de Evidencia**
@@ -479,26 +521,26 @@ stateDiagram-v2
 
 > [!NOTE]
 > **Eliminación Suave (Papelera)**
-> Los servicios eliminados se mueven a una **papelera** y se eliminan permanentemente después de **60 días**.
+> Los servicios eliminados se mueven a una **papelera** y se archivan permanentemente después de **60 días**.
 > Los administradores pueden restaurar servicios de la papelera antes de la eliminación permanente.
 
 ### Reglas de Estados
 
-| Estado | Mensajero | Admin | Eliminar | Bloqueo |
-|--------|-----------|-------|----------|---------|
-| `ASSIGNED` | → `PENDING`, `DELIVERED`, `RETURNED` | → `CANCELED` | ✅ Papelera | - |
-| `RETURNED` | → `PENDING`, `DELIVERED` | → `CANCELED` | ✅ Papelera | - |
-| `PENDING` | 🔒 **Bloqueado** hasta intervención admin | → `CANCELED`, `RESOLVED` | ✅ Papelera | - |
-| `DELIVERED` | 🔒 **Bloqueado** hasta intervención admin | → `CANCELED`, `RESOLVED` | ❌ Protegido tras 72h | ⏱️ 72h |
-| `CANCELED` | - | Admin puede **reasignar** → `ASSIGNED` | ✅ Papelera | - |
-| `RESOLVED` | - | 🔒 **Inmutable** (Estado Final) | ❌ Protegido tras 72h | ⏱️ 72h |
+| Estado | Mensajero | Admin | Eliminar |
+|--------|-----------|-------|----------|
+| `ASSIGNED` | → `PENDING`, `DELIVERED`, `RETURNED` | → `CANCELED`, `RESOLVED` | ✅ Papelera |
+| `RETURNED` | → `PENDING`, `DELIVERED` | → `CANCELED`, `RESOLVED` | ✅ Papelera |
+| `PENDING` | → `DELIVERED`, `RETURNED` | → `CANCELED`, `RESOLVED` | ✅ Papelera |
+| `DELIVERED` | → `PENDING`, `RETURNED` | → `CANCELED`, `RESOLVED` | ✅ Papelera |
+| `CANCELED` | - | Reasignar → `ASSIGNED` | ✅ Papelera |
+| `RESOLVED` | - | - | ✅ Papelera |
 
 ### Resumen de Permisos
 
 | Rol | Estados Disponibles | Acciones Especiales | Notas |
 |-----|---------------------|---------------------|-------|
-| **MENSAJERO** | `PENDING`, `DELIVERED`, `RETURNED` | - | Bloqueado después de usar `PENDING` o `DELIVERED` hasta intervención admin |
-| **ADMIN** | `CANCELED`, `RESOLVED` | **Reassignar mensajero** (desde `CANCELED` únicamente) | Puede desbloquear servicios o resolver pendientes |
+| **MENSAJERO** | `PENDING`, `DELIVERED`, `RETURNED` | - | Puede cambiar servicios a cualquier estado permitido en cualquier momento |
+| **ADMIN** | `CANCELED`, `RESOLVED` | **Reasignar mensajero** (desde `CANCELED` únicamente) | Puede cambiar servicios a estados administrativos desde cualquier estado actual |
 
 ### Flujo de Reasignación
 
@@ -507,7 +549,6 @@ flowchart LR
     A[Servicio en CANCELED] --> B{Admin reasigna}
     B --> C[Nuevo mensajero asignado]
     C --> D[Estado → ASSIGNED]
-    D --> E[Bloqueo 72h reiniciado]
 ```
 
 ### Gestión de Papelera (Soft Delete y Archivo)
