@@ -258,6 +258,7 @@
 						-XX:+EnableDynamicAgentLoading
 						-Djdk.instrument.traceUsage
 						-Dnet.bytebuddy.experimental=true
+						-Duser.timezone=America/Bogota
 					</argLine>
 				</configuration>
 			</plugin>

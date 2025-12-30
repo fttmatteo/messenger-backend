@@ -13,7 +13,6 @@ import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.TimeZone;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +29,7 @@ class ServiceDeliveryRepositoryTest {
     @Autowired
     private EntityManager entityManager;
 
-    @BeforeAll
-    static void setupTimezone() {
+    static {
         TimeZone.setDefault(TimeZone.getTimeZone("America/Bogota"));
     }
 
@@ -55,8 +53,8 @@ class ServiceDeliveryRepositoryTest {
         PlateEntity plate = createPlate("TEST001");
         entityManager.persist(plate);
 
-        // Use middle of the day to avoid timezone/midnight shifts
-        LocalDateTime fixedDate = LocalDateTime.now().withHour(12).withMinute(0).withSecond(0).withNano(0);
+        // Use fixed date to avoid any flaky behavior with midnights/timezones
+        LocalDateTime fixedDate = LocalDateTime.of(2025, 12, 29, 12, 0);
 
         // Created 4 services for this messenger on the same day
         createAndPersistService(messenger, dealership, plate, Status.ASSIGNED, fixedDate);
