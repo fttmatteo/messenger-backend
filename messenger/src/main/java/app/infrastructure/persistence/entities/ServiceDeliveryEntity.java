@@ -143,7 +143,9 @@ public class ServiceDeliveryEntity {
     /** Callback JPA para establecer la fecha de creación automáticamente. */
     @PrePersist
     protected void onCreate() {
-        createdAt = java.time.LocalDateTime.now();
+        if (this.createdAt == null) {
+            this.createdAt = java.time.LocalDateTime.now();
+        }
     }
 
     public java.time.LocalDateTime getCreatedAt() {

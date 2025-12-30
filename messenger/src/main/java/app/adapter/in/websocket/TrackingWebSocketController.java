@@ -49,7 +49,7 @@ public class TrackingWebSocketController {
         if (request.getStatus() != null) {
             domainTracking.setStatus(request.getStatus());
         }
-        domainTracking.setLastUpdate(request.getLastUpdate());
+        // lastUpdate is handled by the use case (server-side time)
 
         LiveTracking tracking = updateLiveTracking.execute(domainTracking);
         LiveTrackingResponse response = mapToResponse(tracking);

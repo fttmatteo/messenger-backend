@@ -13,6 +13,7 @@ import app.infrastructure.persistence.entities.PlateEntity;
 import app.infrastructure.persistence.entities.ServiceDeliveryEntity;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
+import java.util.TimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,10 @@ class ServiceDeliveryControllerIntegrationTest {
     @Autowired
     private EntityManager entityManager;
 
+    static {
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Bogota"));
+    }
+
     @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders
@@ -66,22 +71,24 @@ class ServiceDeliveryControllerIntegrationTest {
         PlateEntity plate = createPlate("INT001");
         entityManager.persist(plate);
 
-        // Use current date/time for the test
-        LocalDateTime now = LocalDateTime.now();
-        createAndPersistService(messenger, dealership, plate, Status.DELIVERED, now);
+        // Use fixed date to avoid any flaky behavior with midnights/timezones
+        LocalDateTime fixedNow = LocalDateTime.of(2025, 12, 29, 12, 0);
+        createAndPersistService(messenger, dealership, plate, Status.DELIVERED, fixedNow);
 
         entityManager.flush();
+
+        String dateStr = fixedNow.toLocalDate().toString();
 
         // When/Then: Call API
         mockMvc.perform(get("/services/stats/daily")
                 .param("messengerId", messenger.getIdEmployee().toString())
-                .param("from", now.toLocalDate().toString())
-                .param("to", now.toLocalDate().toString()))
+                .param("from", dateStr)
+                .param("to", dateStr))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].total", is(1)))
                 .andExpect(jsonPath("$[0].delivered", is(1)))
-                .andExpect(jsonPath("$[0].date", is(now.toLocalDate().toString())));
+                .andExpect(jsonPath("$[0].date", is(dateStr)));
     }
 
     @Test
@@ -90,11 +97,11 @@ class ServiceDeliveryControllerIntegrationTest {
      * Verifica que se requiera autenticación para acceder a las estadísticas.
      */
     void shouldReturn401IfUnauthenticated() throws Exception {
-        LocalDateTime now = LocalDateTime.now();
+        String dateStr = "2025-12-29";
         mockMvc.perform(get("/services/stats/daily")
                 .param("messengerId", "1")
-                .param("from", now.toLocalDate().toString())
-                .param("to", now.toLocalDate().toString()))
+                .param("from", dateStr)
+                .param("to", dateStr))
                 .andExpect(status().isUnauthorized()); // Or 403 depending on security config
     }
 

@@ -51,6 +51,9 @@ public class SecurityConfig {
                                                 .requestMatchers("/dealerships/**").authenticated()
                                                 .requestMatchers("/services/**").authenticated()
                                                 .requestMatchers("/api/files/**").permitAll()
+                                                .requestMatchers(org.springframework.http.HttpMethod.GET,
+                                                                "/settings/status-colors")
+                                                .permitAll()
                                                 .requestMatchers("/api/location/**").authenticated()
                                                 .requestMatchers("/api/tracking/**").authenticated()
                                                 .requestMatchers("/tracking/**").authenticated()

@@ -43,44 +43,66 @@ The project implements **Hexagonal Architecture (Ports & Adapters)** to keep the
 
 ```mermaid
 graph LR
-    subgraph InputAdapters ["Input Adapters"]
+    %% External Actors
+    USER((👤 User/App))
+    MAPS{{G-Maps}}
+    GCS{{GCS}}
+    DB[(MySQL)]
+    REDIS[(Redis)]
+
+    subgraph IN [Input Adapters]
         direction TB
-        REST[REST Controllers]
-        VAL[Validators]
-        BUILD[Builders]
+        REST[🌐 REST API]
+        SOC[🔌 WebSockets]
     end
 
-    subgraph ApplicationLayer ["Application Layer"]
+    subgraph CORE [Application Core]
         direction TB
-        UC[Use Cases]
-        EXC[Exceptions]
+        subgraph APP [Application Layer]
+            UC[⚙️ Use Cases]
+        end
+        subgraph DOMAIN [Domain Layer]
+            SVC[🛠️ Domain Services]
+            PORTS[🎯 Ports]
+            MODEL[💎 Domain Models]
+        end
     end
 
-    subgraph DomainLayer ["Domain Layer"]
+    subgraph OUT [Output Adapters]
         direction TB
-        PORTS[Ports]
-        SVC[Domain Services]
-        MOD[Models]
+        PERS[💾 Persistence]
+        CLD[☁️ Cloud Services]
+        SEC[🔐 Security]
     end
 
-    subgraph OutputAdapters ["Output Adapters"]
-        direction TB
-        OCR[Google Vision OCR]
-        STORAGE[Google Cloud Storage]
-        SEC[JWT Security]
-        MAPS[Google Maps]
-        TRACKING[Location Tracking]
-    end
+    %% Inbound Flow
+    USER --> REST & SOC
+    REST & SOC --> UC
 
-    REST --> UC
-    UC --> PORTS
-    PORTS --> OCR
-    PORTS --> STORAGE
-    PORTS --> SEC
-    PORTS --> MAPS
-    PORTS --> TRACKING
+    %% Application Logic
     UC --> SVC
-    SVC --> MOD
+    UC --> PORTS
+    SVC --> MODEL
+
+    %% Outbound Flow (Dependency Inversion)
+    PERS -.-> PORTS
+    CLD -.-> PORTS
+    SEC -.-> PORTS
+
+    %% Infrastructure Connections
+    PERS --> DB
+    CLD --> GCS & MAPS
+    SEC --> REDIS
+
+    %% Styling
+    style CORE fill:#0d1117,stroke:#30363d,stroke-width:2px,color:#c9d1d9
+    style DOMAIN fill:#161b22,stroke:#58a6ff,stroke-dasharray: 5 5,color:#c9d1d9
+    style APP fill:#161b22,stroke:#30363d,color:#c9d1d9
+    style IN fill:#051d33,stroke:#1f6feb,color:#c9d1d9
+    style OUT fill:#2d1a05,stroke:#f0883e,color:#c9d1d9
+    
+    classDef actor fill:#21262d,stroke:#8b949e,color:#c9d1d9
+    class USER,MAPS,GCS,DB,REDIS actor
 ```
 
 ---
@@ -89,7 +111,7 @@ graph LR
 
 | Component | Technology |
 |-----------|------------|
-| **Framework** | Spring Boot 4.0.1 |
+| **Framework** | Spring Boot 4.x |
 | **Language** | Java 17 |
 | **Database** | MySQL 8.0+ |
 | **Migrations** | Flyway |
@@ -105,6 +127,7 @@ graph LR
 | **Auditing** | JPA Callbacks + AOP (Aspect Oriented Programming) |
 | **CI/CD** | GitHub Actions |
 | **Architecture Testing** | ArchUnit |
+| **Performance** | Database Indices (Optimization for pagination) |
 
 ---
 
@@ -118,7 +141,7 @@ messenger/
 │   │   ├── in/                          # Input Adapters
 │   │   │   ├── builder/                 # Object Builders
 │   │   │   ├── rest/
-│   │   │   │   ├── controllers/         # 7 REST Controllers
+│   │   │   │   ├── controllers/         # 9 REST Controllers
 │   │   │   │   ├── mapper/              # Request/Response Mappers
 │   │   │   │   ├── request/             # Input DTOs
 │   │   │   │   └── response/            # Output DTOs
@@ -131,7 +154,7 @@ messenger/
 │   │       └── tracking/                # Location Tracking
 │   ├── application/
 │   │   ├── exceptions/                  # BusinessException, InputsException
-│   │   └── usecase/                     # 9 Use Cases (Location, Route, Tracking...)
+│   │   └── usecase/                     # 11 Use Cases (Monitoring, Settings, Location...)
 │   ├── domain/
 │   │   ├── model/                       # 12+ Models + 7 Enums + Auth
 │   │   ├── ports/                       # 10 Ports (interfaces)
@@ -271,11 +294,22 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `PUT` | `/services/reassign/{id}` | Reassign to another messenger (ADMIN/CANCELED) |
 | `GET` | `/services/findByServiceId/{id}` | Get service by ID |
 | `GET` | `/services/allServices` | List services (filtered by role) |
+| `GET` | `/services/allServicesPageable` | List services with **pagination & search** |
 | `GET` | `/services/stats/daily` | Daily stats (requires messengerId, from, to) |
 | `DELETE` | `/services/deleteService/{id}` | Move to trash (ADMIN) |
 | `GET` | `/services/trash` | List deleted services (ADMIN) |
 | `POST` | `/services/trash/restore/{id}` | Restore from trash (ADMIN) |
 | `DELETE` | `/services/trash/empty` | Empty trash permanently (ADMIN) |
+| `DELETE` | `/services/trash/{id}` | Permanent delete individual item (ADMIN) |
+
+---
+
+### System Settings (`/settings`) - ADMIN only
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/settings/status-colors` | Get status color configuration |
+| `PUT` | `/settings/status-colors` | Update status color configuration |
 
 ---
 
@@ -307,6 +341,14 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `GET` | `/tracking/active` | Get all active messengers (ADMIN) |
 | `GET` | `/tracking/history/{id}` | Get history by date (`?date=YYYY-MM-DD`) |
 | `GET` | `/tracking/service/{id}` | Get history for a specific service |
+
+---
+
+### Monitoring (`/monitoring`) - ADMIN only
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/monitoring/messenger/{id}/activity` | Get daily activity timeline + stats for a messenger |
 
 ---
 
@@ -385,6 +427,12 @@ erDiagram
         LocalDateTime recorded_at
     }
     
+    system_settings {
+        String setting_key PK
+        String setting_value
+        LocalDateTime updated_at
+    }
+    
     employees ||--o{ service_deliveries : "delivers"
     dealerships ||--o{ service_deliveries : "receives"
     plates ||--o{ service_deliveries : "has"
@@ -432,39 +480,6 @@ GPS tracking system using **Redis** + **WebSocket** for messenger monitoring.
 - **Reverse Geocoding**: Coordinates → Address
 
 ---
-
-## 🔄 State Flow
-
-```mermaid
-stateDiagram-v2
-    direction LR
-    
-    [*] --> ASSIGNED: Auto Register
-    
-    state Messenger_Actions {
-        ASSIGNED --> PENDING
-        ASSIGNED --> DELIVERED
-        ASSIGNED --> RETURNED
-        PENDING --> DELIVERED
-        PENDING --> RETURNED
-        RETURNED --> PENDING
-        RETURNED --> DELIVERED
-        DELIVERED --> PENDING
-        DELIVERED --> RETURNED
-    }
-    
-    state Admin_Actions {
-        ASSIGNED --> RESOLVED
-        ASSIGNED --> CANCELED
-        PENDING --> RESOLVED
-        PENDING --> CANCELED
-        DELIVERED --> CANCELED
-        DELIVERED --> RESOLVED
-        RETURNED --> CANCELED
-        RETURNED --> RESOLVED
-        CANCELED --> ASSIGNED: Reassign
-    }
-```
 
 ### Business Rules
 
