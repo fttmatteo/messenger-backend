@@ -26,6 +26,7 @@ jobs:
 
     env:
       GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/google-credentials.json
+      TZ: America/Bogota
 
     steps:
       # 1. Clonar el código fuente del repositorio

@@ -980,7 +980,7 @@
                             ]
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/services/updateService/1",
+                            "raw": "{{baseUrl}}/services/updateService/1?status=DELIVERED&observation=Entregado&latitude=6.2442&longitude=-75.5812",
                             "host": [
                                 "{{baseUrl}}"
                             ],
@@ -988,6 +988,27 @@
                                 "services",
                                 "updateService",
                                 "1"
+                            ],
+                            "query": [
+                                {
+                                    "key": "status",
+                                    "value": "DELIVERED"
+                                },
+                                {
+                                    "key": "observation",
+                                    "value": "Entregado",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "latitude",
+                                    "value": "6.2442",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "longitude",
+                                    "value": "-75.5812",
+                                    "disabled": true
+                                }
                             ]
                         },
                         "description": "Update service status with optional evidence.\n\n**Business Rules:**\n- MESSENGER can use: PENDING, DELIVERED, RETURNED (from ASSIGNED/RETURNED states)\n- ADMIN can use: CANCELED, RESOLVED\n- DELIVERED requires signature\n- 72h edit window for DELIVERED/RESOLVED states"
@@ -1017,7 +1038,59 @@
                                 "services",
                                 "allServices"
                             ]
-                        }
+                        },
+                        "description": "Retrieve all services. **Note:** Use `allServicesPageable` for large datasets."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get All Services (Pageable + Search)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/services/allServicesPageable?page=0&size=10&sortBy=createdAt&sortDirection=desc&search=ABC123",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "allServicesPageable"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "0"
+                                },
+                                {
+                                    "key": "size",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "sortBy",
+                                    "value": "createdAt"
+                                },
+                                {
+                                    "key": "sortDirection",
+                                    "value": "desc"
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "ABC123",
+                                    "description": "Search by plate, dealership name, or messenger name"
+                                }
+                            ]
+                        },
+                        "description": "Retrieve services with pagination and optional multi-field search."
                     },
                     "response": []
                 },
@@ -1205,6 +1278,35 @@
                     "response": []
                 },
                 {
+                    "name": "Permanent Delete (Individual)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "url": {
+                            "raw": "{{baseUrl}}/services/trash/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "trash",
+                                "1"
+                            ]
+                        },
+                        "description": "Permanently delete an individual service from the trash. **Requires ADMIN role.**"
+                    },
+                    "response": []
+                },
+                {
                     "name": "Get Daily Stats",
                     "request": {
                         "auth": {
@@ -1250,7 +1352,120 @@
             ]
         },
         {
-            "name": "\ud83d\udcc1 Files",
+            "name": "🛠️ System Settings",
+            "item": [
+                {
+                    "name": "Get Status Colors",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/settings/status-colors",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "settings",
+                                "status-colors"
+                            ]
+                        },
+                        "description": "Get the color configuration for the different service statuses."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Status Colors",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"ASSIGNED\": \"#58a6ff\",\n    \"DELIVERED\": \"#238636\",\n    \"RETURNED\": \"#f0883e\",\n    \"CANCELED\": \"#da3633\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/settings/status-colors",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "settings",
+                                "status-colors"
+                            ]
+                        },
+                        "description": "Update the color configuration for service statuses. **Requires ADMIN role.**"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "📊 Monitoring",
+            "item": [
+                {
+                    "name": "Get Messenger Activity",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/monitoring/messenger/1/activity?date=2025-12-29",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "monitoring",
+                                "messenger",
+                                "1",
+                                "activity"
+                            ],
+                            "query": [
+                                {
+                                    "key": "date",
+                                    "value": "2025-12-29",
+                                    "description": "The date to view activity for (YYYY-MM-DD)"
+                                }
+                            ]
+                        },
+                        "description": "Get daily statistics and timeline of events for a specific messenger. **Requires ADMIN role.**"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "📁 Files",
             "item": [
                 {
                     "name": "Get File",
