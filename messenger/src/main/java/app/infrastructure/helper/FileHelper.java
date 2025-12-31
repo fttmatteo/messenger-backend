@@ -2,7 +2,6 @@ package app.infrastructure.helper;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +14,10 @@ import java.util.List;
 @Component
 public class FileHelper {
 
+    /**
+     * Convierte un MultipartFile a un archivo temporal (File) en el sistema.
+     * Intenta detectar la extensión correcta basada en el nombre o contenido.
+     */
     public File convertToFile(MultipartFile multipartFile) throws IOException {
         String originalName = multipartFile.getOriginalFilename();
         String extension = "";
@@ -76,6 +79,10 @@ public class FileHelper {
         return "";
     }
 
+    /**
+     * Ejecuta una operación utilizando un archivo temporal y garantiza su
+     * eliminación al finalizar.
+     */
     public <T> T withTempFile(MultipartFile multipartFile, FileOperation<T> operation) throws IOException {
         File tempFile = convertToFile(multipartFile);
         try {
@@ -96,6 +103,9 @@ public class FileHelper {
         T execute(File tempFile) throws Exception;
     }
 
+    /**
+     * Elimina una lista de archivos temporales si existen.
+     */
     public void cleanupTempFiles(List<File> files) {
         if (files == null)
             return;
@@ -106,6 +116,9 @@ public class FileHelper {
         }
     }
 
+    /**
+     * Convierte una lista de MultipartFile a archivos temporales.
+     */
     public List<File> convertToFiles(
             List<MultipartFile> multipartFiles) throws IOException {
         List<File> files = new ArrayList<>();

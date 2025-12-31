@@ -62,6 +62,10 @@ public class FileValidator {
         }
     }
 
+    /**
+     * Verifica si un archivo es una imagen válida sin lanzar excepción.
+     * Retorna true si es válida, false si no lo es.
+     */
     public static boolean isValidImage(MultipartFile file) {
         try {
             validateImage(file);

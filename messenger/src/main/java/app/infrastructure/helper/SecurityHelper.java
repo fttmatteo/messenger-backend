@@ -22,9 +22,6 @@ public class SecurityHelper {
 
     /**
      * Obtiene el empleado actualmente autenticado.
-     * 
-     * @return Employee del usuario autenticado
-     * @throws UnauthorizedException si no hay autenticación válida
      */
     public Employee getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -57,9 +54,6 @@ public class SecurityHelper {
 
     /**
      * Obtiene el ID del empleado actualmente autenticado.
-     * 
-     * @return ID del empleado autenticado
-     * @throws UnauthorizedException si no hay autenticación válida
      */
     public Long getCurrentUserId() {
         return getCurrentUser().getIdEmployee();
@@ -67,8 +61,6 @@ public class SecurityHelper {
 
     /**
      * Verifica si el usuario actual tiene rol de ADMIN.
-     * 
-     * @return true si es ADMIN, false en caso contrario
      */
     public boolean isCurrentUserAdmin() {
         Employee user = getCurrentUser();
@@ -77,8 +69,6 @@ public class SecurityHelper {
 
     /**
      * Verifica si el usuario actual tiene rol de MESSENGER.
-     * 
-     * @return true si es MESSENGER, false en caso contrario
      */
     public boolean isCurrentUserMessenger() {
         Employee user = getCurrentUser();
