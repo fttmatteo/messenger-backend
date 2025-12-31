@@ -12,7 +12,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -38,10 +37,8 @@ public class MonitoringController {
             @PathVariable Long messengerId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 
-        // Get all services for this messenger
         List<ServiceDelivery> allServices = serviceDeliveryPort.findByMessengerId(messengerId);
 
-        // Calculate daily stats based on CURRENT status of services created today
         int assigned = 0;
         int delivered = 0;
         int returned = 0;
@@ -51,7 +48,6 @@ public class MonitoringController {
         List<ActivityEvent> timeline = new ArrayList<>();
 
         for (ServiceDelivery service : allServices) {
-            // Count services created on this date by their CURRENT status
             if (service.getCreatedAt() != null && service.getCreatedAt().toLocalDate().equals(date)) {
                 total++;
                 Status currentStatus = service.getCurrentStatus();
@@ -66,11 +62,9 @@ public class MonitoringController {
                 }
             }
 
-            // Process history events for timeline
             if (service.getHistory() != null) {
                 for (StatusHistory history : service.getHistory()) {
                     if (history.getChangeDate() != null && history.getChangeDate().toLocalDate().equals(date)) {
-                        // Add to timeline
                         ActivityEvent event = new ActivityEvent();
                         event.setId(history.getIdStatusHistory());
                         event.setStatus(history.getNewStatus().name());
@@ -94,7 +88,6 @@ public class MonitoringController {
             }
         }
 
-        // Sort timeline by timestamp descending (newest first)
         timeline.sort(Comparator.comparing(ActivityEvent::getTimestamp).reversed());
 
         int pending = total - delivered - returned - canceled;

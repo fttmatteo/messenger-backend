@@ -190,9 +190,8 @@ public class GoogleVisionAdapter implements OcrPort {
                     else if (c == 'G')
                         c = '6';
                 } else {
-                    // Letters
                     if (c == '0') {
-                        c = 'Q'; // 0 is invalid in letters, likely Q
+                        c = 'Q';
                     } else if (c == '1') {
                         c = 'I';
                     } else if (c == '5') {

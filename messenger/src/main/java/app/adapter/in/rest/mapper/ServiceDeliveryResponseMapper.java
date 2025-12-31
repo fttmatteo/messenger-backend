@@ -43,7 +43,7 @@ public class ServiceDeliveryResponseMapper {
         response.setCreatedAt(service.getCreatedAt());
 
         response.setLockedAt(service.getLockedAt());
-        response.setLocked(false); // No longer using time-based locking
+        response.setLocked(false);
 
         response.setDeleted(service.isDeleted());
         response.setDeletedAt(service.getDeletedAt());

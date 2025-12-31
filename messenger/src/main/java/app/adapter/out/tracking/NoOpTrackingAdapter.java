@@ -29,25 +29,24 @@ public class NoOpTrackingAdapter implements TrackingPort {
     @Override
     public void saveLiveLocation(LiveTracking tracking) {
         logger.debug("NoOp: saveLiveLocation called (Redis disabled)");
-        // No-op: Redis is disabled in test environment
     }
 
     @Override
     public Optional<LiveTracking> getLastLocation(Long messengerId) {
         logger.debug("NoOp: getLastLocation called for messenger {} (Redis disabled)", messengerId);
-        return Optional.empty(); // No live tracking data without Redis
+        return Optional.empty();
     }
 
     @Override
     public List<LiveTracking> getAllActiveMessengers() {
         logger.debug("NoOp: getAllActiveMessengers called (Redis disabled)");
-        return new ArrayList<>(); // Empty list when Redis is disabled
+        return new ArrayList<>();
     }
 
     @Override
     public TrackingHistory saveTrackingHistory(TrackingHistory history) {
         logger.debug("NoOp: saveTrackingHistory called (Redis disabled)");
-        return history; // Pass-through without persistence
+        return history;
     }
 
     @Override

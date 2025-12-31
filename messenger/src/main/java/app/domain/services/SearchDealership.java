@@ -19,8 +19,6 @@ public class SearchDealership {
 
     /**
      * Obtiene todos los concesionarios registrados.
-     * 
-     * @return Lista completa de concesionarios.
      */
     public List<Dealership> findAll() {
         List<Dealership> dealerships = dealershipPort.findAll();

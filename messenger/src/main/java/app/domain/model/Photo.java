@@ -11,7 +11,7 @@ public class Photo {
     private Long idPhoto;
     private String photoPath;
     private LocalDateTime uploadDate;
-    private PhotoType photoType; // PLATE_DETECTION, DELIVERY_EVIDENCE, DOCUMENT_ID
+    private PhotoType photoType;
 
     public Long getIdPhoto() {
         return idPhoto;

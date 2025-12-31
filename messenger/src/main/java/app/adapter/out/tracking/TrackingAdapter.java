@@ -84,7 +84,6 @@ public class TrackingAdapter implements TrackingPort {
             return Optional.empty();
         }
 
-        // 1. Intenta obtener de Redis (Caché caliente)
         try {
             String key = TRACKING_KEY_PREFIX + messengerId;
             LiveTracking tracking = redisTemplate.opsForValue().get(key);
@@ -93,17 +92,14 @@ public class TrackingAdapter implements TrackingPort {
             }
         } catch (Exception e) {
             logger.warn("Error leyendo de Redis para mensajero {}: {}", messengerId, e.getMessage());
-            // No rethrow, proceed to fallback
         }
 
-        // 2. Fallback: Buscar última ubicación conocida en Base de Datos (Caché fría)
         try {
             TrackingHistoryEntity lastEntity = historyRepository
                     .findFirstByMessengerIdOrderByRecordedAtDesc(messengerId);
             if (lastEntity != null) {
                 LiveTracking historyTracking = new LiveTracking();
                 historyTracking.setMessengerId(lastEntity.getMessengerId());
-                // Construir location
                 Location loc = new Location(
                         lastEntity.getLatitude(),
                         lastEntity.getLongitude(),
@@ -113,14 +109,13 @@ public class TrackingAdapter implements TrackingPort {
 
                 historyTracking.setLastUpdate(lastEntity.getRecordedAt());
                 historyTracking.setSpeed(lastEntity.getSpeed());
-                historyTracking.setHeading(0.0); // Historial no suele tener heading a menos que se guarde
-                historyTracking.setStatus(TrackingStatus.OFFLINE); // Si no está en Redis, asumimos desconectado
+                historyTracking.setHeading(0.0);
+                historyTracking.setStatus(TrackingStatus.OFFLINE);
 
                 return Optional.of(historyTracking);
             }
         } catch (Exception e) {
             logger.error("Error buscando historial en DB para mensajero {}: {}", messengerId, e.getMessage());
-            // No rethrow, return empty optional
         }
 
         return Optional.empty();

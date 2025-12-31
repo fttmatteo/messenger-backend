@@ -17,11 +17,7 @@ public class FlywayRepairConfig {
     @Bean
     public FlywayMigrationStrategy flywayMigrationStrategy() {
         return flyway -> {
-            // Repair limpia la tabla flyway_schema_history de entradas fallidas
-            // Esto es útil cuando una migración falló a mitad de camino y bloquea el
-            // reinicio.
             flyway.repair();
-            // Ejecuta las migraciones pendientes
             flyway.migrate();
         };
     }

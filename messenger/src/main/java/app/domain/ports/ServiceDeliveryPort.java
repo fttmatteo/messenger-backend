@@ -41,8 +41,6 @@ public interface ServiceDeliveryPort {
      */
     List<ServiceDelivery> findByMessengerId(Long messengerId);
 
-    // Métodos para soft delete (papelera)
-
     /**
      * Recupera todos los servicios activos.
      */
@@ -58,27 +56,13 @@ public interface ServiceDeliveryPort {
      */
     List<ServiceDelivery> findDeleted();
 
-    // Páginas paginadas
-
     /**
      * Recupera servicios con paginación.
-     * 
-     * @param keyword  Término de búsqueda opcional
-     * @param deleted  Filtro por estado de eliminación (false = activos, true =
-     *                 papelera)
-     * @param pageable Configuración de paginación y ordenamiento
-     * @return Página de servicios
      */
     Page<ServiceDelivery> findAllPaginated(String keyword, Boolean deleted, Pageable pageable);
 
     /**
      * Recupera servicios de un mensajero específico con paginación.
-     * 
-     * @param messengerId ID del mensajero
-     * @param keyword     Término de búsqueda opcional
-     * @param deleted     Filtro por estado de eliminación
-     * @param pageable    Configuración de paginación y ordenamiento
-     * @return Página de servicios del mensajero
      */
     Page<ServiceDelivery> findByMessengerPaginated(Long messengerId, String keyword, Boolean deleted,
             Pageable pageable);
@@ -97,8 +81,6 @@ public interface ServiceDeliveryPort {
      * Elimina físicamente todos los servicios en la papelera.
      */
     int hardDeleteAllDeleted();
-
-    // Estadísticas diarias por mensajero
 
     /**
      * Obtiene estadísticas diarias de un mensajero en un rango de fechas.
