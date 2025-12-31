@@ -36,10 +36,10 @@ public class TrackingHistoryEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "source", nullable = false)
-    private TrackingSource source; // Origen del dato (GPS, MANUAL)
+    private TrackingSource source;
 
     @Column(name = "speed")
-    private Double speed; // Velocidad en km/h
+    private Double speed;
 
     public Long getHistoryId() {
         return historyId;

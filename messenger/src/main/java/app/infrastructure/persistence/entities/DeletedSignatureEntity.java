@@ -23,11 +23,9 @@ public class DeletedSignatureEntity {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    // Constructors
     public DeletedSignatureEntity() {
     }
 
-    // Getters and Setters
     public Long getIdSignature() {
         return idSignature;
     }

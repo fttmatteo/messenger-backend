@@ -38,11 +38,9 @@ public class DeletedTrackingHistoryEntity {
     @Column(name = "recorded_at", nullable = false)
     private LocalDateTime recordedAt;
 
-    // Constructors
     public DeletedTrackingHistoryEntity() {
     }
 
-    // Getters and Setters
     public Long getHistoryId() {
         return historyId;
     }

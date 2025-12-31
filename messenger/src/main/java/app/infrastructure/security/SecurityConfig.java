@@ -32,6 +32,9 @@ public class SecurityConfig {
         @Autowired
         private RateLimitFilter rateLimitFilter;
 
+        /**
+         * Configura el filtro de seguridad.
+         */
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -64,9 +67,15 @@ public class SecurityConfig {
                 return http.build();
         }
 
+        /**
+         * Configura los orígenes permitidos para CORS.
+         */
         @org.springframework.beans.factory.annotation.Value("${cors.allowed-origins}")
         private String corsAllowedOrigins;
 
+        /**
+         * Configura la configuración CORS.
+         */
         @Bean
         public CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration configuration = new CorsConfiguration();
@@ -93,6 +102,9 @@ public class SecurityConfig {
                 return source;
         }
 
+        /**
+         * Configura el codificador de contraseñas.
+         */
         @Bean
         public PasswordEncoder passwordEncoder() {
                 return new BCryptPasswordEncoder();

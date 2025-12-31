@@ -32,7 +32,6 @@ public class DeletedStatusHistoryEntity {
     @Column(columnDefinition = "TEXT")
     private String observation;
 
-    // Denormalized data
     @Column(name = "changed_by_employee_id")
     private Long changedByEmployeeId;
 
@@ -42,11 +41,9 @@ public class DeletedStatusHistoryEntity {
     @Column(name = "changed_by_document")
     private String changedByDocument;
 
-    // Constructors
     public DeletedStatusHistoryEntity() {
     }
 
-    // Getters and Setters
     public Long getIdStatusHistory() {
         return idStatusHistory;
     }
