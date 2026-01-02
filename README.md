@@ -493,7 +493,8 @@ GPS tracking system using **Redis** + **WebSocket** for messenger monitoring.
 > [!NOTE]
 > **Evidence Requirements**
 > - **DELIVERED**: Signature is mandatory.
-> - **PENDING** & **RETURNED**: Signature, at least one photo, and observation are mandatory.
+> - **PENDING**: Signature, at least one photo, and observation are mandatory.
+> - **RETURNED**: At least one photo and observation are mandatory (no signature required).
 > - **CANCELED** & **RESOLVED**: No additional evidence required.
 
 > [!NOTE]
