@@ -105,7 +105,7 @@ class UpdateServiceDeliveryTest {
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> updateServiceDelivery.updateStatus(1L, Status.PENDING, "Obs", null, photos, 1L));
 
-        assertEquals("Para el estado PENDING la firma es obligatoria.", ex.getMessage());
+        assertEquals("Para marcar como PENDIENTE, la firma es obligatoria.", ex.getMessage());
     }
 
     @Test
@@ -117,7 +117,7 @@ class UpdateServiceDeliveryTest {
         BusinessException ex = assertThrows(BusinessException.class, () -> updateServiceDelivery.updateStatus(1L,
                 Status.RETURNED, "Obs", signature, Collections.emptyList(), 1L));
 
-        assertEquals("Para el estado RETURNED al menos una foto es obligatoria.", ex.getMessage());
+        assertEquals("Para marcar como DEVUELTO, al menos una foto de evidencia es obligatoria.", ex.getMessage());
     }
 
     @Test
