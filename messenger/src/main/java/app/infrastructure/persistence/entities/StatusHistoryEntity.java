@@ -46,6 +46,13 @@ public class StatusHistoryEntity {
     @OneToMany(mappedBy = "statusHistory", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PhotoEntity> photos = new ArrayList<>();
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "signature_id")
+    private SignatureEntity signature;
+
+    @Column(name = "observation", length = 2048)
+    private String observation;
+
     public Long getIdStatusHistory() {
         return idStatusHistory;
     }
@@ -92,6 +99,22 @@ public class StatusHistoryEntity {
 
     public void setPhotos(List<PhotoEntity> photos) {
         this.photos = photos;
+    }
+
+    public SignatureEntity getSignature() {
+        return signature;
+    }
+
+    public void setSignature(SignatureEntity signature) {
+        this.signature = signature;
+    }
+
+    public String getObservation() {
+        return observation;
+    }
+
+    public void setObservation(String observation) {
+        this.observation = observation;
     }
 
     public ServiceDeliveryEntity getServiceDelivery() {

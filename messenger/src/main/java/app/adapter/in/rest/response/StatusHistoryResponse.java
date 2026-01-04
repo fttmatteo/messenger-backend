@@ -16,12 +16,14 @@ public class StatusHistoryResponse {
     private List<PhotoResponse> photos;
     private Double deliveryLatitude;
     private Double deliveryLongitude;
+    private String observation;
 
     public StatusHistoryResponse() {
     }
 
     public StatusHistoryResponse(Long idStatusHistory, Status previousStatus, Status newStatus,
-            LocalDateTime changeDate, EmployeeResponse changedBy, Double deliveryLatitude, Double deliveryLongitude) {
+            LocalDateTime changeDate, EmployeeResponse changedBy, Double deliveryLatitude, Double deliveryLongitude,
+            String observation) {
         this.idStatusHistory = idStatusHistory;
         this.previousStatus = previousStatus;
         this.newStatus = newStatus;
@@ -29,6 +31,7 @@ public class StatusHistoryResponse {
         this.changedBy = changedBy;
         this.deliveryLatitude = deliveryLatitude;
         this.deliveryLongitude = deliveryLongitude;
+        this.observation = observation;
     }
 
     public Long getIdStatusHistory() {
@@ -93,5 +96,13 @@ public class StatusHistoryResponse {
 
     public void setDeliveryLongitude(Double deliveryLongitude) {
         this.deliveryLongitude = deliveryLongitude;
+    }
+
+    public String getObservation() {
+        return observation;
+    }
+
+    public void setObservation(String observation) {
+        this.observation = observation;
     }
 }

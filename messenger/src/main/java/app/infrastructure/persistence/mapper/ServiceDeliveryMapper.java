@@ -69,6 +69,15 @@ public class ServiceDeliveryMapper {
                 hEntity.setDeliveryLatitude(h.getDeliveryLatitude());
                 hEntity.setDeliveryLongitude(h.getDeliveryLongitude());
                 hEntity.setServiceDelivery(entity);
+                hEntity.setObservation(h.getObservation());
+
+                if (h.getSignature() != null) {
+                    SignatureEntity sEntity = new SignatureEntity();
+                    sEntity.setIdSignature(h.getSignature().getIdSignature());
+                    sEntity.setSignaturePath(h.getSignature().getSignaturePath());
+                    sEntity.setUploadDate(h.getSignature().getUploadDate());
+                    hEntity.setSignature(sEntity);
+                }
 
                 if (h.getPhotos() != null) {
                     hEntity.setPhotos(h.getPhotos().stream().map(p -> {
@@ -149,6 +158,15 @@ public class ServiceDeliveryMapper {
                 history.setChangedBy(employeeMapper.toDomain(h.getChangedBy()));
                 history.setDeliveryLatitude(h.getDeliveryLatitude());
                 history.setDeliveryLongitude(h.getDeliveryLongitude());
+                history.setObservation(h.getObservation());
+
+                if (h.getSignature() != null) {
+                    Signature signature = new Signature();
+                    signature.setIdSignature(h.getSignature().getIdSignature());
+                    signature.setSignaturePath(h.getSignature().getSignaturePath());
+                    signature.setUploadDate(h.getSignature().getUploadDate());
+                    history.setSignature(signature);
+                }
                 if (h.getPhotos() != null) {
                     history.setPhotos(h.getPhotos().stream()
                             .map(this::mapPhotoToDomain)
