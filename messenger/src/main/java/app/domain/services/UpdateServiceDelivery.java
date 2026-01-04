@@ -194,10 +194,12 @@ public class UpdateServiceDelivery {
     private void validateEvidence(Status status, Signature signature, List<Photo> photos, String observation)
             throws BusinessException {
 
+        // Estados que no requieren ninguna evidencia
         if (status == Status.CANCELED || status == Status.RESOLVED || status == Status.ASSIGNED) {
             return;
         }
 
+        // DELIVERED: solo requiere firma
         if (status == Status.DELIVERED) {
             if (signature == null) {
                 throw new BusinessException("Para marcar como ENTREGADO, la firma de recibido es obligatoria.");
@@ -205,14 +207,29 @@ public class UpdateServiceDelivery {
             return;
         }
 
-        if (signature == null) {
-            throw new BusinessException("Para el estado " + status + " la firma es obligatoria.");
+        // RETURNED: requiere foto y observación, NO firma
+        if (status == Status.RETURNED) {
+            if (photos == null || photos.isEmpty()) {
+                throw new BusinessException(
+                        "Para marcar como DEVUELTO, al menos una foto de evidencia es obligatoria.");
+            }
+            if (observation == null || observation.trim().isEmpty()) {
+                throw new BusinessException("Para marcar como DEVUELTO, la observación es obligatoria.");
+            }
+            return;
         }
-        if (photos == null || photos.isEmpty()) {
-            throw new BusinessException("Para el estado " + status + " al menos una foto es obligatoria.");
-        }
-        if (observation == null || observation.trim().isEmpty()) {
-            throw new BusinessException("Para el estado " + status + " la observación es obligatoria.");
+
+        // PENDING: requiere firma, foto y observación
+        if (status == Status.PENDING) {
+            if (signature == null) {
+                throw new BusinessException("Para marcar como PENDIENTE, la firma es obligatoria.");
+            }
+            if (photos == null || photos.isEmpty()) {
+                throw new BusinessException("Para marcar como PENDIENTE, al menos una foto es obligatoria.");
+            }
+            if (observation == null || observation.trim().isEmpty()) {
+                throw new BusinessException("Para marcar como PENDIENTE, la observación es obligatoria.");
+            }
         }
     }
 }
