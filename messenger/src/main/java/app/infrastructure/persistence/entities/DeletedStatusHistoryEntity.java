@@ -41,6 +41,9 @@ public class DeletedStatusHistoryEntity {
     @Column(name = "changed_by_document")
     private String changedByDocument;
 
+    @Column(name = "signature_id")
+    private Long signatureId;
+
     public DeletedStatusHistoryEntity() {
     }
 
@@ -114,5 +117,13 @@ public class DeletedStatusHistoryEntity {
 
     public void setChangedByDocument(String changedByDocument) {
         this.changedByDocument = changedByDocument;
+    }
+
+    public Long getSignatureId() {
+        return signatureId;
+    }
+
+    public void setSignatureId(Long signatureId) {
+        this.signatureId = signatureId;
     }
 }

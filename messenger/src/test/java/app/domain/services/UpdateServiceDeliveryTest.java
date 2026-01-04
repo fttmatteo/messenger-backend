@@ -82,7 +82,9 @@ class UpdateServiceDeliveryTest {
         verify(serviceDeliveryPort).save(argThat(s -> s.getCurrentStatus() == Status.PENDING &&
                 s.getSignature() != null &&
                 s.getPhotos().size() == 1 &&
-                s.getHistory().size() == 1));
+                s.getHistory().size() == 1 &&
+                s.getHistory().get(0).getSignature() != null &&
+                s.getHistory().get(0).getObservation().equals("Observacion")));
     }
 
     @Test

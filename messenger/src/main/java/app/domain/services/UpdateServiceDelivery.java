@@ -103,6 +103,14 @@ public class UpdateServiceDelivery {
             history.setPhotos(new ArrayList<>(photos));
         }
 
+        if (signature != null) {
+            history.setSignature(signature);
+        }
+
+        if (observation != null) {
+            history.setObservation(observation);
+        }
+
         service.addHistory(history);
 
         if (latitude != null && longitude != null) {

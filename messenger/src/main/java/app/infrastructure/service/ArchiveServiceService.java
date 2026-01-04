@@ -100,12 +100,40 @@ public class ArchiveServiceService implements ArchivePort {
                 archivedHistory.setPreviousStatus(history.getPreviousStatus());
                 archivedHistory.setNewStatus(history.getNewStatus());
                 archivedHistory.setChangeDate(history.getChangeDate());
-                archivedHistory.setObservation(null);
+                archivedHistory.setObservation(history.getObservation());
 
                 if (history.getChangedBy() != null) {
                     archivedHistory.setChangedByEmployeeId(history.getChangedBy().getIdEmployee());
                     archivedHistory.setChangedByName(history.getChangedBy().getFullName());
                     archivedHistory.setChangedByDocument(history.getChangedBy().getDocument().toString());
+                }
+
+                if (history.getSignature() != null) {
+                    archivedHistory.setSignatureId(history.getSignature().getIdSignature());
+
+                    // Also archive the signature itself if not already archived
+                    // Note: DeletedSignatureEntity uses ID as PK, so we can check/save it
+                    // Ideally we should check if it exists in deleted_signatures table, but
+                    // since we mainly archive when deleting the SERVICE, and signatures are 1-to-1
+                    // or shared...
+                    // Current logic archives the MAIN service signature below.
+                    // If history has signatures, they should also be archived.
+
+                    DeletedSignatureEntity archivedSignature = new DeletedSignatureEntity();
+                    archivedSignature.setIdSignature(history.getSignature().getIdSignature());
+                    archivedSignature.setServiceDeliveryId(serviceId); // Link to service
+                    archivedSignature.setSignaturePath(history.getSignature().getSignaturePath());
+                    archivedSignature.setCreatedAt(
+                            history.getSignature().getUploadDate() != null ? history.getSignature().getUploadDate()
+                                    : LocalDateTime.now());
+
+                    // Use save to update/insert. If ID exists (e.g. was main signature too), it
+                    // will update/do nothing depending on impl.
+                    // However, JPA save might fail if ID exists and we try to insert new entity
+                    // object.
+                    // But here we set ID manually. Spring Data JPA 'save' handles merge if ID is
+                    // present.
+                    deletedSignatureRepository.save(archivedSignature);
                 }
 
                 deletedStatusHistoryRepository.save(archivedHistory);

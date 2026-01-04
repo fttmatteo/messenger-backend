@@ -15,9 +15,27 @@ public class StatusHistory {
     private Employee changedBy;
     private Double deliveryLatitude;
     private Double deliveryLongitude;
+    private Signature signature;
+    private String observation;
 
     public Long getIdStatusHistory() {
         return idStatusHistory;
+    }
+
+    public Signature getSignature() {
+        return signature;
+    }
+
+    public void setSignature(Signature signature) {
+        this.signature = signature;
+    }
+
+    public String getObservation() {
+        return observation;
+    }
+
+    public void setObservation(String observation) {
+        this.observation = observation;
     }
 
     public void setIdStatusHistory(Long idStatusHistory) {
