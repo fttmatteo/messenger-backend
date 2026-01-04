@@ -166,14 +166,9 @@ public class UpdateServiceDelivery {
     private void validateStateTransitionByRole(Status currentStatus, Status newStatus, Role userRole)
             throws BusinessException {
 
-        /*
-         * Permmitimos el mismo estado para permitir actualizaciones de evidencias
-         * (fotos, observaciones) sin cambiar el flujo del proceso.
-         */
-        // if (currentStatus == newStatus) {
-        // throw new BusinessException("El servicio ya se encuentra en estado " +
-        // currentStatus);
-        // }
+        if (currentStatus == newStatus) {
+            throw new BusinessException("El servicio ya se encuentra en estado " + currentStatus);
+        }
 
         if (userRole == Role.MESSENGER) {
             if (!MESSENGER_ALLOWED_STATES.contains(newStatus)) {
