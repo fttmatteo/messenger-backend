@@ -21,10 +21,12 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     private final Map<String, Bucket> bucketCache = new ConcurrentHashMap<>();
     private final Map<String, Bucket> authBucketCache = new ConcurrentHashMap<>();
-
     private static final int GENERAL_REQUESTS_PER_MINUTE = 100;
     private static final int AUTH_REQUESTS_PER_MINUTE = 10;
 
+    /**
+     * Filtra las peticiones para aplicar el rate limiting.
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request,
             HttpServletResponse response,
@@ -82,6 +84,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
         return request.getRemoteAddr();
     }
 
+    /**
+     * Determina si una petición debe ser filtrada (excluida del rate limiting).
+     */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();

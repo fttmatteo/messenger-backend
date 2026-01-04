@@ -22,16 +22,19 @@ public class PlateAdapter implements PlatePort {
     @Autowired
     private PlateMapper mapper;
 
-    @Override
     /**
      * Guarda la información de la placa.
      */
+    @Override
     public void save(Plate plate) {
         PlateEntity entity = mapper.toEntity(plate);
         PlateEntity savedEntity = repository.save(entity);
         plate.setIdPlate(savedEntity.getIdPlate());
     }
 
+    /**
+     * Busca una placa por su ID.
+     */
     @Override
     public Plate findById(Long id) {
         Optional<PlateEntity> entity = repository.findById(id);
@@ -41,10 +44,10 @@ public class PlateAdapter implements PlatePort {
         return null;
     }
 
-    @Override
     /**
      * Busca una placa por su cadena alfanumérica.
      */
+    @Override
     public Plate findByPlateNumber(String plateNumber) {
         PlateEntity entity = repository.findByPlateNumber(plateNumber);
         if (entity != null) {
@@ -53,6 +56,9 @@ public class PlateAdapter implements PlatePort {
         return null;
     }
 
+    /**
+     * Busca todas las placas vehiculares.
+     */
     @Override
     public List<Plate> findAll() {
         return repository.findAll().stream()

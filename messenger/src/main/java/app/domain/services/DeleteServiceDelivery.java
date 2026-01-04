@@ -40,7 +40,6 @@ public class DeleteServiceDelivery {
                     "El servicio de entrega que intenta eliminar no existe o ya está en la papelera.");
         }
 
-        // Marcar como eliminado (soft delete)
         service.setDeleted(true);
         service.setDeletedAt(LocalDateTime.now());
 
@@ -64,15 +63,12 @@ public class DeleteServiceDelivery {
 
         Status previousStatus = service.getCurrentStatus();
 
-        // Registrar en el historial quien eliminó el servicio
         StatusHistory history = new StatusHistory();
         history.setPreviousStatus(previousStatus);
-        history.setNewStatus(Status.DELETED); // El estado no cambia, solo se marca como eliminado
+        history.setNewStatus(Status.DELETED);
         history.setChangeDate(LocalDateTime.now());
         history.setChangedBy(user);
         service.addHistory(history);
-
-        // Marcar como eliminado (soft delete)
         service.setDeleted(true);
         service.setDeletedAt(LocalDateTime.now());
 
@@ -105,7 +101,6 @@ public class DeleteServiceDelivery {
         service.setDeleted(false);
         service.setDeletedAt(null);
 
-        // Registrar restauración en el historial
         StatusHistory history = new StatusHistory();
         history.setPreviousStatus(Status.DELETED);
         history.setNewStatus(service.getCurrentStatus());
@@ -138,19 +133,16 @@ public class DeleteServiceDelivery {
      * Los servicios se mueven al archivo permanente en lugar de ser borrados.
      */
     public int emptyTrash() {
-        // Obtener todos los servicios marcados como eliminados
         java.util.List<ServiceDelivery> deletedServices = serviceDeliveryPort.findDeleted();
 
         if (deletedServices.isEmpty()) {
             return 0;
         }
 
-        // Archivar cada servicio (en lugar de borrar)
         for (ServiceDelivery service : deletedServices) {
             try {
                 archivePort.archiveService(service, null, "Manual trash empty");
             } catch (Exception e) {
-                // Log error pero continuar con el siguiente
                 System.err
                         .println("Error archivando servicio " + service.getIdServiceDelivery() + ": " + e.getMessage());
             }

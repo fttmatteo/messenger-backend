@@ -16,6 +16,10 @@ public class RedisHealthIndicator implements HealthIndicator {
     @Autowired
     private RedisConnectionFactory redisConnectionFactory;
 
+    /**
+     * Verifica la disponibilidad de Redis enviando un comando PING.
+     * Retorna UP si Redis responde PONG, DOWN en caso contrario.
+     */
     @Override
     public Health health() {
         try (RedisConnection connection = redisConnectionFactory.getConnection()) {

@@ -35,11 +35,17 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
         return mapper.toDomain(savedEntity);
     }
 
+    /**
+     * Elimina un servicio por su ID delegando al repositorio JPA.
+     */
     @Override
     public void deleteById(Long idServiceDelivery) {
         repository.deleteById(idServiceDelivery);
     }
 
+    /**
+     * Busca un servicio por su ID.
+     */
     @Override
     public ServiceDelivery findById(Long idServiceDelivery) {
         Optional<ServiceDeliveryEntity> entity = repository.findById(idServiceDelivery);
@@ -49,6 +55,9 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
         return null;
     }
 
+    /**
+     * Busca todos los servicios de entrega.
+     */
     @Override
     public List<ServiceDelivery> findAll() {
         return repository.findAll().stream()
@@ -56,6 +65,9 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Busca todos los servicios de entrega por placa.
+     */
     @Override
     public List<ServiceDelivery> findByPlateNumber(String plateNumber) {
         return repository.findByPlate_PlateNumber(plateNumber).stream()
@@ -63,6 +75,9 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Busca todos los servicios de entrega por mensajero.
+     */
     @Override
     public List<ServiceDelivery> findByMessengerId(Long messengerId) {
         return repository.findByMessenger_IdEmployee(messengerId).stream()
@@ -70,6 +85,9 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Busca todos los servicios de entrega activos.
+     */
     @Override
     public List<ServiceDelivery> findAllActive() {
         return repository.findByDeletedFalse().stream()
@@ -77,15 +95,18 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
                 .collect(Collectors.toList());
     }
 
-    @Override
     /**
      * Busca servicio activo (no eliminado).
      */
+    @Override
     public ServiceDelivery findByIdActive(Long idServiceDelivery) {
         Optional<ServiceDeliveryEntity> entity = repository.findByIdServiceDeliveryAndDeletedFalse(idServiceDelivery);
         return entity.map(mapper::toDomain).orElse(null);
     }
 
+    /**
+     * Busca todos los servicios de entrega eliminados.
+     */
     @Override
     public List<ServiceDelivery> findDeleted() {
         return repository.findByDeletedTrue().stream()
@@ -93,6 +114,9 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Busca todos los servicios de entrega paginados.
+     */
     @Override
     public Page<ServiceDelivery> findAllPaginated(String keyword, Boolean deleted, Pageable pageable) {
         Page<ServiceDeliveryEntity> entityPage;
@@ -104,6 +128,9 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
         return entityPage.map(mapper::toDomain);
     }
 
+    /**
+     * Busca todos los servicios de entrega paginados por mensajero.
+     */
     @Override
     public Page<ServiceDelivery> findByMessengerPaginated(Long messengerId, String keyword, Boolean deleted,
             Pageable pageable) {
@@ -117,21 +144,27 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
         return entityPage.map(mapper::toDomain);
     }
 
-    @Override
     /**
      * Busca servicios en la papelera que hayan expirado antes de la fecha dada.
      */
+    @Override
     public List<ServiceDelivery> findDeletedExpiredBefore(LocalDateTime date) {
         return repository.findByDeletedTrueAndDeletedAtBefore(date).stream()
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Elimina un servicio por su ID.
+     */
     @Override
     public void hardDeleteById(Long idServiceDelivery) {
         repository.deleteById(idServiceDelivery);
     }
 
+    /**
+     * Elimina todos los servicios eliminados.
+     */
     @Override
     public int hardDeleteAllDeleted() {
         List<ServiceDeliveryEntity> deletedEntities = repository.findByDeletedTrue();
@@ -140,6 +173,9 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
         return count;
     }
 
+    /**
+     * Obtiene estadísticas diarias delegando a la consulta nativa del repositorio.
+     */
     @Override
     public List<app.domain.model.DailyStatistics> findDailyStatsByMessenger(
             Long messengerId,
@@ -148,7 +184,6 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
         /**
          * Obtiene estadísticas diarias delegando a la consulta nativa del repositorio.
          */
-        // Convert LocalDate to LocalDateTime for the query
         LocalDateTime fromDateTime = from.atStartOfDay();
         LocalDateTime toDateTime = to.plusDays(1).atStartOfDay(); // End of 'to' day
 

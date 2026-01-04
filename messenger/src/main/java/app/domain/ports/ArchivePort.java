@@ -11,10 +11,6 @@ public interface ArchivePort {
 
     /**
      * Archiva un servicio permanentemente.
-     *
-     * @param service             Servicio a archivar
-     * @param deletedByEmployeeId ID del empleado que archivó (puede ser null)
-     * @param deletionReason      Razón del archivado
      */
     void archiveService(ServiceDelivery service, Long deletedByEmployeeId, String deletionReason);
 

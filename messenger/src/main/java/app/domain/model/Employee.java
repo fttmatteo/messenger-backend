@@ -12,7 +12,7 @@ public class Employee {
     private String fullName;
     private String phone;
     private String password;
-    private Role role; // ADMIN o MESSENGER
+    private Role role;
 
     public Long getIdEmployee() {
         return idEmployee;

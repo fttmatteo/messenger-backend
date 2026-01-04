@@ -31,11 +31,9 @@ public class DeletedPhotoEntity {
     @Column(name = "upload_date", nullable = false)
     private LocalDateTime uploadDate;
 
-    // Constructors
     public DeletedPhotoEntity() {
     }
 
-    // Getters and Setters
     public Long getIdPhoto() {
         return idPhoto;
     }

@@ -69,13 +69,10 @@ public class UpdateServiceDelivery {
         Status previousStatus = service.getCurrentStatus();
         Role userRole = user.getRole();
 
-        // Validar transición de estados según rol
         validateStateTransitionByRole(previousStatus, newStatus, userRole);
 
-        // Validar evidencias requeridas
         validateEvidence(newStatus, signature, photos, observation);
 
-        // Actualizar estado
         service.setCurrentStatus(newStatus);
 
         if (observation != null && !observation.isEmpty()) {
@@ -108,7 +105,6 @@ public class UpdateServiceDelivery {
 
         service.addHistory(history);
 
-        // Save location history if provided
         if (latitude != null && longitude != null) {
             app.domain.model.TrackingHistory tracking = new app.domain.model.TrackingHistory(
                     userId,
@@ -175,7 +171,6 @@ public class UpdateServiceDelivery {
         }
 
         if (userRole == Role.MESSENGER) {
-            // Mensajero solo puede usar PENDING, DELIVERED, RETURNED
             if (!MESSENGER_ALLOWED_STATES.contains(newStatus)) {
                 throw new BusinessException(
                         "Como mensajero solo puedes cambiar el estado a: PENDING, DELIVERED o RETURNED. " +
@@ -184,7 +179,6 @@ public class UpdateServiceDelivery {
         }
 
         if (userRole == Role.ADMIN) {
-            // Admin solo puede usar CANCELED y RESOLVED
             if (!ADMIN_ALLOWED_STATES.contains(newStatus)) {
                 throw new BusinessException(
                         "Como administrador solo puedes cambiar el estado a: CANCELED o RESOLVED. " +
@@ -200,7 +194,6 @@ public class UpdateServiceDelivery {
     private void validateEvidence(Status status, Signature signature, List<Photo> photos, String observation)
             throws BusinessException {
 
-        // Estados que no requieren evidencia
         if (status == Status.CANCELED || status == Status.RESOLVED || status == Status.ASSIGNED) {
             return;
         }
@@ -212,7 +205,6 @@ public class UpdateServiceDelivery {
             return;
         }
 
-        // PENDING y RETURNED requieren firma, foto y observación
         if (signature == null) {
             throw new BusinessException("Para el estado " + status + " la firma es obligatoria.");
         }

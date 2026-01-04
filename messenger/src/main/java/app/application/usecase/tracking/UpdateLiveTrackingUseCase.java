@@ -34,14 +34,12 @@ public class UpdateLiveTrackingUseCase {
     public LiveTracking execute(LiveTracking incomingTracking) {
         logger.debug("Actualizando ubicación para mensajero ID: {}", incomingTracking.getMessengerId());
 
-        // Forzar siempre la hora del servidor sincronizada para rastreo en vivo
         incomingTracking.setLastUpdate(LocalDateTime.now());
 
         if (incomingTracking.getStatus() == null) {
             incomingTracking.setStatus(TrackingStatus.ACTIVE);
         }
 
-        // Obtener el nombre del mensajero si no está seteado
         if (incomingTracking.getMessengerName() == null || incomingTracking.getMessengerName().isEmpty()) {
             try {
                 Employee employee = employeePort.findById(incomingTracking.getMessengerId());
@@ -61,7 +59,7 @@ public class UpdateLiveTrackingUseCase {
             history.setMessengerId(incomingTracking.getMessengerId());
             history.setLocation(incomingTracking.getCurrentLocation());
             history.setRecordedAt(incomingTracking.getLastUpdate());
-            history.setSource(TrackingSource.GPS); // Asumimos GPS por defecto para live tracking
+            history.setSource(TrackingSource.GPS);
             history.setSpeed(incomingTracking.getSpeed());
 
             trackingPort.saveTrackingHistory(history);

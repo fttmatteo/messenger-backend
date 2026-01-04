@@ -25,6 +25,11 @@ public class AuditAspect {
     private static final Logger auditLogger = LoggerFactory.getLogger("AUDIT");
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+    /**
+     * Intercepta métodos anotados con @AuditableAction para registrar la auditoría.
+     * Registra: usuario, acción, método, parámetros, resultado (Éxito/Fallo) y
+     * duración.
+     */
     @Around("@annotation(auditableAction)")
     public Object auditAction(ProceedingJoinPoint joinPoint, AuditableAction auditableAction) throws Throwable {
         long startTime = System.currentTimeMillis();
@@ -60,6 +65,9 @@ public class AuditAspect {
         }
     }
 
+    /**
+     * Obtiene el nombre del usuario autenticado actual.
+     */
     private String getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated()) {
@@ -68,11 +76,18 @@ public class AuditAspect {
         return "ANONYMOUS";
     }
 
+    /**
+     * Obtiene el nombre calificado del método interceptado (Clase.metodo).
+     */
     private String getMethodName(JoinPoint joinPoint) {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         return signature.getDeclaringType().getSimpleName() + "." + signature.getName();
     }
 
+    /**
+     * Extrae y formatea los argumentos del método para el log.
+     * Trunca la salida si es muy larga para evitar logs excesivos.
+     */
     private String getParameters(JoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
         if (args == null || args.length == 0) {

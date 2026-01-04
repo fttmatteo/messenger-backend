@@ -2,6 +2,9 @@ package app.infrastructure.persistence.entities;
 
 import jakarta.persistence.*;
 
+/**
+ * Entidad JPA para representar un concesionario.
+ */
 @Entity
 @Table(name = "dealerships")
 public class DealershipEntity {
@@ -29,7 +32,7 @@ public class DealershipEntity {
     private Double longitude;
 
     @Column(name = "is_geolocated")
-    private Boolean isGeolocated = false; // Indica si tiene coordenadas válidas
+    private Boolean isGeolocated = false;
 
     public Long getIdDealership() {
         return idDealership;

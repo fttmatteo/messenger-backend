@@ -45,6 +45,9 @@ public class DealershipAdapter implements DealershipPort {
         return null;
     }
 
+    /**
+     * Busca todos los concesionarios delegando al repositorio JPA.
+     */
     @Override
     public List<Dealership> findAll() {
         return repository.findAll().stream()
@@ -52,6 +55,9 @@ public class DealershipAdapter implements DealershipPort {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Elimina un concesionario por su ID delegando al repositorio JPA.
+     */
     @Override
     public void deleteById(Long idDealership) {
         repository.deleteById(idDealership);

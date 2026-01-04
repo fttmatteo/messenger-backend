@@ -16,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import app.domain.model.DailyStatistics;
 import app.domain.model.Photo;
 import app.domain.model.ServiceDelivery;
@@ -213,12 +212,6 @@ public class ServiceDeliveryUseCase {
 
     /**
      * Recupera todos los servicios con paginación y ordenamiento.
-     * 
-     * @param page          Número de página (0-based)
-     * @param size          Tamaño de página
-     * @param sortBy        Campo por el cual ordenar (ej. "createdAt")
-     * @param sortDirection Dirección de ordenamiento ("asc" o "desc")
-     * @return Página de servicios
      */
     @Transactional(readOnly = true)
     public Page<ServiceDelivery> findAllPaginated(int page, int size, String sortBy, String sortDirection,
@@ -230,13 +223,6 @@ public class ServiceDeliveryUseCase {
 
     /**
      * Recupera servicios de un mensajero específico con paginación.
-     * 
-     * @param messengerId   ID del mensajero
-     * @param page          Número de página (0-based)
-     * @param size          Tamaño de página
-     * @param sortBy        Campo por el cual ordenar
-     * @param sortDirection Dirección de ordenamiento
-     * @return Página de servicios del mensajero
      */
     @Transactional(readOnly = true)
     public Page<ServiceDelivery> findByMessengerPaginated(Long messengerId, int page, int size, String sortBy,
@@ -290,6 +276,10 @@ public class ServiceDeliveryUseCase {
         return deleteService.restore(id, userId);
     }
 
+    /**
+     * Vacía la papelera eliminando permanentemente todos los servicios marcados
+     * como eliminados.
+     */
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "EMPTY_TRASH", description = "Vaciar papelera completamente")
     public int emptyTrash(Long userId) {
@@ -297,6 +287,9 @@ public class ServiceDeliveryUseCase {
         return deleteService.emptyTrash();
     }
 
+    /**
+     * Elimina permanentemente un servicio específico de la papelera.
+     */
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "ARCHIVE_SERVICE", description = "Archivar permanentemente un servicio de la papelera")
     public void permanentDeleteById(Long id, Long userId) throws Exception {

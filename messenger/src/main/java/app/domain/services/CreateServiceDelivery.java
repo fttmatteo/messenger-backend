@@ -96,7 +96,6 @@ public class CreateServiceDelivery {
 
         ServiceDelivery saved = serviceDeliveryPort.save(service);
 
-        // Save initial tracking location if provided
         if (latitude != null && longitude != null) {
             app.domain.model.TrackingHistory tracking = new app.domain.model.TrackingHistory();
             tracking.setMessengerId(messenger.getIdEmployee());
@@ -106,8 +105,7 @@ public class CreateServiceDelivery {
                     latitude,
                     longitude,
                     LocalDateTime.now(),
-                    0.0 // accuracy default
-            );
+                    0.0);
             tracking.setLocation(location);
 
             tracking.setRecordedAt(LocalDateTime.now());

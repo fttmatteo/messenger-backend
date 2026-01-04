@@ -39,7 +39,7 @@ public class JwtAdapter implements AuthenticationPort {
 
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationTime = expiration;
-        this.refreshExpirationTime = expiration * 24; // 24 times the access token expiration
+        this.refreshExpirationTime = expiration * 24;
     }
 
     /**

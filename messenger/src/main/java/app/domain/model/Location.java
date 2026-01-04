@@ -10,7 +10,7 @@ public class Location {
     private Double latitude;
     private Double longitude;
     private LocalDateTime timestamp;
-    private Double accuracy; // Precisión en metros
+    private Double accuracy;
 
     // Radio de la Tierra en metros
     private static final double EARTH_RADIUS_METERS = 6371000;

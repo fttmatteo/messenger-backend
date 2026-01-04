@@ -56,6 +56,9 @@ public class EmployeeAdapter implements EmployeePort {
         return null;
     }
 
+    /**
+     * Busca todos los empleados delegando al repositorio JPA.
+     */
     @Override
     public List<Employee> findAll() {
         return repository.findAll().stream()
@@ -63,6 +66,9 @@ public class EmployeeAdapter implements EmployeePort {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Elimina un empleado por su ID delegando al repositorio JPA.
+     */
     @Override
     public void deleteById(Long idEmployee) {
         repository.deleteById(idEmployee);

@@ -13,7 +13,7 @@ public class RouteResponse {
     private Double distanceKilometers;
     private Long durationSeconds;
     private String durationFormatted;
-    private String polyline; // Encoded polyline para dibujar en mapa
+    private String polyline;
 
     public RouteResponse() {
     }

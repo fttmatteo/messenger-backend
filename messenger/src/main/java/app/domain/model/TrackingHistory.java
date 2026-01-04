@@ -12,9 +12,9 @@ public class TrackingHistory {
     private Long messengerId;
     private Location location;
     private LocalDateTime recordedAt;
-    private Long serviceDeliveryId; // Servicio activo en ese momento (puede ser null)
-    private TrackingSource source; // Fuente del dato (GPS, MANUAL, etc.)
-    private Double speed; // km/h en el momento del registro
+    private Long serviceDeliveryId;
+    private TrackingSource source;
+    private Double speed;
 
     public TrackingHistory() {
     }

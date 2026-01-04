@@ -493,7 +493,8 @@ Sistema de tracking GPS usando **Redis** + **WebSocket** para monitoreo de mensa
 > [!NOTE]
 > **Requisitos de Evidencia**
 > - **DELIVERED**: Firma de recibido obligatoria.
-> - **PENDING** & **RETURNED**: Firma, al menos una foto y observación obligatorias.
+> - **PENDING**: Firma, al menos una foto y observación obligatorias.
+> - **RETURNED**: Al menos una foto y observación obligatorias (no requiere firma).
 > - **CANCELED** & **RESOLVED**: No requieren evidencia adicional.
 
 > [!NOTE]

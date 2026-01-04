@@ -27,7 +27,6 @@ public class DeleteEmployee {
             throw new BusinessException("El empleado con ID " + id + " no existe.");
         }
 
-        // Check if this employee (as messenger) has any associated service deliveries
         var deliveries = serviceDeliveryPort.findByMessengerId(id);
         if (deliveries != null && !deliveries.isEmpty()) {
             throw new BusinessException("No se puede eliminar. El empleado tiene " + deliveries.size()

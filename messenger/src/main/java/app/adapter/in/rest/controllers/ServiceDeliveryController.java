@@ -168,10 +168,6 @@ public class ServiceDeliveryController {
      * Reasigna un servicio a otro mensajero.
      * Solo disponible para ADMIN y solo cuando el servicio está en CANCELED.
      */
-    /**
-     * Reasigna un servicio a otro mensajero.
-     * Solo disponible para ADMIN y solo cuando el servicio está en CANCELED.
-     */
     @PutMapping("/reassign/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ServiceDeliveryResponse> reassignMessenger(
@@ -243,12 +239,6 @@ public class ServiceDeliveryController {
     /**
      * Obtiene todos los servicios con paginación.
      * Los mensajeros solo ven sus propios servicios asignados.
-     * 
-     * @param page          Número de página (0-indexed)
-     * @param size          Tamaño de página (por defecto 10)
-     * @param sortBy        Campo para ordenar (por defecto "createdAt")
-     * @param sortDirection Dirección de ordenamiento (por defecto "desc")
-     * @return Respuesta paginada de servicios
      */
     @GetMapping("/allServicesPageable")
     @PreAuthorize("isAuthenticated()")
@@ -275,7 +265,6 @@ public class ServiceDeliveryController {
                     page, size, sortBy, sortDirection, search);
         }
 
-        // Convert domain Page to PageResponse with DTOs
         Page<ServiceDeliveryResponse> responsePage = servicePage.map(responseMapper::toResponse);
         PageResponse<ServiceDeliveryResponse> pageResponse = PageResponse.from(responsePage);
 
@@ -317,9 +306,6 @@ public class ServiceDeliveryController {
     /**
      * Restaura un servicio desde la papelera (solo ADMIN).
      */
-    /**
-     * Restaura un servicio desde la papelera (solo ADMIN).
-     */
     @PostMapping("/trash/restore/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ServiceDeliveryResponse> restore(@PathVariable Long id) throws Exception {
@@ -331,10 +317,6 @@ public class ServiceDeliveryController {
         return ResponseEntity.ok(responseMapper.toResponse(restored));
     }
 
-    /**
-     * Vacía la papelera eliminando permanentemente todos los servicios (solo
-     * ADMIN).
-     */
     /**
      * Vacía la papelera eliminando permanentemente todos los servicios (solo
      * ADMIN).

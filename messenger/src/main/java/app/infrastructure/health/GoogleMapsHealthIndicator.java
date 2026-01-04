@@ -19,6 +19,11 @@ public class GoogleMapsHealthIndicator implements HealthIndicator {
     @Autowired
     private GeoApiContext geoApiContext;
 
+    /**
+     * Verifica la disponibilidad de la API de Google Maps mediante una petición de
+     * prueba.
+     * Retorna UP si la API responde correctamente, DOWN en caso de error.
+     */
     @Override
     public Health health() {
         try {

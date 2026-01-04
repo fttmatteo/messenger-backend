@@ -18,79 +18,110 @@ import java.util.Optional;
 @Repository
 public interface ServiceDeliveryRepository extends JpaRepository<ServiceDeliveryEntity, Long> {
 
-  List<ServiceDeliveryEntity> findByCurrentStatus(Status currentStatus);
+    /**
+     * Encuentra servicios por estado actual.
+     */
+    List<ServiceDeliveryEntity> findByCurrentStatus(Status currentStatus);
 
-  List<ServiceDeliveryEntity> findByMessenger_Document(Long messengerDocument);
+    /**
+     * Encuentra servicios de un mensajero específico.
+     */
+    List<ServiceDeliveryEntity> findByMessenger_Document(Long messengerDocument);
 
-  List<ServiceDeliveryEntity> findByPlate_PlateNumber(String plateNumber);
+    /**
+     * Encuentra servicios por placa.
+     */
+    List<ServiceDeliveryEntity> findByPlate_PlateNumber(String plateNumber);
 
-  List<ServiceDeliveryEntity> findByDealership_IdDealership(Long dealershipId);
+    /**
+     * Encuentra servicios por concesionario.
+     */
+    List<ServiceDeliveryEntity> findByDealership_IdDealership(Long dealershipId);
 
-  List<ServiceDeliveryEntity> findByMessenger_IdEmployee(Long messengerId);
+    /**
+     * Encuentra servicios de un mensajero específico.
+     */
+    List<ServiceDeliveryEntity> findByMessenger_IdEmployee(Long messengerId);
 
-  List<ServiceDeliveryEntity> findByDeletedFalse();
+    /**
+     * Encuentra servicios no eliminados.
+     */
+    List<ServiceDeliveryEntity> findByDeletedFalse();
 
-  Optional<ServiceDeliveryEntity> findByIdServiceDeliveryAndDeletedFalse(Long id);
+    /**
+     * Encuentra un servicio por su ID y estado de eliminación.
+     */
+    Optional<ServiceDeliveryEntity> findByIdServiceDeliveryAndDeletedFalse(Long id);
 
-  List<ServiceDeliveryEntity> findByDeletedTrue();
+    /**
+     * Encuentra servicios eliminados.
+     */
+    List<ServiceDeliveryEntity> findByDeletedTrue();
 
-  // Paginated Methods
-  /**
-   * Encuentra servicios con paginación filtrado por estado de eliminación
-   */
-  Page<ServiceDeliveryEntity> findByDeleted(Boolean deleted, Pageable pageable);
+    /**
+     * Encuentra servicios con paginación filtrado por estado de eliminación
+     */
+    Page<ServiceDeliveryEntity> findByDeleted(Boolean deleted, Pageable pageable);
 
-  /**
-   * Encuentra servicios de un mensajero específico con paginación
-   */
-  Page<ServiceDeliveryEntity> findByMessenger_IdEmployeeAndDeleted(Long messengerId, Boolean deleted,
-      Pageable pageable);
+    /**
+     * Encuentra servicios de un mensajero específico con paginación
+     */
+    Page<ServiceDeliveryEntity> findByMessenger_IdEmployeeAndDeleted(Long messengerId, Boolean deleted,
+            Pageable pageable);
 
-  // Search Methods
-  /**
-   * Busca servicios por keyword en múltiples campos (ID, placa, concesionario,
-   * mensajero)
-   */
-  @Query("SELECT s FROM ServiceDeliveryEntity s WHERE s.deleted = :deleted AND (" +
-      "CAST(s.idServiceDelivery AS string) LIKE %:keyword% OR " +
-      "LOWER(s.plate.plateNumber) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-      "LOWER(s.dealership.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-      "LOWER(s.messenger.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')))")
-  Page<ServiceDeliveryEntity> searchAll(@Param("keyword") String keyword, @Param("deleted") Boolean deleted,
-      Pageable pageable);
+    /**
+     * Busca servicios por keyword en múltiples campos (ID, placa, concesionario,
+     * mensajero)
+     */
+    @Query("SELECT s FROM ServiceDeliveryEntity s WHERE s.deleted = :deleted AND (" +
+            "CAST(s.idServiceDelivery AS string) LIKE %:keyword% OR " +
+            "LOWER(s.plate.plateNumber) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(s.dealership.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(s.messenger.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    Page<ServiceDeliveryEntity> searchAll(@Param("keyword") String keyword, @Param("deleted") Boolean deleted,
+            Pageable pageable);
 
-  /**
-   * Busca servicios de un mensajero específico por keyword
-   */
-  @Query("SELECT s FROM ServiceDeliveryEntity s WHERE s.messenger.idEmployee = :messengerId AND s.deleted = :deleted AND ("
-      +
-      "CAST(s.idServiceDelivery AS string) LIKE %:keyword% OR " +
-      "LOWER(s.plate.plateNumber) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-      "LOWER(s.dealership.name) LIKE LOWER(CONCAT('%', :keyword, '%')))")
-  Page<ServiceDeliveryEntity> searchByMessenger(@Param("messengerId") Long messengerId,
-      @Param("keyword") String keyword, @Param("deleted") Boolean deleted, Pageable pageable);
+    /**
+     * Busca servicios de un mensajero específico por keyword
+     */
+    @Query("SELECT s FROM ServiceDeliveryEntity s WHERE s.messenger.idEmployee = :messengerId AND s.deleted = :deleted AND ("
+            +
+            "CAST(s.idServiceDelivery AS string) LIKE %:keyword% OR " +
+            "LOWER(s.plate.plateNumber) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(s.dealership.name) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    Page<ServiceDeliveryEntity> searchByMessenger(@Param("messengerId") Long messengerId,
+            @Param("keyword") String keyword, @Param("deleted") Boolean deleted, Pageable pageable);
 
-  List<ServiceDeliveryEntity> findByDeletedTrueAndDeletedAtBefore(LocalDateTime date);
+    /**
+     * Encuentra servicios eliminados antes de una fecha específica
+     */
+    List<ServiceDeliveryEntity> findByDeletedTrueAndDeletedAtBefore(LocalDateTime date);
 
-  List<ServiceDeliveryEntity> findByPlate_PlateNumberAndDeletedFalse(String plateNumber);
+    /**
+     * Encuentra servicios por placa y estado de eliminación
+     */
+    List<ServiceDeliveryEntity> findByPlate_PlateNumberAndDeletedFalse(String plateNumber);
 
-  @Query(value = """
-      SELECT DATE(created_at) as date,
-             SUM(CASE WHEN current_status = 'ASSIGNED' THEN 1 ELSE 0 END) as assigned,
-             SUM(CASE WHEN current_status = 'DELIVERED' THEN 1 ELSE 0 END) as delivered,
-             SUM(CASE WHEN current_status = 'RETURNED' THEN 1 ELSE 0 END) as returned,
-             SUM(CASE WHEN current_status = 'CANCELED' THEN 1 ELSE 0 END) as canceled,
-             COUNT(*) as total
-      FROM service_deliveries
-      WHERE messenger_id = :messengerId
-        AND created_at >= :fromDate
-        AND created_at < :toDate
-        AND deleted = false
-      GROUP BY DATE(created_at)
-      ORDER BY date DESC
-      """, nativeQuery = true)
-  List<Object[]> findDailyStatsByMessenger(
-      @Param("messengerId") Long messengerId,
-      @Param("fromDate") LocalDateTime fromDate,
-      @Param("toDate") LocalDateTime toDate);
+    /**
+     * Busca estadísticas diarias de servicios por mensajero
+     */
+    @Query(value = """
+            SELECT DATE(created_at) as date,
+                   SUM(CASE WHEN current_status = 'ASSIGNED' THEN 1 ELSE 0 END) as assigned,
+                   SUM(CASE WHEN current_status = 'DELIVERED' THEN 1 ELSE 0 END) as delivered,
+                   SUM(CASE WHEN current_status = 'RETURNED' THEN 1 ELSE 0 END) as returned,
+                   SUM(CASE WHEN current_status = 'CANCELED' THEN 1 ELSE 0 END) as canceled,
+                   COUNT(*) as total
+            FROM service_deliveries
+            WHERE messenger_id = :messengerId
+              AND created_at >= :fromDate
+              AND created_at < :toDate
+              AND deleted = false
+            GROUP BY DATE(created_at)
+            ORDER BY date DESC
+            """, nativeQuery = true)
+    List<Object[]> findDailyStatsByMessenger(
+            @Param("messengerId") Long messengerId,
+            @Param("fromDate") LocalDateTime fromDate,
+            @Param("toDate") LocalDateTime toDate);
 }

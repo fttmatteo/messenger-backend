@@ -17,15 +17,20 @@ public class NoOpTokenBlacklistService implements app.domain.ports.TokenBlacklis
 
     private static final Logger logger = LoggerFactory.getLogger(NoOpTokenBlacklistService.class);
 
+    /**
+     * Agrega un token a la lista negra (no-op en este caso).
+     */
     @Override
     public void addToBlacklist(String token, long ttlSeconds) {
         logger.debug("NoOp: addToBlacklist called (Redis disabled)");
-        // No-op: Token blacklist not enforced in test environment
     }
 
+    /**
+     * Verifica si un token está en la lista negra (no-op en este caso).
+     */
     @Override
     public boolean isBlacklisted(String token) {
         logger.debug("NoOp: isBlacklisted called (Redis disabled)");
-        return false; // No tokens are blacklisted when Redis is disabled
+        return false;
     }
 }

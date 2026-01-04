@@ -4,10 +4,8 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 
 /**
- * Generic wrapper for paginated responses.
- * Provides pagination metadata alongside the data content.
- * 
- * @param <T> The type of content in the page
+ * Envoltorio genérico para respuestas paginadas.
+ * Proporciona metadatos de paginación junto con el contenido de los datos.
  */
 public class PageResponse<T> {
     private List<T> content;
@@ -33,7 +31,7 @@ public class PageResponse<T> {
     }
 
     /**
-     * Factory method to create PageResponse from Spring's Page object
+     * Método de fábrica para crear PageResponse a partir del objeto Page de Spring.
      */
     public static <T> PageResponse<T> from(Page<T> page) {
         return new PageResponse<>(
@@ -46,7 +44,6 @@ public class PageResponse<T> {
                 page.isLast());
     }
 
-    // Getters and Setters
     public List<T> getContent() {
         return content;
     }

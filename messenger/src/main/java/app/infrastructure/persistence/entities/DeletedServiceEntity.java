@@ -18,7 +18,6 @@ public class DeletedServiceEntity {
     @Column(name = "id_service_delivery")
     private Long idServiceDelivery;
 
-    // ========== Original Service Fields ==========
     @Enumerated(EnumType.STRING)
     @Column(name = "current_status", nullable = false)
     private Status currentStatus;
@@ -35,7 +34,6 @@ public class DeletedServiceEntity {
     @Column(name = "locked_at")
     private LocalDateTime lockedAt;
 
-    // ========== Foreign Key IDs (preserved for reference) ==========
     @Column(name = "plate_id")
     private Long plateId;
 
@@ -48,7 +46,6 @@ public class DeletedServiceEntity {
     @Column(name = "signature_id")
     private Long signatureId;
 
-    // ========== Archive Metadata ==========
     @Column(name = "permanently_deleted_at", nullable = false)
     private LocalDateTime permanentlyDeletedAt;
 
@@ -58,8 +55,6 @@ public class DeletedServiceEntity {
     @Column(name = "deletion_reason")
     private String deletionReason;
 
-    // ========== Denormalized Data (preserved even if related entities deleted)
-    // ==========
     @Column(name = "messenger_name")
     private String messengerName;
 
@@ -84,11 +79,9 @@ public class DeletedServiceEntity {
     @Column(name = "plate_type", nullable = false)
     private String plateType;
 
-    // ========== Constructors ==========
     public DeletedServiceEntity() {
     }
 
-    // ========== Getters and Setters ==========
     public Long getIdServiceDelivery() {
         return idServiceDelivery;
     }

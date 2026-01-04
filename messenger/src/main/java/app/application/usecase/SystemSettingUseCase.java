@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+/**
+ * Caso de uso para la gestión de configuraciones del sistema.
+ */
 @Service
 public class SystemSettingUseCase {
 
@@ -19,6 +22,10 @@ public class SystemSettingUseCase {
 
     private static final String STATUS_COLORS_KEY = "STATUS_COLORS";
 
+    /**
+     * Obtiene la configuración actual de colores de estado en formato JSON.
+     * Retorna un JSON vacío por defecto si no existe configuración o hay error.
+     */
     public String getStatusColors() {
         try {
             return systemSettingPort.findByKey(STATUS_COLORS_KEY)
@@ -26,10 +33,13 @@ public class SystemSettingUseCase {
                     .orElse("{}");
         } catch (Exception e) {
             logger.error("Error al obtener colores de estados (posible tabla faltante): {}", e.getMessage());
-            return "{}"; // Fallback para evitar 500
+            return "{}";
         }
     }
 
+    /**
+     * Actualiza o crea la configuración de colores de estado.
+     */
     public void updateStatusColors(String colorsJson) {
         SystemSetting setting = systemSettingPort.findByKey(STATUS_COLORS_KEY)
                 .orElse(new SystemSetting(STATUS_COLORS_KEY, colorsJson));

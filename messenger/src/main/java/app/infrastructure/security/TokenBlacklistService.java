@@ -19,11 +19,19 @@ public class TokenBlacklistService implements app.domain.ports.TokenBlacklistPor
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
+    /**
+     * Agrega un token a la lista negra.
+     */
+    @Override
     public void addToBlacklist(String token, long ttlSeconds) {
         String key = BLACKLIST_PREFIX + hashToken(token);
         redisTemplate.opsForValue().set(key, "revoked", Duration.ofSeconds(ttlSeconds));
     }
 
+    /**
+     * Verifica si un token está en la lista negra.
+     */
+    @Override
     public boolean isBlacklisted(String token) {
         String key = BLACKLIST_PREFIX + hashToken(token);
         Boolean exists = redisTemplate.hasKey(key);
@@ -31,6 +39,9 @@ public class TokenBlacklistService implements app.domain.ports.TokenBlacklistPor
         return blacklisted;
     }
 
+    /**
+     * Genera un hash para el token.
+     */
     private String hashToken(String token) {
         if (token.length() <= 32) {
             return token;

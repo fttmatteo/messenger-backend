@@ -5,7 +5,6 @@ import app.adapter.in.rest.response.LiveTrackingResponse;
 import app.application.usecase.tracking.UpdateLiveTrackingUseCase;
 import app.domain.model.LiveTracking;
 import app.domain.model.Location;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -49,7 +48,6 @@ public class TrackingWebSocketController {
         if (request.getStatus() != null) {
             domainTracking.setStatus(request.getStatus());
         }
-        // lastUpdate is handled by the use case (server-side time)
 
         LiveTracking tracking = updateLiveTracking.execute(domainTracking);
         LiveTrackingResponse response = mapToResponse(tracking);
