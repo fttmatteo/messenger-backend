@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -43,31 +44,39 @@ public class MonitoringController {
         int delivered = 0;
         int returned = 0;
         int canceled = 0;
+        int pendingCount = 0;
         int total = 0;
 
         List<ActivityEvent> timeline = new ArrayList<>();
 
         for (ServiceDelivery service : allServices) {
+            boolean wasAssignedToday = false;
+
             if (service.getCreatedAt() != null && service.getCreatedAt().toLocalDate().equals(date)) {
-                total++;
-                Status currentStatus = service.getCurrentStatus();
-                if (currentStatus == Status.ASSIGNED) {
-                    assigned++;
-                } else if (currentStatus == Status.DELIVERED) {
-                    delivered++;
-                } else if (currentStatus == Status.RETURNED) {
-                    returned++;
-                } else if (currentStatus == Status.CANCELED) {
-                    canceled++;
-                }
+                wasAssignedToday = true;
             }
 
             if (service.getHistory() != null) {
+                Status latestStatusToday = null;
+                LocalDateTime latestChangeDate = null;
+
                 for (StatusHistory history : service.getHistory()) {
                     if (history.getChangeDate() != null && history.getChangeDate().toLocalDate().equals(date)) {
+                        Status newStatus = history.getNewStatus();
+
+                        // Track the latest status transition for this service today
+                        if (latestChangeDate == null || history.getChangeDate().isAfter(latestChangeDate)) {
+                            latestChangeDate = history.getChangeDate();
+                            latestStatusToday = newStatus;
+                        }
+
+                        if (newStatus == Status.ASSIGNED) {
+                            wasAssignedToday = true;
+                        }
+
                         ActivityEvent event = new ActivityEvent();
                         event.setId(history.getIdStatusHistory());
-                        event.setStatus(history.getNewStatus().name());
+                        event.setStatus(newStatus.name());
                         event.setTimestamp(history.getChangeDate());
                         event.setPlateNumber(service.getPlate() != null ? service.getPlate().getPlateNumber() : null);
                         event.setDealershipName(
@@ -85,14 +94,31 @@ public class MonitoringController {
                         timeline.add(event);
                     }
                 }
+
+                if (wasAssignedToday) {
+                    total++;
+                }
+
+                // Increment summary counters based ONLY on the last status reached today
+                if (latestStatusToday != null) {
+                    if (latestStatusToday == Status.DELIVERED) {
+                        delivered++;
+                    } else if (latestStatusToday == Status.RETURNED) {
+                        returned++;
+                    } else if (latestStatusToday == Status.CANCELED) {
+                        canceled++;
+                    } else if (latestStatusToday == Status.PENDING) {
+                        pendingCount++;
+                    }
+                }
+            } else if (wasAssignedToday) {
+                total++;
             }
         }
 
         timeline.sort(Comparator.comparing(ActivityEvent::getTimestamp).reversed());
 
-        int pending = total - delivered - returned - canceled;
-        if (pending < 0)
-            pending = 0;
+        int pending = pendingCount;
 
         DailyStats stats = new DailyStats(assigned, delivered, returned, canceled, pending, total);
         MessengerActivityResponse response = new MessengerActivityResponse(stats, timeline);
