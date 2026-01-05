@@ -111,7 +111,7 @@ graph LR
 
 | Component | Technology |
 |-----------|------------|
-| **Framework** | Spring Boot 4.x |
+| **Framework** | Spring Boot 4.0.1 |
 | **Language** | Java 17 |
 | **Database** | MySQL 8.0+ |
 | **Migrations** | Flyway |
@@ -141,30 +141,33 @@ messenger/
 │   │   ├── in/                          # Input Adapters
 │   │   │   ├── builder/                 # Object Builders
 │   │   │   ├── rest/
-│   │   │   │   ├── controllers/         # 9 REST Controllers
+│   │   │   │   ├── controllers/         # REST Controllers
 │   │   │   │   ├── mapper/              # Request/Response Mappers
 │   │   │   │   ├── request/             # Input DTOs
 │   │   │   │   └── response/            # Output DTOs
-│   │   │   └── validators/              # Input Validators
-│   │   └── out/                         # Output Adapters
+│   │   │   └── websocket/               # Real-time tracking
 │   │       ├── maps/                    # Google Maps Integration
 │   │       ├── ocr/                     # Google Vision OCR
+│   │       ├── persistence/             # JPA Adapters
 │   │       ├── security/                # JWT Adapter
 │   │       ├── storage/                 # Google Cloud Storage
 │   │       └── tracking/                # Location Tracking
 │   ├── application/
-│   │   ├── exceptions/                  # BusinessException, InputsException
 │   │   └── usecase/                     # 11 Use Cases (Monitoring, Settings, Location...)
 │   ├── domain/
+│   │   ├── exception/                   # BusinessException, InputsException...
 │   │   ├── model/                       # 12+ Models + 7 Enums + Auth
+│   │   │   └── enums/                   # Role, Status, PlateType...
 │   │   ├── ports/                       # 10 Ports (interfaces)
 │   │   └── services/                    # Domain Services
 │   └── infrastructure/
+│       ├── audit/                       # AOP Audit System
+│       ├── config/                      # Spring Configuration
+│       ├── exception/                   # Global Error Handler
 │       ├── persistence/
-│       │   ├── entities/                # JPA Entities
-│       │   ├── mapper/                  # Entity ↔ Domain mappers
-│       │   └── repository/              # Spring Data Repositories
-│       └── security/                    # SecurityConfig, JwtFilter
+│       │   └── entities/                # JPA Entities
+│       ├── scheduler/                   # Trash Cleanup Jobs
+│       └── security/                    # Spring Security Config / Filters
 └── src/main/resources/
     ├── application.properties           # Base Configuration
     ├── application-local.properties     # Local Development (H2)
@@ -282,6 +285,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `PUT` | `/dealerships/updateDealership/{id}` | Update dealership (ADMIN) |
 | `DELETE` | `/dealerships/deleteDealership/{id}` | Delete dealership (ADMIN) |
 | `POST` | `/dealerships/geocodeDealership/{id}` | Geocode dealership address (ADMIN) |
+| `GET` | `/dealerships/findByDealershipName/{name}` | Get by Name |
 
 ---
 
@@ -374,6 +378,7 @@ erDiagram
         String zone
         Double latitude
         Double longitude
+        Boolean is_geolocated
     }
     
     plates {
@@ -392,6 +397,9 @@ erDiagram
         String observation
         Long signature_id FK
         LocalDateTime created_at
+        Boolean deleted
+        LocalDateTime deleted_at
+        LocalDateTime locked_at
     }
     
     signatures {
@@ -414,6 +422,9 @@ erDiagram
         LocalDateTime change_date
         Long changed_by_employee_id FK
         Long service_delivery_id FK
+        Double delivery_latitude
+        Double delivery_longitude
+        String observation
     }
     
     tracking_history {
@@ -466,11 +477,23 @@ GPS tracking system using **Redis** + **WebSocket** for messenger monitoring.
 
 | Feature | Description |
 |---------|-------------|
-| 🔴 **Live location** | Updates every 30 seconds |
+| 🔴 **Live location** | Updates every 5-45 seconds (5s rate limit) |
 | 📍 **Delivery validation** | Maximum 200m radius from destination |
+| 🎯 **Technical accuracy** | < 100m GPS error filtered for history |
 | 📊 **Complete history** | 30-day retention |
 | ⚡ **Low latency** | Redis for location caching |
 | 🌐 **WebSocket** | Real-time push notifications |
+
+### WebSocket API
+
+Connecting URL: `ws://localhost:8080/ws`
+
+| Type | Destination | Description |
+|------|-------------|-------------|
+| `SEND` | `/app/tracking/update` | Send GPS location update |
+| `SEND` | `/app/tracking/heartbeat` | Send keep-alive signal (no GPS) |
+| `SUB` | `/topic/tracking/{id}` | Receive updates for specific messenger |
+| `SUB` | `/topic/tracking/all` | Receive updates for all messengers (Admin) |
 
 ### Google Maps Integration
 
@@ -586,7 +609,7 @@ flowchart LR
 | Token | Prod Duration | Dev Duration | Local Duration | Usage |
 |-------|---------------|--------------|----------------|-------|
 | **Access Token** | 30 minutes | 8 hours | 8 hours | Header `Authorization: Bearer <token>` |
-| **Refresh Token** | 7 days | 7 days | 7 days | Endpoint `/auth/refresh` to renew |
+| **Refresh Token** | 12 hours | 8 days | 8 days | Endpoint `/auth/refresh` to renew |
 
 ### Security Features
 
@@ -597,8 +620,10 @@ flowchart LR
 
 ### Rate Limiting
 
-- Implemented with **Bucket4j** to prevent abuse
-- Limits applied per IP address
+- **IP-Based Throttling**:
+  - `AUTH`: 10 requests / minute (Brute-force protection)
+  - `GENERAL`: 100 requests / minute
+- **WebSocket Throttling**: 5 seconds minimum interval between updates per messenger.
 - Response headers: `X-Rate-Limit-Remaining`, `X-Rate-Limit-Retry-After-Seconds`
 
 ### Roles & Permissions
@@ -664,6 +689,7 @@ The application includes a centralized **audit logging system** using Aspect-Ori
 | | `DELETE_SERVICE` | Move service to trash |
 | | `RESTORE_SERVICE` | Restore service from trash |
 | | `EMPTY_TRASH` | Permanently empty trash |
+| | `ARCHIVE_SERVICE` | Manually archive service from trash |
 | **EmployeeUseCase** | `CREATE_EMPLOYEE` | Create new employee |
 | | `UPDATE_EMPLOYEE` | Update employee information |
 | | `DELETE_EMPLOYEE` | Delete employee |
@@ -724,28 +750,16 @@ AUDIT | timestamp | user_document | action | method | params | status | duration
 <details>
 <summary><b>🔐 Required Variables</b></summary>
 
-```bash
-# Database
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=messenger
-DB_USERNAME=root
-DB_PASSWORD=your_password
-
-# JWT
-JWT_SECRET=your_base64_encoded_secret_key
-
-# Redis
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_PASSWORD=            # Production only
-
-# Google Cloud
-GCP_PROJECT_ID=your_project_id
-GCS_BUCKET_NAME=your_bucket_name
-GOOGLE_MAPS_API_KEY=your_api_key
-GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
-```
+| Variable | Description | Default/Example |
+|----------|-------------|-----------------|
+| `DB_NAME` | MySQL Database Name | `messenger_db` |
+| `DB_USERNAME` | Database User | `root` |
+| `DB_PASSWORD` | Database Password | `******` |
+| `REDIS_HOST` | Redis Server Host | `localhost` |
+| `JWT_SECRET` | 256-bit Key for Tokens | `openssl rand -base64 64` |
+| `GOOGLE_MAPS_API_KEY` | Google Maps Platform Key | `AIza...` |
+| `GCS_BUCKET_NAME` | Bucket for evidence | `plak-evidence` |
+| `CORS_ALLOWED_ORIGINS`| Allowed Frontend URLs | `http://localhost:5173` |
 
 </details>
 

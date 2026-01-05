@@ -72,6 +72,7 @@ public class TrackingController {
 
     /**
      * Obtiene la última ubicación conocida de un mensajero (solo ADMIN).
+     * Retorna 200 con null si no hay datos (mensajero nuevo o inactivo).
      */
     @GetMapping("/messenger/{messengerId}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -82,7 +83,8 @@ public class TrackingController {
         LiveTracking tracking = trackingPort.getLastLocation(messengerId).orElse(null);
 
         if (tracking == null) {
-            return ResponseEntity.notFound().build();
+            // Return 200 with null body to avoid browser console 404 errors
+            return ResponseEntity.ok(null);
         }
 
         return ResponseEntity.ok(responseMapper.toResponse(tracking));

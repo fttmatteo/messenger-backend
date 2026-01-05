@@ -97,6 +97,7 @@ public class MonitoringController {
 
                 if (wasAssignedToday) {
                     total++;
+                    assigned++;
                 }
 
                 // Increment summary counters based ONLY on the last status reached today

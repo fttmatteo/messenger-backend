@@ -17,6 +17,10 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
  * Configuración de Redis para tracking en tiempo real.
+ * Usa serialización JSON con tolerancia a cambios de schema:
+ * - FAIL_ON_UNKNOWN_PROPERTIES deshabilitado para compatibilidad hacia adelante
+ * - Si se agregan nuevos campos, versiones antiguas los ignorarán
+ * - Si se quitan campos, se deserializarán como null
  */
 @Configuration
 @ConditionalOnProperty(name = "redis.enabled", havingValue = "true", matchIfMissing = true)
@@ -47,7 +51,7 @@ public class RedisConfig {
 
     /**
      * Configura el template de Redis para manejar objetos LiveTracking con
-     * serialización JSON.
+     * serialización JSON compatible con cambios de versión.
      */
     @Bean
     public RedisTemplate<String, LiveTracking> liveTrackingRedisTemplate(
@@ -59,7 +63,9 @@ public class RedisConfig {
         template.setKeySerializer(new StringRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
 
+        // Configurar JsonMapper tolerante a cambios de schema
         JsonMapper jsonMapper = JsonMapper.builder()
+                // No fallar si hay campos desconocidos (compatibilidad hacia adelante)
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 .build();
 

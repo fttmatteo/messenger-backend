@@ -36,6 +36,15 @@ services:
         condition: service_healthy
     networks:
       - messenger-network
+    # Reiniciar automáticamente si falla
+    restart: unless-stopped
+    # Healthcheck para asegurar que Spring Boot responda
+    healthcheck:
+      test: "curl --fail --silent http://localhost:8080/actuator/health | grep UP || exit 1"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
 
   # DATABASE: MySQL 8.0
   messenger-db:
@@ -57,6 +66,7 @@ services:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       timeout: 20s
       retries: 10
+    restart: unless-stopped
 
   # CACHE: Redis
   messenger-redis:
@@ -74,6 +84,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
 # VOLÚMENES Y REDES
 volumes:

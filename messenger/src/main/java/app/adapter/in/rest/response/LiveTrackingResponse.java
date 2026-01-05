@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 /**
  * DTO de respuesta con tracking en tiempo real de mensajero.
+ * Incluye lastHeartbeat para indicar conectividad separada de GPS.
  */
 public class LiveTrackingResponse {
     private Long messengerId;
@@ -12,6 +13,7 @@ public class LiveTrackingResponse {
     private Double latitude;
     private Double longitude;
     private LocalDateTime lastUpdate;
+    private LocalDateTime lastHeartbeat;
     private TrackingStatus status;
     private Double speed;
     private Double heading;
@@ -21,13 +23,14 @@ public class LiveTrackingResponse {
 
     public LiveTrackingResponse(Long messengerId, String messengerName,
             Double latitude, Double longitude,
-            LocalDateTime lastUpdate, TrackingStatus status,
-            Double speed, Double heading) {
+            LocalDateTime lastUpdate, LocalDateTime lastHeartbeat,
+            TrackingStatus status, Double speed, Double heading) {
         this.messengerId = messengerId;
         this.messengerName = messengerName;
         this.latitude = latitude;
         this.longitude = longitude;
         this.lastUpdate = lastUpdate;
+        this.lastHeartbeat = lastHeartbeat;
         this.status = status;
         this.speed = speed;
         this.heading = heading;
@@ -71,6 +74,14 @@ public class LiveTrackingResponse {
 
     public void setLastUpdate(LocalDateTime lastUpdate) {
         this.lastUpdate = lastUpdate;
+    }
+
+    public LocalDateTime getLastHeartbeat() {
+        return lastHeartbeat;
+    }
+
+    public void setLastHeartbeat(LocalDateTime lastHeartbeat) {
+        this.lastHeartbeat = lastHeartbeat;
     }
 
     public TrackingStatus getStatus() {
