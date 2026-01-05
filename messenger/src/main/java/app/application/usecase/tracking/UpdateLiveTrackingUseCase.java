@@ -2,6 +2,7 @@ package app.application.usecase.tracking;
 
 import app.domain.model.Employee;
 import app.domain.model.LiveTracking;
+import app.domain.model.Location;
 import app.domain.model.TrackingHistory;
 import app.domain.model.enums.TrackingSource;
 import app.domain.model.enums.TrackingStatus;
@@ -21,6 +22,13 @@ public class UpdateLiveTrackingUseCase {
 
     private static final Logger logger = LoggerFactory.getLogger(UpdateLiveTrackingUseCase.class);
 
+    /**
+     * Precisión máxima aceptable en metros para guardar en historial.
+     * Ubicaciones con mayor margen de error se ignoran para evitar rutas
+     * imprecisas.
+     */
+    private static final double MAX_ACCEPTABLE_ACCURACY_METERS = 100.0;
+
     @Autowired
     private TrackingPort trackingPort;
 
@@ -29,7 +37,7 @@ public class UpdateLiveTrackingUseCase {
 
     /**
      * Procesa y guarda una actualización de ubicación en tiempo real.
-     * También registra el historial si hay coordenadas válidas.
+     * También registra el historial si hay coordenadas válidas con buena precisión.
      */
     public LiveTracking execute(LiveTracking incomingTracking) {
         logger.debug("Actualizando ubicación para mensajero ID: {}", incomingTracking.getMessengerId());
@@ -52,19 +60,70 @@ public class UpdateLiveTrackingUseCase {
             }
         }
 
+        // Siempre guardar en Redis para mantener status de conexión
         trackingPort.saveLiveLocation(incomingTracking);
 
-        if (incomingTracking.getCurrentLocation() != null) {
-            TrackingHistory history = new TrackingHistory();
-            history.setMessengerId(incomingTracking.getMessengerId());
-            history.setLocation(incomingTracking.getCurrentLocation());
-            history.setRecordedAt(incomingTracking.getLastUpdate());
-            history.setSource(TrackingSource.GPS);
-            history.setSpeed(incomingTracking.getSpeed());
+        // Solo guardar en historial si hay coordenadas válidas y con buena precisión
+        Location location = incomingTracking.getCurrentLocation();
+        if (location != null && location.isValid()) {
+            Double accuracy = location.getAccuracy();
 
-            trackingPort.saveTrackingHistory(history);
+            if (accuracy != null && accuracy > MAX_ACCEPTABLE_ACCURACY_METERS) {
+                logger.debug("Ubicación ignorada para historial (precisión: {}m > {}m): mensajero {}",
+                        accuracy, MAX_ACCEPTABLE_ACCURACY_METERS, incomingTracking.getMessengerId());
+            } else {
+                TrackingHistory history = new TrackingHistory();
+                history.setMessengerId(incomingTracking.getMessengerId());
+                history.setLocation(location);
+                history.setRecordedAt(incomingTracking.getLastUpdate());
+                history.setSource(TrackingSource.GPS);
+                history.setSpeed(incomingTracking.getSpeed());
+
+                trackingPort.saveTrackingHistory(history);
+                logger.debug("Historial guardado para mensajero {} (precisión: {}m)",
+                        incomingTracking.getMessengerId(), accuracy);
+            }
         }
 
         return incomingTracking;
+    }
+
+    /**
+     * Procesa un heartbeat (señal de vida sin GPS).
+     * Solo actualiza lastHeartbeat en Redis, no guarda historial.
+     * Útil cuando el mensajero está conectado pero sin señal GPS.
+     */
+    public LiveTracking executeHeartbeat(LiveTracking heartbeatTracking) {
+        logger.debug("Procesando heartbeat para mensajero ID: {}", heartbeatTracking.getMessengerId());
+
+        // Obtener tracking existente o crear uno nuevo
+        LiveTracking existing = trackingPort.getLastLocation(heartbeatTracking.getMessengerId())
+                .orElse(new LiveTracking());
+
+        // Preservar datos existentes (ubicación, nombre, etc.)
+        existing.setMessengerId(heartbeatTracking.getMessengerId());
+        // Usar timestamp incoming o generar uno nuevo
+        existing.setLastHeartbeat(heartbeatTracking.getLastHeartbeat() != null
+                ? heartbeatTracking.getLastHeartbeat()
+                : LocalDateTime.now());
+        existing.setStatus(TrackingStatus.ACTIVE);
+
+        // Obtener nombre si no existe
+        if (existing.getMessengerName() == null || existing.getMessengerName().isEmpty()) {
+            try {
+                Employee employee = employeePort.findById(heartbeatTracking.getMessengerId());
+                if (employee != null && employee.getFullName() != null) {
+                    existing.setMessengerName(employee.getFullName());
+                }
+            } catch (Exception e) {
+                logger.warn("No se pudo obtener el nombre del mensajero {}: {}",
+                        heartbeatTracking.getMessengerId(), e.getMessage());
+            }
+        }
+
+        // Solo guardar en Redis, no en historial (no hay coordenadas GPS)
+        trackingPort.saveLiveLocation(existing);
+
+        return existing;
     }
 }

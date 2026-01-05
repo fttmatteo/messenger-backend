@@ -22,6 +22,7 @@ public class TrackingResponseMapper {
                 tracking.getCurrentLocation() != null ? tracking.getCurrentLocation().getLatitude() : null,
                 tracking.getCurrentLocation() != null ? tracking.getCurrentLocation().getLongitude() : null,
                 tracking.getLastUpdate(),
+                tracking.getLastHeartbeat(),
                 tracking.getStatus(),
                 tracking.getSpeed(),
                 tracking.getHeading());

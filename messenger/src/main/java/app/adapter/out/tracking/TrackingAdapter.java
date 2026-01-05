@@ -34,7 +34,8 @@ public class TrackingAdapter implements TrackingPort {
     private static final Logger logger = LoggerFactory.getLogger(TrackingAdapter.class);
 
     private static final String TRACKING_KEY_PREFIX = "tracking:messenger:";
-    private static final long TRACKING_TTL_SECONDS = 30; // Expira después de 30 segundos sin actualizar
+    private static final long TRACKING_TTL_SECONDS = 90; // Expira después de 90 segundos sin actualizar (tolerancia a
+                                                         // delays GPS)
 
     @Autowired
     @Qualifier("liveTrackingRedisTemplate")

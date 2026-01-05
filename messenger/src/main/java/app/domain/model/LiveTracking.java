@@ -5,7 +5,11 @@ import java.time.LocalDateTime;
 
 /**
  * Representa el estado de rastreo en tiempo real de un mensajero.
- * Incluye ubicación actual, velocidad y dirección.
+ * Incluye ubicación actual, velocidad, dirección y heartbeat.
+ * 
+ * - lastUpdate: última vez que se recibió una ubicación GPS válida
+ * - lastHeartbeat: última vez que el mensajero envió señal de vida (puede no
+ * tener GPS)
  */
 public class LiveTracking {
     private Long trackingId;
@@ -13,6 +17,7 @@ public class LiveTracking {
     private String messengerName;
     private Location currentLocation;
     private LocalDateTime lastUpdate;
+    private LocalDateTime lastHeartbeat;
     private String deviceId;
     private TrackingStatus status;
     private Double speed;
@@ -25,6 +30,7 @@ public class LiveTracking {
         this.messengerId = messengerId;
         this.currentLocation = currentLocation;
         this.lastUpdate = LocalDateTime.now();
+        this.lastHeartbeat = LocalDateTime.now();
         this.status = TrackingStatus.ACTIVE;
     }
 
@@ -133,5 +139,13 @@ public class LiveTracking {
 
     public void setHeading(Double heading) {
         this.heading = heading;
+    }
+
+    public LocalDateTime getLastHeartbeat() {
+        return lastHeartbeat;
+    }
+
+    public void setLastHeartbeat(LocalDateTime lastHeartbeat) {
+        this.lastHeartbeat = lastHeartbeat;
     }
 }
