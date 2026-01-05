@@ -111,7 +111,7 @@ graph LR
 
 | Componente | Tecnología |
 |------------|------------|
-| **Framework** | Spring Boot 4.x |
+| **Framework** | Spring Boot 4.0.1 |
 | **Lenguaje** | Java 17 |
 | **Base de Datos** | MySQL 8.0+ |
 | **Migraciones** | Flyway |
@@ -141,30 +141,34 @@ messenger/
 │   │   ├── in/                          # Adaptadores de entrada
 │   │   │   ├── builder/                 # Constructores de objetos
 │   │   │   ├── rest/
-│   │   │   │   ├── controllers/         # 9 REST Controllers
+│   │   │   │   ├── controllers/         # REST Controllers
 │   │   │   │   ├── mapper/              # Mappers Request/Response
 │   │   │   │   ├── request/             # DTOs de entrada
 │   │   │   │   └── response/            # DTOs de salida
-│   │   │   └── validators/              # Validadores de entrada
+│   │   │   └── websocket/               # Tracking en tiempo real
 │   │   └── out/                         # Adaptadores de salida
 │   │       ├── maps/                    # Google Maps Integration
 │   │       ├── ocr/                     # Google Vision OCR
+│   │       ├── persistence/             # Adaptadores JPA
 │   │       ├── security/                # JWT Adapter
 │   │       ├── storage/                 # Google Cloud Storage
 │   │       └── tracking/                # Location Tracking
 │   ├── application/
-│   │   ├── exceptions/                  # BusinessException, InputsException
-│   │   └── usecase/                     # 11 Casos de Uso (Monitoring, Settings, Location...)
+│   │   └── usecase/                     # 11 Casos de Uso
 │   ├── domain/
+│   │   ├── exception/                   # BusinessException, InputsException...
 │   │   ├── model/                       # 12+ Modelos + 7 Enums + Auth
+│   │   │   └── enums/                   # Role, Status, PlateType...
 │   │   ├── ports/                       # 10 Puertos (interfaces)
 │   │   └── services/                    # Servicios de dominio
 │   └── infrastructure/
+│       ├── audit/                       # Sistema de Auditoría AOP
+│       ├── config/                      # Configuración de Spring
+│       ├── exception/                   # Manejo global de errores
 │       ├── persistence/
-│       │   ├── entities/                # Entidades JPA
-│       │   ├── mapper/                  # Entity ↔ Domain mappers
-│       │   └── repository/              # Spring Data Repositories
-│       └── security/                    # SecurityConfig, JwtFilter
+│       │   └── entities/                # Entidades JPA
+│       ├── scheduler/                   # Tareas de limpieza (Trash)
+│       └── security/                    # Configuración de Seguridad / Filtros
 └── src/main/resources/
     ├── application.properties           # Configuración base
     ├── application-local.properties     # Desarrollo local (H2)
@@ -282,6 +286,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `PUT` | `/dealerships/updateDealership/{id}` | Actualizar concesionario (ADMIN) |
 | `DELETE` | `/dealerships/deleteDealership/{id}` | Eliminar concesionario (ADMIN) |
 | `POST` | `/dealerships/geocodeDealership/{id}` | Geocodificar dirección de concesionario (ADMIN) |
+| `GET` | `/dealerships/findByDealershipName/{name}` | Obtener por Nombre |
 
 ---
 
@@ -374,6 +379,7 @@ erDiagram
         String zone
         Double latitude
         Double longitude
+        Boolean is_geolocated
     }
     
     plates {
@@ -392,6 +398,9 @@ erDiagram
         String observation
         Long signature_id FK
         LocalDateTime created_at
+        Boolean deleted
+        LocalDateTime deleted_at
+        LocalDateTime locked_at
     }
     
     signatures {
@@ -414,6 +423,9 @@ erDiagram
         LocalDateTime change_date
         Long changed_by_employee_id FK
         Long service_delivery_id FK
+        Double delivery_latitude
+        Double delivery_longitude
+        String observation
     }
     
     tracking_history {
@@ -466,11 +478,23 @@ Sistema de tracking GPS usando **Redis** + **WebSocket** para monitoreo de mensa
 
 | Feature | Descripción |
 |---------|-------------|
-| 🔴 **Ubicación en vivo** | Actualización cada 30 segundos |
+| 🔴 **Ubicación en vivo** | Actualización cada 5-45 seg (mín. 5s) |
 | 📍 **Validación de entrega** | Radio máximo de 200m del destino |
+| 🎯 **Precisión técnica** | Filtro de error GPS < 100m para historial |
 | 📊 **Historial completo** | Retención de 30 días |
 | ⚡ **Baja latencia** | Redis para caché de ubicaciones |
 | 🌐 **WebSocket** | Notificaciones push en tiempo real |
+
+### API WebSocket
+
+URL de conexión: `ws://localhost:8080/ws`
+
+| Tipo | Destino | Descripción |
+|------|---------|-------------|
+| `SEND` | `/app/tracking/update` | Enviar actualización de GPS |
+| `SEND` | `/app/tracking/heartbeat` | Enviar señal de vida (sin GPS) |
+| `SUB` | `/topic/tracking/{id}` | Recibir actualizaciones de un mensajero |
+| `SUB` | `/topic/tracking/all` | Recibir actualizaciones de todos (Admin) |
 
 ### Integración Google Maps
 
@@ -585,7 +609,7 @@ flowchart LR
 | Token | Duración (prod) | Duración (dev) | Duración (local) | Uso |
 |-------|-----------------|----------------|------------------|-----|
 | **Access Token** | 30 minutos | 8 horas | 8 horas | Header `Authorization: Bearer <token>` |
-| **Refresh Token** | 7 días | 7 días | 7 días | Endpoint `/auth/refresh` para renovar |
+| **Refresh Token** | 12 horas | 8 días | 8 días | Endpoint `/auth/refresh` para renovar |
 
 ### Características de Seguridad
 
@@ -596,8 +620,10 @@ flowchart LR
 
 ### Rate Limiting
 
-- Implementado con **Bucket4j** para prevenir abusos
-- Límites aplicados por dirección IP
+- **Limitación por IP**:
+  - `AUTENTICACIÓN`: 10 peticiones / minuto (Protección brute-force)
+  - `GENERAL`: 100 peticiones / minuto
+- **Limitación WebSocket**: Intervalo mínimo de 5 segundos entre actualizaciones por mensajero.
 - Headers de respuesta: `X-Rate-Limit-Remaining`, `X-Rate-Limit-Retry-After-Seconds`
 
 ### Roles y Permisos
@@ -663,6 +689,7 @@ La aplicación incluye un **sistema de logging de auditoría centralizado** usan
 | | `DELETE_SERVICE` | Mover servicio a papelera |
 | | `RESTORE_SERVICE` | Restaurar servicio desde papelera |
 | | `EMPTY_TRASH` | Vaciar papelera permanentemente |
+| | `ARCHIVE_SERVICE` | Archivar servicio de la papelera manualmente |
 | **EmployeeUseCase** | `CREATE_EMPLOYEE` | Crear nuevo empleado |
 | | `UPDATE_EMPLOYEE` | Actualizar información de empleado |
 | | `DELETE_EMPLOYEE` | Eliminar empleado |
@@ -723,28 +750,16 @@ AUDIT | timestamp | documento_usuario | accion | metodo | parametros | estado | 
 <details>
 <summary><b>🔐 Variables Requeridas</b></summary>
 
-```bash
-# Base de Datos
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=messenger
-DB_USERNAME=root
-DB_PASSWORD=your_password
-
-# JWT
-JWT_SECRET=your_base64_encoded_secret_key
-
-# Redis
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_PASSWORD=            # Solo producción
-
-# Google Cloud
-GCP_PROJECT_ID=your_project_id
-GCS_BUCKET_NAME=your_bucket_name
-GOOGLE_MAPS_API_KEY=your_api_key
-GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
-```
+| Variable | Descripción | Default/Ejemplo |
+|----------|-------------|-----------------|
+| `DB_NAME` | Nombre de la DB MySQL | `messenger_db` |
+| `DB_USERNAME` | Usuario de la DB | `root` |
+| `DB_PASSWORD` | Contraseña de la DB | `******` |
+| `REDIS_HOST` | Host del servidor Redis | `localhost` |
+| `JWT_SECRET` | Clave 256-bit para Tokens | `openssl rand -base64 64` |
+| `GOOGLE_MAPS_API_KEY` | Key de Google Maps | `AIza...` |
+| `GCS_BUCKET_NAME` | Bucket para evidencias | `plak-evidence` |
+| `CORS_ALLOWED_ORIGINS`| URLs de frontend permitidas | `http://localhost:5173` |
 
 </details>
 
