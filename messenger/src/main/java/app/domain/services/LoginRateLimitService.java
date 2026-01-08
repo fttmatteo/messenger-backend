@@ -1,6 +1,7 @@
 package app.domain.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import java.util.concurrent.TimeUnit;
@@ -8,8 +9,12 @@ import java.util.concurrent.TimeUnit;
 /**
  * Servicio de rate limiting para proteger contra ataques de fuerza bruta en login.
  * Limita intentos fallidos por documento y por IP.
+ * 
+ * Solo se carga cuando redis.enabled=true.
+ * Cuando redis.enabled=false, se usa NoOpLoginRateLimitService en su lugar.
  */
 @Service
+@ConditionalOnProperty(name = "redis.enabled", havingValue = "true", matchIfMissing = true)
 public class LoginRateLimitService {
 
     private static final int MAX_FAILED_ATTEMPTS = 5;
