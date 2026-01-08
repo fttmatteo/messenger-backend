@@ -489,7 +489,7 @@ Sistema de tracking GPS usando **Redis** + **WebSocket** para monitoreo de mensa
 | Feature | Descripción |
 |---------|-------------|
 | 🔴 **Ubicación en vivo** | Actualización cada 5-45 seg (mín. 5s) |
-| 📍 **Validación de entrega** | Radio máximo de 200m del destino |
+| 📍 **Validación de entrega** | Radio máximo de 200m del destino [Proxima Implementación] |
 | 🎯 **Precisión técnica** | Filtro de error GPS < 100m para historial |
 | 📊 **Historial completo** | Retención de 30 días |
 | ⚡ **Baja latencia** | Redis para caché de ubicaciones |
@@ -497,7 +497,7 @@ Sistema de tracking GPS usando **Redis** + **WebSocket** para monitoreo de mensa
 
 ### API WebSocket
 
-URL de conexión: `ws://localhost:8080/ws`
+URL de conexión: `ws://localhost:8080/ws/tracking`
 
 | Tipo | Destino | Descripción |
 |------|---------|-------------|
@@ -805,9 +805,9 @@ Pipeline automatizado con **GitHub Actions**:
 # .github/workflows/maven.yml
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "develop" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "develop" ]
 ```
 
 ### Características
@@ -817,7 +817,7 @@ on:
 | ✅ Build automático | Java 17 + Maven |
 | ✅ Caché de dependencias | Builds más rápidos |
 | ✅ Secrets seguros | Inyección de credenciales |
-| ✅ Testing | Profile `test` con H2 |
+| ✅ Testing | Profile `test` con Docker (MySQL/Redis) |
 
 ### Secrets de GitHub Requeridos
 
@@ -826,7 +826,7 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 ```
 
 > [!NOTE]
-> Los secrets de base de datos y APIs ya no son necesarios para el pipeline de CI, ya que utiliza un ambiente H2 aislado con servicios simulados (mocks).
+> El pipeline utiliza un entorno efímero con **Docker** (MySQL + Redis) para los tests de integración, garantizando máxima paridad con producción. No se requieren secrets de BD externa.
 
 ---
 
@@ -883,7 +883,6 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 - Repositorio: `messenger-backend`
 - Autor: Matteo
 - Email: valenciaardila988@icloud.com
-- Última actualización: Enero 2026
 
 ---
 

@@ -4,8 +4,8 @@
 
 # 🚀 Deployment Guide - Google Cloud Run
 
-**Messenger Backend** | Spring Boot 4.0 | Cloud Run Serverless  
-Documentation updated: December 2025
+**Messenger Backend** | Spring Boot 3.5 | Cloud Run Serverless  
+Documentation updated: January 2026
 
 [🇪🇸 Español](#-tabla-de-contenidos) • [🇺🇸 English](#-table-of-contents)
 
@@ -618,7 +618,7 @@ jobs:
 - Repository: `messenger-backend`
 - Email: valenciaardila988@icloud.com
 - Author: Matteo
-- Last update: December 2025
+- Last update: January 2026
 
 </details>
 
@@ -626,8 +626,8 @@ jobs:
 
 # Guía Profesional de Despliegue - Google Cloud Run
 
-**Messenger Backend** | Spring Boot 4.0 | Cloud Run Serverless  
-Documentación actualizada: Diciembre 2025
+**Messenger Backend** | Spring Boot 3.5 | Cloud Run Serverless  
+Documentación actualizada: Enero 2026
 
 ---
 
@@ -940,7 +940,7 @@ gcloud builds submit \
 **¿Qué hace Cloud Build?**
 1. Sube código fuente a Cloud Storage
 2. Ejecuta `Dockerfile` multi-stage build
-3. Compila con Maven (Java 21)
+3. Compila con Maven (Java 17)
 4. Crea imagen optimizada con Alpine Linux
 5. Sube imagen a Artifact Registry
 
@@ -1233,7 +1233,7 @@ jobs:
 - Repository: `messenger-backend`
 - Autor: Matteo
 - Email: valenciaardila988@icloud.com
-- Última actualización: Diciembre 2025
+- Última actualización: Enero 2026
 
 ---
 

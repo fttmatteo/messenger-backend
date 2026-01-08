@@ -488,7 +488,7 @@ GPS tracking system using **Redis** + **WebSocket** for messenger monitoring.
 | Feature | Description |
 |---------|-------------|
 | 🔴 **Live location** | Updates every 5-45 seconds (5s rate limit) |
-| 📍 **Delivery validation** | Maximum 200m radius from destination |
+| 📍 **Delivery validation** | Maximum 200m radius from destination [Next Implementation] |
 | 🎯 **Technical accuracy** | < 100m GPS error filtered for history |
 | 📊 **Complete history** | 30-day retention |
 | ⚡ **Low latency** | Redis for location caching |
@@ -496,7 +496,7 @@ GPS tracking system using **Redis** + **WebSocket** for messenger monitoring.
 
 ### WebSocket API
 
-Connecting URL: `ws://localhost:8080/ws`
+Connection URL: `ws://localhost:8080/ws/tracking`
 
 | Type | Destination | Description |
 |------|-------------|-------------|
@@ -805,9 +805,9 @@ Automated pipeline with **GitHub Actions**:
 # .github/workflows/maven.yml
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "develop" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "develop" ]
 ```
 
 ### Features
@@ -817,7 +817,7 @@ on:
 | ✅ Automated build | Java 17 + Maven |
 | ✅ Dependency caching | Faster builds |
 | ✅ Secure secrets | Credential injection |
-| ✅ Testing | `test` profile with MySQL/Redis |
+| ✅ Testing | Profile test with Docker (MySQL/Redis) |
 
 ### Required GitHub Secrets
 
@@ -826,7 +826,7 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 ```
 
 > [!NOTE]
-> Database and API secrets are no longer required for the CI pipeline as it uses an isolated environment with ephemeral Docker services and mocked APIs.
+> The CI pipeline uses an ephemeral **Docker** environment (MySQL + Redis) for integration tests, ensuring maximum parity with production. No external DB secrets are required.
 
 ---
 
