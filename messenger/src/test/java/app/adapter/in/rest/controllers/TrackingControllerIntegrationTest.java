@@ -15,11 +15,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,125 +28,126 @@ import java.time.LocalDateTime;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
-@SpringBootTest
-@ActiveProfiles("test")
+import app.support.AbstractIntegrationTest;
+
 @Transactional
 @DisplayName("TrackingController Integration Tests")
-class TrackingControllerIntegrationTest {
+class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private WebApplicationContext context;
+        @Autowired
+        private WebApplicationContext context;
 
-    @Autowired
-    private EntityManager entityManager;
+        @Autowired
+        private EntityManager entityManager;
 
-    @MockitoBean
-    private app.domain.ports.TrackingPort trackingPort;
+        @MockitoBean
+        private app.domain.ports.TrackingPort trackingPort;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+        private ObjectMapper objectMapper = new ObjectMapper();
 
-    private MockMvc mockMvc;
+        private MockMvc mockMvc;
 
-    @BeforeEach
-    public void setup() {
-        mockMvc = MockMvcBuilders
-                .webAppContextSetup(context)
-                .apply(springSecurity())
-                .build();
-    }
+        @BeforeEach
+        public void setup() {
+                mockMvc = MockMvcBuilders
+                                .webAppContextSetup(context)
+                                .apply(springSecurity())
+                                .build();
+        }
 
-    @Test
-    @WithMockUser(roles = "MESSENGER")
-    @DisplayName("POST /tracking/update should return 200 and save location")
-    void shouldUpdateLocationSuccessfully() throws Exception {
-        // Create messenger first
-        EmployeeEntity messenger = new EmployeeEntity();
-        messenger.setDocument(77766655L);
-        messenger.setFullName("Messenger One");
-        messenger.setRole(Role.MESSENGER);
-        messenger.setPassword("secret123");
-        messenger.setPhone("3111111111");
-        entityManager.persist(messenger);
-        entityManager.flush();
+        @Test
+        @WithMockUser(roles = "MESSENGER")
+        @DisplayName("POST /tracking/update should return 200 and save location")
+        void shouldUpdateLocationSuccessfully() throws Exception {
+                // Create messenger first
+                EmployeeEntity messenger = new EmployeeEntity();
+                messenger.setDocument(77766655L);
+                messenger.setFullName("Messenger One");
+                messenger.setRole(Role.MESSENGER);
+                messenger.setPassword("secret123");
+                messenger.setPhone("3111111111");
+                entityManager.persist(messenger);
+                entityManager.flush();
 
-        // Given
-        LiveTrackingRequest request = new LiveTrackingRequest();
-        request.setMessengerId(messenger.getIdEmployee());
-        request.setLatitude(4.6789);
-        request.setLongitude(-74.0567);
-        request.setAccuracy(10.0);
-        request.setSpeed(0.0);
-        request.setHeading(0.0);
-        request.setStatus(TrackingStatus.ACTIVE);
-        request.setDeviceId("test-device");
+                // Given
+                LiveTrackingRequest request = new LiveTrackingRequest();
+                request.setMessengerId(messenger.getIdEmployee());
+                request.setLatitude(4.6789);
+                request.setLongitude(-74.0567);
+                request.setAccuracy(10.0);
+                request.setSpeed(0.0);
+                request.setHeading(0.0);
+                request.setStatus(TrackingStatus.ACTIVE);
+                request.setDeviceId("test-device");
 
-        // When/Then
-        mockMvc.perform(post("/tracking/update")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.messengerId").value(messenger.getIdEmployee()))
-                .andExpect(jsonPath("$.latitude").value(4.6789))
-                .andExpect(jsonPath("$.longitude").value(-74.0567));
-    }
+                // When/Then
+                mockMvc.perform(post("/tracking/update")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.messengerId").value(messenger.getIdEmployee()))
+                                .andExpect(jsonPath("$.latitude").value(4.6789))
+                                .andExpect(jsonPath("$.longitude").value(-74.0567));
+        }
 
-    @Test
-    @WithMockUser(roles = "ADMIN")
-    @DisplayName("GET /tracking/messenger/{id} should return location for admin")
-    void shouldGetLastLocationForAdmin() throws Exception {
-        // Create messenger first
-        EmployeeEntity messenger = new EmployeeEntity();
-        messenger.setDocument(55544433L);
-        messenger.setFullName("Messenger Two");
-        messenger.setRole(Role.MESSENGER);
-        messenger.setPassword("secret123");
-        messenger.setPhone("3222222222");
-        entityManager.persist(messenger);
-        entityManager.flush();
+        @Test
+        @WithMockUser(roles = "ADMIN")
+        @DisplayName("GET /tracking/messenger/{id} should return location for admin")
+        void shouldGetLastLocationForAdmin() throws Exception {
+                // Create messenger first
+                EmployeeEntity messenger = new EmployeeEntity();
+                messenger.setDocument(55544433L);
+                messenger.setFullName("Messenger Two");
+                messenger.setRole(Role.MESSENGER);
+                messenger.setPassword("secret123");
+                messenger.setPhone("3222222222");
+                entityManager.persist(messenger);
+                entityManager.flush();
 
-        // First update a location
-        LiveTrackingRequest request = new LiveTrackingRequest();
-        request.setMessengerId(messenger.getIdEmployee());
-        request.setLatitude(4.7110);
-        request.setLongitude(-74.0720);
-        request.setStatus(TrackingStatus.ACTIVE);
+                // First update a location
+                LiveTrackingRequest request = new LiveTrackingRequest();
+                request.setMessengerId(messenger.getIdEmployee());
+                request.setLatitude(4.7110);
+                request.setLongitude(-74.0720);
+                request.setStatus(TrackingStatus.ACTIVE);
 
-        // Mock the port behavior since it uses NoOp in tests
-        app.domain.model.LiveTracking liveTracking = new app.domain.model.LiveTracking();
-        liveTracking.setMessengerId(messenger.getIdEmployee());
-        liveTracking.setCurrentLocation(new app.domain.model.Location(4.7110, -74.0720, LocalDateTime.now(), 10.0));
-        liveTracking.setStatus(TrackingStatus.ACTIVE);
-        org.mockito.Mockito.when(trackingPort.getLastLocation(messenger.getIdEmployee()))
-                .thenReturn(java.util.Optional.of(liveTracking));
+                // Mock the port behavior since it uses NoOp in tests
+                app.domain.model.LiveTracking liveTracking = new app.domain.model.LiveTracking();
+                liveTracking.setMessengerId(messenger.getIdEmployee());
+                liveTracking.setCurrentLocation(
+                                new app.domain.model.Location(4.7110, -74.0720, LocalDateTime.now(), 10.0));
+                liveTracking.setStatus(TrackingStatus.ACTIVE);
+                org.mockito.Mockito.when(trackingPort.getLastLocation(messenger.getIdEmployee()))
+                                .thenReturn(java.util.Optional.of(liveTracking));
 
-        mockMvc.perform(post("/tracking/update")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
+                mockMvc.perform(post("/tracking/update")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                                .andExpect(status().isOk());
 
-        // Then get it
-        mockMvc.perform(get("/tracking/messenger/" + messenger.getIdEmployee()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.messengerId").value(messenger.getIdEmployee()))
-                .andExpect(jsonPath("$.latitude").value(4.7110));
-    }
+                // Then get it
+                mockMvc.perform(get("/tracking/messenger/" + messenger.getIdEmployee()))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.messengerId").value(messenger.getIdEmployee()))
+                                .andExpect(jsonPath("$.latitude").value(4.7110));
+        }
 
-    @Test
-    @WithMockUser(roles = "MESSENGER")
-    @DisplayName("GET /tracking/messenger/{id} should return 403 for non-admin")
-    void shouldReturnForbiddenForNonAdmin() throws Exception {
-        mockMvc.perform(get("/tracking/messenger/1"))
-                .andExpect(status().isForbidden());
-    }
+        @Test
+        @WithMockUser(roles = "MESSENGER")
+        @DisplayName("GET /tracking/messenger/{id} should return 403 for non-admin")
+        void shouldReturnForbiddenForNonAdmin() throws Exception {
+                mockMvc.perform(get("/tracking/messenger/1"))
+                                .andExpect(status().isForbidden());
+        }
 
-    @Test
-    @WithMockUser
-    @DisplayName("GET /tracking/history/{id} should return historical data")
-    void shouldGetTrackingHistory() throws Exception {
-        String today = LocalDate.now().toString();
+        @Test
+        @WithMockUser
+        @DisplayName("GET /tracking/history/{id} should return historical data")
+        void shouldGetTrackingHistory() throws Exception {
+                String today = LocalDate.now().toString();
 
-        mockMvc.perform(get("/tracking/history/1")
-                .param("date", today))
-                .andExpect(status().isOk());
-    }
+                mockMvc.perform(get("/tracking/history/1")
+                                .param("date", today))
+                                .andExpect(status().isOk());
+        }
 }
