@@ -1,20 +1,24 @@
 services:
-  messenger-db-test:
+  mysql:
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: test
       MYSQL_DATABASE: messenger_db_test
     ports:
       - "3306"
+    labels:
+      org.springframework.boot.service-connection: mysql
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       timeout: 20s
       retries: 10
 
-  messenger-redis-test:
+  redis:
     image: redis:alpine
     ports:
       - "6379"
+    labels:
+      org.springframework.boot.service-connection: redis
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
