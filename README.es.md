@@ -186,7 +186,7 @@ messenger/
 |--------|-----------|---------------|---------------|----------|
 | `local` | Desarrollo local sin dependencias | H2 In-Memory | Mock/Deshabilitado | 8 horas |
 | `dev` | Desarrollo con servicios reales | MySQL | Habilitado | 8 horas |
-| `test` | Testing automatizado (CI/CD) | H2 In-Memory | Mock | 1 hora |
+| `test` | Testing automatizado (CI/CD) | MySQL (Docker) | Mock | 1 hora |
 | `prod` | Producción (Cloud Run) | MySQL (SSL) | Habilitado (JSON Logs) | 30 min |
 
 ### Características por Perfil
@@ -216,10 +216,11 @@ messenger/
 <details>
 <summary><b>🧪 Test</b> - Testing automatizado</summary>
 
-- H2 en memoria (aislamiento)
-- Servicios mock
-- Sin dependencias externas
+- MySQL & Redis en contenedores (Docker Compose)
+- Servicios externos mockeados
+- Aislamiento total por puerto (3307/6380)
 - Compatible con GitHub Actions
+- Migraciones Flyway reales
 
 </details>
 
@@ -822,10 +823,10 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 
 ## 🧪 Testing
 
-- **Unit Tests**: Cobertura completa para todos los adaptadores
-- **Integration Tests**: Repositorios JPA y servicios de dominio
-- **Test Profile**: Base de datos H2 aislada, sin dependencias externas
-- **Coverage**: 100+ tests en adaptadores, use cases y repositorios
+- **Unit Tests**: Cobertura amplia para adaptadores y modelos
+- **Integration Tests**: Servicios de dominio y persistencia con MySQL/Redis reales vía Docker
+- **Test Profile**: Ambiente idéntico a producción mediante contenedores locales
+- **CI/CD**: Integración continua en GitHub Actions con servicios Docker efímeros
 
 ---
 
@@ -873,7 +874,7 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 - Repositorio: `messenger-backend`
 - Autor: Matteo
 - Email: valenciaardila988@icloud.com
-- Última actualización: Diciembre 2025
+- Última actualización: Enero 2026
 
 ---
 
@@ -885,7 +886,7 @@ Ver archivo [LICENSE](./LICENSE) para detalles.
 
 <div align="center">
 
-**Made with ❤️ using Spring Boot 4.0**
+**Made with ❤️ using Spring Boot 3.4**
 
 </div>
 

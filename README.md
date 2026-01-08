@@ -185,7 +185,7 @@ messenger/
 |---------|---------|----------|---------------|----------|
 | `local` | Local development without dependencies | H2 In-Memory | Mock/Disabled | 8 hours |
 | `dev` | Development with real services | MySQL | Enabled | 8 hours |
-| `test` | Automated testing (CI/CD) | H2 In-Memory | Mock | 1 hour |
+| `test` | Automated testing (CI/CD) | MySQL (Docker) | Mock | 1 hour |
 | `prod` | Production (Cloud Run) | MySQL (SSL) | Enabled (JSON Logs) | 30 min |
 
 ### Profile Characteristics
@@ -215,10 +215,11 @@ messenger/
 <details>
 <summary><b>🧪 Test</b> - Automated testing</summary>
 
-- H2 in-memory (isolation)
-- Mock services
-- No external dependencies
+- MySQL & Redis in containers (Docker Compose)
+- Mocked external services
+- Total isolation via dedicated ports (3307/6380)
 - GitHub Actions compatible
+- Real Flyway migrations
 
 </details>
 
@@ -807,7 +808,7 @@ on:
 | ✅ Automated build | Java 17 + Maven |
 | ✅ Dependency caching | Faster builds |
 | ✅ Secure secrets | Credential injection |
-| ✅ Testing | `test` profile with H2 |
+| ✅ Testing | `test` profile with MySQL/Redis |
 
 ### Required GitHub Secrets
 
@@ -816,16 +817,16 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 ```
 
 > [!NOTE]
-> Database and API secrets are no longer required for the CI pipeline as it uses an isolated H2 environment with mocked services.
+> Database and API secrets are no longer required for the CI pipeline as it uses an isolated environment with ephemeral Docker services and mocked APIs.
 
 ---
 
 ## 🧪 Testing
 
-- **Unit Tests**: Comprehensive coverage for all adapters
-- **Integration Tests**: JPA repositories and domain services
-- **Test Profile**: Isolated H2 database, no external dependencies
-- **Coverage**: 100+ tests across adapters, use cases, and repositories
+- **Unit Tests**: Broad coverage for adapters and domain models
+- **Integration Tests**: Domain services and persistence with real MySQL/Redis via Docker
+- **Test Profile**: Environment identical to production via local containers
+- **CI/CD**: Continuous Integration on GitHub Actions with ephemeral Docker services
 
 ---
 
@@ -873,7 +874,7 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 - Repository: `messenger-backend`
 - Author: Matteo
 - Email: valenciaardila988@icloud.com
-- Last update: December 2025
+- Last update: January 2026
 
 ---
 
@@ -885,7 +886,7 @@ See [LICENSE](./LICENSE) file for details.
 
 <div align="center">
 
-**Made with ❤️ using Spring Boot 4.0**
+**Made with ❤️ using Spring Boot 3.4**
 
 </div>
 
