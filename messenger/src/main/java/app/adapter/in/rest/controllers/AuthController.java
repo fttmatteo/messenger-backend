@@ -42,7 +42,7 @@ public class AuthController {
     @Value("${jwt.expiration:1800000}")
     private long accessTokenExpiration;
     
-    @Value("${app.cookie.secure:true}")
+    @Value("${app.cookie.secure:false}")
     private boolean cookieSecure;
 
     /**
