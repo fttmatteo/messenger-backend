@@ -34,19 +34,16 @@ public class TrashCleanupScheduler {
 
     @Scheduled(cron = "${app.trash.cleanup-cron:0 0 3 * * ?}")
     public void cleanupExpiredTrash() {
-        logger.info(
-                "Iniciando archivado de servicios en papelera. Servicios eliminados hace más de {} días serán archivados permanentemente.",
-                retentionDays);
+        // ...existing code...
 
         LocalDateTime expirationDate = LocalDateTime.now().minusDays(retentionDays);
         List<ServiceDelivery> expiredServices = serviceDeliveryPort.findDeletedExpiredBefore(expirationDate);
 
         if (expiredServices.isEmpty()) {
-            logger.info("No hay servicios expirados en la papelera.");
             return;
         }
 
-        logger.info("Encontrados {} servicios expirados en la papelera.", expiredServices.size());
+        // ...existing code...
 
         int archivedCount = 0;
         int errorCount = 0;
@@ -55,13 +52,14 @@ public class TrashCleanupScheduler {
             try {
                 archiveServiceService.archiveService(service, null, "Auto-archive after " + retentionDays + " days");
                 archivedCount++;
-                logger.debug("Archivado permanentemente servicio ID: {}", service.getIdServiceDelivery());
+                // ...existing code...
             } catch (Exception e) {
                 errorCount++;
                 logger.error("Error archivando servicio ID: {}: {}", service.getIdServiceDelivery(), e.getMessage());
             }
         }
 
-        logger.info("Archivado de papelera completado. Archivados: {}, Errores: {}", archivedCount, errorCount);
+        logger.info("Trash cleanup completed: {} services archived, {} errors.", archivedCount, errorCount);
+        // ...existing code...
     }
 }

@@ -26,19 +26,17 @@ public class GeocodeDealershipUseCase {
      * Ejecuta la geocodificación de un concesionario y actualiza su ubicación.
      */
     public Dealership execute(Long dealershipId) {
-        logger.info("Geocodificando concesionario ID: {}", dealershipId);
+        // ...existing code...
         Dealership dealership = dealershipPort.findById(dealershipId);
 
         try {
             Location location = locationPort.geocodeAddress(dealership.getAddress());
-            logger.debug("Ubicación encontrada: {}, {}", location.getLatitude(), location.getLongitude());
 
             dealership.setLatitude(location.getLatitude());
             dealership.setLongitude(location.getLongitude());
             dealership.setIsGeolocated(true);
 
             dealershipPort.save(dealership);
-            logger.info("Concesionario geocodificado exitosamente");
             return dealership;
         } catch (Exception e) {
             logger.error("Error geocodificando concesionario ID: {}: {}", dealershipId, e.getMessage());

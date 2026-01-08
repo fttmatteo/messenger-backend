@@ -33,9 +33,7 @@ public class DealershipUseCase {
      */
     @app.infrastructure.audit.AuditableAction(action = "CREATE_DEALERSHIP", description = "Crear nuevo concesionario")
     public Dealership create(Dealership dealership) throws Exception {
-        logger.info("Creando concesionario: {}", dealership.getName());
         Dealership created = createDealership.create(dealership);
-        logger.info("Concesionario creado con ID: {}", created.getIdDealership());
         return created;
     }
 
@@ -44,9 +42,7 @@ public class DealershipUseCase {
      */
     @app.infrastructure.audit.AuditableAction(action = "UPDATE_DEALERSHIP", description = "Actualizar concesionario")
     public Dealership update(Long id, Dealership dealership) throws Exception {
-        logger.info("Actualizando concesionario ID: {}", id);
         Dealership updated = updateDealership.update(id, dealership);
-        logger.info("Concesionario ID: {} actualizado", id);
         return updated;
     }
 
@@ -76,8 +72,7 @@ public class DealershipUseCase {
      */
     @app.infrastructure.audit.AuditableAction(action = "DELETE_DEALERSHIP", description = "Eliminar concesionario")
     public void deleteById(Long id) throws Exception {
-        logger.warn("Eliminando concesionario ID: {}", id);
         deleteDealership.deleteById(id);
-        logger.info("Concesionario ID: {} eliminado", id);
+        logger.warn("Eliminando concesionario ID: {}", id);
     }
 }

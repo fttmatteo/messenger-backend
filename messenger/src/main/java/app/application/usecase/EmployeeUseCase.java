@@ -34,9 +34,7 @@ public class EmployeeUseCase {
      */
     @AuditableAction(action = "CREATE_EMPLOYEE", description = "Crear nuevo empleado")
     public Employee create(Employee employee) throws Exception {
-        logger.info("Creando empleado con documento: {}, rol: {}", employee.getDocument(), employee.getRole());
         Employee created = createEmployee.create(employee);
-        logger.info("Empleado creado con ID: {}", created.getIdEmployee());
         return created;
     }
 
@@ -45,9 +43,7 @@ public class EmployeeUseCase {
      */
     @AuditableAction(action = "UPDATE_EMPLOYEE", description = "Actualizar empleado")
     public Employee update(Long id, Employee employee) throws Exception {
-        logger.info("Actualizando empleado ID: {}", id);
         Employee updated = updateEmployee.update(id, employee);
-        logger.info("Empleado ID: {} actualizado", id);
         return updated;
     }
 
@@ -77,8 +73,7 @@ public class EmployeeUseCase {
      */
     @AuditableAction(action = "DELETE_EMPLOYEE", description = "Eliminar empleado")
     public void deleteById(Long id) throws Exception {
-        logger.warn("Eliminando empleado ID: {}", id);
         deleteEmployee.deleteById(id);
-        logger.info("Empleado ID: {} eliminado", id);
+        logger.warn("Eliminando empleado ID: {}", id);
     }
 }

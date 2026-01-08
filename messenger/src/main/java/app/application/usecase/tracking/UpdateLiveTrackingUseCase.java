@@ -40,7 +40,7 @@ public class UpdateLiveTrackingUseCase {
      * También registra el historial si hay coordenadas válidas con buena precisión.
      */
     public LiveTracking execute(LiveTracking incomingTracking) {
-        logger.debug("Actualizando ubicación para mensajero ID: {}", incomingTracking.getMessengerId());
+        // ...existing code...
 
         incomingTracking.setLastUpdate(LocalDateTime.now());
 
@@ -69,8 +69,7 @@ public class UpdateLiveTrackingUseCase {
             Double accuracy = location.getAccuracy();
 
             if (accuracy != null && accuracy > MAX_ACCEPTABLE_ACCURACY_METERS) {
-                logger.debug("Ubicación ignorada para historial (precisión: {}m > {}m): mensajero {}",
-                        accuracy, MAX_ACCEPTABLE_ACCURACY_METERS, incomingTracking.getMessengerId());
+                // ...existing code...
             } else {
                 TrackingHistory history = new TrackingHistory();
                 history.setMessengerId(incomingTracking.getMessengerId());
@@ -80,8 +79,7 @@ public class UpdateLiveTrackingUseCase {
                 history.setSpeed(incomingTracking.getSpeed());
 
                 trackingPort.saveTrackingHistory(history);
-                logger.debug("Historial guardado para mensajero {} (precisión: {}m)",
-                        incomingTracking.getMessengerId(), accuracy);
+                // ...existing code...
             }
         }
 
@@ -94,7 +92,7 @@ public class UpdateLiveTrackingUseCase {
      * Útil cuando el mensajero está conectado pero sin señal GPS.
      */
     public LiveTracking executeHeartbeat(LiveTracking heartbeatTracking) {
-        logger.debug("Procesando heartbeat para mensajero ID: {}", heartbeatTracking.getMessengerId());
+        // ...existing code...
 
         // Obtener tracking existente o crear uno nuevo
         LiveTracking existing = trackingPort.getLastLocation(heartbeatTracking.getMessengerId())

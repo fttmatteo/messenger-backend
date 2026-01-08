@@ -33,7 +33,6 @@ public class ValidateDeliveryLocationUseCase {
         Dealership dealership = dealershipPort.findById(dealershipId);
 
         if (dealership.getIsGeolocated() == null || !dealership.getIsGeolocated()) {
-            logger.debug("Validación de ubicación omitida para concesionario ID: {} (no geolocalizado)", dealershipId);
             return true;
         }
 
@@ -54,7 +53,7 @@ public class ValidateDeliveryLocationUseCase {
                             maxDistanceMeters));
         }
 
-        logger.debug("Validación exitosa: Distancia {}m dentro del rango", distance);
+        // ...existing code...
         return true;
     }
 

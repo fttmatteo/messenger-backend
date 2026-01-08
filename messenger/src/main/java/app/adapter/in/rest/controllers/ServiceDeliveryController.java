@@ -278,8 +278,7 @@ public class ServiceDeliveryController {
             @RequestParam(defaultValue = "desc") String sortDirection,
             @RequestParam(required = false) String search) {
 
-        logger.info("Consultando servicios paginados - page: {}, size: {}, sortBy: {}, sortDirection: {}, search: {}",
-                page, size, sortBy, sortDirection, search);
+        // ...existing code...
 
         Employee currentUser = securityHelper.getCurrentUser();
 
@@ -321,7 +320,7 @@ public class ServiceDeliveryController {
     @GetMapping("/trash")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ServiceDeliveryResponse>> findDeleted() {
-        logger.info("Consultando servicios en papelera");
+        // ...existing code...
 
         List<ServiceDelivery> services = serviceDeliveryUseCase.findDeleted();
         List<ServiceDeliveryResponse> responses = services.stream()

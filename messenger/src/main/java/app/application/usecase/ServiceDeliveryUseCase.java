@@ -65,20 +65,18 @@ public class ServiceDeliveryUseCase {
     public ServiceDelivery createServiceFromImage(File imageFile, Long dealershipId, Long messengerId, Double latitude,
             Double longitude)
             throws Exception {
-        logger.info("Iniciando creación de servicio desde imagen. DealershipId: {}, MessengerId: {}", dealershipId,
-                messengerId);
+        // ...existing code...
         String extractedText = ocrPort.extractText(imageFile);
-        logger.debug("Texto extraído por OCR: {}", extractedText);
+        // ...existing code...
         String timestamp = LocalDateTime.now().format(DATE_FORMAT);
         String fileName = extractedText + "_ASSIGNED_" + timestamp;
 
         String savedPath = storagePort.save(imageFile, "detections", fileName);
 
         try {
-            ServiceDelivery service = createService.create(extractedText, savedPath, dealershipId, messengerId,
+                ServiceDelivery service = createService.create(extractedText, savedPath, dealershipId, messengerId,
                     latitude, longitude);
-            logger.info("Servicio creado exitosamente con ID: {}", service.getIdServiceDelivery());
-            return service;
+                return service;
         } catch (Exception e) {
             logger.error("Error creando servicio desde imagen: {}", e.getMessage());
             cleanupFiles(savedPath);
@@ -93,18 +91,16 @@ public class ServiceDeliveryUseCase {
     @AuditableAction(action = "CREATE_SERVICE_MANUAL", description = "Crear servicio con placa manual")
     public ServiceDelivery createServiceWithManualPlate(File imageFile, String manualPlateNumber, Long dealershipId,
             Long messengerId, Double latitude, Double longitude) throws Exception {
-        logger.info("Iniciando creación de servicio manual. Placa: {}, DealershipId: {}, MessengerId: {}",
-                manualPlateNumber, dealershipId, messengerId);
+        // ...existing code...
         String timestamp = LocalDateTime.now().format(DATE_FORMAT);
         String fileName = manualPlateNumber + "_ASSIGNED_" + timestamp;
 
         String savedPath = storagePort.save(imageFile, "detections", fileName);
 
         try {
-            ServiceDelivery service = createService.create(manualPlateNumber, savedPath, dealershipId, messengerId,
+                ServiceDelivery service = createService.create(manualPlateNumber, savedPath, dealershipId, messengerId,
                     latitude, longitude);
-            logger.info("Servicio manual creado exitosamente con ID: {}", service.getIdServiceDelivery());
-            return service;
+                return service;
         } catch (Exception e) {
             logger.error("Error creando servicio manual: {}", e.getMessage());
             cleanupFiles(savedPath);
@@ -126,7 +122,7 @@ public class ServiceDeliveryUseCase {
     @AuditableAction(action = "UPDATE_STATUS", description = "Actualizar estado de servicio")
     public ServiceDelivery updateStatus(Long serviceId, Status newStatus, String observation,
             Signature signature, List<Photo> photos, Long userId, Double latitude, Double longitude) throws Exception {
-        logger.info("Actualizando estado de servicio ID: {} a {}", serviceId, newStatus);
+        // ...existing code...
         return updateService.updateStatus(serviceId, newStatus, observation, signature, photos, userId, latitude,
                 longitude);
     }
@@ -138,7 +134,7 @@ public class ServiceDeliveryUseCase {
     public ServiceDelivery updateStatusWithFiles(Long serviceId, Status newStatus, String observation,
             File signatureFile, List<File> photoFiles, Long userId, Double latitude, Double longitude)
             throws Exception {
-        logger.info("Actualizando estado con archivos. ServiceID: {}, NuevoEstado: {}", serviceId, newStatus);
+        // ...existing code...
 
         ServiceDelivery service = searchService.findById(serviceId);
         String plateNumber = service.getPlate().getPlateNumber();
@@ -172,10 +168,9 @@ public class ServiceDeliveryUseCase {
         }
 
         try {
-            ServiceDelivery updated = updateService.updateStatus(serviceId, newStatus, observation, signature, photos,
+                ServiceDelivery updated = updateService.updateStatus(serviceId, newStatus, observation, signature, photos,
                     userId, latitude, longitude);
-            logger.info("Estado actualizado exitosamente para servicio ID: {}", serviceId);
-            return updated;
+                return updated;
         } catch (Exception e) {
             logger.error("Error actualizando estado de servicio ID: {}: {}", serviceId, e.getMessage());
             cleanupFiles(savedPaths);
@@ -189,8 +184,7 @@ public class ServiceDeliveryUseCase {
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "REASSIGN_MESSENGER", description = "Reasignar servicio a otro mensajero")
     public ServiceDelivery reassignMessenger(Long serviceId, Long newMessengerId, Long adminUserId) throws Exception {
-        logger.info("Reasignando servicio ID: {} a mensajero ID: {} por admin ID: {}",
-                serviceId, newMessengerId, adminUserId);
+        // ...existing code...
         return updateService.reassignMessenger(serviceId, newMessengerId, adminUserId);
     }
 
@@ -245,7 +239,7 @@ public class ServiceDeliveryUseCase {
      * explícito).
      */
     public void deleteById(Long id) throws Exception {
-        logger.info("Moviendo servicio ID: {} a la papelera", id);
+        // ...existing code...
         deleteService.deleteById(id);
     }
 
@@ -254,7 +248,7 @@ public class ServiceDeliveryUseCase {
      */
     @AuditableAction(action = "DELETE_SERVICE", description = "Mover servicio a papelera")
     public void deleteById(Long id, Long userId) throws Exception {
-        logger.info("Moviendo servicio ID: {} a la papelera por usuario ID: {}", id, userId);
+        // ...existing code...
         deleteService.deleteById(id, userId);
     }
 
@@ -272,7 +266,7 @@ public class ServiceDeliveryUseCase {
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "RESTORE_SERVICE", description = "Restaurar servicio desde papelera")
     public ServiceDelivery restore(Long id, Long userId) throws Exception {
-        logger.info("Restaurando servicio ID: {} de la papelera por usuario ID: {}", id, userId);
+        // ...existing code...
         return deleteService.restore(id, userId);
     }
 
@@ -283,7 +277,7 @@ public class ServiceDeliveryUseCase {
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "EMPTY_TRASH", description = "Vaciar papelera completamente")
     public int emptyTrash(Long userId) {
-        logger.info("Vaciando papelera por usuario ID: {}", userId);
+        // ...existing code...
         return deleteService.emptyTrash();
     }
 
@@ -293,7 +287,7 @@ public class ServiceDeliveryUseCase {
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "ARCHIVE_SERVICE", description = "Archivar permanentemente un servicio de la papelera")
     public void permanentDeleteById(Long id, Long userId) throws Exception {
-        logger.info("Archivando permanentemente servicio ID: {} por usuario ID: {}", id, userId);
+        // ...existing code...
         deleteService.archiveService(id);
     }
 

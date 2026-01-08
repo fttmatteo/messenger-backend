@@ -48,7 +48,6 @@ public class FileValidationService {
             throw new SecurityException("Archivo no proporcionado");
         }
 
-        logger.info("Validando archivo de imagen: {}", file.getOriginalFilename());
 
         // 1. Verificar que no esté vacío
         if (file.isEmpty()) {
@@ -74,7 +73,6 @@ public class FileValidationService {
         // 4. Validar que sea realmente una imagen (leer contenido)
         validateImageContent(file);
 
-        logger.info("Validación de imagen exitosa: {}", file.getOriginalFilename());
     }
 
     /**
@@ -86,7 +84,6 @@ public class FileValidationService {
             throw new SecurityException("Archivo de firma no proporcionado");
         }
 
-        logger.info("Validando archivo de firma: {}", file.getOriginalFilename());
 
         // 1. Validaciones básicas (imagen)
         if (file.isEmpty()) {
@@ -111,7 +108,6 @@ public class FileValidationService {
         // 3. Validar contenido de imagen
         validateImageContent(file);
 
-        logger.info("Validación de firma exitosa: {}", file.getOriginalFilename());
     }
 
     /**
@@ -123,7 +119,6 @@ public class FileValidationService {
             throw new SecurityException("Archivo de foto no proporcionado");
         }
 
-        logger.info("Validando archivo de foto: {}", file.getOriginalFilename());
 
         if (file.isEmpty()) {
             throw new SecurityException("Archivo de foto vacío");
@@ -145,7 +140,6 @@ public class FileValidationService {
 
         validateImageContent(file);
 
-        logger.info("Validación de foto exitosa: {}", file.getOriginalFilename());
     }
 
     /**

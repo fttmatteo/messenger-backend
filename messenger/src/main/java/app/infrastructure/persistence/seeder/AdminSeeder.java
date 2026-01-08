@@ -1,7 +1,5 @@
 package app.infrastructure.persistence.seeder;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,8 +13,6 @@ import app.infrastructure.persistence.repository.EmployeeRepository;
  */
 @Component
 public class AdminSeeder implements CommandLineRunner {
-
-    private static final Logger logger = LoggerFactory.getLogger(AdminSeeder.class);
 
     @Autowired
     private EmployeeRepository employeeRepository;
@@ -35,11 +31,6 @@ public class AdminSeeder implements CommandLineRunner {
 
             employeeRepository.save(admin);
 
-            logger.info("=============================================");
-            logger.info("🚀 Usuario ADMIN creado exitosamente");
-            logger.info("👤 Documento: 1000000000");
-            logger.info("🔑 Pass: Admin123!");
-            logger.info("=============================================");
         }
     }
 }

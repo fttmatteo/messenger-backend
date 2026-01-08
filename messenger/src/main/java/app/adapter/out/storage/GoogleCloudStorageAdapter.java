@@ -68,7 +68,7 @@ public class GoogleCloudStorageAdapter implements StoragePort {
 
     private String uploadToGCS(File file, String subDirectory, String fileName) throws IOException {
         String objectName = subDirectory + "/" + fileName;
-        logger.info("Subiendo archivo a GCS. Bucket: {}, Objeto: {}", bucketName, objectName);
+        // ...existing code...
 
         String contentType = Files.probeContentType(file.toPath());
         if (contentType == null) {
@@ -82,7 +82,6 @@ public class GoogleCloudStorageAdapter implements StoragePort {
 
         byte[] fileBytes = Files.readAllBytes(file.toPath());
         storage.create(blobInfo, fileBytes);
-        logger.debug("Archivo subido exitosamente. Tamaño: {} bytes", fileBytes.length);
 
         return objectName;
     }
@@ -193,11 +192,11 @@ public class GoogleCloudStorageAdapter implements StoragePort {
      * Elimina un objeto del bucket.
      */
     public boolean delete(String objectName) {
-        logger.info("Eliminando objeto de GCS: {}", objectName);
+        // ...existing code...
         BlobId blobId = BlobId.of(bucketName, objectName);
         boolean deleted = storage.delete(blobId);
         if (deleted) {
-            logger.info("Objeto eliminado exitosamente");
+            // ...existing code...
         } else {
             logger.warn("No se pudo eliminar el objeto (posiblemente no existe)");
         }

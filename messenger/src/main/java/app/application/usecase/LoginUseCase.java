@@ -42,7 +42,6 @@ public class LoginUseCase {
      */
     @app.infrastructure.audit.AuditableAction(action = "USER_LOGIN", description = "Inicio de sesión de usuario")
     public LoginResult login(AuthCredentials credentials) {
-        logger.info("Intento de login para documento: {}", credentials.getDocument());
         // Obtener datos del empleado
         Employee employee = employeePort.findByDocument(credentials.getDocument());
         if (employee == null) {
@@ -55,8 +54,7 @@ public class LoginUseCase {
             // Autenticar y obtener tokens
             TokenResponse response = authenticationService.authenticate(credentials);
             
-            logger.info("Login exitoso para documento: {} con rol: {}", 
-                credentials.getDocument(), employee.getRole());
+
             
             return new LoginResult(response, employee);
         } catch (app.domain.exception.BusinessException e) {
