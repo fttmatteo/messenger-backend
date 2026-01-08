@@ -53,7 +53,7 @@ jobs:
 
       # 5. Ejecutar suite de pruebas unitarias e integración
       - name: 🧪 Ejecutar tests
-        run: mvn -B test
+        run: mvn -B test -Dspring.profiles.active=test
 
       # 6. Empaquetar el JAR ejecutable (skip tests para ahorrar tiempo)
       - name: 📦 Empaquetar aplicación
