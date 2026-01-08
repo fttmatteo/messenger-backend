@@ -139,6 +139,7 @@ public class GoogleCloudStorageAdapter implements StoragePort {
                 return metadataEmail;
             }
         } catch (Exception e) {
+            logger.warn("No se pudo obtener email de cuenta de servicio desde metadata: {}", e.getMessage());
             return null;
         }
 
@@ -174,6 +175,7 @@ public class GoogleCloudStorageAdapter implements StoragePort {
             } catch (Exception e) {
                 throw new IOException("Failed to fetch email from metadata server. HTTP error code: " + responseCode);
             }
+            logger.warn("Metadata server devolvió código HTTP {} al solicitar email de servicio", responseCode);
             return null;
         }
     }

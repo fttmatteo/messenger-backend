@@ -3,6 +3,8 @@ package app.adapter.in.rest.mapper;
 import app.adapter.in.rest.response.*;
 import app.adapter.out.storage.GoogleCloudStorageAdapter;
 import app.domain.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.stream.Collectors;
@@ -12,6 +14,8 @@ import java.util.stream.Collectors;
  */
 @Component
 public class ServiceDeliveryResponseMapper {
+
+    private static final Logger logger = LoggerFactory.getLogger(ServiceDeliveryResponseMapper.class);
 
     @Autowired
     private EmployeeResponseMapper employeeMapper;
@@ -25,6 +29,7 @@ public class ServiceDeliveryResponseMapper {
             try {
                 return storageAdapter.regenerateSignedUrl(path);
             } catch (Exception e) {
+                logger.warn("Failed to regenerate signed URL for path {}: {}", path, e.getMessage());
                 return null;
             }
         }

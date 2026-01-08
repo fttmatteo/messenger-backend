@@ -3,6 +3,8 @@ package app.adapter.out.security;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import javax.crypto.SecretKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import app.domain.model.auth.AuthCredentials;
@@ -21,6 +23,8 @@ import io.jsonwebtoken.security.SignatureException;
  */
 @Component
 public class JwtAdapter implements AuthenticationPort {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtAdapter.class);
 
     private final SecretKey secretKey;
     private final long expirationTime;
@@ -63,14 +67,19 @@ public class JwtAdapter implements AuthenticationPort {
             this.getClaims(token);
             return true;
         } catch (SignatureException e) {
+            logger.warn("JWT inválido por firma: {}", e.getMessage());
             return false;
         } catch (MalformedJwtException e) {
+            logger.warn("JWT malformado: {}", e.getMessage());
             return false;
         } catch (ExpiredJwtException e) {
+            logger.warn("JWT expirado: {}", e.getMessage());
             return false;
         } catch (UnsupportedJwtException e) {
+            logger.warn("JWT no soportado: {}", e.getMessage());
             return false;
         } catch (IllegalArgumentException e) {
+            logger.warn("JWT argumento inválido: {}", e.getMessage());
             return false;
         }
     }

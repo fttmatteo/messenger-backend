@@ -124,6 +124,7 @@ public class GoogleMapsAdapter implements LocationPort {
         } catch (GeolocationException e) {
             throw e;
         } catch (Exception e) {
+            logger.error("Error calculando ruta optimizada: {}", e.getMessage());
             throw new GeolocationException(
                     "Error al calcular la ruta optimizada: " + e.getMessage());
         }
@@ -178,6 +179,7 @@ public class GoogleMapsAdapter implements LocationPort {
 
             return results[0].formattedAddress;
         } catch (Exception e) {
+            logger.error("Error al obtener dirección por geocodificación inversa: {}", e.getMessage());
             throw new GeolocationException(
                     "Error al obtener la dirección: " + e.getMessage());
         }

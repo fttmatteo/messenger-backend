@@ -7,13 +7,13 @@
     <!-- Propiedad para el directorio de logs -->
     <property name="LOG_PATH" value="logs"/>
 
-    <!-- Patrón de formato de logs -->
+    <!-- Patrón de formato de logs con Correlation ID -->
     <property name="LOG_PATTERN" 
-              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{correlationId}] [%thread] %-5level %logger{36} - %msg%n"/>
     
-    <!-- Patrón de formato con colores para consola -->
+    <!-- Patrón de formato con colores para consola con Correlation ID -->
     <property name="CONSOLE_LOG_PATTERN" 
-              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [%thread] %cyan(%logger{36}) - %msg%n"/>
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [%X{correlationId}] [%thread] %cyan(%logger{36}) - %msg%n"/>
 
     <!-- Appender para consola (desarrollo y producción en Cloud Run) -->
     <!-- Appender para consola (desarrollo) -->
@@ -137,9 +137,9 @@
     <!-- APPENDER PARA AUDITORÍA              -->
     <!-- ===================================== -->
     
-    <!-- Patrón específico para logs de auditoría -->
+    <!-- Patrón específico para logs de auditoría con Correlation ID -->
     <property name="AUDIT_PATTERN" 
-              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [AUDIT] %msg%n"/>
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{correlationId}] [AUDIT] %msg%n"/>
     
     <!-- Appender de consola para auditoría (todos los ambientes) -->
     <appender name="AUDIT_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">

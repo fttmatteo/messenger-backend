@@ -29,7 +29,7 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 
     @Autowired
     private JwtAdapter jwtAdapter;
-    
+
     @Value("${spring.profiles.active:}")
     private String activeProfiles;
 
@@ -59,7 +59,7 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 
             // Validar el token si está presente
             if (!jwtAdapter.validateToken(token)) {
-                logger.warn("Invalid or expired JWT token for WebSocket connection");
+                logger.warn("Conexión WebSocket rechazada - Token JWT inválido o expirado");
                 throw new IllegalArgumentException("Token JWT inválido o expirado");
             }
 
@@ -72,6 +72,7 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
                     List.of(new SimpleGrantedAuthority("ROLE_" + role)));
 
             accessor.setUser(authentication);
+            logger.info("Conexión WebSocket exitosa para usuario: {} con rol: {}", username, role);
         }
 
         return message;

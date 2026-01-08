@@ -1,5 +1,7 @@
 package app.infrastructure.helper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
@@ -13,6 +15,8 @@ import java.util.List;
  */
 @Component
 public class FileHelper {
+
+    private static final Logger logger = LoggerFactory.getLogger(FileHelper.class);
 
     /**
      * Convierte un MultipartFile a un archivo temporal (File) en el sistema.
@@ -73,6 +77,7 @@ public class FileHelper {
                 }
             }
         } catch (IOException e) {
+            logger.warn("Error detectando extensión desde bytes del archivo: {}", e.getMessage());
             return "";
         }
 
@@ -90,6 +95,7 @@ public class FileHelper {
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
+            logger.error("Error procesando archivo temporal: {}", e.getMessage(), e);
             throw new IOException("Error processing temporary file", e);
         } finally {
             if (tempFile != null && tempFile.exists()) {

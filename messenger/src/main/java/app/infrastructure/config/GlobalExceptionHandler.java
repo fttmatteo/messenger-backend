@@ -47,7 +47,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleInputsException(
                         InputsException ex,
                         HttpServletRequest request) {
-                logger.warn("InputsException: {} en {}", ex.getMessage(), request.getRequestURI());
+                logger.warn("Petición inválida detectada [{}]: {}", request.getRequestURI(), ex.getMessage());
                 ErrorResponse errorResponse = new ErrorResponse(
                                 HttpStatus.BAD_REQUEST.value(),
                                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
@@ -65,12 +65,13 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleValidationExceptions(
                         MethodArgumentNotValidException ex,
                         HttpServletRequest request) {
-                logger.warn("MethodArgumentNotValidException: {} en {}", ex.getMessage(), request.getRequestURI());
 
                 List<ErrorDetail> details = new ArrayList<>();
                 for (FieldError error : ex.getBindingResult().getFieldErrors()) {
                         details.add(new ErrorDetail(error.getField(), error.getDefaultMessage()));
                 }
+
+                logger.warn("Error de validación en [{}]: {}", request.getRequestURI(), details);
 
                 ErrorResponse errorResponse = new ErrorResponse(
                                 HttpStatus.BAD_REQUEST.value(),
@@ -90,7 +91,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleBusinessException(
                         BusinessException ex,
                         HttpServletRequest request) {
-                logger.warn("BusinessException: {} en {}", ex.getMessage(), request.getRequestURI());
+                logger.warn("Conflicto de negocio en [{}]: {}", request.getRequestURI(), ex.getMessage());
 
                 ErrorResponse errorResponse = new ErrorResponse(
                                 HttpStatus.CONFLICT.value(),
@@ -109,7 +110,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleUnauthorizedException(
                         UnauthorizedException ex,
                         HttpServletRequest request) {
-                logger.warn("UnauthorizedException: {} en {}", ex.getMessage(), request.getRequestURI());
+                logger.warn("Acceso no autorizado en [{}]: {}", request.getRequestURI(), ex.getMessage());
 
                 ErrorResponse errorResponse = new ErrorResponse(
                                 HttpStatus.UNAUTHORIZED.value(),
@@ -128,7 +129,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
                         ResourceNotFoundException ex,
                         HttpServletRequest request) {
-                logger.warn("ResourceNotFoundException: {} en {}", ex.getMessage(), request.getRequestURI());
+                logger.info("Recurso no encontrado: {} en {}", ex.getMessage(), request.getRequestURI());
 
                 ErrorResponse errorResponse = new ErrorResponse(
                                 HttpStatus.NOT_FOUND.value(),
@@ -147,7 +148,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleGeolocationException(
                         GeolocationException ex,
                         HttpServletRequest request) {
-                logger.error("GeolocationException: {} en {}", ex.getMessage(), request.getRequestURI(), ex);
+                logger.error("Fallo de geolocalización en [{}]: {}", request.getRequestURI(), ex.getMessage(), ex);
 
                 ErrorResponse errorResponse = new ErrorResponse(
                                 HttpStatus.BAD_REQUEST.value(),
@@ -166,7 +167,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleExternalServiceException(
                         ExternalServiceException ex,
                         HttpServletRequest request) {
-                logger.error("ExternalServiceException: {} en {}", ex.getMessage(), request.getRequestURI(), ex);
+                logger.error("Error en servicio externo en [{}]: {}", request.getRequestURI(), ex.getMessage(), ex);
 
                 ErrorResponse errorResponse = new ErrorResponse(
                                 HttpStatus.SERVICE_UNAVAILABLE.value(),
@@ -185,7 +186,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleAccessDeniedException(
                         AccessDeniedException ex,
                         HttpServletRequest request) {
-                logger.warn("AccessDeniedException: {} en {}", ex.getMessage(), request.getRequestURI());
+                logger.warn("Acceso denegado en [{}]: {}", request.getRequestURI(), ex.getMessage());
 
                 ErrorResponse errorResponse = new ErrorResponse(
                                 HttpStatus.FORBIDDEN.value(),
@@ -204,7 +205,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleSecurityException(
                         SecurityException ex,
                         HttpServletRequest request) {
-                logger.warn("SecurityException: {} en {}", ex.getMessage(), request.getRequestURI());
+                logger.error("Violación de seguridad en [{}]: {}", request.getRequestURI(), ex.getMessage());
 
                 ErrorResponse errorResponse = new ErrorResponse(
                                 HttpStatus.FORBIDDEN.value(),
@@ -229,7 +230,7 @@ public class GlobalExceptionHandler {
                         return handleBusinessException((BusinessException) cause, request);
                 }
 
-                logger.error("ERROR NO CONTROLADO: {} en URI: {}", ex.getMessage(), request.getRequestURI(), ex);
+                logger.error("ERROR CRÍTICO NO CONTROLADO en [{}]: {}", request.getRequestURI(), ex.getMessage(), ex);
 
                 String message = isProdEnvironment()
                                 ? "Error interno del servidor"
