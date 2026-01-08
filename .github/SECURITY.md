@@ -56,6 +56,10 @@ This project implements:
 - ✅ Secrets managed via environment variables
 - ✅ Dependency scanning via Dependabot
 
+> [!NOTE]
+> **Rate Limiting in Cloud Run**: The rate limiting is now globally synchronized across instances using Redis.
+> This ensures strict limits even in multi-instance environments with autoscaling.
+
 ---
 
 # Política de Seguridad
@@ -107,5 +111,9 @@ Este proyecto implementa:
 - ✅ HTTPS obligatorio en producción
 - ✅ Secretos gestionados via variables de entorno
 - ✅ Escaneo de dependencias via Dependabot
+
+> [!NOTE]
+> **Rate Limiting en Cloud Run**: El rate limiting ahora está sincronizado globalmente entre instancias utilizando Redis.
+> Esto garantiza límites estrictos incluso en entornos multi-instancia con escalado automático.
 
 > **Copyright (C) 2025 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**

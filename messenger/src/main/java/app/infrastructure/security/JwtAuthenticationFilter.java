@@ -46,13 +46,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         }
-        
+
         // FALLBACK: Leer de header Authorization (compatibilidad con clientes legacy)
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer")) {
             return header.substring(7);
         }
-        
+
         return null;
     }
 
@@ -76,8 +76,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     null,
                     authorities);
             SecurityContextHolder.getContext().setAuthentication(auth);
-        } else {
-            throw new RuntimeException("Invalid token");
         }
+        // Token inválido: no autenticar al usuario silenciosamente.
+        // Spring Security denegará acceso a endpoints protegidos con 401/403.
     }
 }
