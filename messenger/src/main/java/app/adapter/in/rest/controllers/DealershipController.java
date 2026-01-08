@@ -16,9 +16,6 @@ import app.application.usecase.location.GeocodeDealershipUseCase;
 import app.domain.model.Dealership;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Controlador REST para gestión de concesionarios.
  */
@@ -26,8 +23,6 @@ import org.slf4j.LoggerFactory;
 @RequestMapping("/dealerships")
 @PreAuthorize("isAuthenticated()")
 public class DealershipController {
-
-    private static final Logger logger = LoggerFactory.getLogger(DealershipController.class);
 
     @Autowired
     private DealershipUseCase dealershipUseCase;
@@ -44,7 +39,6 @@ public class DealershipController {
     @PostMapping("/createDealership")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DealershipResponse> create(@Valid @RequestBody DealershipRequest request) throws Exception {
-        logger.info("Solicitud para crear concesionario: {}", request.getName());
         Dealership dealership = builder.build(request);
         Dealership created = dealershipUseCase.create(dealership);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseMapper.toResponse(created));
@@ -91,7 +85,6 @@ public class DealershipController {
     @DeleteMapping("/deleteDealership/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) throws Exception {
-        logger.info("Solicitud para eliminar concesionario ID: {}", id);
         dealershipUseCase.deleteById(id);
         return ResponseEntity.noContent().build();
     }

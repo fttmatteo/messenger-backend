@@ -56,8 +56,7 @@ public class AuthController {
             HttpServletResponse response) {
         
         Long document = credentials.getDocument();
-        logger.info("Solicitud de login recibida para documento: {}",
-            LogSanitizer.maskDocument(document));
+            LogSanitizer.maskDocument(document);
         
         // Verificar si la cuenta está bloqueada por demasiados intentos fallidos
         if (rateLimitService.isBlocked(document)) {
@@ -113,9 +112,6 @@ public class AuthController {
                 "Login exitoso",
                 userInfo
             );
-            
-            logger.info("Login exitoso para documento: {} con rol: {}",
-                LogSanitizer.maskDocument(document), tokenResponse.getRole());
             
             return ResponseEntity.ok(loginResponse);
             
@@ -211,8 +207,6 @@ public class AuthController {
         // Limpiar cookie de refresh token
         Cookie refreshTokenCookie = createSecureCookie("refreshToken", "", 0, "/auth/refresh");
         response.addCookie(refreshTokenCookie);
-        
-        logger.info("Logout exitoso - cookies limpiadas");
         
         return ResponseEntity.ok().build();
     }

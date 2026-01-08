@@ -16,8 +16,6 @@ import app.infrastructure.audit.AuditableAction;
 import app.infrastructure.logging.LogSanitizer;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Controlador REST para gestión de empleados (solo ADMIN).
@@ -26,8 +24,6 @@ import org.slf4j.LoggerFactory;
 @RequestMapping("/employees")
 @PreAuthorize("hasRole('ADMIN')")
 public class EmployeeController {
-
-    private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 
     @Autowired
     private EmployeeUseCase employeeUseCase;
@@ -43,8 +39,7 @@ public class EmployeeController {
     @PreAuthorize("hasRole('ADMIN')")
     @AuditableAction(action = "CREATE_EMPLOYEE", description = "Crear nuevo empleado")
     public ResponseEntity<EmployeeResponse> create(@Valid @RequestBody EmployeeRequest request) throws Exception {
-        logger.info("Solicitud para crear empleado documento: {}",
-            LogSanitizer.maskDocument(request.getDocument()));
+            LogSanitizer.maskDocument(request.getDocument());
         Employee employee = builder.build(request.getDocument(),
                 request.getFullName(),
                 request.getPhone(),
@@ -104,7 +99,6 @@ public class EmployeeController {
     @PreAuthorize("hasRole('ADMIN')")
     @AuditableAction(action = "DELETE_EMPLOYEE", description = "Eliminar empleado")
     public ResponseEntity<Void> delete(@PathVariable Long id) throws Exception {
-        logger.info("Solicitud para eliminar empleado ID: {}", id);
         employeeUseCase.deleteById(id);
         return ResponseEntity.noContent().build();
     }

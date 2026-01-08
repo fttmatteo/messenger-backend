@@ -62,14 +62,11 @@ public class TrackingAdapter implements TrackingPort {
             }
 
             if (tracking.getStatus() == TrackingStatus.OFFLINE) {
-                logger.debug("Mensajero {} offline, eliminando tracking", tracking.getMessengerId());
                 redisTemplate.delete(key);
                 return;
             }
 
             redisTemplate.opsForValue().set(key, tracking, TRACKING_TTL_SECONDS, TimeUnit.SECONDS);
-            logger.debug("Guardado tracking en Redis para mensajero {}: {} (TTL: {} seg)",
-                    tracking.getMessengerId(), tracking.getCurrentLocation(), TRACKING_TTL_SECONDS);
         } catch (Exception e) {
             logger.error("Error guardando tracking en Redis: {}", e.getMessage());
             throw new RuntimeException("Error al guardar en Redis: " + e.getMessage());
@@ -132,11 +129,8 @@ public class TrackingAdapter implements TrackingPort {
             Set<String> keys = redisTemplate.keys(TRACKING_KEY_PREFIX + "*");
 
             if (keys == null || keys.isEmpty()) {
-                logger.debug("No active messengers found in Redis");
                 return activeMessengers;
             }
-
-            logger.debug("Found {} keys for messengers in Redis", keys.size());
 
             for (String key : keys) {
                 try {

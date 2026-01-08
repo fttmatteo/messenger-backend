@@ -16,9 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Controlador REST para geocodificación y cálculo de rutas.
  */
@@ -26,8 +23,6 @@ import org.slf4j.LoggerFactory;
 @RequestMapping("/locations")
 @PreAuthorize("isAuthenticated()")
 public class LocationController {
-
-    private static final Logger logger = LoggerFactory.getLogger(LocationController.class);
 
     @Autowired
     private GeocodeDealershipUseCase geocodeDealership;
@@ -45,7 +40,6 @@ public class LocationController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<LocationResponse> geocodeAddress(
             @Valid @RequestBody GeocodeRequest request) {
-        logger.info("Solicitud geocodificación: {}", request.getAddress());
         Location location = geocodeDealership.geocodeAddress(request.getAddress());
         String formattedAddress = locationPort.reverseGeocode(location);
         return ResponseEntity.ok(responseMapper.toLocationResponse(location, formattedAddress));
@@ -58,7 +52,6 @@ public class LocationController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<RouteResponse> calculateRoute(
             @Valid @RequestBody RouteRequest request) {
-        logger.info("Solicitud cálculo ruta desde {},{}", request.getOriginLatitude(), request.getOriginLongitude());
         Route route = calculateOptimalRoute.execute(
                 request.getOriginLatitude(),
                 request.getOriginLongitude(),

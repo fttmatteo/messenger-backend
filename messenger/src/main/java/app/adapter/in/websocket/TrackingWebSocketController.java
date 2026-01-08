@@ -6,8 +6,6 @@ import app.application.usecase.tracking.UpdateLiveTrackingUseCase;
 import app.domain.model.LiveTracking;
 import app.domain.model.Location;
 import app.domain.model.enums.TrackingStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -22,8 +20,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Controller
 public class TrackingWebSocketController {
-
-    private static final Logger logger = LoggerFactory.getLogger(TrackingWebSocketController.class);
 
     /**
      * Intervalo mínimo en milisegundos entre updates de un mismo mensajero.
@@ -50,13 +46,6 @@ public class TrackingWebSocketController {
     public void receiveLocationUpdate(LiveTrackingRequest request, Principal principal) {
         Long messengerId = request.getMessengerId();
 
-        logger.debug("📍 Ubicación recibida del mensajero {}: lat={}, lng={}, accuracy={}m, status={}",
-                messengerId,
-                request.getLatitude(),
-                request.getLongitude(),
-                request.getAccuracy(),
-                request.getStatus());
-
         // Permitir siempre cambios de status (OFFLINE/INACTIVE importantes)
         boolean isStatusChange = request.getStatus() != null &&
                 request.getStatus() != TrackingStatus.ACTIVE;
@@ -64,20 +53,16 @@ public class TrackingWebSocketController {
         // Rate limiting: ignorar updates demasiado frecuentes (excepto cambios de
         // status)
         if (!isStatusChange && !shouldProcessUpdate(messengerId)) {
-            logger.debug("Rate limited: update ignorado para mensajero {} (muy frecuente)", messengerId);
             return;
         }
 
         // Validar que las coordenadas sean válidas
         if (request.getLatitude() != null && request.getLongitude() != null) {
             if (request.getLatitude() == 0 && request.getLongitude() == 0) {
-                logger.warn("⚠️ Coordenadas inválidas (0,0) recibidas del mensajero {}", messengerId);
+                // Invalid coordinates received
             } else {
-                logger.info("✅ Ubicación válida recibida del mensajero {}: lat={}, lng={}, accuracy={}m",
-                        messengerId, request.getLatitude(), request.getLongitude(), request.getAccuracy());
+                // Valid coordinates received
             }
-        } else {
-            logger.debug("📡 Heartbeat/Update sin coordenadas del mensajero {}", messengerId);
         }
 
         LiveTracking domainTracking = new LiveTracking();
@@ -138,8 +123,6 @@ public class TrackingWebSocketController {
         if (messengerId == null) {
             return;
         }
-
-        logger.debug("Heartbeat recibido de mensajero {}", messengerId);
 
         // Crear tracking mínimo solo con heartbeat
         LiveTracking domainTracking = new LiveTracking();

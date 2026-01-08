@@ -113,7 +113,6 @@ public class TrackingController {
             @PathVariable Long messengerId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 
-        logger.info("Solicitud historial tracking mensajero ID: {}, fecha: {}", messengerId, date);
         List<TrackingHistory> history = getTrackingHistory.byMessengerAndDate(messengerId, date);
         List<TrackingHistoryResponse> response = history.stream()
                 .map(responseMapper::toHistoryResponse)

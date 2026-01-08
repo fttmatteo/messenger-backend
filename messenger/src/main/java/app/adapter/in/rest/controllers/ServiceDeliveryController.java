@@ -77,7 +77,6 @@ public class ServiceDeliveryController {
             @RequestParam(value = "latitude", required = false) Double latitude,
             @RequestParam(value = "longitude", required = false) Double longitude) throws Exception {
 
-        logger.info("Solicitud creación servicio. DealershipId: {}", dealershipId);
 
         // Validar imagen ANTES de procesarla
         try {
@@ -142,7 +141,6 @@ public class ServiceDeliveryController {
             @RequestParam(value = "latitude", required = false) Double latitude,
             @RequestParam(value = "longitude", required = false) Double longitude) throws Exception {
 
-        logger.info("Solicitud actualización servicio ID: {} a status: {}", id, status);
 
         List<File> tempFiles = new ArrayList<>();
         try {
@@ -206,7 +204,6 @@ public class ServiceDeliveryController {
             @PathVariable Long id,
             @RequestBody Map<String, Long> request) throws Exception {
 
-        logger.info("Solicitud de reasignación de servicio ID: {}", id);
 
         Long newMessengerId = request.get("messengerId");
         if (newMessengerId == null) {
@@ -309,7 +306,6 @@ public class ServiceDeliveryController {
     @DeleteMapping("/deleteService/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, String>> delete(@PathVariable Long id) throws Exception {
-        logger.info("Solicitud eliminación servicio ID: {}", id);
 
         Employee currentUser = securityHelper.getCurrentUser();
         serviceDeliveryUseCase.deleteById(id, currentUser.getIdEmployee());
@@ -341,7 +337,6 @@ public class ServiceDeliveryController {
     @PostMapping("/trash/restore/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ServiceDeliveryResponse> restore(@PathVariable Long id) throws Exception {
-        logger.info("Solicitud restaurar servicio ID: {} desde papelera", id);
 
         Employee currentUser = securityHelper.getCurrentUser();
         ServiceDelivery restored = serviceDeliveryUseCase.restore(id, currentUser.getIdEmployee());
@@ -356,7 +351,6 @@ public class ServiceDeliveryController {
     @DeleteMapping("/trash/empty")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> emptyTrash() {
-        logger.info("Solicitud vaciar papelera");
 
         Employee currentUser = securityHelper.getCurrentUser();
         int deletedCount = serviceDeliveryUseCase.emptyTrash(currentUser.getIdEmployee());
@@ -372,7 +366,6 @@ public class ServiceDeliveryController {
     @DeleteMapping("/trash/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, String>> permanentDeleteFromTrash(@PathVariable Long id) throws Exception {
-        logger.info("Solicitud eliminar permanentemente servicio ID: {} de papelera", id);
 
         Employee currentUser = securityHelper.getCurrentUser();
         serviceDeliveryUseCase.permanentDeleteById(id, currentUser.getIdEmployee());
