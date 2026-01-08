@@ -265,11 +265,10 @@
 			<artifactId>junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- Docker Compose Support (The "Docker Extension") -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-docker-compose</artifactId>
-			<optional>true</optional>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
