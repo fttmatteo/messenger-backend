@@ -24,6 +24,7 @@ import app.domain.model.ServiceDelivery;
 import app.domain.model.enums.Role;
 import app.infrastructure.helper.FileHelper;
 import app.infrastructure.helper.SecurityHelper;
+import app.domain.services.FileValidationService;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +60,8 @@ public class ServiceDeliveryController {
     private SecurityHelper securityHelper;
     @Autowired
     private FileHelper fileHelper;
+    @Autowired
+    private FileValidationService fileValidationService;
 
     /**
      * Crea un nuevo servicio de entrega.
@@ -75,6 +78,14 @@ public class ServiceDeliveryController {
             @RequestParam(value = "longitude", required = false) Double longitude) throws Exception {
 
         logger.info("Solicitud creación servicio. DealershipId: {}", dealershipId);
+
+        // Validar imagen ANTES de procesarla
+        try {
+            fileValidationService.validateImageFile(image);
+        } catch (SecurityException e) {
+            logger.warn("Validación de archivo fallida: {}", e.getMessage());
+            throw new InputsException(e.getMessage());
+        }
 
         Employee currentUser = securityHelper.getCurrentUser();
 
@@ -147,11 +158,32 @@ public class ServiceDeliveryController {
 
             File signatureFile = null;
             if (signature != null && !signature.isEmpty()) {
+                // Validar firma antes de procesarla
+                try {
+                    fileValidationService.validateSignatureFile(signature);
+                } catch (SecurityException e) {
+                    logger.warn("Validación de firma fallida: {}", e.getMessage());
+                    throw new InputsException("Error en firma: " + e.getMessage());
+                }
                 signatureFile = fileHelper.convertToFile(signature);
                 tempFiles.add(signatureFile);
             }
 
-            List<File> photoFiles = fileHelper.convertToFiles(photos);
+            List<File> photoFiles = new ArrayList<>();
+            if (photos != null && !photos.isEmpty()) {
+                for (MultipartFile photo : photos) {
+                    if (!photo.isEmpty()) {
+                        // Validar cada foto antes de procesarla
+                        try {
+                            fileValidationService.validatePhotoFile(photo);
+                        } catch (SecurityException e) {
+                            logger.warn("Validación de foto fallida: {}", e.getMessage());
+                            throw new InputsException("Error en foto: " + e.getMessage());
+                        }
+                        photoFiles.add(fileHelper.convertToFile(photo));
+                    }
+                }
+            }
             tempFiles.addAll(photoFiles);
 
             ServiceDelivery updated = serviceDeliveryUseCase.updateStatusWithFiles(id, data.getStatus(),

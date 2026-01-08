@@ -26,6 +26,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
@@ -51,6 +56,14 @@ class FullBusinessFlowIntegrationTest {
                                 .webAppContextSetup(context)
                                 .apply(springSecurity())
                                 .build();
+        }
+
+        // Helper: Crear una imagen PNG válida
+        private byte[] createValidPngImage(int width, int height) throws IOException {
+                BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(image, "png", baos);
+                return baos.toByteArray();
         }
 
         @Test
@@ -111,8 +124,9 @@ class FullBusinessFlowIntegrationTest {
                                 .get("idDealership").asLong();
 
                 // 4. Admin creates a Service (simulating manual entry)
+                byte[] validImageBytes = createValidPngImage(800, 600);
                 MockMultipartFile imageFile = new MockMultipartFile("image", "plate.png", "image/png",
-                                "fake-image-content".getBytes());
+                                validImageBytes);
 
                 MvcResult serviceResult = mockMvc.perform(multipart("/services/createService")
                                 .file(imageFile)
@@ -129,10 +143,12 @@ class FullBusinessFlowIntegrationTest {
                                 .get("idServiceDelivery").asLong();
 
                 // 5. Messenger updates status to DELIVERED
+                byte[] validSignatureBytes = createValidPngImage(200, 100);
+                byte[] validPhotoBytes = createValidPngImage(1024, 768);
                 MockMultipartFile signatureFile = new MockMultipartFile("signature", "sign.png", "image/png",
-                                "fake-signature".getBytes());
+                                validSignatureBytes);
                 MockMultipartFile photo1 = new MockMultipartFile("photos", "photo1.png", "image/png",
-                                "fake-photo1".getBytes());
+                                validPhotoBytes);
 
                 mockMvc.perform(multipart("/services/updateService/" + serviceId)
                                 .file(signatureFile)
