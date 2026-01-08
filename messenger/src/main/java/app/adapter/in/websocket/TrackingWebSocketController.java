@@ -50,6 +50,13 @@ public class TrackingWebSocketController {
     public void receiveLocationUpdate(LiveTrackingRequest request, Principal principal) {
         Long messengerId = request.getMessengerId();
 
+        logger.debug("📍 Ubicación recibida del mensajero {}: lat={}, lng={}, accuracy={}m, status={}",
+                messengerId,
+                request.getLatitude(),
+                request.getLongitude(),
+                request.getAccuracy(),
+                request.getStatus());
+
         // Permitir siempre cambios de status (OFFLINE/INACTIVE importantes)
         boolean isStatusChange = request.getStatus() != null &&
                 request.getStatus() != TrackingStatus.ACTIVE;
@@ -59,6 +66,18 @@ public class TrackingWebSocketController {
         if (!isStatusChange && !shouldProcessUpdate(messengerId)) {
             logger.debug("Rate limited: update ignorado para mensajero {} (muy frecuente)", messengerId);
             return;
+        }
+
+        // Validar que las coordenadas sean válidas
+        if (request.getLatitude() != null && request.getLongitude() != null) {
+            if (request.getLatitude() == 0 && request.getLongitude() == 0) {
+                logger.warn("⚠️ Coordenadas inválidas (0,0) recibidas del mensajero {}", messengerId);
+            } else {
+                logger.info("✅ Ubicación válida recibida del mensajero {}: lat={}, lng={}, accuracy={}m",
+                        messengerId, request.getLatitude(), request.getLongitude(), request.getAccuracy());
+            }
+        } else {
+            logger.debug("📡 Heartbeat/Update sin coordenadas del mensajero {}", messengerId);
         }
 
         LiveTracking domainTracking = new LiveTracking();
