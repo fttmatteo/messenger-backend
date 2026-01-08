@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import app.domain.model.auth.AuthCredentials;
 import app.domain.model.auth.TokenResponse;
+import app.domain.model.Employee;
 import app.domain.services.AuthenticationService;
+import app.domain.ports.EmployeePort;
 
 /**
  * Caso de uso para login de usuarios.
@@ -18,19 +20,46 @@ public class LoginUseCase {
 
     @Autowired
     private AuthenticationService authenticationService;
+    
+    @Autowired
+    private EmployeePort employeePort;
 
     /**
-     * Autentica a un usuario verificando sus credenciales (documento y password).
+     * Result object para devolver tanto token como datos del usuario.
+     */
+    public static class LoginResult {
+        public TokenResponse tokenResponse;
+        public Employee employee;
+
+        public LoginResult(TokenResponse tokenResponse, Employee employee) {
+            this.tokenResponse = tokenResponse;
+            this.employee = employee;
+        }
+    }
+
+    /**
+     * Autentica a un usuario y devuelve tokens + información del empleado.
      */
     @app.infrastructure.audit.AuditableAction(action = "USER_LOGIN", description = "Inicio de sesión de usuario")
-    public TokenResponse login(AuthCredentials credentials) throws Exception {
+    public LoginResult login(AuthCredentials credentials) throws Exception {
         logger.info("Intento de login para documento: {}", credentials.getDocument());
         try {
+            // Obtener datos del empleado
+            Employee employee = employeePort.findByDocument(credentials.getDocument());
+            if (employee == null) {
+                throw new Exception("Usuario no encontrado");
+            }
+            
+            // Autenticar y obtener tokens
             TokenResponse response = authenticationService.authenticate(credentials);
-            logger.info("Login exitoso para documento: {}", credentials.getDocument());
-            return response;
+            
+            logger.info("Login exitoso para documento: {} con rol: {}", 
+                credentials.getDocument(), employee.getRole());
+            
+            return new LoginResult(response, employee);
         } catch (Exception e) {
-            logger.warn("Login fallido para documento: {} - Razón: {}", credentials.getDocument(), e.getMessage());
+            logger.warn("Login fallido para documento: {} - Razón: {}", 
+                credentials.getDocument(), e.getMessage());
             throw e;
         }
     }

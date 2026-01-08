@@ -17,6 +17,7 @@ import app.application.usecase.RefreshTokenUseCase;
 import app.domain.model.auth.AuthCredentials;
 import app.domain.model.auth.LoginResponse;
 import app.domain.model.auth.TokenResponse;
+import app.domain.services.LoginRateLimitService;
 import app.infrastructure.audit.AuditableAction;
 import app.infrastructure.logging.LogSanitizer;
 import org.slf4j.Logger;
@@ -35,6 +36,8 @@ public class AuthController {
     private RefreshTokenUseCase refreshTokenUseCase;
     @Autowired
     private LoginUseCase loginUseCase;
+    @Autowired
+    private LoginRateLimitService rateLimitService;
 
     @Value("${jwt.expiration:1800000}")
     private long accessTokenExpiration;
@@ -49,46 +52,94 @@ public class AuthController {
             @Valid @RequestBody AuthCredentials credentials,
             HttpServletResponse response) throws Exception {
         
+        Long document = credentials.getDocument();
         logger.info("Solicitud de login recibida para documento: {}",
-            LogSanitizer.maskDocument(credentials.getDocument()));
-        TokenResponse tokenResponse = loginUseCase.login(credentials);
+            LogSanitizer.maskDocument(document));
         
-        // Setear access token en cookie HttpOnly
-        Cookie accessTokenCookie = createSecureCookie(
-            "accessToken", 
-            tokenResponse.getToken(),
-            (int) (accessTokenExpiration / 1000), // Convertir a segundos
-            "/"
-        );
-        response.addCookie(accessTokenCookie);
+        // Verificar si la cuenta está bloqueada por demasiados intentos fallidos
+        if (rateLimitService.isBlocked(document)) {
+            logger.warn("Login rechazado - documento bloqueado por rate limit: {}",
+                LogSanitizer.maskDocument(document));
+            
+            LoginResponse errorResponse = new LoginResponse(
+                null,
+                "Demasiados intentos fallidos. Intenta de nuevo en 15 minutos.",
+                null
+            );
+            return ResponseEntity
+                .status(HttpStatus.TOO_MANY_REQUESTS) // 429
+                .body(errorResponse);
+        }
         
-        // Setear refresh token en cookie HttpOnly separada
-        Cookie refreshTokenCookie = createSecureCookie(
-            "refreshToken",
-            tokenResponse.getRefreshToken(),
-            24 * 60 * 60, // 24 horas en segundos
-            "/auth/refresh" // Solo accesible para endpoint de refresh
-        );
-        response.addCookie(refreshTokenCookie);
-        
-        // Retornar solo metadata (NO los tokens)
-        LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo(
-            null, // id
-            null, // name
-            credentials.getDocument(),
-            null  // dealershipName
-        );
-        
-        LoginResponse loginResponse = new LoginResponse(
-            tokenResponse.getRole(),
-            "Login exitoso",
-            userInfo
-        );
-        
-        logger.info("Login exitoso para documento: {} con rol: {}",
-            LogSanitizer.maskDocument(credentials.getDocument()), tokenResponse.getRole());
-        
-        return ResponseEntity.ok(loginResponse);
+        try {
+            // Obtener tokens y datos del usuario
+            LoginUseCase.LoginResult loginResult = loginUseCase.login(credentials);
+            TokenResponse tokenResponse = loginResult.tokenResponse;
+            
+            // Limpiar intentos fallidos tras login exitoso
+            rateLimitService.clearFailedAttempts(document);
+            
+            // Setear access token en cookie HttpOnly
+            Cookie accessTokenCookie = createSecureCookie(
+                "accessToken", 
+                tokenResponse.getToken(),
+                (int) (accessTokenExpiration / 1000), // Convertir a segundos
+                "/"
+            );
+            response.addCookie(accessTokenCookie);
+            
+            // Setear refresh token en cookie HttpOnly separada
+            Cookie refreshTokenCookie = createSecureCookie(
+                "refreshToken",
+                tokenResponse.getRefreshToken(),
+                24 * 60 * 60, // 24 horas en segundos
+                "/auth/refresh" // Solo accesible para endpoint de refresh
+            );
+            response.addCookie(refreshTokenCookie);
+            
+            // Retornar metadata con datos del usuario
+            LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo(
+                loginResult.employee.getIdEmployee(),
+                loginResult.employee.getFullName(),
+                credentials.getDocument(),
+                null  // dealershipName - puede obtenerse después si es necesario
+            );
+            
+            LoginResponse loginResponse = new LoginResponse(
+                tokenResponse.getRole(),
+                "Login exitoso",
+                userInfo
+            );
+            
+            logger.info("Login exitoso para documento: {} con rol: {}",
+                LogSanitizer.maskDocument(document), tokenResponse.getRole());
+            
+            return ResponseEntity.ok(loginResponse);
+            
+        } catch (Exception e) {
+            // Registrar intento fallido
+            int remainingAttempts = rateLimitService.recordFailedAttempt(document);
+            
+            logger.warn("Login fallido para documento: {}. Intentos restantes: {} - Error: {}",
+                LogSanitizer.maskDocument(document), 
+                remainingAttempts,
+                e.getMessage());
+            
+            String errorMessage = remainingAttempts > 0
+                ? String.format("Credenciales inválidas. Intentos restantes: %d", remainingAttempts)
+                : "Cuenta bloqueada por demasiados intentos fallidos. Intenta de nuevo en 15 minutos.";
+            
+            LoginResponse errorResponse = new LoginResponse(
+                null,
+                errorMessage,
+                null
+            );
+            
+            int statusCode = remainingAttempts > 0 ? 401 : 429;
+            return ResponseEntity
+                .status(statusCode)
+                .body(errorResponse);
+        }
     }
 
     /**

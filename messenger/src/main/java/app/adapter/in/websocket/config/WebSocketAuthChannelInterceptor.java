@@ -2,6 +2,7 @@ package app.adapter.in.websocket.config;
 
 import app.adapter.out.security.JwtAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -13,15 +14,24 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Arrays;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Interceptor para autenticar conexiones WebSocket via JWT.
+ * En producción: requiere token válido
+ * En desarrollo: permite sin token (facilita testing)
  */
 @Component
 public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketAuthChannelInterceptor.class);
+
     @Autowired
     private JwtAdapter jwtAdapter;
+    
+    @Value("${spring.profiles.active:}")
+    private String activeProfiles;
 
     /**
      * Intercepta mensajes entrantes para validar el token JWT en la conexión
@@ -34,15 +44,26 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 
         if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
             String token = extractToken(accessor);
+            boolean isProduction = activeProfiles != null && activeProfiles.contains("prod");
 
+            // Si no hay token, comportamiento diferente según environment
             if (token == null) {
-                throw new IllegalArgumentException("Token JWT requerido para conexión WebSocket");
+                if (isProduction) {
+                    logger.warn("WebSocket connection attempt without JWT token in PRODUCTION - rejecting");
+                    throw new IllegalArgumentException("Token JWT requerido para conexión WebSocket");
+                } else {
+                    logger.warn("WebSocket connection without JWT token - allowed in development");
+                    return message;
+                }
             }
 
+            // Validar el token si está presente
             if (!jwtAdapter.validateToken(token)) {
+                logger.warn("Invalid or expired JWT token for WebSocket connection");
                 throw new IllegalArgumentException("Token JWT inválido o expirado");
             }
 
+            // Token válido: establecer autenticación
             String username = jwtAdapter.extractUsername(token);
             String role = jwtAdapter.extractRole(token);
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
