@@ -183,7 +183,7 @@ messenger/
 
 | Profile | Purpose | Database | External APIs | JWT Exp. |
 |---------|---------|----------|---------------|----------|
-| `local` | Local development without dependencies | H2 In-Memory | Mock/Disabled | 8 hours |
+| `local` | Local development without dependencies | MySQL Local | Mock/Disabled | 8 hours |
 | `dev` | Development with real services | MySQL | Enabled | 8 hours |
 | `test` | Automated testing (CI/CD) | MySQL (Docker) | Mock | 1 hour |
 | `prod` | Production (Cloud Run) | MySQL (SSL) | Enabled (JSON Logs) | 30 min |
@@ -193,7 +193,7 @@ messenger/
 <details>
 <summary><b>🏠 Local</b> - No external dependencies</summary>
 
-- H2 in-memory database
+- MySQL Local database
 - Simulated OCR (placeholder)
 - Local file storage
 - Detailed logging

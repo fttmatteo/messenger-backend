@@ -112,11 +112,11 @@ graph LR
 | Componente | Tecnología |
 |------------|------------|
 | **Framework** | Spring Boot 3.5.9 |
-| **Language** | Java 17 |
-| **Database** | MySQL 8.0+ |
-| **Migrations** | Flyway |
+| **Lenguaje** | Java 17 |
+| **Base de Datos** | MySQL 8.0+ |
+| **Migraciones** | Flyway |
 | **Cache/Streaming** | Redis |
-| **Security** | JWT + BCrypt + Bucket4j (Rate Limiting Distribuido con Redis) |
+| **Seguridad** | JWT + BCrypt + Bucket4j (Rate Limiting Distribuido con Redis) |
 | **Documentación** | OpenAPI / Swagger UI |
 | **OCR** | Google Cloud Vision API |
 | **Almacenamiento** | Google Cloud Storage |
@@ -184,7 +184,7 @@ messenger/
 
 | Perfil | Propósito | Base de Datos | APIs Externas | JWT Exp. |
 |--------|-----------|---------------|---------------|----------|
-| `local` | Desarrollo local sin dependencias | H2 In-Memory | Mock/Deshabilitado | 8 horas |
+| `local` | Desarrollo local sin dependencias | MySQL Local | Mock/Deshabilitado | 8 horas |
 | `dev` | Desarrollo con servicios reales | MySQL | Habilitado | 8 horas |
 | `test` | Testing automatizado (CI/CD) | MySQL (Docker) | Mock | 1 hora |
 | `prod` | Producción (Cloud Run) | MySQL (SSL) | Habilitado (JSON Logs) | 30 min |
@@ -194,7 +194,7 @@ messenger/
 <details>
 <summary><b>🏠 Local</b> - Sin dependencias externas</summary>
 
-- Base de datos H2 en memoria
+- Base de datos MySQL Local
 - OCR simulado (placeholder)
 - Almacenamiento en sistema de archivos
 - Logs detallados
