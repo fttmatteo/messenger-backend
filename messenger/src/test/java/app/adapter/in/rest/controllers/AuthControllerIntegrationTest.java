@@ -132,10 +132,14 @@ class AuthControllerIntegrationTest {
         MvcResult loginResult = mockMvc.perform(post("/auth/login")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(credentials)))
+            .andExpect(status().isOk())
+            .andExpect(cookie().exists("accessToken"))
+            .andExpect(cookie().exists("refreshToken"))
             .andReturn();
 
         // Obtener refresh token desde cookie
         var refreshCookie = loginResult.getResponse().getCookie("refreshToken");
+        org.junit.jupiter.api.Assertions.assertNotNull(refreshCookie, "Refresh token cookie must not be null after login");
 
         // When/Then: usar la cookie en la solicitud de refresh (sin body)
         mockMvc.perform(post("/auth/refresh")
