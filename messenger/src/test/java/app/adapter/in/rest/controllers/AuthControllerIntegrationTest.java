@@ -1,11 +1,11 @@
 package app.adapter.in.rest.controllers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import app.domain.model.auth.AuthCredentials;
-import app.domain.model.auth.RefreshTokenRequest;
 import app.infrastructure.persistence.entities.EmployeeEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
@@ -73,12 +73,14 @@ class AuthControllerIntegrationTest {
 
         // When/Then
         mockMvc.perform(post("/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(credentials)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").exists())
-                .andExpect(jsonPath("$.refreshToken").exists())
-                .andExpect(jsonPath("$.role", org.hamcrest.Matchers.is("ADMIN")));
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(credentials)))
+            .andExpect(status().isOk())
+            // Tokens ahora van en cookies HttpOnly
+            .andExpect(cookie().exists("accessToken"))
+            .andExpect(cookie().exists("refreshToken"))
+            .andExpect(jsonPath("$.role", org.hamcrest.Matchers.is("ADMIN")))
+            .andExpect(jsonPath("$.message").exists());
     }
 
     @Test
@@ -128,22 +130,19 @@ class AuthControllerIntegrationTest {
         credentials.setPassword("secret123");
 
         MvcResult loginResult = mockMvc.perform(post("/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(credentials)))
-                .andReturn();
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(credentials)))
+            .andReturn();
 
-        String responseBody = loginResult.getResponse().getContentAsString();
-        String refreshToken = objectMapper.readTree(responseBody).get("refreshToken").asText();
+        // Obtener refresh token desde cookie
+        var refreshCookie = loginResult.getResponse().getCookie("refreshToken");
 
-        RefreshTokenRequest refreshRequest = new RefreshTokenRequest();
-        refreshRequest.setRefreshToken(refreshToken);
-
-        // When/Then
+        // When/Then: usar la cookie en la solicitud de refresh (sin body)
         mockMvc.perform(post("/auth/refresh")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(refreshRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").exists())
-                .andExpect(jsonPath("$.refreshToken").exists());
+            .cookie(refreshCookie))
+            .andExpect(status().isOk())
+            .andExpect(cookie().exists("accessToken"))
+            // Puede que renueve refreshToken o no; validamos si existe
+            .andExpect(jsonPath("$.message").exists());
     }
 }

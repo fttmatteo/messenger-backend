@@ -11,6 +11,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import app.domain.ports.AuthenticationPort;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -37,10 +38,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String extractToken(HttpServletRequest request) {
+        // PRIORIDAD 1: Intentar leer token de cookie (m\u00e1s seguro)
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("accessToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        
+        // FALLBACK: Leer de header Authorization (compatibilidad con clientes legacy)
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer")) {
             return header.substring(7);
         }
+        
         return null;
     }
 

@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import java.util.List;
+import java.util.Arrays;
 
 /**
  * Interceptor para autenticar conexiones WebSocket via JWT.
@@ -32,13 +33,11 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
         if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
-            String authHeader = accessor.getFirstNativeHeader("Authorization");
+            String token = extractToken(accessor);
 
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            if (token == null) {
                 throw new IllegalArgumentException("Token JWT requerido para conexión WebSocket");
             }
-
-            String token = authHeader.substring(7);
 
             if (!jwtAdapter.validateToken(token)) {
                 throw new IllegalArgumentException("Token JWT inválido o expirado");
@@ -55,5 +54,30 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
         }
 
         return message;
+    }
+
+    /**
+     * Extrae token JWT desde headers STOMP.
+     * Prioridad: Authorization -> Cookie: accessToken=...
+     */
+    private String extractToken(StompHeaderAccessor accessor) {
+        // 1) Authorization header (Bearer)
+        String authHeader = accessor.getFirstNativeHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+
+        // 2) Cookie header: accessToken=...
+        String cookieHeader = accessor.getFirstNativeHeader("Cookie");
+        if (cookieHeader != null) {
+            return Arrays.stream(cookieHeader.split(";"))
+                    .map(String::trim)
+                    .filter(c -> c.startsWith("accessToken="))
+                    .findFirst()
+                    .map(c -> c.substring("accessToken=".length()))
+                    .orElse(null);
+        }
+
+        return null;
     }
 }
