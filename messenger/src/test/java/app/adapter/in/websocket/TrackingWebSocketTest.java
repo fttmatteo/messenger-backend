@@ -3,14 +3,14 @@ package app.adapter.in.websocket;
 import app.adapter.in.rest.request.LiveTrackingRequest;
 import app.adapter.in.rest.response.LiveTrackingResponse;
 import app.domain.model.enums.TrackingStatus;
-import tools.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.messaging.converter.JacksonJsonMessageConverter;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
@@ -41,13 +41,14 @@ class TrackingWebSocketTest {
     private int port;
 
     private WebSocketStompClient stompClient;
-    private final JsonMapper jsonMapper = JsonMapper.builder().build();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setup() {
         List<Transport> transports = Collections.singletonList(new WebSocketTransport(new StandardWebSocketClient()));
         this.stompClient = new WebSocketStompClient(new SockJsClient(transports));
-        JacksonJsonMessageConverter converter = new JacksonJsonMessageConverter(jsonMapper);
+        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+        converter.setObjectMapper(objectMapper);
         this.stompClient.setMessageConverter(converter);
     }
 

@@ -46,7 +46,6 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
             String token = extractToken(accessor);
             boolean isProduction = activeProfiles != null && activeProfiles.contains("prod");
 
-            // Si no hay token, comportamiento diferente según environment
             if (token == null) {
                 if (isProduction) {
                     logger.warn("WebSocket connection attempt without JWT token in PRODUCTION - rejecting");
@@ -57,13 +56,11 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
                 }
             }
 
-            // Validar el token si está presente
             if (!jwtAdapter.validateToken(token)) {
                 logger.warn("Conexión WebSocket rechazada - Token JWT inválido o expirado");
                 throw new IllegalArgumentException("Token JWT inválido o expirado");
             }
 
-            // Token válido: establecer autenticación
             String username = jwtAdapter.extractUsername(token);
             String role = jwtAdapter.extractRole(token);
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
@@ -83,13 +80,11 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
      * Prioridad: Authorization -> Cookie: accessToken=...
      */
     private String extractToken(StompHeaderAccessor accessor) {
-        // 1) Authorization header (Bearer)
         String authHeader = accessor.getFirstNativeHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             return authHeader.substring(7);
         }
 
-        // 2) Cookie header: accessToken=...
         String cookieHeader = accessor.getFirstNativeHeader("Cookie");
         if (cookieHeader != null) {
             return Arrays.stream(cookieHeader.split(";"))

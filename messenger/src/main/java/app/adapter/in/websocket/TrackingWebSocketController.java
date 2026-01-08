@@ -25,7 +25,7 @@ public class TrackingWebSocketController {
      * Intervalo mínimo en milisegundos entre updates de un mismo mensajero.
      * Evita flood de requests y reduce carga en base de datos.
      */
-    private static final long MIN_UPDATE_INTERVAL_MS = 5000; // 5 segundos
+    private static final long MIN_UPDATE_INTERVAL_MS = 5000;
 
     /**
      * Cache de últimos timestamps de update por mensajero.
@@ -46,22 +46,15 @@ public class TrackingWebSocketController {
     public void receiveLocationUpdate(LiveTrackingRequest request, Principal principal) {
         Long messengerId = request.getMessengerId();
 
-        // Permitir siempre cambios de status (OFFLINE/INACTIVE importantes)
         boolean isStatusChange = request.getStatus() != null &&
                 request.getStatus() != TrackingStatus.ACTIVE;
 
-        // Rate limiting: ignorar updates demasiado frecuentes (excepto cambios de
-        // status)
         if (!isStatusChange && !shouldProcessUpdate(messengerId)) {
             return;
         }
-
-        // Validar que las coordenadas sean válidas
         if (request.getLatitude() != null && request.getLongitude() != null) {
             if (request.getLatitude() == 0 && request.getLongitude() == 0) {
-                // Invalid coordinates received
             } else {
-                // Valid coordinates received
             }
         }
 
@@ -72,7 +65,7 @@ public class TrackingWebSocketController {
             Location location = new Location(
                     request.getLatitude(),
                     request.getLongitude(),
-                    LocalDateTime.now(), // Hora sincronizada del servidor
+                    LocalDateTime.now(),
                     request.getAccuracy());
             domainTracking.setCurrentLocation(location);
         }
@@ -124,17 +117,14 @@ public class TrackingWebSocketController {
             return;
         }
 
-        // Crear tracking mínimo solo con heartbeat
         LiveTracking domainTracking = new LiveTracking();
         domainTracking.setMessengerId(messengerId);
         domainTracking.setLastHeartbeat(LocalDateTime.now());
         domainTracking.setStatus(TrackingStatus.ACTIVE);
 
-        // El UseCase actualizará solo el heartbeat en Redis, no guardará historial
         LiveTracking tracking = updateLiveTracking.executeHeartbeat(domainTracking);
         LiveTrackingResponse response = mapToResponse(tracking);
 
-        // Notificar a admins
         messagingTemplate.convertAndSend("/topic/tracking/all", response);
     }
 
