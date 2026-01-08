@@ -5,9 +5,9 @@
 # 🚀 Messenger Backend API
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
-[![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.1-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.4.1-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
-[![Redis](https://img.shields.io/badge/Redis-6.0+-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
+[![Redis](https://img.shields.io/badge/Redis-7.0+-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 
 **Delivery management system with automatic license plate recognition via OCR.**
 
@@ -111,12 +111,12 @@ graph LR
 
 | Component | Technology |
 |-----------|------------|
-| **Framework** | Spring Boot 4.0.1 |
+| **Framework** | Spring Boot 3.4.1 |
 | **Language** | Java 17 |
 | **Database** | MySQL 8.0+ |
 | **Migrations** | Flyway |
 | **Cache/Streaming** | Redis |
-| **Security** | JWT + BCrypt + Bucket4j (Rate Limiting) |
+| **Security** | JWT + BCrypt + Bucket4j (Distributed Rate Limiting with Redis) |
 | **Documentation** | OpenAPI / Swagger UI |
 | **OCR** | Google Cloud Vision API |
 | **Storage** | Google Cloud Storage |
@@ -618,11 +618,15 @@ flowchart LR
 - ⏱️ **Auto Expiration**: Tokens expire automatically
 - 🛡️ **HMAC-SHA256**: Robust digital signature algorithm
 
-### Rate Limiting
+### Distributed Rate Limiting
 
-- **IP-Based Throttling**:
-  - `AUTH`: 10 requests / minute (Brute-force protection)
-  - `GENERAL`: 100 requests / minute
+- **Redis-Backed Throttling**:
+  - Global enforcement across multiple instances (Cloud Run compatible).
+  - `AUTH`: 10 requests / minute (Brute-force protection).
+  - `GENERAL`: 100 requests / minute.
+- **Resilience**:
+  - Automatic fallback to in-memory rate limiting if Redis is unavailable.
+  - Memory-efficient TTL management for Redis keys.
 - **WebSocket Throttling**: 5 seconds minimum interval between updates per messenger.
 - Response headers: `X-Rate-Limit-Remaining`, `X-Rate-Limit-Retry-After-Seconds`
 

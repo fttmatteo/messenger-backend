@@ -5,9 +5,9 @@
 # 🚀 Messenger Backend API
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
-[![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.1-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.4.1-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
-[![Redis](https://img.shields.io/badge/Redis-6.0+-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
+[![Redis](https://img.shields.io/badge/Redis-7.0+-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 
 **Sistema de entregas con reconocimiento automático de placas vehiculares mediante OCR.**
 
@@ -111,12 +111,12 @@ graph LR
 
 | Componente | Tecnología |
 |------------|------------|
-| **Framework** | Spring Boot 4.0.1 |
-| **Lenguaje** | Java 17 |
-| **Base de Datos** | MySQL 8.0+ |
-| **Migraciones** | Flyway |
+| **Framework** | Spring Boot 3.4.1 |
+| **Language** | Java 17 |
+| **Database** | MySQL 8.0+ |
+| **Migrations** | Flyway |
 | **Cache/Streaming** | Redis |
-| **Seguridad** | JWT + BCrypt + Bucket4j (Rate Limiting) |
+| **Security** | JWT + BCrypt + Bucket4j (Rate Limiting Distribuido con Redis) |
 | **Documentación** | OpenAPI / Swagger UI |
 | **OCR** | Google Cloud Vision API |
 | **Almacenamiento** | Google Cloud Storage |
@@ -618,11 +618,15 @@ flowchart LR
 - ⏱️ **Expiración Automática**: Tokens expire automáticamente
 - 🛡️ **HMAC-SHA256**: Algoritmo robusto de firma digital
 
-### Rate Limiting
+### Rate Limiting Distribuido
 
-- **Limitación por IP**:
-  - `AUTENTICACIÓN`: 10 peticiones / minuto (Protección brute-force)
-  - `GENERAL`: 100 peticiones / minuto
+- **Limitación en Redis**:
+  - Protección global sincronizada entre múltiples instancias (Cloud Run).
+  - `AUTENTICACIÓN`: 10 peticiones / minuto (Protección brute-force).
+  - `GENERAL`: 100 peticiones / minuto.
+- **Resiliencia**:
+  - Fallback automático a memoria local si Redis no está disponible.
+  - Gestión eficiente de memoria mediante TTL dinámico en Redis.
 - **Limitación WebSocket**: Intervalo mínimo de 5 segundos entre actualizaciones por mensajero.
 - Headers de respuesta: `X-Rate-Limit-Remaining`, `X-Rate-Limit-Retry-After-Seconds`
 
