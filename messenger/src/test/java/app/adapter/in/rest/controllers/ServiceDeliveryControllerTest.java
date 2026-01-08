@@ -63,7 +63,9 @@ class ServiceDeliveryControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(controller)
+                .setMessageConverters(new org.springframework.http.converter.json.MappingJackson2HttpMessageConverter())
+                .build();
 
         messengerUser = new Employee();
         messengerUser.setIdEmployee(2L);

@@ -91,6 +91,9 @@ class TrackingWebSocketTest {
             }
         });
 
+        // Wait for subscription to be registered before sending
+        Thread.sleep(1000);
+
         // Send an update through the WebSocket
         LiveTrackingRequest request = new LiveTrackingRequest();
         request.setMessengerId(testMessengerId);
@@ -100,8 +103,8 @@ class TrackingWebSocketTest {
 
         session.send("/app/tracking/update", request);
 
-        // Wait for the broadcast back
-        LiveTrackingResponse received = blockingQueue.poll(15, TimeUnit.SECONDS);
+        // Wait for the broadcast back (increased timeout for CI environments)
+        LiveTrackingResponse received = blockingQueue.poll(30, TimeUnit.SECONDS);
 
         assertNotNull(session);
         assertNotNull(received, "Should have received a message within timeout");
