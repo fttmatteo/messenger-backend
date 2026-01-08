@@ -41,6 +41,9 @@ public class AuthController {
 
     @Value("${jwt.expiration:1800000}")
     private long accessTokenExpiration;
+    
+    @Value("${app.cookie.secure:true}")
+    private boolean cookieSecure;
 
     /**
      * Inicia sesión de usuario y genera tokens de acceso.
@@ -50,7 +53,7 @@ public class AuthController {
     @AuditableAction(action = "LOGIN", description = "Inicio de sesión de usuario")
     public ResponseEntity<LoginResponse> login(
             @Valid @RequestBody AuthCredentials credentials,
-            HttpServletResponse response) throws Exception {
+            HttpServletResponse response) {
         
         Long document = credentials.getDocument();
         logger.info("Solicitud de login recibida para documento: {}",
@@ -116,7 +119,7 @@ public class AuthController {
             
             return ResponseEntity.ok(loginResponse);
             
-        } catch (Exception e) {
+        } catch (app.domain.exception.BusinessException e) {
             // Registrar intento fallido
             int remainingAttempts = rateLimitService.recordFailedAttempt(document);
             
@@ -220,11 +223,13 @@ public class AuthController {
     private Cookie createSecureCookie(String name, String value, int maxAge, String path) {
         Cookie cookie = new Cookie(name, value);
         cookie.setHttpOnly(true);  // No accesible desde JavaScript (previene XSS)
-        cookie.setSecure(true);    // Solo HTTPS (en producción)
+        cookie.setSecure(cookieSecure);    // Solo HTTPS (configurable por perfil)
         cookie.setPath(path);      // Scope del cookie
         cookie.setMaxAge(maxAge);  // Tiempo de vida en segundos
         // SameSite=None permite enviar la cookie en contextos cross-site (frontend y backend en dominios distintos)
-        cookie.setAttribute("SameSite", "None");
+        if (cookieSecure) {
+            cookie.setAttribute("SameSite", "None");
+        }
         return cookie;
     }
 

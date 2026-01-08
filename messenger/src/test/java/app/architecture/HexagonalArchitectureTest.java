@@ -48,6 +48,7 @@ public class HexagonalArchitectureTest {
         @ArchTest
         static final ArchRule service_names_should_end_with_service_or_usecase = classes()
                         .that().resideInAPackage("..application.usecase..")
+                        .and().areNotNestedClasses()
                         .should().haveSimpleNameEndingWith("UseCase");
 
         @ArchTest

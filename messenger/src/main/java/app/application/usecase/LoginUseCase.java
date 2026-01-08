@@ -41,15 +41,17 @@ public class LoginUseCase {
      * Autentica a un usuario y devuelve tokens + información del empleado.
      */
     @app.infrastructure.audit.AuditableAction(action = "USER_LOGIN", description = "Inicio de sesión de usuario")
-    public LoginResult login(AuthCredentials credentials) throws Exception {
+    public LoginResult login(AuthCredentials credentials) {
         logger.info("Intento de login para documento: {}", credentials.getDocument());
+        // Obtener datos del empleado
+        Employee employee = employeePort.findByDocument(credentials.getDocument());
+        if (employee == null) {
+            logger.warn("Login fallido para documento: {} - Usuario no encontrado", 
+                credentials.getDocument());
+            throw new app.domain.exception.BusinessException("Usuario no encontrado");
+        }
+        
         try {
-            // Obtener datos del empleado
-            Employee employee = employeePort.findByDocument(credentials.getDocument());
-            if (employee == null) {
-                throw new Exception("Usuario no encontrado");
-            }
-            
             // Autenticar y obtener tokens
             TokenResponse response = authenticationService.authenticate(credentials);
             
@@ -57,10 +59,14 @@ public class LoginUseCase {
                 credentials.getDocument(), employee.getRole());
             
             return new LoginResult(response, employee);
-        } catch (Exception e) {
+        } catch (app.domain.exception.BusinessException e) {
             logger.warn("Login fallido para documento: {} - Razón: {}", 
                 credentials.getDocument(), e.getMessage());
             throw e;
+        } catch (Exception e) {
+            logger.error("Error inesperado durante login para documento: {}", 
+                credentials.getDocument(), e);
+            throw new app.domain.exception.BusinessException("Error durante autenticación: " + e.getMessage());
         }
     }
 }

@@ -141,6 +141,12 @@
             "type": "java.lang.String",
             "description": "Expresión cron para el job de limpieza de papelera. Por defecto: diariamente a las 3:00 AM.",
             "defaultValue": "0 0 3 * * ?"
+        },
+        {
+            "name": "app.cookie.secure",
+            "type": "java.lang.Boolean",
+            "description": "Habilita el flag Secure en cookies de autenticación. Debe ser true en producción (solo HTTPS), false en desarrollo/testing.",
+            "defaultValue": true
         }
     ],
     "hints": [
