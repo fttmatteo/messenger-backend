@@ -18,7 +18,13 @@ public class RefreshTokenUseCase {
     /**
      * Renueva un token de acceso utilizando un refresh token válido.
      */
-    public TokenResponse refreshToken(RefreshTokenRequest request) throws Exception {
-        return authenticationService.refreshToken(request.getRefreshToken());
+    public TokenResponse refreshToken(RefreshTokenRequest request) {
+        try {
+            return authenticationService.refreshToken(request.getRefreshToken());
+        } catch (app.domain.exception.BusinessException | app.domain.exception.UnauthorizedException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new app.domain.exception.BusinessException("Error durante renovación de token: " + e.getMessage());
+        }
     }
 }

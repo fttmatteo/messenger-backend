@@ -152,7 +152,7 @@ public class AuthController {
     @AuditableAction(action = "TOKEN_REFRESH", description = "Renovación de token de acceso")
     public ResponseEntity<LoginResponse> refresh(
             HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            HttpServletResponse response) {
         
         // Extraer refresh token de cookie
         String refreshToken = extractTokenFromCookie(request, "refreshToken");
