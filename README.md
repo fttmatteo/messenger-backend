@@ -423,6 +423,7 @@ erDiagram
         LocalDateTime change_date
         Long changed_by_employee_id FK
         Long service_delivery_id FK
+        Long signature_id FK
         Double delivery_latitude
         Double delivery_longitude
         String observation
@@ -444,6 +445,13 @@ erDiagram
         String setting_value
         LocalDateTime updated_at
     }
+
+    deleted_services {
+        Long id_service_delivery PK
+        LocalDateTime permanently_deleted_at
+        String deletion_reason
+        String original_data_json
+    }
     
     employees ||--o{ service_deliveries : "delivers"
     dealerships ||--o{ service_deliveries : "receives"
@@ -453,6 +461,7 @@ erDiagram
     service_deliveries ||--o{ status_history : "tracks"
     employees ||--o{ status_history : "changes"
     status_history ||--o{ photos : "evidence"
+    status_history ||--o| signatures : "verified_by"
     employees ||--o{ tracking_history : "tracked"
     service_deliveries ||--o{ tracking_history : "route"
 ```
