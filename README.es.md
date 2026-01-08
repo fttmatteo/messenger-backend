@@ -5,7 +5,7 @@
 # 🚀 Messenger Backend API
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
-[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.4.1-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.9-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Redis](https://img.shields.io/badge/Redis-7.0+-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 
@@ -111,7 +111,7 @@ graph LR
 
 | Componente | Tecnología |
 |------------|------------|
-| **Framework** | Spring Boot 3.4.1 |
+| **Framework** | Spring Boot 3.5.9 |
 | **Language** | Java 17 |
 | **Database** | MySQL 8.0+ |
 | **Migrations** | Flyway |
@@ -886,7 +886,7 @@ Ver archivo [LICENSE](./LICENSE) para detalles.
 
 <div align="center">
 
-**Made with ❤️ using Spring Boot 3.4**
+**Made with ❤️ using Spring Boot 3.5**
 
 </div>
 
