@@ -51,11 +51,31 @@ jobs:
       - name: 🔨 Compilar con Maven
         run: mvn -B compile -DskipTests
 
-      # 5. Ejecutar suite de pruebas unitarias e integración (genera reporte JaCoCo)
+      # 5. Iniciar servicios Docker para tests de integración
+      - name: 🐳 Iniciar servicios de test (MySQL, Redis)
+        run: |
+          docker compose -f src/test/resources/compose.yml up -d
+          echo "Esperando que MySQL esté listo..."
+          for i in {1..30}; do
+            if docker compose -f src/test/resources/compose.yml exec -T mysql mysqladmin ping -h localhost --silent 2>/dev/null; then
+              echo "MySQL está listo!"
+              break
+            fi
+            echo "Esperando MySQL... ($i/30)"
+            sleep 2
+          done
+          docker compose -f src/test/resources/compose.yml ps
+
+      # 6. Ejecutar suite de pruebas unitarias e integración (genera reporte JaCoCo)
       - name: 🧪 Ejecutar tests
         run: mvn -B test
 
-      # 6. Subir reporte de cobertura de JaCoCo
+      # 7. Detener servicios Docker
+      - name: 🧹 Detener servicios de test
+        if: always()
+        run: docker compose -f src/test/resources/compose.yml down
+
+      # 8. Subir reporte de cobertura de JaCoCo
       - name: 📊 Subir reporte de cobertura (JaCoCo)
         uses: actions/upload-artifact@v4
         with:
@@ -63,11 +83,11 @@ jobs:
           path: messenger/target/site/jacoco/
           retention-days: 7
 
-      # 7. Empaquetar el JAR ejecutable (skip tests para ahorrar tiempo)
+      # 9. Empaquetar el JAR ejecutable (skip tests para ahorrar tiempo)
       - name: 📦 Empaquetar aplicación
         run: mvn -B package -DskipTests
 
-      # 8. Subir el artefacto compilado (solo en rama main)
+      # 10. Subir el artefacto compilado (solo en rama main)
       - name: 📤 Subir artefacto JAR
         uses: actions/upload-artifact@v4
         if: github.ref == 'refs/heads/main'
