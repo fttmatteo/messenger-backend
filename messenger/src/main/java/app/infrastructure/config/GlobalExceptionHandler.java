@@ -16,6 +16,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.core.env.Environment;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +27,17 @@ import java.util.List;
 public class GlobalExceptionHandler {
 
         private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+        private final Environment environment;
+
+        public GlobalExceptionHandler(Environment environment) {
+                this.environment = environment;
+        }
+
+        // Constructor sin argumentos para compatibilidad con tests legacy
+        public GlobalExceptionHandler() {
+                this.environment = null;
+        }
 
         /**
          * Maneja excepciones de argumentos inválidos (InputsException).
@@ -219,12 +231,32 @@ public class GlobalExceptionHandler {
 
                 logger.error("ERROR NO CONTROLADO: {} en URI: {}", ex.getMessage(), request.getRequestURI(), ex);
 
+                String message = isProdEnvironment()
+                                ? "Error interno del servidor"
+                                : ex.getMessage();
+
                 ErrorResponse errorResponse = new ErrorResponse(
                                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                                "Ha ocurrido un error interno. Por favor contacte a soporte.",
+                                message,
                                 request.getRequestURI());
 
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+
+        private boolean isProdEnvironment() {
+                if (environment == null) {
+                        return false;
+                }
+                String[] profiles = environment.getActiveProfiles();
+                if (profiles == null) {
+                        return false;
+                }
+                for (String profile : profiles) {
+                        if ("prod".equalsIgnoreCase(profile)) {
+                                return true;
+                        }
+                }
+                return false;
         }
 }

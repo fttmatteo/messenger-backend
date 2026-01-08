@@ -18,6 +18,7 @@ import app.domain.model.auth.AuthCredentials;
 import app.domain.model.auth.LoginResponse;
 import app.domain.model.auth.TokenResponse;
 import app.infrastructure.audit.AuditableAction;
+import app.infrastructure.logging.LogSanitizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +49,8 @@ public class AuthController {
             @Valid @RequestBody AuthCredentials credentials,
             HttpServletResponse response) throws Exception {
         
-        logger.info("Solicitud de login recibida para documento: {}", credentials.getDocument());
+        logger.info("Solicitud de login recibida para documento: {}",
+            LogSanitizer.maskDocument(credentials.getDocument()));
         TokenResponse tokenResponse = loginUseCase.login(credentials);
         
         // Setear access token en cookie HttpOnly
@@ -83,8 +85,8 @@ public class AuthController {
             userInfo
         );
         
-        logger.info("Login exitoso para documento: {} con rol: {}", 
-            credentials.getDocument(), tokenResponse.getRole());
+        logger.info("Login exitoso para documento: {} con rol: {}",
+            LogSanitizer.maskDocument(credentials.getDocument()), tokenResponse.getRole());
         
         return ResponseEntity.ok(loginResponse);
     }
