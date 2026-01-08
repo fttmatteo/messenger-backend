@@ -36,7 +36,6 @@ public class GoogleVisionAdapter implements OcrPort {
      */
     @Override
     public String extractText(File imageFile) {
-        logger.info("Iniciando extracción de texto OCR para archivo: {}", imageFile.getName());
         try {
 
             ByteString imgBytes = ByteString.readFrom(new FileInputStream(imageFile));
@@ -56,10 +55,8 @@ public class GoogleVisionAdapter implements OcrPort {
                     throw new RuntimeException("Error de Vision API: " + res.getError().getMessage());
                 }
                 String rawText = res.getFullTextAnnotation().getText();
-                logger.debug("Texto crudo extraído ({} chars)", rawText != null ? rawText.length() : 0);
 
                 String cleanedPlate = cleanPlateNumber(rawText);
-                logger.info("Placa detectada y limpiada: {}", cleanedPlate);
                 return cleanedPlate;
             }
         } catch (IOException e) {

@@ -37,7 +37,6 @@ public class GoogleMapsAdapter implements LocationPort {
      */
     @Override
     public Location geocodeAddress(String address) {
-        logger.info("Geocodificando dirección: {}", address);
         try {
             GeocodingResult[] results = GeocodingApi.geocode(context, address)
                     .language("es")
@@ -45,13 +44,11 @@ public class GoogleMapsAdapter implements LocationPort {
                     .await();
 
             if (results == null || results.length == 0) {
-                logger.warn("No se encontraron resultados para dirección: {}", address);
                 throw new GeolocationException(
                         "No se encontraron coordenadas para la dirección: " + address);
             }
 
             Location location = mapper.toLocation(results[0]);
-            logger.debug("Coordenadas encontradas: {}, {}", location.getLatitude(), location.getLongitude());
             return location;
         } catch (GeolocationException e) {
             throw e;
@@ -67,8 +64,6 @@ public class GoogleMapsAdapter implements LocationPort {
      */
     @Override
     public Route calculateRoute(Location origin, Location destination) {
-        logger.info("Calculando ruta simple. Origen: {},{} -> Destino: {},{}",
-                origin.getLatitude(), origin.getLongitude(), destination.getLatitude(), destination.getLongitude());
         try {
             DirectionsResult result = DirectionsApi.newRequest(context)
                     .origin(mapper.toLatLng(origin))
@@ -78,7 +73,6 @@ public class GoogleMapsAdapter implements LocationPort {
                     .await();
 
             if (result == null || result.routes == null || result.routes.length == 0) {
-                logger.warn("No se encontró ruta entre los puntos especificados");
                 throw new GeolocationException(
                         "No se pudo calcular la ruta entre los puntos especificados");
             }
