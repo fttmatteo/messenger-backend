@@ -64,7 +64,6 @@ public class MonitoringController {
                     if (history.getChangeDate() != null && history.getChangeDate().toLocalDate().equals(date)) {
                         Status newStatus = history.getNewStatus();
 
-                        // Track the latest status transition for this service today
                         if (latestChangeDate == null || history.getChangeDate().isAfter(latestChangeDate)) {
                             latestChangeDate = history.getChangeDate();
                             latestStatusToday = newStatus;
@@ -100,7 +99,6 @@ public class MonitoringController {
                     assigned++;
                 }
 
-                // Increment summary counters based ONLY on the last status reached today
                 if (latestStatusToday != null) {
                     if (latestStatusToday == Status.DELIVERED) {
                         delivered++;

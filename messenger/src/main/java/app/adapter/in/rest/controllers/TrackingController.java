@@ -83,7 +83,6 @@ public class TrackingController {
         LiveTracking tracking = trackingPort.getLastLocation(messengerId).orElse(null);
 
         if (tracking == null) {
-            // Return 200 with null body to avoid browser console 404 errors
             return ResponseEntity.ok(null);
         }
 

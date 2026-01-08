@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 /**
  * Controlador REST para geocodificación y cálculo de rutas.
  */
@@ -72,9 +73,8 @@ public class LocationController {
         Location from = new Location(fromLat, fromLng);
         Location to = new Location(toLat, toLng);
         Double distanceMeters = locationPort.calculateDistance(from, to);
-        // Estimamos duración basado en velocidad promedio de 40 km/h
         Long durationSeconds = distanceMeters != null
-                ? Math.round(distanceMeters / 11.11) // 40 km/h = 11.11 m/s
+                ? Math.round(distanceMeters / 11.11)
                 : null;
         return ResponseEntity.ok(new DistanceResponse(distanceMeters, durationSeconds));
     }
