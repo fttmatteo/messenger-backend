@@ -1,4 +1,4 @@
-> **Copyright (C) 2025 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**
+> **Copyright (C) 2026 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**
 
 <div align="center">
 
@@ -777,7 +777,38 @@ AUDIT | timestamp | documento_usuario | accion | metodo | parametros | estado | 
 
 </details>
 
-### Instalación Rápida
+### Inicio Rápido (Docker) - Recomendado
+
+Ejecuta el stack completo localmente con un solo comando.
+
+#### Requisitos Previos
+- Docker y Docker Compose
+- Git
+
+#### Pasos
+
+1. **Clonar el repositorio**
+   ```bash
+   git clone https://github.com/StartApp-FTT/messenger-backend.git
+   cd messenger-backend
+   ```
+
+2. **Configurar Entorno**
+   ```bash
+   cd messenger
+   cp .env.example .env
+   # Edita .env con tu Key de Google Maps y Credenciales
+   ```
+
+3. **Ejecutar con Docker**
+   ```bash
+   cd ..
+   docker-compose up --build
+   ```
+
+La API estará disponible en `http://localhost:8080`.
+
+### Instalación Manual
 
 ```bash
 # 1. Clonar
@@ -898,4 +929,4 @@ Ver archivo [LICENSE](./LICENSE) para detalles.
 
 </div>
 
-> **Copyright (C) 2025 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**
+> **Copyright (C) 2026 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**

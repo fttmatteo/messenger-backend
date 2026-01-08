@@ -1,4 +1,4 @@
-> **Copyright (C) 2025 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**
+> **Copyright (C) 2026 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**
 
 <div align="center">
 
@@ -777,7 +777,38 @@ AUDIT | timestamp | user_document | action | method | params | status | duration
 
 </details>
 
-### Quick Start
+### Quick Start (Docker) - Recommended
+
+Run the full stack locally with one command.
+
+#### Prerequisites
+- Docker & Docker Compose
+- Git
+
+#### Steps
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/StartApp-FTT/messenger-backend.git
+   cd messenger-backend
+   ```
+
+2. **Configure Environment**
+   ```bash
+   cd messenger
+   cp .env.example .env
+   # Edit .env with your Google Maps Key & Credentials
+   ```
+
+3. **Run with Docker**
+   ```bash
+   cd ..
+   docker-compose up --build
+   ```
+
+The API will be available at `http://localhost:8080`.
+
+### Manual Quick Start
 
 ```bash
 # 1. Clone
@@ -899,4 +930,4 @@ See [LICENSE](./LICENSE) file for details.
 
 </div>
 
-> **Copyright (C) 2025 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**
+> **Copyright (C) 2026 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**
