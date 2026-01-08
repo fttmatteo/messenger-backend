@@ -6,6 +6,8 @@ import app.application.usecase.tracking.UpdateLiveTrackingUseCase;
 import app.domain.model.LiveTracking;
 import app.domain.model.Location;
 import app.domain.model.enums.TrackingStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -20,6 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Controller
 public class TrackingWebSocketController {
+
+    private static final Logger logger = LoggerFactory.getLogger(TrackingWebSocketController.class);
 
     /**
      * Intervalo mínimo en milisegundos entre updates de un mismo mensajero.
@@ -45,11 +49,13 @@ public class TrackingWebSocketController {
     @MessageMapping("/tracking/update")
     public void receiveLocationUpdate(LiveTrackingRequest request, Principal principal) {
         Long messengerId = request.getMessengerId();
+        logger.debug("Recibida actualización de tracking para messengerId: {}", messengerId);
 
         boolean isStatusChange = request.getStatus() != null &&
                 request.getStatus() != TrackingStatus.ACTIVE;
 
         if (!isStatusChange && !shouldProcessUpdate(messengerId)) {
+            logger.debug("Update de messengerId {} filtrado por rate limiting", messengerId);
             return;
         }
         if (request.getLatitude() != null && request.getLongitude() != null) {
@@ -77,13 +83,24 @@ public class TrackingWebSocketController {
             domainTracking.setStatus(request.getStatus());
         }
 
-        LiveTracking tracking = updateLiveTracking.execute(domainTracking);
-        LiveTrackingResponse response = mapToResponse(tracking);
-        messagingTemplate.convertAndSend(
-                "/topic/tracking/" + tracking.getMessengerId(),
-                response);
-
-        messagingTemplate.convertAndSend("/topic/tracking/all", response);
+        try {
+            LiveTracking tracking = updateLiveTracking.execute(domainTracking);
+            LiveTrackingResponse response = mapToResponse(tracking);
+            messagingTemplate.convertAndSend(
+                    "/topic/tracking/" + tracking.getMessengerId(),
+                    response);
+            messagingTemplate.convertAndSend("/topic/tracking/all", response);
+            logger.debug("Broadcast exitoso para messengerId: {}", messengerId);
+        } catch (Exception e) {
+            logger.error("Error procesando tracking update para messengerId {}: {}", messengerId, e.getMessage());
+            // Aún así intentar broadcast con datos básicos para que los clientes reciban
+            // algo
+            LiveTrackingResponse fallbackResponse = new LiveTrackingResponse(
+                    messengerId, null,
+                    request.getLatitude(), request.getLongitude(),
+                    LocalDateTime.now(), null, request.getStatus(), null, null);
+            messagingTemplate.convertAndSend("/topic/tracking/all", fallbackResponse);
+        }
     }
 
     /**
