@@ -43,7 +43,8 @@ public class SecurityConfig {
 
                 http
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                                // CSRF: Deshabilitado para endpoints REST (stateless JWT), habilitado para WebSocket
+                                // CSRF: Deshabilitado para endpoints REST (stateless JWT), habilitado para
+                                // WebSocket
                                 .csrf(csrf -> csrf
                                                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                                                 .ignoringRequestMatchers(
@@ -69,18 +70,23 @@ public class SecurityConfig {
                                                 .contentSecurityPolicy(csp -> csp
                                                                 .policyDirectives(
                                                                                 "default-src 'self'; " +
-                                                                                                "script-src 'self' 'wasm-unsafe-eval'; " +
-                                                                                                "style-src 'self' 'unsafe-inline'; " +
-                                                                                                "img-src 'self' data: https: blob:; " +
-                                                                                                "font-src 'self' data:; " +
-                                                                                                "connect-src 'self' https: wss:; " +
-                                                                                                "frame-ancestors 'none'; " +
+                                                                                                "script-src 'self' 'wasm-unsafe-eval'; "
+                                                                                                +
+                                                                                                "style-src 'self' 'unsafe-inline'; "
+                                                                                                +
+                                                                                                "img-src 'self' data: https: blob:; "
+                                                                                                +
+                                                                                                "font-src 'self' data:; "
+                                                                                                +
+                                                                                                "connect-src 'self' https: wss:; "
+                                                                                                +
+                                                                                                "frame-ancestors 'none'; "
+                                                                                                +
                                                                                                 "base-uri 'self'; " +
                                                                                                 "form-action 'self'; " +
                                                                                                 "object-src 'none'; " +
                                                                                                 "child-src 'self'; " +
-                                                                                                "media-src 'self';")
-                                                ))
+                                                                                                "media-src 'self';")))
                                 .exceptionHandling(exception -> exception
                                                 .authenticationEntryPoint(jwtAuthenticationEntryPoint))
                                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -139,7 +145,8 @@ public class SecurityConfig {
                                 "Origin",
                                 "X-Requested-With",
                                 "Cache-Control",
-                                "X-CSRF-TOKEN"));
+                                "X-CSRF-TOKEN",
+                                "X-Correlation-Id"));
                 configuration.setAllowCredentials(true);
                 configuration.setMaxAge(3600L);
                 configuration.setExposedHeaders(Arrays.asList("Authorization", "X-CSRF-TOKEN"));
