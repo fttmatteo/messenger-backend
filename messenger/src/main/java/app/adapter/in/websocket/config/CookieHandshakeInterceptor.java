@@ -26,12 +26,26 @@ public class CookieHandshakeInterceptor implements HandshakeInterceptor {
             WebSocketHandler wsHandler, Map<String, Object> attributes) {
         if (request instanceof ServletServerHttpRequest servletRequest) {
             HttpServletRequest httpRequest = servletRequest.getServletRequest();
+
+            // 1. Intentar extraer del query parameter ?token=... (Crucial para Safari
+            // Mobile)
+            String tokenParam = httpRequest.getParameter("token");
+            if (tokenParam != null && !tokenParam.trim().isEmpty()) {
+                attributes.put("accessToken", tokenParam);
+                logger.debug("Token encontrado en query parameter 'token' y copiado a atributos de sesión");
+            }
+
+            // 2. Intentar extraer de cookies (Soporte tradicional/Chrome)
             Cookie[] cookies = httpRequest.getCookies();
             if (cookies != null) {
                 for (Cookie cookie : cookies) {
                     if ("accessToken".equals(cookie.getName())) {
-                        attributes.put("accessToken", cookie.getValue());
-                        logger.debug("Token accessToken encontrado en cookie y copiado a atributos de sesión");
+                        // Solo sobreescribimos si no se encontró en el query param o para prioridad
+                        // En este caso, el query param tiene prioridad para el fix de Safari
+                        if (!attributes.containsKey("accessToken")) {
+                            attributes.put("accessToken", cookie.getValue());
+                            logger.debug("Token accessToken encontrado en cookie y copiado a atributos de sesión");
+                        }
                     }
                 }
             }

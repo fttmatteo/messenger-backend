@@ -149,4 +149,28 @@ class TrackingWebSocketTest {
         assertTrue(session.isConnected(), "WebSocket session should be connected via WS Token");
         session.disconnect();
     }
+
+    @Test
+    @DisplayName("Should successfully connect with WS token in query parameter")
+    void shouldConnectWithWsTokenInQueryParamSuccessfully() throws Exception {
+        // 1. Generate a WS Token
+        app.domain.model.auth.AuthCredentials credentials = new app.domain.model.auth.AuthCredentials();
+        credentials.setDocument(11223344L);
+        String wsToken = jwtAdapter.authenticate(credentials, "MESSENGER", 4L).getToken();
+
+        // 2. Connect to WebSocket using the token in the URL query parameter
+        WebSocketHttpHeaders wsHttpHeaders = new WebSocketHttpHeaders();
+        StompHeaders stompHeaders = new StompHeaders();
+
+        // El token va en la URL, simulando el fix de Safari
+        String url = "ws://localhost:" + port + "/ws/tracking?token=" + wsToken;
+
+        StompSession session = stompClient
+                .connectAsync(url, wsHttpHeaders, stompHeaders, new StompSessionHandlerAdapter() {
+                })
+                .get(10, TimeUnit.SECONDS);
+
+        assertTrue(session.isConnected(), "WebSocket session should be connected via Query Token");
+        session.disconnect();
+    }
 }
