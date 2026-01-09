@@ -3,6 +3,8 @@ package app.adapter.in.rest.controllers;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Arrays;
+import java.util.List;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -207,11 +209,17 @@ public class AuthController {
     @AuditableAction(action = "LOGOUT", description = "Cierre de sesión de usuario")
     public ResponseEntity<Void> logout(HttpServletResponse response) {
 
+        // Limpiamos cookies en la ruta raíz (nueva configuración)
         Cookie accessTokenCookie = createSecureCookie("accessToken", "", 0, "/");
         response.addCookie(accessTokenCookie);
 
         Cookie refreshTokenCookie = createSecureCookie("refreshToken", "", 0, "/");
         response.addCookie(refreshTokenCookie);
+
+        // Limpiamos cookies en la ruta antigua (por si quedaran residuos en el
+        // navegador)
+        Cookie oldRefreshCookie = createSecureCookie("refreshToken", "", 0, "/auth/refresh");
+        response.addCookie(oldRefreshCookie);
 
         return ResponseEntity.ok().build();
     }
@@ -236,9 +244,21 @@ public class AuthController {
      */
     private String extractTokenFromCookie(HttpServletRequest request, String cookieName) {
         if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if (cookieName.equals(cookie.getName())) {
-                    return cookie.getValue();
+            List<String> potentialTokens = Arrays.stream(request.getCookies())
+                    .filter(c -> cookieName.equals(c.getName()))
+                    .map(Cookie::getValue)
+                    .filter(v -> v != null && !v.trim().isEmpty())
+                    .toList();
+
+            for (String val : potentialTokens) {
+                // Para accessToken, validamos
+                if (cookieName.equals("accessToken") && loginUseCase.validateToken(val)) {
+                    return val;
+                }
+                // Para refreshToken, no podemos validar aquí fácilmente,
+                // pero si hay varias, al menos devolvemos una que no esté vacía
+                if (cookieName.equals("refreshToken")) {
+                    return val;
                 }
             }
         }

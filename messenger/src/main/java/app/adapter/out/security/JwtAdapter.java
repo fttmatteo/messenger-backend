@@ -79,7 +79,7 @@ public class JwtAdapter implements AuthenticationPort {
             logger.warn("JWT no soportado: {}", e.getMessage());
             return false;
         } catch (IllegalArgumentException e) {
-            logger.warn("JWT argumento inválido: {}", e.getMessage());
+            logger.warn("JWT argumento inválido. Hash: {} - Error: {}", token.hashCode(), e.getMessage());
             return false;
         }
     }
