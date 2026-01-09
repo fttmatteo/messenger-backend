@@ -86,6 +86,9 @@ public class AuthController {
                     "/");
             response.addCookie(accessTokenCookie);
 
+            logger.info("Login exitoso. Expiración configurada: {} ms ({} segundos). Cookie 'accessToken' seteada.",
+                    accessTokenExpiration, accessTokenExpiration / 1000);
+
             Cookie refreshTokenCookie = createSecureCookie(
                     "refreshToken",
                     tokenResponse.getRefreshToken(),
@@ -102,6 +105,7 @@ public class AuthController {
             LoginResponse loginResponse = new LoginResponse(
                     tokenResponse.getRole(),
                     "Login exitoso",
+                    tokenResponse.getToken(), // Fallback para Safari y otros browsers
                     userInfo);
 
             return ResponseEntity.ok(loginResponse);
@@ -197,6 +201,7 @@ public class AuthController {
         LoginResponse loginResponse = new LoginResponse(
                 tokenResponse.getRole(),
                 "Token renovado exitosamente",
+                tokenResponse.getToken(), // Fallback
                 null);
 
         return ResponseEntity.ok(loginResponse);

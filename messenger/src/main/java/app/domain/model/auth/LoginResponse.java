@@ -8,6 +8,7 @@ public class LoginResponse {
 
     private String role;
     private String message;
+    private String accessToken;
     private UserInfo user;
 
     public LoginResponse() {
@@ -16,6 +17,13 @@ public class LoginResponse {
     public LoginResponse(String role, String message, UserInfo user) {
         this.role = role;
         this.message = message;
+        this.user = user;
+    }
+
+    public LoginResponse(String role, String message, String accessToken, UserInfo user) {
+        this.role = role;
+        this.message = message;
+        this.accessToken = accessToken;
         this.user = user;
     }
 
@@ -33,6 +41,14 @@ public class LoginResponse {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 
     public UserInfo getUser() {

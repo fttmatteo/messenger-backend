@@ -67,19 +67,19 @@ public class JwtAdapter implements AuthenticationPort {
             this.getClaims(token);
             return true;
         } catch (SignatureException e) {
-            logger.warn("JWT inválido por firma: {}", e.getMessage());
+            logger.info("JWT firma inválida: {}", e.getMessage());
             return false;
         } catch (MalformedJwtException e) {
-            logger.warn("JWT malformado: {}", e.getMessage());
+            logger.info("JWT malformado: {}", e.getMessage());
             return false;
         } catch (ExpiredJwtException e) {
-            logger.warn("JWT expirado: {}", e.getMessage());
+            logger.info("JWT expirado: {}", e.getMessage());
             return false;
         } catch (UnsupportedJwtException e) {
-            logger.warn("JWT no soportado: {}", e.getMessage());
+            logger.info("JWT no soportado: {}", e.getMessage());
             return false;
         } catch (IllegalArgumentException e) {
-            logger.warn("JWT argumento inválido. Hash: {} - Error: {}", token.hashCode(), e.getMessage());
+            logger.info("JWT argumento inválido. Hash: {} - Error: {}", token.hashCode(), e.getMessage());
             return false;
         }
     }

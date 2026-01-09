@@ -44,7 +44,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String cookieNames = Arrays.stream(request.getCookies())
                     .map(Cookie::getName)
                     .collect(Collectors.joining(", "));
-            logger.debug("Request a {}: Cookies recibidas: [{}]", request.getRequestURI(), cookieNames);
+            logger.info("Request a {}: Cookies recibidas: [{}]", request.getRequestURI(), cookieNames);
+        } else {
+            // Solo logueamos si la ruta es protegida para no inundar logs
+            if (isProtectedRoute(request)) {
+                logger.info("Request a {}: NO se recibieron cookies en una ruta protegida.", request.getRequestURI());
+            }
         }
 
         String token = this.extractToken(request);
@@ -57,25 +62,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private String extractToken(HttpServletRequest request) {
         // PRIORIDAD 1: Intentar leer token de cookie (más seguro)
         if (request.getCookies() != null) {
-            List<String> potentialTokens = Arrays.stream(request.getCookies())
-                    .filter(c -> "accessToken".equals(c.getName()))
-                    .map(Cookie::getValue)
-                    .filter(v -> v != null && !v.trim().isEmpty())
-                    .toList();
-
-            if (potentialTokens.size() > 1) {
-                logger.warn("Se detectaron {} cookies 'accessToken'. Probando validación...", potentialTokens.size());
-            }
-
-            for (String val : potentialTokens) {
-                if (authenticationPort.validateToken(val)) {
-                    return val;
+            for (Cookie cookie : request.getCookies()) {
+                if ("accessToken".equals(cookie.getName())) {
+                    return cookie.getValue();
                 }
-            }
-
-            // Si ninguna fue válida pero había cookies, retornamos null (silencioso)
-            if (!potentialTokens.isEmpty()) {
-                return null;
             }
         }
 
@@ -86,6 +76,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (value.isEmpty()) {
                 return null;
             }
+            logger.info("Token encontrado en header Authorization (Hash: {})", value.hashCode());
             return value;
         }
 
@@ -113,7 +104,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authorities);
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
-        // Token inválido: no autenticar al usuario silenciosamente.
-        // Spring Security denegará acceso a endpoints protegidos con 401/403.
+    }
+
+    private boolean isProtectedRoute(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return !path.startsWith("/auth/") &&
+                !path.startsWith("/swagger-ui") &&
+                !path.startsWith("/v3/api-docs") &&
+                !path.equals("/settings/status-colors") &&
+                !path.startsWith("/ws/");
     }
 }
