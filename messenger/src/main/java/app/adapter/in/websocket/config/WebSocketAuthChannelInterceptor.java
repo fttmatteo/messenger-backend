@@ -82,7 +82,8 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
     private String extractToken(StompHeaderAccessor accessor) {
         String authHeader = accessor.getFirstNativeHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            return authHeader.substring(7);
+            String token = authHeader.substring(7).trim();
+            return token.isEmpty() ? null : token;
         }
 
         String cookieHeader = accessor.getFirstNativeHeader("Cookie");
@@ -90,8 +91,9 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
             return Arrays.stream(cookieHeader.split(";"))
                     .map(String::trim)
                     .filter(c -> c.startsWith("accessToken="))
+                    .map(c -> c.substring("accessToken=".length()).trim())
+                    .filter(token -> !token.isEmpty())
                     .findFirst()
-                    .map(c -> c.substring("accessToken=".length()))
                     .orElse(null);
         }
 
