@@ -56,9 +56,12 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
             boolean isProduction = activeProfiles != null && activeProfiles.contains("prod");
 
             if (token == null) {
+                logger.warn("Token no encontrado en CONNECT. Atributos: {} | Headers Nativos: {}",
+                        accessor.getSessionAttributes(), accessor.toNativeHeaderMap());
+
                 if (isProduction) {
                     logger.warn("WebSocket connection attempt without JWT token in PRODUCTION - rejecting. " +
-                            "Session ID: {}", accessor.getSessionId());
+                            "Session ID: {} | User: {}", accessor.getSessionId(), accessor.getUser());
                     throw new IllegalArgumentException("Token JWT requerido para conexión WebSocket");
                 } else {
                     logger.warn("WebSocket connection without JWT token - allowed in development");
@@ -67,8 +70,8 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
             }
 
             if (!jwtAdapter.validateToken(token)) {
-                logger.warn("Conexión WebSocket rechazada - Token JWT inválido o expirado. Token hash: {}",
-                        token.hashCode());
+                logger.error("Token JWT inválido o expirado en WebSocket. Token hash: {} | Session: {}",
+                        token.hashCode(), accessor.getSessionId());
                 throw new IllegalArgumentException("Token JWT inválido o expirado");
             }
 

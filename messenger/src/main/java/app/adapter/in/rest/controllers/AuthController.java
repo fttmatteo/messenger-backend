@@ -88,7 +88,7 @@ public class AuthController {
                     "refreshToken",
                     tokenResponse.getRefreshToken(),
                     24 * 60 * 60,
-                    "/auth/refresh");
+                    "/");
             response.addCookie(refreshTokenCookie);
 
             LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo(
@@ -182,12 +182,13 @@ public class AuthController {
                 "/");
         response.addCookie(accessTokenCookie);
 
+        Cookie refreshTokenCookie = createSecureCookie(
+                "refreshToken",
+                tokenResponse.getRefreshToken(),
+                24 * 60 * 60,
+                "/");
+
         if (tokenResponse.getRefreshToken() != null) {
-            Cookie refreshTokenCookie = createSecureCookie(
-                    "refreshToken",
-                    tokenResponse.getRefreshToken(),
-                    24 * 60 * 60,
-                    "/auth/refresh");
             response.addCookie(refreshTokenCookie);
         }
 
@@ -209,7 +210,7 @@ public class AuthController {
         Cookie accessTokenCookie = createSecureCookie("accessToken", "", 0, "/");
         response.addCookie(accessTokenCookie);
 
-        Cookie refreshTokenCookie = createSecureCookie("refreshToken", "", 0, "/auth/refresh");
+        Cookie refreshTokenCookie = createSecureCookie("refreshToken", "", 0, "/");
         response.addCookie(refreshTokenCookie);
 
         return ResponseEntity.ok().build();
