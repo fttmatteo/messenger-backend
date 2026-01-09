@@ -38,11 +38,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String extractToken(HttpServletRequest request) {
-        // PRIORIDAD 1: Intentar leer token de cookie (m\u00e1s seguro)
+        // PRIORIDAD 1: Intentar leer token de cookie (más seguro)
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("accessToken".equals(cookie.getName())) {
-                    return cookie.getValue();
+                    String value = cookie.getValue();
+                    if (value == null || value.trim().isEmpty()) {
+                        return null;
+                    }
+                    return value;
                 }
             }
         }
@@ -50,7 +54,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // FALLBACK: Leer de header Authorization (compatibilidad con clientes legacy)
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer")) {
-            return header.substring(7);
+            String value = header.substring(7).trim();
+            if (value.isEmpty()) {
+                return null;
+            }
+            return value;
         }
 
         return null;
