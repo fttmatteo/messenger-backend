@@ -60,6 +60,29 @@ public class AuthenticationService {
         return response;
     }
 
+    public boolean validateToken(String token) {
+        return authenticationPort.validateToken(token);
+    }
+
+    public String extractUsername(String token) {
+        return authenticationPort.extractUsername(token);
+    }
+
+    public String extractRole(String token) {
+        return authenticationPort.extractRole(token);
+    }
+
+    /**
+     * Genera un token de corta duración para WebSocket.
+     */
+    public String generateWsToken(String username, String role) {
+        // Obtenemos el empleado para tener su ID (opcional pero útil)
+        Employee employee = employeePort.findByDocument(Long.parseLong(username));
+        Long userId = (employee != null) ? employee.getIdEmployee() : null;
+
+        return authenticationPort.generateShortLivedToken(username, role, userId, 60000); // 60 segundos
+    }
+
     private boolean isPasswordEncoded(String storedPassword) {
         if (storedPassword == null) {
             return false;

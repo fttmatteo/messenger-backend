@@ -129,6 +129,32 @@ public class AuthController {
     }
 
     /**
+     * Genera un token de corta duración para la conexión inicial de WebSocket.
+     * Útil para navegadores (como Safari Mobile) que no envían cookies en el
+     * handshake.
+     */
+    @PostMapping("/ws-token")
+    @AuditableAction(action = "WS_TOKEN_GEN", description = "Generación de token temporal para WebSocket")
+    public ResponseEntity<app.domain.model.auth.WsTokenResponse> getWsToken(HttpServletRequest request) {
+        // El usuario ya debe estar autenticado por cookie para llegar aquí
+        String accessToken = extractTokenFromCookie(request, "accessToken");
+        if (accessToken == null || !loginUseCase.validateToken(accessToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String username = loginUseCase.extractUsername(accessToken);
+        String role = loginUseCase.extractRole(accessToken);
+        // Podemos extraer el ID si es necesario, por ahora enviamos null si no lo
+        // tenemos fácil
+        // O mejor: el JwtAdapter ya sabe extraerlo si ajustamos la interfaz o usamos
+        // claims directos
+
+        String wsToken = loginUseCase.generateWsToken(username, role);
+
+        return ResponseEntity.ok(new app.domain.model.auth.WsTokenResponse(wsToken));
+    }
+
+    /**
      * Renueva el token de acceso utilizando un refresh token de cookie.
      */
     @PostMapping("/refresh")

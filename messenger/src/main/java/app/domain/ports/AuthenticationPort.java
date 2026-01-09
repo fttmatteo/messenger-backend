@@ -37,4 +37,10 @@ public interface AuthenticationPort {
      * Valida la integridad de un refresh token.
      */
     boolean validateRefreshToken(String token);
+
+    /**
+     * Genera un token de acceso de muy corta duración (ej. para WebSocket
+     * handshake).
+     */
+    String generateShortLivedToken(String username, String role, Long userId, long durationMs);
 }

@@ -20,7 +20,7 @@ public class LoginUseCase {
 
     @Autowired
     private AuthenticationService authenticationService;
-    
+
     @Autowired
     private EmployeePort employeePort;
 
@@ -37,6 +37,22 @@ public class LoginUseCase {
         }
     }
 
+    public boolean validateToken(String token) {
+        return authenticationService.validateToken(token);
+    }
+
+    public String extractUsername(String token) {
+        return authenticationService.extractUsername(token);
+    }
+
+    public String extractRole(String token) {
+        return authenticationService.extractRole(token);
+    }
+
+    public String generateWsToken(String username, String role) {
+        return authenticationService.generateWsToken(username, role);
+    }
+
     /**
      * Autentica a un usuario y devuelve tokens + información del empleado.
      */
@@ -45,25 +61,23 @@ public class LoginUseCase {
         // Obtener datos del empleado
         Employee employee = employeePort.findByDocument(credentials.getDocument());
         if (employee == null) {
-            logger.warn("Login fallido para documento: {} - Usuario no encontrado", 
-                credentials.getDocument());
+            logger.warn("Login fallido para documento: {} - Usuario no encontrado",
+                    credentials.getDocument());
             throw new app.domain.exception.BusinessException("Usuario no encontrado");
         }
-        
+
         try {
             // Autenticar y obtener tokens
             TokenResponse response = authenticationService.authenticate(credentials);
-            
 
-            
             return new LoginResult(response, employee);
         } catch (app.domain.exception.BusinessException e) {
-            logger.warn("Login fallido para documento: {} - Razón: {}", 
-                credentials.getDocument(), e.getMessage());
+            logger.warn("Login fallido para documento: {} - Razón: {}",
+                    credentials.getDocument(), e.getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("Error inesperado durante login para documento: {}", 
-                credentials.getDocument(), e);
+            logger.error("Error inesperado durante login para documento: {}",
+                    credentials.getDocument(), e);
             throw new app.domain.exception.BusinessException("Error durante autenticación: " + e.getMessage());
         }
     }

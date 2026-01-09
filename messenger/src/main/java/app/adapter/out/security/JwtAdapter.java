@@ -102,20 +102,23 @@ public class JwtAdapter implements AuthenticationPort {
         return claims.get("role", String.class);
     }
 
-    private String generateToken(String document, String role, Long userId) {
+    @Override
+    public String generateShortLivedToken(String username, String role, Long userId, long durationMs) {
         Date now = new Date();
-        Date expiration = new Date(now.getTime() + expirationTime);
+        Date expiration = new Date(now.getTime() + durationMs);
 
-        String token = Jwts.builder()
-                .subject(document)
+        return Jwts.builder()
+                .subject(username)
                 .claim("role", role)
                 .claim("id", userId)
                 .issuedAt(now)
                 .expiration(expiration)
                 .signWith(secretKey)
                 .compact();
+    }
 
-        return token;
+    private String generateToken(String document, String role, Long userId) {
+        return generateShortLivedToken(document, role, userId, expirationTime);
     }
 
     /**
