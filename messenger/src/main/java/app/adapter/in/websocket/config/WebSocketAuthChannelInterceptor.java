@@ -43,12 +43,22 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
         if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
+            // 1. Verificar si ya está autenticado por el Handshake
+            // (JwtAuthenticationFilter)
+            if (accessor.getUser() != null) {
+                logger.debug("Conexión WebSocket ya autenticada vía Principal para usuario: {}",
+                        accessor.getUser().getName());
+                return message;
+            }
+
+            // 2. Intentar extraer token de headers o atributos de sesión
             String token = extractToken(accessor);
             boolean isProduction = activeProfiles != null && activeProfiles.contains("prod");
 
             if (token == null) {
                 if (isProduction) {
-                    logger.warn("WebSocket connection attempt without JWT token in PRODUCTION - rejecting");
+                    logger.warn("WebSocket connection attempt without JWT token in PRODUCTION - rejecting. " +
+                            "Session ID: {}", accessor.getSessionId());
                     throw new IllegalArgumentException("Token JWT requerido para conexión WebSocket");
                 } else {
                     logger.warn("WebSocket connection without JWT token - allowed in development");
@@ -57,7 +67,8 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
             }
 
             if (!jwtAdapter.validateToken(token)) {
-                logger.warn("Conexión WebSocket rechazada - Token JWT inválido o expirado");
+                logger.warn("Conexión WebSocket rechazada - Token JWT inválido o expirado. Token hash: {}",
+                        token.hashCode());
                 throw new IllegalArgumentException("Token JWT inválido o expirado");
             }
 
@@ -76,16 +87,28 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
     }
 
     /**
-     * Extrae token JWT desde headers STOMP.
-     * Prioridad: Authorization -> Cookie: accessToken=...
+     * Extrae token JWT desde headers STOMP o atributos de sesión.
+     * Prioridad: Authorization Header -> Session Attribute (Cookies) -> Native
+     * Cookie Header
      */
     private String extractToken(StompHeaderAccessor accessor) {
+        // 1. Authorization Header (STOMP native)
         String authHeader = accessor.getFirstNativeHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7).trim();
-            return token.isEmpty() ? null : token;
+            if (!token.isEmpty())
+                return token;
         }
 
+        // 2. Atributos de sesión (donde CookieHandshakeInterceptor puso el token)
+        if (accessor.getSessionAttributes() != null) {
+            String token = (String) accessor.getSessionAttributes().get("accessToken");
+            if (token != null && !token.isEmpty())
+                return token;
+        }
+
+        // 3. Native Cookie Header (poco común en browsers, pero posible en otros
+        // clientes)
         String cookieHeader = accessor.getFirstNativeHeader("Cookie");
         if (cookieHeader != null) {
             return Arrays.stream(cookieHeader.split(";"))

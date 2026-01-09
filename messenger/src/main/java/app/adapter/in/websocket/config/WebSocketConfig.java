@@ -53,8 +53,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
         registry.addEndpoint("/ws/tracking")
                 .setAllowedOriginPatterns(origins)
+                .addInterceptors(new CookieHandshakeInterceptor())
                 .withSockJS();
         registry.addEndpoint("/ws/tracking")
-                .setAllowedOriginPatterns(origins);
+                .setAllowedOriginPatterns(origins)
+                .addInterceptors(new CookieHandshakeInterceptor());
     }
 }
