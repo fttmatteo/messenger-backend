@@ -1,4 +1,3 @@
-version: '3.8'
 # ORQUESTACIÓN DE SERVICIOS (Docker Compose)
 # Define la infraestructura local necesaria para correr la aplicación completa.
 #
@@ -14,21 +13,18 @@ services:
     container_name: messenger-backend
     ports:
       - "8080:8080"
-    # Cargar variables desde el archivo .env en el subdirectorio
+    # Cargar variables desde el archivo .env
     env_file:
-      - ./messenger/.env
+      - ./.env
     environment:
-      # Conectar a servicios definidos en este mismo archivo
-      - SPRING_PROFILES_ACTIVE=prod
+      # Sobreescribir hosts para conectar a servicios de Docker
       - DB_HOST=messenger-db
-      - DB_PORT=3306
       - REDIS_HOST=messenger-redis
-      - REDIS_PORT=6379
-      # Mapear credenciales dentro del contenedor
+      # Credenciales de Google Cloud dentro del contenedor
       - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
     volumes:
-      # Montar credenciales de Google Cloud desde el host (path en .env)
-      - ${GOOGLE_APPLICATION_CREDENTIALS}:/app/credentials.json:ro
+      # Montar credenciales de Google Cloud (ruta definida en .env)
+      - "${GOOGLE_APPLICATION_CREDENTIALS}:/app/credentials.json:ro"
     depends_on:
       messenger-db:
         condition: service_healthy
@@ -36,9 +32,7 @@ services:
         condition: service_healthy
     networks:
       - messenger-network
-    # Reiniciar automáticamente si falla
     restart: unless-stopped
-    # Healthcheck para asegurar que Spring Boot responda
     healthcheck:
       test: "curl --fail --silent http://localhost:8080/actuator/health | grep UP || exit 1"
       interval: 30s
@@ -51,9 +45,8 @@ services:
     image: mysql:8.0
     container_name: messenger-db
     env_file:
-      - ./messenger/.env
+      - ./.env
     environment:
-      # Usar la misma password definida en .env para el usuario root
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
     ports:
@@ -68,6 +61,23 @@ services:
       retries: 10
     restart: unless-stopped
 
+  # PHPMYADMIN: Interfaz web para MySQL
+  # Acceder en: http://localhost:8081
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: messenger-phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: messenger-db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      - messenger-db
+    networks:
+      - messenger-network
+    restart: unless-stopped
+
   # CACHE: Redis
   messenger-redis:
     image: redis:alpine
@@ -76,11 +86,11 @@ services:
       - "6379:6379"
     command: redis-server --requirepass ${REDIS_PASSWORD}
     env_file:
-      - ./messenger/.env
+      - ./.env
     networks:
       - messenger-network
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -89,6 +99,7 @@ services:
 # VOLÚMENES Y REDES
 volumes:
   mysql_data:
+
 
 networks:
   messenger-network:

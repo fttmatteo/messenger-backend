@@ -33,6 +33,7 @@ replay_pid*
 # ============================================
 # Archivos Sensibles - NUNCA subir
 # ============================================
+
 .env
 .env.local
 .env.*.local
