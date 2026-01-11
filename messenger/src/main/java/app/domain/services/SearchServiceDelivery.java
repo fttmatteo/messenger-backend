@@ -64,18 +64,20 @@ public class SearchServiceDelivery {
     }
 
     /**
-     * Retorna todos los servicios con paginación.
+     * Retorna todos los servicios con paginación y filtro de estado.
      */
-    public Page<ServiceDelivery> findAllPaginated(String keyword, Boolean deleted, Pageable pageable) {
-        return serviceDeliveryPort.findAllPaginated(keyword, deleted, pageable);
+    public Page<ServiceDelivery> findAllPaginated(String keyword, Boolean deleted,
+            List<app.domain.model.enums.Status> statuses, Pageable pageable) {
+        return serviceDeliveryPort.findAllPaginated(keyword, deleted, statuses, pageable);
     }
 
     /**
-     * Retorna servicios de un mensajero específico con paginación.
+     * Retorna servicios de un mensajero específico con paginación y filtro de
+     * estado.
      */
     public Page<ServiceDelivery> findByMessengerPaginated(Long messengerId, String keyword, Boolean deleted,
-            Pageable pageable) {
-        return serviceDeliveryPort.findByMessengerPaginated(messengerId, keyword, deleted, pageable);
+            List<app.domain.model.enums.Status> statuses, Pageable pageable) {
+        return serviceDeliveryPort.findByMessengerPaginated(messengerId, keyword, deleted, statuses, pageable);
     }
 
     /**

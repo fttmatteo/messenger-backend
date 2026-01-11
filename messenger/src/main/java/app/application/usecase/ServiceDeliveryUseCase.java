@@ -211,25 +211,26 @@ public class ServiceDeliveryUseCase {
     }
 
     /**
-     * Recupera todos los servicios con paginación y ordenamiento.
+     * Recupera todos los servicios con paginación, ordenamiento y filtro de estado.
      */
     @Transactional(readOnly = true)
     public Page<ServiceDelivery> findAllPaginated(int page, int size, String sortBy, String sortDirection,
-            String search) {
+            String search, List<Status> statuses) {
         Sort.Direction direction = sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
-        return searchService.findAllPaginated(search, false, pageable);
+        return searchService.findAllPaginated(search, false, statuses, pageable);
     }
 
     /**
-     * Recupera servicios de un mensajero específico con paginación.
+     * Recupera servicios de un mensajero específico con paginación, ordenamiento y
+     * filtro de estado.
      */
     @Transactional(readOnly = true)
     public Page<ServiceDelivery> findByMessengerPaginated(Long messengerId, int page, int size, String sortBy,
-            String sortDirection, String search) {
+            String sortDirection, String search, List<Status> statuses) {
         Sort.Direction direction = sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
-        return searchService.findByMessengerPaginated(messengerId, search, false, pageable);
+        return searchService.findByMessengerPaginated(messengerId, search, false, statuses, pageable);
     }
 
     /**

@@ -118,10 +118,13 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
      * Busca todos los servicios de entrega paginados.
      */
     @Override
-    public Page<ServiceDelivery> findAllPaginated(String keyword, Boolean deleted, Pageable pageable) {
+    public Page<ServiceDelivery> findAllPaginated(String keyword, Boolean deleted,
+            List<app.domain.model.enums.Status> statuses, Pageable pageable) {
         Page<ServiceDeliveryEntity> entityPage;
         if (keyword != null && !keyword.trim().isEmpty()) {
-            entityPage = repository.searchAll(keyword, deleted, pageable);
+            entityPage = repository.searchAll(keyword, deleted, statuses, pageable);
+        } else if (statuses != null && !statuses.isEmpty()) {
+            entityPage = repository.findByDeletedAndCurrentStatusIn(deleted, statuses, pageable);
         } else {
             entityPage = repository.findByDeleted(deleted, pageable);
         }
@@ -133,10 +136,14 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
      */
     @Override
     public Page<ServiceDelivery> findByMessengerPaginated(Long messengerId, String keyword, Boolean deleted,
-            Pageable pageable) {
+            List<app.domain.model.enums.Status> statuses, Pageable pageable) {
         Page<ServiceDeliveryEntity> entityPage;
         if (keyword != null && !keyword.trim().isEmpty()) {
-            entityPage = repository.searchByMessenger(messengerId, keyword, deleted, pageable);
+            entityPage = repository.searchByMessenger(messengerId, keyword, deleted, statuses, pageable);
+        } else if (statuses != null && !statuses.isEmpty()) {
+            entityPage = repository.findByMessenger_IdEmployeeAndDeletedAndCurrentStatusIn(messengerId, deleted,
+                    statuses,
+                    pageable);
         } else {
             entityPage = repository.findByMessenger_IdEmployeeAndDeleted(messengerId, deleted,
                     pageable);

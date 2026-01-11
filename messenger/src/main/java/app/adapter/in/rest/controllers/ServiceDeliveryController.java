@@ -77,7 +77,6 @@ public class ServiceDeliveryController {
             @RequestParam(value = "latitude", required = false) Double latitude,
             @RequestParam(value = "longitude", required = false) Double longitude) throws Exception {
 
-
         // Validar imagen ANTES de procesarla
         try {
             fileValidationService.validateImageFile(image);
@@ -141,7 +140,6 @@ public class ServiceDeliveryController {
             @RequestParam(value = "latitude", required = false) Double latitude,
             @RequestParam(value = "longitude", required = false) Double longitude) throws Exception {
 
-
         List<File> tempFiles = new ArrayList<>();
         try {
             Employee currentUser = securityHelper.getCurrentUser();
@@ -203,7 +201,6 @@ public class ServiceDeliveryController {
     public ResponseEntity<ServiceDeliveryResponse> reassignMessenger(
             @PathVariable Long id,
             @RequestBody Map<String, Long> request) throws Exception {
-
 
         Long newMessengerId = request.get("messengerId");
         if (newMessengerId == null) {
@@ -276,6 +273,7 @@ public class ServiceDeliveryController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDirection,
+            @RequestParam(required = false) List<String> status,
             @RequestParam(required = false) String search) {
 
         // ...existing code...
@@ -284,13 +282,20 @@ public class ServiceDeliveryController {
 
         Page<ServiceDelivery> servicePage;
 
+        List<app.domain.model.enums.Status> statusEnums = null;
+        if (status != null && !status.isEmpty()) {
+            statusEnums = status.stream()
+                    .map(s -> app.domain.model.enums.Status.valueOf(s.toUpperCase()))
+                    .collect(Collectors.toList());
+        }
+
         if (currentUser.getRole() == Role.MESSENGER) {
             Long messengerId = currentUser.getIdEmployee();
             servicePage = serviceDeliveryUseCase.findByMessengerPaginated(
-                    messengerId, page, size, sortBy, sortDirection, search);
+                    messengerId, page, size, sortBy, sortDirection, search, statusEnums);
         } else {
             servicePage = serviceDeliveryUseCase.findAllPaginated(
-                    page, size, sortBy, sortDirection, search);
+                    page, size, sortBy, sortDirection, search, statusEnums);
         }
 
         Page<ServiceDeliveryResponse> responsePage = servicePage.map(responseMapper::toResponse);
