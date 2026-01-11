@@ -616,9 +616,8 @@ jobs:
 
 **Project Specific:**
 - Repository: `messenger-backend`
-- Email: valenciaardila988@icloud.com
+- Email: contacto@plak.digital
 - Author: Matteo
-- Last update: January 2026
 
 </details>
 
@@ -1232,8 +1231,7 @@ jobs:
 **Proyecto Específico:**
 - Repository: `messenger-backend`
 - Autor: Matteo
-- Email: valenciaardila988@icloud.com
-- Última actualización: Enero 2026
+- Email: contacto@plak.digital
 
 ---
 

@@ -913,8 +913,7 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 **Project Specific:**
 - Repository: `messenger-backend`
 - Author: Matteo
-- Email: valenciaardila988@icloud.com
-- Last update: January 2026
+- Email: contacto@plak.digital
 
 ---
 

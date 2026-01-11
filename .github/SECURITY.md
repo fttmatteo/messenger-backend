@@ -27,7 +27,7 @@ We take security seriously. If you discover a security vulnerability, please fol
 
 ### Do
 
-1. **Email us directly** at: **valenciaardila988@icloud.com**
+1. **Email us directly** at: **soporte@plak.digital**
 2. Include in your report:
    - Description of the vulnerability
    - Steps to reproduce (Proof of Concept)
@@ -83,7 +83,7 @@ Tomamos la seguridad seriamente. Si descubres una vulnerabilidad, por favor sigu
 
 ### SÍ haz
 
-1. **Envíanos un correo** a: **valenciaardila988@icloud.com**
+1. **Envíanos un correo** a: **soporte@plak.digital**
 2. Incluye en tu reporte:
    - Descripción de la vulnerabilidad
    - Pasos para reproducirla (Prueba de Concepto)
