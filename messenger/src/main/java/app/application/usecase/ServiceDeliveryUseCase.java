@@ -216,8 +216,9 @@ public class ServiceDeliveryUseCase {
     @Transactional(readOnly = true)
     public Page<ServiceDelivery> findAllPaginated(int page, int size, String sortBy, String sortDirection,
             String search, List<Status> statuses) {
+        String mappedSortBy = mapSortField(sortBy);
         Sort.Direction direction = sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, mappedSortBy));
         return searchService.findAllPaginated(search, false, statuses, pageable);
     }
 
@@ -228,9 +229,27 @@ public class ServiceDeliveryUseCase {
     @Transactional(readOnly = true)
     public Page<ServiceDelivery> findByMessengerPaginated(Long messengerId, int page, int size, String sortBy,
             String sortDirection, String search, List<Status> statuses) {
+        String mappedSortBy = mapSortField(sortBy);
         Sort.Direction direction = sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, mappedSortBy));
         return searchService.findByMessengerPaginated(messengerId, search, false, statuses, pageable);
+    }
+
+    /**
+     * Maps frontend sort fields to JPA entity property paths to avoid 500 Internal
+     * Server Errors.
+     */
+    private String mapSortField(String sortBy) {
+        if (sortBy == null)
+            return "createdAt";
+
+        return switch (sortBy) {
+            case "plateNumber" -> "plate.plateNumber";
+            case "dealershipName" -> "dealership.name";
+            case "messengerName" -> "messenger.fullName";
+            case "currentStatus" -> "currentStatus";
+            default -> sortBy;
+        };
     }
 
     /**
