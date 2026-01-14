@@ -186,7 +186,7 @@ messenger/
 | `local` | Local development without dependencies | MySQL Local | Mock/Disabled | 8 hours |
 | `dev` | Development with real services | MySQL | Enabled | 8 hours |
 | `test` | Automated testing (CI/CD) | MySQL (Docker) | Mock | 1 hour |
-| `prod` | Production (Cloud Run) | MySQL (SSL) | Enabled (JSON Logs) | 30 min |
+| `prod` | Production (Cloud Run) | Cloud SQL (MySQL 8) | Enabled | 30 min |
 
 ### Profile Characteristics
 
