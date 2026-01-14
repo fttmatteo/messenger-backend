@@ -544,11 +544,12 @@ gcloud run services update messenger-backend \
 
 ### Database Migration Status
 
-**Configuration:** `spring.jpa.hibernate.ddl-auto=validate`
+**Configuration:** `spring.jpa.hibernate.ddl-auto=none`
 
-- ✅ **Hibernate in validation mode** - Only validates schema, doesn't modify
-- ✅ **Existing tables** - Previously created
-- ✅ **Flyway auto-executed** - Configured to run migrations on startup (`spring.flyway.enabled=true`)
+- ✅ **Hibernate in none mode** - Does not modify schema at all
+- ✅ **Flyway enabled** - Manages all schema migrations (`spring.flyway.enabled=true`)
+- ✅ **Flyway validation** - Validates migrations on startup (`spring.flyway.validate-on-migrate=true`)
+- ✅ **Baseline on migrate** - Supports existing databases (`spring.flyway.baseline-on-migrate=true`)
 
 **For future migrations:**
 1. Create new SQL script in `src/main/resources/db/migration` (e.g., `V2__Add_Column.sql`)
@@ -1188,11 +1189,12 @@ gcloud run services update messenger-backend \
 
 ### Estado de Migraciones de Base de Datos
 
-**Configuración:** `spring.jpa.hibernate.ddl-auto=validate`
+**Configuración:** `spring.jpa.hibernate.ddl-auto=none`
 
-- ✅ **Hibernate en modo validación** - Solo valida esquema, no modifica
-- ✅ **Tablas existentes** - Creadas previamente
-- ✅ **Flyway activo** - Ejecuta migraciones automáticamente (`spring.flyway.enabled=true`)
+- ✅ **Hibernate en modo none** - No modifica el esquema en absoluto
+- ✅ **Flyway habilitado** - Gestiona todas las migraciones (`spring.flyway.enabled=true`)
+- ✅ **Validación Flyway** - Valida migraciones al iniciar (`spring.flyway.validate-on-migrate=true`)
+- ✅ **Baseline on migrate** - Soporta bases de datos existentes (`spring.flyway.baseline-on-migrate=true`)
 
 **Para futuras migraciones:**
 1. Crear nuevo script SQL en `src/main/resources/db/migration` (ej: `V2__Add_Column.sql`)
