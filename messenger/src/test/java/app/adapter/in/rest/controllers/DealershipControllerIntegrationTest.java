@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import app.support.AbstractIntegrationTest;
 
@@ -78,6 +79,7 @@ class DealershipControllerIntegrationTest extends AbstractIntegrationTest {
         request.setName("Forbidden Dealer");
 
         mockMvc.perform(post("/dealerships/createDealership")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
@@ -97,6 +99,7 @@ class DealershipControllerIntegrationTest extends AbstractIntegrationTest {
         request.setZone("Norte");
 
         mockMvc.perform(post("/dealerships/createDealership")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -118,7 +121,8 @@ class DealershipControllerIntegrationTest extends AbstractIntegrationTest {
         entityManager.persist(d);
         entityManager.flush();
 
-        mockMvc.perform(delete("/dealerships/deleteDealership/" + d.getIdDealership()))
+        mockMvc.perform(delete("/dealerships/deleteDealership/" + d.getIdDealership())
+                .with(csrf()))
                 .andExpect(status().isNoContent());
 
         DealershipEntity deleted = entityManager.find(DealershipEntity.class, d.getIdDealership());

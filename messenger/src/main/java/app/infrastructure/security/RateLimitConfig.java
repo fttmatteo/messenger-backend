@@ -17,6 +17,7 @@ import java.time.Duration;
  * (Lettuce).
  */
 @Configuration
+@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(name = "redis.enabled", havingValue = "true", matchIfMissing = true)
 public class RateLimitConfig {
 
     /**

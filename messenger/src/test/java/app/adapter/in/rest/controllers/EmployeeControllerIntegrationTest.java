@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import app.support.AbstractIntegrationTest;
 
@@ -93,6 +94,7 @@ class EmployeeControllerIntegrationTest extends AbstractIntegrationTest {
         request.setRole("MESSENGER");
 
         mockMvc.perform(post("/employees/createEmployee")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -114,7 +116,8 @@ class EmployeeControllerIntegrationTest extends AbstractIntegrationTest {
         entityManager.persist(emp);
         entityManager.flush();
 
-        mockMvc.perform(delete("/employees/deleteEmployee/" + emp.getIdEmployee()))
+        mockMvc.perform(delete("/employees/deleteEmployee/" + emp.getIdEmployee())
+                .with(csrf()))
                 .andExpect(status().isNoContent());
 
         EmployeeEntity deleted = entityManager.find(EmployeeEntity.class, emp.getIdEmployee());
