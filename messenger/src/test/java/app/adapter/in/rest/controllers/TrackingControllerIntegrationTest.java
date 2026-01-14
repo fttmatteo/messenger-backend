@@ -27,6 +27,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import app.support.AbstractIntegrationTest;
 
@@ -82,6 +83,7 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
 
                 // When/Then
                 mockMvc.perform(post("/tracking/update")
+                                .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                                 .andExpect(status().isOk())
@@ -121,6 +123,7 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
                                 .thenReturn(java.util.Optional.of(liveTracking));
 
                 mockMvc.perform(post("/tracking/update")
+                                .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                                 .andExpect(status().isOk());

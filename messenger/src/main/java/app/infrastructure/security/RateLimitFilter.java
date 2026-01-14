@@ -27,7 +27,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(RateLimitFilter.class);
 
-    @Autowired
+    @Autowired(required = false)
     private ProxyManager<byte[]> proxyManager;
 
     // Cache local para fallback en caso de que Redis no esté disponible.
@@ -60,8 +60,13 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
         Bucket bucket;
         try {
-            // Intentar obtener el bucket distribuido desde Redis.
-            bucket = proxyManager.builder().build(key.getBytes(StandardCharsets.UTF_8), () -> config);
+            // Intentar obtener el bucket distribuido desde Redis si el proxyManager está
+            // presente.
+            if (proxyManager != null) {
+                bucket = proxyManager.builder().build(key.getBytes(StandardCharsets.UTF_8), () -> config);
+            } else {
+                throw new Exception("ProxyManager no disponible");
+            }
         } catch (Exception e) {
             // FALLBACK: Si Redis falla, usar un bucket local en memoria.
             // Esto asegura ALTA DISPONIBILIDAD del servicio aunque Redis esté caído.
