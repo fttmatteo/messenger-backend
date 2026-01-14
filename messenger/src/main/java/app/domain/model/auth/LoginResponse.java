@@ -9,7 +9,7 @@ public class LoginResponse {
     private String role;
     private String message;
     private String accessToken;
-    private String refreshToken; // Fallback para Safari PWA
+    private String refreshToken;
     private UserInfo user;
 
     public LoginResponse() {

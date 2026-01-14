@@ -26,7 +26,6 @@ public class GeocodeDealershipUseCase {
      * Ejecuta la geocodificación de un concesionario y actualiza su ubicación.
      */
     public Dealership execute(Long dealershipId) {
-        // ...existing code...
         Dealership dealership = dealershipPort.findById(dealershipId);
 
         try {

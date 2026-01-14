@@ -6,7 +6,6 @@ package app.infrastructure.logging;
 public final class LogSanitizer {
 
     private LogSanitizer() {
-        // Utility class
     }
 
     public static String maskDocument(Long document) {

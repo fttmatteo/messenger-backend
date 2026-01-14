@@ -97,8 +97,6 @@ public class AuditAspect {
 
         String params = Arrays.toString(args);
 
-        // Sanitización básica: reemplazar valores de contraseñas en JSON/toString
-        // Busca patrones como "password=...", "password:...", "\"password\":\"...\""
         params = params.replaceAll("(?i)(password[:=]\\s?['\"]?)([^,}\"\\s]+)(['\"]?)", "$1****$3");
 
         if (params.length() > 200) {

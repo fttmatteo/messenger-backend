@@ -111,14 +111,6 @@ public class ArchiveServiceService implements ArchivePort {
                 if (history.getSignature() != null) {
                     archivedHistory.setSignatureId(history.getSignature().getIdSignature());
 
-                    // Also archive the signature itself if not already archived
-                    // Note: DeletedSignatureEntity uses ID as PK, so we can check/save it
-                    // Ideally we should check if it exists in deleted_signatures table, but
-                    // since we mainly archive when deleting the SERVICE, and signatures are 1-to-1
-                    // or shared...
-                    // Current logic archives the MAIN service signature below.
-                    // If history has signatures, they should also be archived.
-
                     DeletedSignatureEntity archivedSignature = new DeletedSignatureEntity();
                     archivedSignature.setIdSignature(history.getSignature().getIdSignature());
                     archivedSignature.setServiceDeliveryId(serviceId); // Link to service
@@ -127,12 +119,6 @@ public class ArchiveServiceService implements ArchivePort {
                             history.getSignature().getUploadDate() != null ? history.getSignature().getUploadDate()
                                     : LocalDateTime.now());
 
-                    // Use save to update/insert. If ID exists (e.g. was main signature too), it
-                    // will update/do nothing depending on impl.
-                    // However, JPA save might fail if ID exists and we try to insert new entity
-                    // object.
-                    // But here we set ID manually. Spring Data JPA 'save' handles merge if ID is
-                    // present.
                     deletedSignatureRepository.save(archivedSignature);
                 }
 

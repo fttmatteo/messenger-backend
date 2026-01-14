@@ -34,7 +34,6 @@ public class GlobalExceptionHandler {
                 this.environment = environment;
         }
 
-        // Constructor sin argumentos para compatibilidad con tests legacy
         public GlobalExceptionHandler() {
                 this.environment = null;
         }

@@ -32,15 +32,11 @@ public class RateLimitConfig {
 
         LettuceConnectionFactory lettuceFactory = (LettuceConnectionFactory) connectionFactory;
 
-        // Obtenemos el cliente nativo de Lettuce desde la factoría de Spring
         RedisClient redisClient = (RedisClient) lettuceFactory.getNativeClient();
 
         if (redisClient == null) {
             throw new IllegalStateException("No se pudo obtener el cliente nativo de Redis (Lettuce).");
         }
-
-        // Configuración de expiración para las llaves en Redis.
-        // Evita que Redis se llene con IPs que solo se vieron una vez.
         ClientSideConfig clientSideConfig = ClientSideConfig.getDefault()
                 .withExpirationAfterWriteStrategy(
                         ExpirationAfterWriteStrategy.basedOnTimeForRefillingBucketUpToMax(Duration.ofMinutes(1)));

@@ -26,15 +26,11 @@ public class CookieHandshakeInterceptor implements HandshakeInterceptor {
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
             WebSocketHandler wsHandler, Map<String, Object> attributes) {
 
-        logger.info("Iniciando WebSocket Handshake. URI: {} | Headers: {}", request.getURI(), request.getHeaders());
+        logger.info("Iniciando WebSocket Handshake. URI: {}", request.getURI());
 
         if (request instanceof ServletServerHttpRequest servletRequest) {
             HttpServletRequest httpRequest = servletRequest.getServletRequest();
 
-            // 1. Intentar extraer del query parameter ?token=... (Crucial para Safari
-            // Mobile)
-            // Usamos tanto el getParameter como el parseo manual del query string por si
-            // acaso
             String tokenParam = httpRequest.getParameter("token");
             if (tokenParam == null || tokenParam.trim().isEmpty()) {
                 String query = request.getURI().getQuery();
@@ -54,7 +50,6 @@ public class CookieHandshakeInterceptor implements HandshakeInterceptor {
                 logger.info("Token de acceso encontrado en query param y copiado a atributos de sesión");
             }
 
-            // 2. Intentar extraer de cookies (Soporte tradicional/Chrome)
             Cookie[] cookies = httpRequest.getCookies();
             if (cookies != null) {
                 logger.debug("Handshake: encontradas {} cookies", cookies.length);
@@ -76,6 +71,5 @@ public class CookieHandshakeInterceptor implements HandshakeInterceptor {
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response,
             WebSocketHandler wsHandler, Exception exception) {
-        // No requiere implementación
     }
 }

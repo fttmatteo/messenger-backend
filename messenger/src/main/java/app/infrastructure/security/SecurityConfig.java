@@ -43,10 +43,6 @@ public class SecurityConfig {
 
                 http
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                                // CSRF: Habilitado para navegación web (cookies).
-                                // Se ignora para:
-                                // 1. Endpoints de autenticación (/auth/**).
-                                // 2. Peticiones que usan el header Authorization (apps nativas iOS/Android).
                                 .csrf(csrf -> csrf
                                                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                                                 .ignoringRequestMatchers("/auth/**", "/api/files/**",
@@ -55,7 +51,6 @@ public class SecurityConfig {
                                                         String authHeader = request.getHeader("Authorization");
                                                         return authHeader != null && authHeader.startsWith("Bearer ");
                                                 }))
-                                // Security Headers HTTP
                                 .headers(headers -> headers
                                                 .contentTypeOptions(Customizer.withDefaults())
                                                 .xssProtection(xss -> xss
@@ -134,7 +129,6 @@ public class SecurityConfig {
                 configuration.setAllowedOrigins(origins);
                 configuration.setAllowedMethods(Arrays.asList(
                                 "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-                // Headers específicos permitidos (más seguro que "*")
                 configuration.setAllowedHeaders(Arrays.asList(
                                 "Authorization",
                                 "Content-Type",

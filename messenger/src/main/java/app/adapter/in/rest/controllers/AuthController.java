@@ -92,7 +92,7 @@ public class AuthController {
             Cookie refreshTokenCookie = createSecureCookie(
                     "refreshToken",
                     tokenResponse.getRefreshToken(),
-                    (int) (accessTokenExpiration * 24 / 1000), // Sincronizado con JWT payload (12h si expr=30m)
+                    (int) (accessTokenExpiration * 24 / 1000),
                     "/");
             response.addCookie(refreshTokenCookie);
 

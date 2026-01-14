@@ -192,7 +192,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
          * Obtiene estadísticas diarias delegando a la consulta nativa del repositorio.
          */
         LocalDateTime fromDateTime = from.atStartOfDay();
-        LocalDateTime toDateTime = to.plusDays(1).atStartOfDay(); // End of 'to' day
+        LocalDateTime toDateTime = to.plusDays(1).atStartOfDay();
 
         List<Object[]> rawResults = repository.findDailyStatsByMessenger(
                 messengerId, fromDateTime, toDateTime);

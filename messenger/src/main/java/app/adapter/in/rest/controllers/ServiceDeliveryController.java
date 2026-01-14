@@ -30,8 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.data.domain.Page;
 
 /**
@@ -47,8 +46,6 @@ import org.springframework.data.domain.Page;
 @RequestMapping("/services")
 @PreAuthorize("isAuthenticated()")
 public class ServiceDeliveryController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ServiceDeliveryController.class);
 
     @Autowired
     private ServiceDeliveryUseCase serviceDeliveryUseCase;
@@ -77,11 +74,9 @@ public class ServiceDeliveryController {
             @RequestParam(value = "latitude", required = false) Double latitude,
             @RequestParam(value = "longitude", required = false) Double longitude) throws Exception {
 
-        // Validar imagen ANTES de procesarla
         try {
             fileValidationService.validateImageFile(image);
         } catch (SecurityException e) {
-            logger.warn("Validación de archivo fallida: {}", e.getMessage());
             throw new InputsException(e.getMessage());
         }
 
@@ -154,11 +149,9 @@ public class ServiceDeliveryController {
 
             File signatureFile = null;
             if (signature != null && !signature.isEmpty()) {
-                // Validar firma antes de procesarla
                 try {
                     fileValidationService.validateSignatureFile(signature);
                 } catch (SecurityException e) {
-                    logger.warn("Validación de firma fallida: {}", e.getMessage());
                     throw new InputsException("Error en firma: " + e.getMessage());
                 }
                 signatureFile = fileHelper.convertToFile(signature);
@@ -169,11 +162,9 @@ public class ServiceDeliveryController {
             if (photos != null && !photos.isEmpty()) {
                 for (MultipartFile photo : photos) {
                     if (!photo.isEmpty()) {
-                        // Validar cada foto antes de procesarla
                         try {
                             fileValidationService.validatePhotoFile(photo);
                         } catch (SecurityException e) {
-                            logger.warn("Validación de foto fallida: {}", e.getMessage());
                             throw new InputsException("Error en foto: " + e.getMessage());
                         }
                         photoFiles.add(fileHelper.convertToFile(photo));
@@ -276,8 +267,6 @@ public class ServiceDeliveryController {
             @RequestParam(required = false) List<String> status,
             @RequestParam(required = false) String search) {
 
-        // ...existing code...
-
         Employee currentUser = securityHelper.getCurrentUser();
 
         Page<ServiceDelivery> servicePage;
@@ -325,7 +314,6 @@ public class ServiceDeliveryController {
     @GetMapping("/trash")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ServiceDeliveryResponse>> findDeleted() {
-        // ...existing code...
 
         List<ServiceDelivery> services = serviceDeliveryUseCase.findDeleted();
         List<ServiceDeliveryResponse> responses = services.stream()

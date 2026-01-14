@@ -68,7 +68,6 @@ public class GoogleCloudStorageAdapter implements StoragePort {
 
     private String uploadToGCS(File file, String subDirectory, String fileName) throws IOException {
         String objectName = subDirectory + "/" + fileName;
-        // ...existing code...
 
         String contentType = Files.probeContentType(file.toPath());
         if (contentType == null) {
@@ -152,8 +151,8 @@ public class GoogleCloudStorageAdapter implements StoragePort {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Metadata-Flavor", "Google");
-        connection.setConnectTimeout(2000); // 2 seconds
-        connection.setReadTimeout(2000); // 2 seconds
+        connection.setConnectTimeout(2000);
+        connection.setReadTimeout(2000);
 
         int responseCode = connection.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK) {
@@ -194,11 +193,9 @@ public class GoogleCloudStorageAdapter implements StoragePort {
      * Elimina un objeto del bucket.
      */
     public boolean delete(String objectName) {
-        // ...existing code...
         BlobId blobId = BlobId.of(bucketName, objectName);
         boolean deleted = storage.delete(blobId);
         if (deleted) {
-            // ...existing code...
         } else {
             logger.warn("No se pudo eliminar el objeto (posiblemente no existe)");
         }

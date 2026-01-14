@@ -119,15 +119,12 @@ public class ServiceDeliveryEntity {
         this.history = history;
     }
 
-    /** Fecha y hora de creación del servicio (auto-generada). */
     @Column(name = "created_at", nullable = true, updatable = false)
     private java.time.LocalDateTime createdAt;
 
-    /** Indica si el servicio está en la papelera (soft delete). */
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
 
-    /** Fecha y hora en que el servicio fue movido a la papelera. */
     @Column(name = "deleted_at")
     private java.time.LocalDateTime deletedAt;
 
@@ -140,7 +137,6 @@ public class ServiceDeliveryEntity {
     @Column(name = "locked_at")
     private java.time.LocalDateTime lockedAt;
 
-    /** Callback JPA para establecer la fecha de creación automáticamente. */
     @PrePersist
     protected void onCreate() {
         if (this.createdAt == null) {
