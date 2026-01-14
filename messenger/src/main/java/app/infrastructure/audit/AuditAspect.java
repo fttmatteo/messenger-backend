@@ -87,6 +87,7 @@ public class AuditAspect {
     /**
      * Extrae y formatea los argumentos del método para el log.
      * Trunca la salida si es muy larga para evitar logs excesivos.
+     * Sanitiza información sensible como contraseñas.
      */
     private String getParameters(JoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
@@ -95,6 +96,11 @@ public class AuditAspect {
         }
 
         String params = Arrays.toString(args);
+
+        // Sanitización básica: reemplazar valores de contraseñas en JSON/toString
+        // Busca patrones como "password=...", "password:...", "\"password\":\"...\""
+        params = params.replaceAll("(?i)(password[:=]\\s?['\"]?)([^,}\"\\s]+)(['\"]?)", "$1****$3");
+
         if (params.length() > 200) {
             params = params.substring(0, 200) + "...";
         }

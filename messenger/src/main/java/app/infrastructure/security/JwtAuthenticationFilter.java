@@ -43,11 +43,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String cookieNames = Arrays.stream(request.getCookies())
                     .map(Cookie::getName)
                     .collect(Collectors.joining(", "));
-            logger.info("Request a {}: Cookies recibidas: [{}]", request.getRequestURI(), cookieNames);
+            logger.debug("Request a {}: Cookies recibidas: [{}]", request.getRequestURI(), cookieNames);
         } else {
             // Solo logueamos si la ruta es protegida para no inundar logs
             if (isProtectedRoute(request)) {
-                logger.info("Request a {}: NO se recibieron cookies en una ruta protegida.", request.getRequestURI());
+                logger.debug("Request a {}: NO se recibieron cookies en una ruta protegida.", request.getRequestURI());
             }
         }
 

@@ -13,7 +13,6 @@ import app.adapter.in.rest.response.EmployeeResponse;
 import app.application.usecase.EmployeeUseCase;
 import app.domain.model.Employee;
 import app.infrastructure.audit.AuditableAction;
-import app.infrastructure.logging.LogSanitizer;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,7 +38,6 @@ public class EmployeeController {
     @PreAuthorize("hasRole('ADMIN')")
     @AuditableAction(action = "CREATE_EMPLOYEE", description = "Crear nuevo empleado")
     public ResponseEntity<EmployeeResponse> create(@Valid @RequestBody EmployeeRequest request) throws Exception {
-            LogSanitizer.maskDocument(request.getDocument());
         Employee employee = builder.build(request.getDocument(),
                 request.getFullName(),
                 request.getPhone(),
