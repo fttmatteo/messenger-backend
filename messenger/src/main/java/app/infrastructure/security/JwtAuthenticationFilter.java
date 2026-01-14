@@ -63,20 +63,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("accessToken".equals(cookie.getName())) {
-                    return cookie.getValue();
+                    String value = cookie.getValue();
+                    // Validamos preventivamente si hay múltiples cookies para quedarnos con una
+                    // válida
+                    if (value != null && !value.trim().isEmpty() && authenticationPort.validateToken(value)) {
+                        return value;
+                    }
                 }
             }
         }
 
-        // FALLBACK: Leer de header Authorization (compatibilidad con clientes legacy)
+        // FALLBACK: Leer de header Authorization
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer")) {
             String value = header.substring(7).trim();
-            if (value.isEmpty()) {
-                return null;
+            if (!value.isEmpty() && authenticationPort.validateToken(value)) {
+                logger.info("Token válido encontrado en header Authorization");
+                return value;
             }
-            logger.info("Token encontrado en header Authorization (Hash: {})", value.hashCode());
-            return value;
         }
 
         return null;
@@ -111,6 +115,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 !path.startsWith("/swagger-ui") &&
                 !path.startsWith("/v3/api-docs") &&
                 !path.equals("/settings/status-colors") &&
+                !path.equals("/actuator/health") &&
                 !path.startsWith("/ws/");
     }
 }

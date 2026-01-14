@@ -43,21 +43,18 @@ public class SecurityConfig {
 
                 http
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                                // CSRF: Deshabilitado para endpoints REST (stateless JWT), habilitado para
-                                // WebSocket
+                                // CSRF: Habilitado para navegación web (cookies).
+                                // Se ignora para:
+                                // 1. Endpoints de autenticación (/auth/**).
+                                // 2. Peticiones que usan el header Authorization (apps nativas iOS/Android).
                                 .csrf(csrf -> csrf
                                                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                                                .ignoringRequestMatchers(
-                                                                "/auth/**",
-                                                                "/api/**",
-                                                                "/services/**",
-                                                                "/employees/**",
-                                                                "/dealerships/**",
-                                                                "/tracking/**",
-                                                                "/settings/**",
-                                                                "/actuator/**",
-                                                                "/v3/api-docs/**",
-                                                                "/swagger-ui/**"))
+                                                .ignoringRequestMatchers("/auth/**", "/api/files/**",
+                                                                "/actuator/health", "/v3/api-docs/**", "/swagger-ui/**")
+                                                .ignoringRequestMatchers(request -> {
+                                                        String authHeader = request.getHeader("Authorization");
+                                                        return authHeader != null && authHeader.startsWith("Bearer ");
+                                                }))
                                 // Security Headers HTTP
                                 .headers(headers -> headers
                                                 .contentTypeOptions(Customizer.withDefaults())
