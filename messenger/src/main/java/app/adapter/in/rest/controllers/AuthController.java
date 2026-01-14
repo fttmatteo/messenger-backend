@@ -106,6 +106,7 @@ public class AuthController {
                     tokenResponse.getRole(),
                     "Login exitoso",
                     tokenResponse.getToken(), // Fallback para Safari y otros browsers
+                    tokenResponse.getRefreshToken(),
                     userInfo);
 
             return ResponseEntity.ok(loginResponse);
@@ -142,8 +143,17 @@ public class AuthController {
     @PostMapping("/ws-token")
     @AuditableAction(action = "WS_TOKEN_GEN", description = "Generación de token temporal para WebSocket")
     public ResponseEntity<app.domain.model.auth.WsTokenResponse> getWsToken(HttpServletRequest request) {
-        // El usuario ya debe estar autenticado por cookie para llegar aquí
+        // El usuario ya debe estar autenticado por cookie o header para llegar aquí
         String accessToken = extractTokenFromCookie(request, "accessToken");
+
+        // Fallback: Authorization Header (para Safari/Mobile)
+        if (accessToken == null) {
+            String header = request.getHeader("Authorization");
+            if (header != null && header.startsWith("Bearer ")) {
+                accessToken = header.substring(7);
+            }
+        }
+
         if (accessToken == null || !loginUseCase.validateToken(accessToken)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -167,12 +177,18 @@ public class AuthController {
     @AuditableAction(action = "TOKEN_REFRESH", description = "Renovación de token de acceso")
     public ResponseEntity<LoginResponse> refresh(
             HttpServletRequest request,
-            HttpServletResponse response) {
+            HttpServletResponse response,
+            @RequestBody(required = false) app.domain.model.auth.RefreshTokenRequest requestBody) {
 
         String refreshToken = extractTokenFromCookie(request, "refreshToken");
 
+        // Fallback: Si no hay cookie, intentar sacar del body
+        if (refreshToken == null && requestBody != null) {
+            refreshToken = requestBody.getRefreshToken();
+        }
+
         if (refreshToken == null) {
-            logger.warn("Intento de refresh sin token en cookie");
+            logger.warn("Intento de refresh sin token en cookie ni body");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -202,6 +218,7 @@ public class AuthController {
                 tokenResponse.getRole(),
                 "Token renovado exitosamente",
                 tokenResponse.getToken(), // Fallback
+                tokenResponse.getRefreshToken(),
                 null);
 
         return ResponseEntity.ok(loginResponse);

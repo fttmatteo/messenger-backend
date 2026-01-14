@@ -9,6 +9,7 @@ public class LoginResponse {
     private String role;
     private String message;
     private String accessToken;
+    private String refreshToken; // Fallback para Safari PWA
     private UserInfo user;
 
     public LoginResponse() {
@@ -20,10 +21,11 @@ public class LoginResponse {
         this.user = user;
     }
 
-    public LoginResponse(String role, String message, String accessToken, UserInfo user) {
+    public LoginResponse(String role, String message, String accessToken, String refreshToken, UserInfo user) {
         this.role = role;
         this.message = message;
         this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
         this.user = user;
     }
 
@@ -49,6 +51,14 @@ public class LoginResponse {
 
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     public UserInfo getUser() {
