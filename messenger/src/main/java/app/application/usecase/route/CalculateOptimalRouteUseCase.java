@@ -30,7 +30,6 @@ public class CalculateOptimalRouteUseCase {
      * Calcula la ruta óptima desde un origen visitando múltiples concesionarios.
      */
     public Route execute(Double originLat, Double originLng, List<Long> dealershipIds) {
-        // ...existing code...
 
         Location origin = new Location(originLat, originLng);
 

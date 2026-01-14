@@ -41,21 +41,17 @@ public class LoginRateLimitService {
     public int recordFailedAttempt(Long document) {
         String attemptKey = LOGIN_ATTEMPT_PREFIX + document;
         
-        // Incrementar contador de intentos
         Long attempts = redisTemplate.opsForValue().increment(attemptKey);
         
-        // Establecer expiración en 15 minutos si es el primer intento
         if (attempts == 1) {
             redisTemplate.expire(attemptKey, BLOCK_DURATION_MINUTES, TimeUnit.MINUTES);
         }
         
-        // Si se exceden los intentos, bloquear la cuenta
         if (attempts >= MAX_FAILED_ATTEMPTS) {
             String blockKey = LOGIN_BLOCK_PREFIX + document;
             redisTemplate.opsForValue().set(blockKey, "blocked", BLOCK_DURATION_MINUTES, TimeUnit.MINUTES);
         }
         
-        // Retornar intentos restantes
         return Math.max(0, MAX_FAILED_ATTEMPTS - (int)attempts.longValue());
     }
 

@@ -24,20 +24,16 @@ public class FileValidationService {
 
     private static final Logger logger = LoggerFactory.getLogger(FileValidationService.class);
 
-    // Tipos MIME permitidos
     private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of(
             "image/jpeg",
             "image/png",
             "image/webp"
     );
 
-    // Límites de tamaño
-    private static final long MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
-    private static final long MAX_SIGNATURE_SIZE = 5 * 1024 * 1024; // 5MB
-    private static final long MAX_PHOTO_SIZE = 20 * 1024 * 1024; // 20MB por foto
-
-    // Límites de dimensiones
-    private static final int MAX_IMAGE_DIMENSION = 4096; // 4096x4096
+    private static final long MAX_IMAGE_SIZE = 10 * 1024 * 1024; 
+    private static final long MAX_SIGNATURE_SIZE = 5 * 1024 * 1024; 
+    private static final long MAX_PHOTO_SIZE = 20 * 1024 * 1024; 
+    private static final int MAX_IMAGE_DIMENSION = 4096;
 
     /**
      * Valida un archivo de imagen genérico (para creación de servicios).
@@ -49,12 +45,10 @@ public class FileValidationService {
         }
 
 
-        // 1. Verificar que no esté vacío
         if (file.isEmpty()) {
             throw new SecurityException("Archivo vacío");
         }
 
-        // 2. Verificar tamaño
         if (file.getSize() > MAX_IMAGE_SIZE) {
             logger.warn("Archivo de imagen excede tamaño máximo: {} bytes",
                     file.getSize());
@@ -63,14 +57,12 @@ public class FileValidationService {
                             MAX_IMAGE_SIZE / (1024 * 1024)));
         }
 
-        // 3. Detectar MIME type REAL
         String detectedType = detectMimeType(file);
         if (!ALLOWED_IMAGE_TYPES.contains(detectedType)) {
             logger.warn("Tipo de archivo no permitido: {}", detectedType);
             throw new SecurityException("Tipo de archivo no permitido: " + detectedType);
         }
 
-        // 4. Validar que sea realmente una imagen (leer contenido)
         validateImageContent(file);
 
     }
@@ -85,7 +77,6 @@ public class FileValidationService {
         }
 
 
-        // 1. Validaciones básicas (imagen)
         if (file.isEmpty()) {
             throw new SecurityException("Archivo de firma vacío");
         }
@@ -98,14 +89,12 @@ public class FileValidationService {
                             MAX_SIGNATURE_SIZE / (1024 * 1024)));
         }
 
-        // 2. Detectar MIME type
         String detectedType = detectMimeType(file);
         if (!ALLOWED_IMAGE_TYPES.contains(detectedType)) {
             logger.warn("Tipo de firma no permitido: {}", detectedType);
             throw new SecurityException("Tipo de archivo de firma no permitido");
         }
 
-        // 3. Validar contenido de imagen
         validateImageContent(file);
 
     }
@@ -147,18 +136,14 @@ public class FileValidationService {
      */
     private String detectMimeType(MultipartFile file) throws SecurityException {
         try {
-            // Intentar detectar usando el contenido del archivo
             String contentType = file.getContentType();
 
-            // Fallback: analizar el stream si es posible
             if (contentType == null || contentType.equals("application/octet-stream")) {
-                // Intentar con magic bytes
                 byte[] bytes = new byte[12];
                 try (var is = file.getInputStream()) {
                     is.read(bytes);
                 }
 
-                // Detectar por magic bytes
                 contentType = detectByMagicBytes(bytes);
             }
 
@@ -180,19 +165,16 @@ public class FileValidationService {
         if (bytes.length < 4)
             return null;
 
-        // PNG: 89 50 4E 47
         if (bytes[0] == (byte) 0x89 && bytes[1] == 0x50 &&
                 bytes[2] == 0x4E && bytes[3] == 0x47) {
             return "image/png";
         }
 
-        // JPEG: FF D8 FF
         if (bytes[0] == (byte) 0xFF && bytes[1] == (byte) 0xD8 &&
                 bytes[2] == (byte) 0xFF) {
             return "image/jpeg";
         }
 
-        // WebP: RIFF ... WEBP
         if (bytes[0] == 0x52 && bytes[1] == 0x49 &&
                 bytes[2] == 0x46 && bytes[3] == 0x46) {
             if (bytes.length >= 12 &&
@@ -217,7 +199,6 @@ public class FileValidationService {
                 throw new SecurityException("El archivo no es una imagen válida");
             }
 
-            // Verificar dimensiones
             if (image.getWidth() > MAX_IMAGE_DIMENSION ||
                     image.getHeight() > MAX_IMAGE_DIMENSION) {
                 logger.warn("Dimensiones de imagen exceden límite: {}x{}",
@@ -227,7 +208,6 @@ public class FileValidationService {
                                 MAX_IMAGE_DIMENSION, MAX_IMAGE_DIMENSION));
             }
 
-            // Validaciones adicionales para seguridad
             validateImageDimensions(image.getWidth(), image.getHeight());
 
         } catch (SecurityException e) {
@@ -242,12 +222,10 @@ public class FileValidationService {
      * Validaciones adicionales de dimensiones de imagen.
      */
     private void validateImageDimensions(int width, int height) throws SecurityException {
-        // Rechazar imágenes muy pequeñas (posible garbage)
         if (width < 10 || height < 10) {
             throw new SecurityException("Dimensiones de imagen demasiado pequeñas");
         }
 
-        // Rechazar imágenes con ratio muy extremo (1:100+)
         double ratio = Math.max(width, height) / (double) Math.min(width, height);
         if (ratio > 100) {
             throw new SecurityException("Aspecto de imagen inválido");

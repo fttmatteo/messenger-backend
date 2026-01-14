@@ -34,7 +34,6 @@ public class TrashCleanupScheduler {
 
     @Scheduled(cron = "${app.trash.cleanup-cron:0 0 3 * * ?}")
     public void cleanupExpiredTrash() {
-        // ...existing code...
 
         LocalDateTime expirationDate = LocalDateTime.now().minusDays(retentionDays);
         List<ServiceDelivery> expiredServices = serviceDeliveryPort.findDeletedExpiredBefore(expirationDate);
@@ -43,7 +42,6 @@ public class TrashCleanupScheduler {
             return;
         }
 
-        // ...existing code...
 
         int archivedCount = 0;
         int errorCount = 0;
@@ -52,7 +50,6 @@ public class TrashCleanupScheduler {
             try {
                 archiveServiceService.archiveService(service, null, "Auto-archive after " + retentionDays + " days");
                 archivedCount++;
-                // ...existing code...
             } catch (Exception e) {
                 errorCount++;
                 logger.error("Error archivando servicio ID: {}: {}", service.getIdServiceDelivery(), e.getMessage());
@@ -60,6 +57,5 @@ public class TrashCleanupScheduler {
         }
 
         logger.info("Trash cleanup completed: {} services archived, {} errors.", archivedCount, errorCount);
-        // ...existing code...
     }
 }

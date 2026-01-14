@@ -9,6 +9,7 @@ import app.domain.model.auth.TokenResponse;
 import app.domain.model.Employee;
 import app.domain.services.AuthenticationService;
 import app.domain.ports.EmployeePort;
+import app.infrastructure.logging.LogSanitizer;
 
 /**
  * Caso de uso para login de usuarios.
@@ -58,26 +59,20 @@ public class LoginUseCase {
      */
     @app.infrastructure.audit.AuditableAction(action = "USER_LOGIN", description = "Inicio de sesión de usuario")
     public LoginResult login(AuthCredentials credentials) {
-        // Obtener datos del empleado
         Employee employee = employeePort.findByDocument(credentials.getDocument());
         if (employee == null) {
-            logger.warn("Login fallido para documento: {} - Usuario no encontrado",
-                    credentials.getDocument());
             throw new app.domain.exception.BusinessException("Usuario no encontrado");
         }
 
         try {
-            // Autenticar y obtener tokens
             TokenResponse response = authenticationService.authenticate(credentials);
 
             return new LoginResult(response, employee);
         } catch (app.domain.exception.BusinessException e) {
-            logger.warn("Login fallido para documento: {} - Razón: {}",
-                    credentials.getDocument(), e.getMessage());
             throw e;
         } catch (Exception e) {
             logger.error("Error inesperado durante login para documento: {}",
-                    credentials.getDocument(), e);
+                    LogSanitizer.maskDocument(credentials.getDocument()), e);
             throw new app.domain.exception.BusinessException("Error durante autenticación: " + e.getMessage());
         }
     }

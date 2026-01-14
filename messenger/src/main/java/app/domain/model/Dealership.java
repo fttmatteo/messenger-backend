@@ -12,7 +12,7 @@ public class Dealership {
     private String zone;
     private Double latitude;
     private Double longitude;
-    private Boolean isGeolocated = false; // Indica si las coordenadas han sido establecidas
+    private Boolean isGeolocated = false;
 
     public Long getIdDealership() {
         return idDealership;
@@ -80,8 +80,6 @@ public class Dealership {
 
     /**
      * Convierte los campos de lat/lng en un objeto Location.
-     * 
-     * @return Location o null si no está geocodificado
      */
     public Location getLocation() {
         if (latitude == null || longitude == null) {

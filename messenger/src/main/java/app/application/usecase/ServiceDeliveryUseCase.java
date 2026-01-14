@@ -65,9 +65,7 @@ public class ServiceDeliveryUseCase {
     public ServiceDelivery createServiceFromImage(File imageFile, Long dealershipId, Long messengerId, Double latitude,
             Double longitude)
             throws Exception {
-        // ...existing code...
         String extractedText = ocrPort.extractText(imageFile);
-        // ...existing code...
         String timestamp = LocalDateTime.now().format(DATE_FORMAT);
         String fileName = extractedText + "_ASSIGNED_" + timestamp;
 
@@ -80,7 +78,6 @@ public class ServiceDeliveryUseCase {
                     service.getIdServiceDelivery(), extractedText, messengerId);
             return service;
         } catch (Exception e) {
-            logger.error("Error creando servicio desde imagen: {}", e.getMessage());
             cleanupFiles(savedPath);
             throw e;
         }
@@ -93,7 +90,6 @@ public class ServiceDeliveryUseCase {
     @AuditableAction(action = "CREATE_SERVICE_MANUAL", description = "Crear servicio con placa manual")
     public ServiceDelivery createServiceWithManualPlate(File imageFile, String manualPlateNumber, Long dealershipId,
             Long messengerId, Double latitude, Double longitude) throws Exception {
-        // ...existing code...
         String timestamp = LocalDateTime.now().format(DATE_FORMAT);
         String fileName = manualPlateNumber + "_ASSIGNED_" + timestamp;
 
@@ -106,7 +102,6 @@ public class ServiceDeliveryUseCase {
                     service.getIdServiceDelivery(), manualPlateNumber, messengerId);
             return service;
         } catch (Exception e) {
-            logger.error("Error creando servicio manual: {}", e.getMessage());
             cleanupFiles(savedPath);
             throw e;
         }
@@ -126,7 +121,6 @@ public class ServiceDeliveryUseCase {
     @AuditableAction(action = "UPDATE_STATUS", description = "Actualizar estado de servicio")
     public ServiceDelivery updateStatus(Long serviceId, Status newStatus, String observation,
             Signature signature, List<Photo> photos, Long userId, Double latitude, Double longitude) throws Exception {
-        // ...existing code...
         return updateService.updateStatus(serviceId, newStatus, observation, signature, photos, userId, latitude,
                 longitude);
     }
@@ -138,7 +132,6 @@ public class ServiceDeliveryUseCase {
     public ServiceDelivery updateStatusWithFiles(Long serviceId, Status newStatus, String observation,
             File signatureFile, List<File> photoFiles, Long userId, Double latitude, Double longitude)
             throws Exception {
-        // ...existing code...
 
         ServiceDelivery service = searchService.findById(serviceId);
         String plateNumber = service.getPlate().getPlateNumber();
@@ -178,7 +171,6 @@ public class ServiceDeliveryUseCase {
                     serviceId, newStatus, userId);
             return updated;
         } catch (Exception e) {
-            logger.error("Error actualizando estado de servicio ID: {}: {}", serviceId, e.getMessage());
             cleanupFiles(savedPaths);
             throw e;
         }
@@ -265,7 +257,6 @@ public class ServiceDeliveryUseCase {
      * explícito).
      */
     public void deleteById(Long id) throws Exception {
-        // ...existing code...
         deleteService.deleteById(id);
     }
 
@@ -274,7 +265,6 @@ public class ServiceDeliveryUseCase {
      */
     @AuditableAction(action = "DELETE_SERVICE", description = "Mover servicio a papelera")
     public void deleteById(Long id, Long userId) throws Exception {
-        // ...existing code...
         deleteService.deleteById(id, userId);
     }
 
@@ -292,7 +282,6 @@ public class ServiceDeliveryUseCase {
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "RESTORE_SERVICE", description = "Restaurar servicio desde papelera")
     public ServiceDelivery restore(Long id, Long userId) throws Exception {
-        // ...existing code...
         return deleteService.restore(id, userId);
     }
 
@@ -303,7 +292,6 @@ public class ServiceDeliveryUseCase {
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "EMPTY_TRASH", description = "Vaciar papelera completamente")
     public int emptyTrash(Long userId) {
-        // ...existing code...
         return deleteService.emptyTrash();
     }
 
@@ -313,7 +301,6 @@ public class ServiceDeliveryUseCase {
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "ARCHIVE_SERVICE", description = "Archivar permanentemente un servicio de la papelera")
     public void permanentDeleteById(Long id, Long userId) throws Exception {
-        // ...existing code...
         deleteService.archiveService(id);
     }
 

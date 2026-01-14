@@ -25,7 +25,7 @@ public class NoOpLoginRateLimitService extends LoginRateLimitService {
      */
     @Override
     public int recordFailedAttempt(Long document) {
-        return 4; // Retorna 4 intentos restantes (5 - 1)
+        return 4;
     }
 
     /**
@@ -33,7 +33,6 @@ public class NoOpLoginRateLimitService extends LoginRateLimitService {
      */
     @Override
     public void clearFailedAttempts(Long document) {
-        // No-op
     }
 
     /**
@@ -41,6 +40,6 @@ public class NoOpLoginRateLimitService extends LoginRateLimitService {
      */
     @Override
     public int getRemainingAttempts(Long document) {
-        return 5; // MAX_FAILED_ATTEMPTS
+        return 5;
     }
 }

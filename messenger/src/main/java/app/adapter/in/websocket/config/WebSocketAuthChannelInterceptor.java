@@ -1,6 +1,7 @@
 package app.adapter.in.websocket.config;
 
 import app.adapter.out.security.JwtAdapter;
+import app.infrastructure.logging.LogSanitizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.Message;
@@ -43,21 +44,17 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
         if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
-            // 1. Verificar si ya está autenticado por el Handshake
-            // (JwtAuthenticationFilter)
             if (accessor.getUser() != null) {
                 logger.debug("Conexión WebSocket ya autenticada vía Principal para usuario: {}",
-                        accessor.getUser().getName());
+                        LogSanitizer.maskDocument(accessor.getUser().getName()));
                 return message;
             }
 
-            // 2. Intentar extraer token de headers o atributos de sesión
             String token = extractToken(accessor);
             boolean isProduction = activeProfiles != null && activeProfiles.contains("prod");
 
             if (token == null) {
-                logger.warn("Token no encontrado en CONNECT. Atributos: {} | Headers Nativos: {}",
-                        accessor.getSessionAttributes(), accessor.toNativeHeaderMap());
+                logger.warn("Token no encontrado en CONNECT.");
 
                 if (isProduction) {
                     logger.warn("WebSocket connection attempt without JWT token in PRODUCTION - rejecting. " +
@@ -83,7 +80,8 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
                     List.of(new SimpleGrantedAuthority("ROLE_" + role)));
 
             accessor.setUser(authentication);
-            logger.info("Conexión WebSocket exitosa para usuario: {} con rol: {}", username, role);
+            logger.info("Conexión WebSocket exitosa para usuario: {} con rol: {}", LogSanitizer.maskDocument(username),
+                    role);
         }
 
         return message;
@@ -95,7 +93,6 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
      * Cookie Header
      */
     private String extractToken(StompHeaderAccessor accessor) {
-        // 1. Authorization Header (STOMP native)
         String authHeader = accessor.getFirstNativeHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7).trim();
@@ -103,15 +100,12 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
                 return token;
         }
 
-        // 2. Atributos de sesión (donde CookieHandshakeInterceptor puso el token)
         if (accessor.getSessionAttributes() != null) {
             String token = (String) accessor.getSessionAttributes().get("accessToken");
             if (token != null && !token.isEmpty())
                 return token;
         }
 
-        // 3. Native Cookie Header (poco común en browsers, pero posible en otros
-        // clientes)
         String cookieHeader = accessor.getFirstNativeHeader("Cookie");
         if (cookieHeader != null) {
             return Arrays.stream(cookieHeader.split(";"))

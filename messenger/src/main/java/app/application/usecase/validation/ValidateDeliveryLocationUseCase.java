@@ -53,7 +53,6 @@ public class ValidateDeliveryLocationUseCase {
                             maxDistanceMeters));
         }
 
-        // ...existing code...
         return true;
     }
 

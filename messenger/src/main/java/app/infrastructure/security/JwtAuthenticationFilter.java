@@ -37,15 +37,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        // Log diagnóstico (solo nombres de cookies) para detectar duplicados en
-        // producción
         if (request.getCookies() != null) {
             String cookieNames = Arrays.stream(request.getCookies())
                     .map(Cookie::getName)
                     .collect(Collectors.joining(", "));
             logger.debug("Request a {}: Cookies recibidas: [{}]", request.getRequestURI(), cookieNames);
         } else {
-            // Solo logueamos si la ruta es protegida para no inundar logs
             if (isProtectedRoute(request)) {
                 logger.debug("Request a {}: NO se recibieron cookies en una ruta protegida.", request.getRequestURI());
             }
@@ -59,13 +56,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String extractToken(HttpServletRequest request) {
-        // PRIORIDAD 1: Intentar leer token de cookie (más seguro)
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("accessToken".equals(cookie.getName())) {
                     String value = cookie.getValue();
-                    // Validamos preventivamente si hay múltiples cookies para quedarnos con una
-                    // válida
                     if (value != null && !value.trim().isEmpty() && authenticationPort.validateToken(value)) {
                         return value;
                     }
@@ -73,7 +67,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        // FALLBACK: Leer de header Authorization
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer")) {
             String value = header.substring(7).trim();

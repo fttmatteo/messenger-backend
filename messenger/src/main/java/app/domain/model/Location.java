@@ -11,8 +11,6 @@ public class Location {
     private Double longitude;
     private LocalDateTime timestamp;
     private Double accuracy;
-
-    // Radio de la Tierra en metros
     private static final double EARTH_RADIUS_METERS = 6371000;
 
     public Location() {

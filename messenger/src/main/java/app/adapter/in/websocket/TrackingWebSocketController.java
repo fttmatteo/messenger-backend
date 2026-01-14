@@ -93,8 +93,6 @@ public class TrackingWebSocketController {
             logger.debug("Broadcast exitoso para messengerId: {}", messengerId);
         } catch (Exception e) {
             logger.error("Error procesando tracking update para messengerId {}: {}", messengerId, e.getMessage());
-            // Aún así intentar broadcast con datos básicos para que los clientes reciban
-            // algo
             LiveTrackingResponse fallbackResponse = new LiveTrackingResponse(
                     messengerId, null,
                     request.getLatitude(), request.getLongitude(),

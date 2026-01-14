@@ -65,10 +65,8 @@ public class RedisConfig {
         template.setKeySerializer(new StringRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
 
-        // Configurar ObjectMapper tolerante a cambios de schema
         ObjectMapper objectMapper = JsonMapper.builder()
                 .addModule(new JavaTimeModule())
-                // No fallar si hay campos desconocidos (compatibilidad hacia adelante)
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 .build();
 
