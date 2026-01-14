@@ -26,12 +26,6 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
     @Autowired
     private EntityManager entityManager;
 
-    /*
-     * static {
-     * TimeZone.setDefault(TimeZone.getTimeZone("America/Bogota"));
-     * }
-     */
-
     @Autowired
     private ServiceDeliveryRepository repository;
 
@@ -42,7 +36,6 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
      * por estado.
      */
     void shouldCalculateDailyStatsCorrectly() {
-        // Given
         EmployeeEntity messenger = createEmployee("999999", "Test Messenger");
         entityManager.persist(messenger);
 
@@ -52,10 +45,8 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
         PlateEntity plate = createPlate("TEST001");
         entityManager.persist(plate);
 
-        // Use fixed date to avoid any flaky behavior with midnights/timezones
         LocalDateTime fixedDate = LocalDateTime.of(2025, 12, 29, 12, 0);
 
-        // Created 4 services for this messenger on the same day
         createAndPersistService(messenger, dealership, plate, Status.ASSIGNED, fixedDate);
         createAndPersistService(messenger, dealership, plate, Status.DELIVERED, fixedDate);
         createAndPersistService(messenger, dealership, plate, Status.RETURNED, fixedDate);
@@ -63,19 +54,14 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
 
         entityManager.flush();
 
-        // When
         List<Object[]> stats = repository.findDailyStatsByMessenger(
                 messenger.getIdEmployee(),
                 fixedDate.toLocalDate().atStartOfDay(),
                 fixedDate.toLocalDate().plusDays(1).atStartOfDay());
 
-        // Then
         assertThat(stats).hasSize(1);
         Object[] dayStats = stats.get(0);
 
-        // Expected columns: date, assigned, delivered, returned, canceled, total
-        // We cast to Number because different DBs/Drivers might return Long,
-        // BigInteger, BigDecimal
         assertThat(((Number) dayStats[1]).longValue()).isEqualTo(1); // assigned
         assertThat(((Number) dayStats[2]).longValue()).isEqualTo(1); // delivered
         assertThat(((Number) dayStats[3]).longValue()).isEqualTo(1); // returned
