@@ -25,6 +25,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -94,8 +96,8 @@ class FullBusinessFlowIntegrationTest {
                 messengerRequest.setPassword("Secure@123");
 
                 MvcResult messengerResult = mockMvc.perform(post("/employees/createEmployee")
-                                .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
-                                                .user("999999").roles("ADMIN"))
+                                .with(user("999999").roles("ADMIN"))
+                                .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(messengerRequest)))
                                 .andExpect(status().isCreated())
@@ -113,8 +115,8 @@ class FullBusinessFlowIntegrationTest {
                 dealershipRequest.setZone("Centro");
 
                 MvcResult dealershipResult = mockMvc.perform(post("/dealerships/createDealership")
-                                .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
-                                                .user("999999").roles("ADMIN"))
+                                .with(user("999999").roles("ADMIN"))
+                                .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(dealershipRequest)))
                                 .andExpect(status().isCreated())
@@ -133,8 +135,8 @@ class FullBusinessFlowIntegrationTest {
                                 .param("dealershipId", dealershipId.toString())
                                 .param("messengerId", messengerId.toString())
                                 .param("manualPlateNumber", "XYZ789")
-                                .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
-                                                .user("999999").roles("ADMIN")))
+                                .with(user("999999").roles("ADMIN"))
+                                .with(csrf()))
                                 .andExpect(status().isCreated())
                                 .andExpect(jsonPath("$.plate.plateNumber", org.hamcrest.Matchers.is("XYZ789")))
                                 .andReturn();
@@ -159,15 +161,14 @@ class FullBusinessFlowIntegrationTest {
                                         request.setMethod("PUT");
                                         return request;
                                 })
-                                .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
-                                                .user("888888").roles("MESSENGER")))
+                                .with(user("888888").roles("MESSENGER"))
+                                .with(csrf()))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.currentStatus", org.hamcrest.Matchers.is("DELIVERED")));
 
                 // 6. Verify result
                 mockMvc.perform(get("/services/findByServiceId/" + serviceId)
-                                .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
-                                                .user("999999").roles("ADMIN")))
+                                .with(user("999999").roles("ADMIN")))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.history",
                                                 org.hamcrest.Matchers.hasSize(org.hamcrest.Matchers.greaterThan(0))));
