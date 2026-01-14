@@ -8,7 +8,6 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import app.domain.exception.BusinessException;
 import app.domain.model.Dealership;
 import app.domain.model.Employee;
@@ -78,7 +77,6 @@ class CreateServiceDeliveryTest {
     void shouldThrowExceptionIfPlateAlreadyExists() {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
-        // Simula que YA existe un servicio con esa placa
         when(serviceDeliveryPort.findByPlateNumber("ABC123"))
                 .thenReturn(java.util.List.of(new app.domain.model.ServiceDelivery()));
 
@@ -151,7 +149,6 @@ class CreateServiceDeliveryTest {
     void shouldNormalizePlateToUpperCase() throws Exception {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
-        // Stub for the NORMALIZED value that the service should produce
         when(platePort.findByPlateNumber("ABC123")).thenReturn(plate);
 
         app.domain.model.ServiceDelivery savedService = new app.domain.model.ServiceDelivery();

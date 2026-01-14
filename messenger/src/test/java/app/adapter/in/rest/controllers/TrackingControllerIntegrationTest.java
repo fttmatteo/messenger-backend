@@ -4,7 +4,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import app.adapter.in.rest.request.LiveTrackingRequest;
 import app.domain.model.enums.Role;
 import app.domain.model.enums.TrackingStatus;
@@ -22,13 +21,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-
 import app.support.AbstractIntegrationTest;
 
 @Transactional
@@ -60,7 +56,6 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
         @WithMockUser(roles = "MESSENGER")
         @DisplayName("POST /tracking/update should return 200 and save location")
         void shouldUpdateLocationSuccessfully() throws Exception {
-                // Create messenger first
                 EmployeeEntity messenger = new EmployeeEntity();
                 messenger.setDocument(77766655L);
                 messenger.setFullName("Messenger One");
@@ -70,7 +65,6 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
                 entityManager.persist(messenger);
                 entityManager.flush();
 
-                // Given
                 LiveTrackingRequest request = new LiveTrackingRequest();
                 request.setMessengerId(messenger.getIdEmployee());
                 request.setLatitude(4.6789);
@@ -81,7 +75,6 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
                 request.setStatus(TrackingStatus.ACTIVE);
                 request.setDeviceId("test-device");
 
-                // When/Then
                 mockMvc.perform(post("/tracking/update")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -96,7 +89,6 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("GET /tracking/messenger/{id} should return location for admin")
         void shouldGetLastLocationForAdmin() throws Exception {
-                // Create messenger first
                 EmployeeEntity messenger = new EmployeeEntity();
                 messenger.setDocument(55544433L);
                 messenger.setFullName("Messenger Two");
@@ -106,14 +98,12 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
                 entityManager.persist(messenger);
                 entityManager.flush();
 
-                // First update a location
                 LiveTrackingRequest request = new LiveTrackingRequest();
                 request.setMessengerId(messenger.getIdEmployee());
                 request.setLatitude(4.7110);
                 request.setLongitude(-74.0720);
                 request.setStatus(TrackingStatus.ACTIVE);
 
-                // Mock the port behavior since it uses NoOp in tests
                 app.domain.model.LiveTracking liveTracking = new app.domain.model.LiveTracking();
                 liveTracking.setMessengerId(messenger.getIdEmployee());
                 liveTracking.setCurrentLocation(
@@ -128,7 +118,6 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
                                 .content(objectMapper.writeValueAsString(request)))
                                 .andExpect(status().isOk());
 
-                // Then get it
                 mockMvc.perform(get("/tracking/messenger/" + messenger.getIdEmployee()))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.messengerId").value(messenger.getIdEmployee()))

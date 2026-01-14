@@ -62,11 +62,11 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
         assertThat(stats).hasSize(1);
         Object[] dayStats = stats.get(0);
 
-        assertThat(((Number) dayStats[1]).longValue()).isEqualTo(1); // assigned
-        assertThat(((Number) dayStats[2]).longValue()).isEqualTo(1); // delivered
-        assertThat(((Number) dayStats[3]).longValue()).isEqualTo(1); // returned
-        assertThat(((Number) dayStats[4]).longValue()).isEqualTo(1); // canceled
-        assertThat(((Number) dayStats[5]).longValue()).isEqualTo(4); // total
+        assertThat(((Number) dayStats[1]).longValue()).isEqualTo(1);
+        assertThat(((Number) dayStats[2]).longValue()).isEqualTo(1);
+        assertThat(((Number) dayStats[3]).longValue()).isEqualTo(1);
+        assertThat(((Number) dayStats[4]).longValue()).isEqualTo(1);
+        assertThat(((Number) dayStats[5]).longValue()).isEqualTo(4);
     }
 
     private void createAndPersistService(EmployeeEntity messenger, DealershipEntity dealership, PlateEntity plate,

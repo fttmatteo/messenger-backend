@@ -3,7 +3,6 @@ package app.messenger;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import app.adapter.in.rest.request.DealershipRequest;
 import app.adapter.in.rest.request.EmployeeRequest;
 import app.domain.model.enums.Role;
@@ -27,7 +26,6 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -60,7 +58,6 @@ class FullBusinessFlowIntegrationTest {
                                 .build();
         }
 
-        // Helper: Crear una imagen PNG válida
         private byte[] createValidPngImage(int width, int height) throws IOException {
                 BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -78,7 +75,6 @@ class FullBusinessFlowIntegrationTest {
          * 4. Verificación final de historial.
          */
         void shouldCompleteFullBusinessCycle() throws Exception {
-                // 1. Setup Admin User directly in DB to start the process
                 EmployeeEntity adminEntity = new EmployeeEntity();
                 adminEntity.setDocument(999999L);
                 adminEntity.setFullName("Master Admin");
@@ -87,7 +83,6 @@ class FullBusinessFlowIntegrationTest {
                 entityManager.persist(adminEntity);
                 entityManager.flush();
 
-                // 2. Admin creates a Messenger
                 EmployeeRequest messengerRequest = new EmployeeRequest();
                 messengerRequest.setDocument("888888");
                 messengerRequest.setFullName("John Doe Messenger");
@@ -107,7 +102,6 @@ class FullBusinessFlowIntegrationTest {
                                 .get("idEmployee")
                                 .asLong();
 
-                // 3. Admin creates a Dealership
                 DealershipRequest dealershipRequest = new DealershipRequest();
                 dealershipRequest.setName("Central Motors");
                 dealershipRequest.setAddress("Main St 456");
@@ -125,7 +119,6 @@ class FullBusinessFlowIntegrationTest {
                 Long dealershipId = objectMapper.readTree(dealershipResult.getResponse().getContentAsString())
                                 .get("idDealership").asLong();
 
-                // 4. Admin creates a Service (simulating manual entry)
                 byte[] validImageBytes = createValidPngImage(800, 600);
                 MockMultipartFile imageFile = new MockMultipartFile("image", "plate.png", "image/png",
                                 validImageBytes);
@@ -144,7 +137,6 @@ class FullBusinessFlowIntegrationTest {
                 Long serviceId = objectMapper.readTree(serviceResult.getResponse().getContentAsString())
                                 .get("idServiceDelivery").asLong();
 
-                // 5. Messenger updates status to DELIVERED
                 byte[] validSignatureBytes = createValidPngImage(200, 100);
                 byte[] validPhotoBytes = createValidPngImage(1024, 768);
                 MockMultipartFile signatureFile = new MockMultipartFile("signature", "sign.png", "image/png",
@@ -166,7 +158,6 @@ class FullBusinessFlowIntegrationTest {
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.currentStatus", org.hamcrest.Matchers.is("DELIVERED")));
 
-                // 6. Verify result
                 mockMvc.perform(get("/services/findByServiceId/" + serviceId)
                                 .with(user("999999").roles("ADMIN")))
                                 .andExpect(status().isOk())

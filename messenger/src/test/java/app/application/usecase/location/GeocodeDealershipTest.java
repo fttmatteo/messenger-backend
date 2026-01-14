@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import app.domain.model.Dealership;
 import app.domain.model.Location;
 import app.domain.ports.DealershipPort;

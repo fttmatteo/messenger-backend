@@ -205,19 +205,16 @@ class ServiceDeliveryUseCaseTest {
         @Test
         @DisplayName("Debe mapear campos de ordenamiento correctamente en paginación")
         void shouldMapSortFieldsInPagination() {
-            // Test for messengerName mapping
             serviceDeliveryUseCase.findAllPaginated(0, 10, "messengerName", "asc", null, null);
             verify(searchService).findAllPaginated(isNull(), eq(false), isNull(),
                     argThat(pageable -> pageable.getSort().getOrderFor("messenger.fullName") != null &&
                             pageable.getSort().getOrderFor("messenger.fullName").isAscending()));
 
-            // Test for plateNumber mapping
             serviceDeliveryUseCase.findByMessengerPaginated(123L, 0, 10, "plateNumber", "desc", null, null);
             verify(searchService).findByMessengerPaginated(eq(123L), isNull(), eq(false), isNull(),
                     argThat(pageable -> pageable.getSort().getOrderFor("plate.plateNumber") != null &&
                             pageable.getSort().getOrderFor("plate.plateNumber").isDescending()));
 
-            // Test for dealershipName mapping
             serviceDeliveryUseCase.findAllPaginated(0, 10, "dealershipName", "desc", null, null);
             verify(searchService).findAllPaginated(isNull(), eq(false), isNull(),
                     argThat(pageable -> pageable.getSort().getOrderFor("dealership.name") != null &&

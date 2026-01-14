@@ -13,11 +13,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.function.Supplier;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -48,7 +46,6 @@ class RateLimitFilterTest {
     @BeforeEach
     @SuppressWarnings("unchecked")
     void setUp() {
-        // Mocking the chain: proxyManager.builder().build(key, configSupplier)
         when(proxyManager.builder()).thenReturn(bucketBuilder);
         when(bucketBuilder.build(any(byte[].class), any(Supplier.class))).thenReturn(bucket);
     }

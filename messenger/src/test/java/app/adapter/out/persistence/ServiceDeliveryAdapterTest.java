@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import app.domain.model.ServiceDelivery;
 import app.domain.model.enums.Status;
 import app.infrastructure.persistence.entities.ServiceDeliveryEntity;
