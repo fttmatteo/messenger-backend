@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import app.domain.model.Dealership;
 import app.infrastructure.persistence.entities.DealershipEntity;
 import app.infrastructure.persistence.mapper.DealershipMapper;

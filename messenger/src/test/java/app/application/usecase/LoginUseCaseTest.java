@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import app.domain.model.auth.AuthCredentials;
 import app.domain.model.auth.TokenResponse;
 import app.domain.model.Employee;
@@ -37,7 +36,6 @@ class LoginUseCaseTest {
      * y retorne LoginResult con token y datos del empleado.
      */
     void shouldDelegateLogin() throws Exception {
-        // Preparar datos
         AuthCredentials credentials = new AuthCredentials();
         credentials.setDocument(123456789L);
         
@@ -50,14 +48,11 @@ class LoginUseCaseTest {
         expectedEmployee.setFullName("John Doe");
         expectedEmployee.setDocument(123456789L);
         
-        // Configurar mocks
         when(employeePort.findByDocument(123456789L)).thenReturn(expectedEmployee);
         when(authenticationService.authenticate(credentials)).thenReturn(expectedTokenResponse);
         
-        // Ejecutar
         LoginUseCase.LoginResult actualResult = loginUseCase.login(credentials);
         
-        // Verificar
         assertEquals(expectedTokenResponse, actualResult.tokenResponse);
         assertEquals(expectedEmployee, actualResult.employee);
         verify(employeePort).findByDocument(123456789L);

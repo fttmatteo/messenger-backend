@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import app.domain.model.enums.Status;
 import app.infrastructure.persistence.entities.DealershipEntity;
 import app.infrastructure.persistence.entities.EmployeeEntity;
@@ -23,7 +22,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-
 import app.support.AbstractIntegrationTest;
 
 @Transactional
@@ -41,7 +39,7 @@ class ServiceDeliveryControllerIntegrationTest extends AbstractIntegrationTest {
     /*
      * static {
      * TimeZone.setDefault(TimeZone.getTimeZone("America/Bogota"));
-     * }
+     * 
      */
 
     @BeforeEach
@@ -54,13 +52,12 @@ class ServiceDeliveryControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("GET /services/stats/daily should return 200 and correct JSON structure")
-    @WithMockUser // Simulates an authenticated user
+    @WithMockUser
     /**
      * Verifica que el endpoint de estadísticas diarias retorne datos correctos y
      * completos.
      */
     void shouldReturnDailyStats() throws Exception {
-        // Given: Prepare data in H2
         EmployeeEntity messenger = createEmployee("888888", "Integration Messenger");
         entityManager.persist(messenger);
 
@@ -70,7 +67,6 @@ class ServiceDeliveryControllerIntegrationTest extends AbstractIntegrationTest {
         PlateEntity plate = createPlate("INT001");
         entityManager.persist(plate);
 
-        // Use fixed date to avoid any flaky behavior with midnights/timezones
         LocalDateTime fixedNow = LocalDateTime.of(2025, 12, 29, 12, 0);
         createAndPersistService(messenger, dealership, plate, Status.DELIVERED, fixedNow);
 
@@ -78,7 +74,6 @@ class ServiceDeliveryControllerIntegrationTest extends AbstractIntegrationTest {
 
         String dateStr = fixedNow.toLocalDate().toString();
 
-        // When/Then: Call API
         mockMvc.perform(get("/services/stats/daily")
                 .param("messengerId", messenger.getIdEmployee().toString())
                 .param("from", dateStr)
@@ -101,7 +96,7 @@ class ServiceDeliveryControllerIntegrationTest extends AbstractIntegrationTest {
                 .param("messengerId", "1")
                 .param("from", dateStr)
                 .param("to", dateStr))
-                .andExpect(status().isUnauthorized()); // Or 403 depending on security config
+                .andExpect(status().isUnauthorized());
     }
 
     private void createAndPersistService(EmployeeEntity messenger, DealershipEntity dealership, PlateEntity plate,

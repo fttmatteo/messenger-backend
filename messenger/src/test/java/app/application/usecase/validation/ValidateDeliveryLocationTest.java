@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
-
 import app.domain.exception.GeolocationException;
 import app.domain.model.Dealership;
 import app.domain.model.Location;
@@ -30,7 +29,6 @@ class ValidateDeliveryLocationUseCaseTest {
 
     @BeforeEach
     void setUp() {
-        // Set max distance to 200 meters using ReflectionTestUtils since it's @Value
         ReflectionTestUtils.setField(validateDeliveryLocation, "maxDistanceMeters", 200.0);
     }
 
@@ -62,7 +60,6 @@ class ValidateDeliveryLocationUseCaseTest {
         d.setLongitude(-72.0);
         when(dealershipPort.findById(1L)).thenReturn(d);
 
-        // Same location -> distance 0
         boolean result = validateDeliveryLocation.execute(new Location(4.0, -72.0), 1L);
 
         assertTrue(result);
@@ -82,7 +79,6 @@ class ValidateDeliveryLocationUseCaseTest {
         d.setName("Dealership 1");
         when(dealershipPort.findById(1L)).thenReturn(d);
 
-        // Far location
         Location deliveryLoc = new Location(5.0, -73.0);
 
         assertThrows(GeolocationException.class, () -> validateDeliveryLocation.execute(deliveryLoc, 1L));

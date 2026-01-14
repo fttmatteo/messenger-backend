@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
-
 import app.domain.model.Dealership;
 import app.domain.model.Location;
 import app.domain.model.Route;
@@ -63,7 +62,7 @@ class CalculateOptimalRouteUseCaseTest {
      * Verifica validación de destinos geolocalizados antes de calcular ruta.
      */
     void shouldThrowExceptionIfNoValidDestinations() {
-        Dealership d1 = new Dealership(); // Not geolocated
+        Dealership d1 = new Dealership();
         d1.setIsGeolocated(false);
 
         when(dealershipPort.findById(1L)).thenReturn(d1);

@@ -18,11 +18,9 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.Transport;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -54,7 +52,6 @@ class TrackingWebSocketTest {
     @Test
     @DisplayName("Should successfully connect to WebSocket and subscribe to tracking topic")
     void shouldConnectAndSubscribeSuccessfully() throws Exception {
-        // Generate token for a test messenger
         app.domain.model.auth.AuthCredentials credentials = new app.domain.model.auth.AuthCredentials();
         credentials.setDocument(12345678L);
         String token = jwtAdapter.authenticate(credentials, "MESSENGER", 1L).getToken();
@@ -71,33 +68,26 @@ class TrackingWebSocketTest {
                 })
                 .get(10, TimeUnit.SECONDS);
 
-        // Verify connection
         assertTrue(session.isConnected(), "WebSocket session should be connected");
 
-        // Subscribe to topic (verify subscription doesn't throw)
         StompSession.Subscription subscription = session.subscribe("/topic/tracking/all",
                 new StompSessionHandlerAdapter() {
                 });
         assertNotNull(subscription, "Subscription should be created");
 
-        // Clean up
         session.disconnect();
     }
 
     @Test
     @DisplayName("Should successfully connect to WebSocket using a cookie")
     void shouldConnectWithCookieSuccessfully() throws Exception {
-        // Generate token
         app.domain.model.auth.AuthCredentials credentials = new app.domain.model.auth.AuthCredentials();
         credentials.setDocument(87654321L);
         String token = jwtAdapter.authenticate(credentials, "MESSENGER", 2L).getToken();
 
-        // Simulate cookie in HTTP headers (used during handshake)
         WebSocketHttpHeaders httpHeaders = new WebSocketHttpHeaders();
         httpHeaders.add("Cookie", "accessToken=" + token);
 
-        // Stomp headers don't need the token because CookieHandshakeInterceptor will
-        // extract it
         StompHeaders stompHeaders = new StompHeaders();
 
         String url = "ws://localhost:" + port + "/ws/tracking";
@@ -106,22 +96,18 @@ class TrackingWebSocketTest {
                 })
                 .get(10, TimeUnit.SECONDS);
 
-        // Verify connection
         assertTrue(session.isConnected(), "WebSocket session should be connected via cookie");
 
-        // Clean up
         session.disconnect();
     }
 
     @Test
     @DisplayName("Should successfully connect with WS token obtained from endpoint")
     void shouldConnectWithWsTokenFromEndpointSuccessfully() throws Exception {
-        // 1. Generate a normal session token for a messenger
         app.domain.model.auth.AuthCredentials credentials = new app.domain.model.auth.AuthCredentials();
         credentials.setDocument(55554444L);
         String sessionToken = jwtAdapter.authenticate(credentials, "MESSENGER", 3L).getToken();
 
-        // 2. Request a WS Token from the endpoint using the session cookie
         org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
         headers.add("Cookie", "accessToken=" + sessionToken);
         org.springframework.http.HttpEntity<Void> entity = new org.springframework.http.HttpEntity<>(headers);
@@ -134,7 +120,6 @@ class TrackingWebSocketTest {
         String wsToken = response.getBody().getWsToken();
         assertNotNull(wsToken);
 
-        // 3. Connect to WebSocket using the obtained short-lived token
         WebSocketHttpHeaders wsHttpHeaders = new WebSocketHttpHeaders();
         wsHttpHeaders.add("Authorization", "Bearer " + wsToken);
         StompHeaders stompHeaders = new StompHeaders();
@@ -153,16 +138,13 @@ class TrackingWebSocketTest {
     @Test
     @DisplayName("Should successfully connect with WS token in query parameter")
     void shouldConnectWithWsTokenInQueryParamSuccessfully() throws Exception {
-        // 1. Generate a WS Token
         app.domain.model.auth.AuthCredentials credentials = new app.domain.model.auth.AuthCredentials();
         credentials.setDocument(11223344L);
         String wsToken = jwtAdapter.authenticate(credentials, "MESSENGER", 4L).getToken();
 
-        // 2. Connect to WebSocket using the token in the URL query parameter
         WebSocketHttpHeaders wsHttpHeaders = new WebSocketHttpHeaders();
         StompHeaders stompHeaders = new StompHeaders();
 
-        // El token va en la URL, simulando el fix de Safari
         String url = "ws://localhost:" + port + "/ws/tracking?token=" + wsToken;
 
         StompSession session = stompClient

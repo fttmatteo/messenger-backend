@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import app.domain.model.ServiceDelivery;
 import app.domain.model.enums.Status;
 import app.infrastructure.persistence.entities.ServiceDeliveryEntity;
@@ -87,5 +86,58 @@ class ServiceDeliveryAdapterTest {
 
         assertEquals(2, all.size());
         verify(repository).findAll();
+    }
+
+    @Test
+    @DisplayName("Debe retornar servicios paginados correctamente")
+    /**
+     * Verifica que findAllPaginated delegue correctamente al repositorio
+     * y mapee los resultados.
+     */
+    void shouldFindAllPaginated() {
+        ServiceDeliveryEntity entity = new ServiceDeliveryEntity();
+        ServiceDelivery domain = new ServiceDelivery();
+
+        org.springframework.data.domain.Page<ServiceDeliveryEntity> entityPage = new org.springframework.data.domain.PageImpl<>(
+                Arrays.asList(entity));
+
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(0, 10);
+
+        when(repository.findByDeleted(false, pageable)).thenReturn(entityPage);
+        when(mapper.toDomain(entity)).thenReturn(domain);
+
+        org.springframework.data.domain.Page<ServiceDelivery> result = serviceDeliveryAdapter.findAllPaginated(null,
+                false, null, pageable);
+
+        assertEquals(1, result.getContent().size());
+        verify(repository).findByDeleted(false, pageable);
+        verify(mapper).toDomain(entity);
+    }
+
+    @Test
+    @DisplayName("Debe retornar servicios paginados por mensajero")
+    /**
+     * Verifica que findByMessengerPaginated delegue correctamente al repositorio.
+     */
+    void shouldFindByMessengerPaginated() {
+        Long messengerId = 1L;
+        ServiceDeliveryEntity entity = new ServiceDeliveryEntity();
+        ServiceDelivery domain = new ServiceDelivery();
+
+        org.springframework.data.domain.Page<ServiceDeliveryEntity> entityPage = new org.springframework.data.domain.PageImpl<>(
+                Arrays.asList(entity));
+
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(0, 10);
+
+        when(repository.findByMessenger_IdEmployeeAndDeleted(messengerId, false, pageable))
+                .thenReturn(entityPage);
+        when(mapper.toDomain(entity)).thenReturn(domain);
+
+        org.springframework.data.domain.Page<ServiceDelivery> result = serviceDeliveryAdapter
+                .findByMessengerPaginated(messengerId, null, false, null, pageable);
+
+        assertEquals(1, result.getContent().size());
+        verify(repository).findByMessenger_IdEmployeeAndDeleted(messengerId, false, pageable);
+        verify(mapper).toDomain(entity);
     }
 }

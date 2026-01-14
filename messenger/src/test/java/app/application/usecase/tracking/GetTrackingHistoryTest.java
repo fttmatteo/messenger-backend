@@ -2,7 +2,6 @@ package app.application.usecase.tracking;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
-
 import app.domain.model.TrackingHistory;
 import app.domain.ports.TrackingPort;
 import java.time.LocalDate;

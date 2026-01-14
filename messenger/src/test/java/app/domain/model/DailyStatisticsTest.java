@@ -15,21 +15,18 @@ class DailyStatisticsTest {
      * usando java.sql.Date.
      */
     void shouldCreateFromRawSqlDate() {
-        // Given
         java.sql.Date sqlDate = java.sql.Date.valueOf("2023-10-05");
         Object[] row = {
                 sqlDate,
-                10L, // assigned
-                5L, // delivered
-                2L, // returned
-                1L, // canceled
-                18L // total
+                10L,
+                5L,
+                2L,
+                1L,
+                18L
         };
 
-        // When
         DailyStatistics stats = DailyStatistics.fromRaw(row);
 
-        // Then
         assertEquals(LocalDate.of(2023, 10, 5), stats.date());
         assertEquals(10L, stats.assigned());
         assertEquals(5L, stats.delivered());
@@ -45,26 +42,23 @@ class DailyStatisticsTest {
      * numéricos.
      */
     void shouldCreateFromRawLocalDate() {
-        // Given
         LocalDate localDate = LocalDate.of(2023, 10, 5);
         Object[] row = {
                 localDate,
-                10, // Integer
-                5, // Integer
-                2L, // Long
-                1.0, // Double - Number
+                10,
+                5,
+                2L,
+                1.0,
                 18L
         };
 
-        // When
         DailyStatistics stats = DailyStatistics.fromRaw(row);
 
-        // Then
         assertEquals(LocalDate.of(2023, 10, 5), stats.date());
-        assertEquals(10L, stats.assigned()); // Checking conversion from Integer
+        assertEquals(10L, stats.assigned());
         assertEquals(5L, stats.delivered());
         assertEquals(2L, stats.returned());
-        assertEquals(1L, stats.canceled()); // Checking conversion from Double
+        assertEquals(1L, stats.canceled());
         assertEquals(18L, stats.total());
     }
 }

@@ -3,7 +3,6 @@ package app.adapter.in.rest.controllers;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import app.domain.model.enums.Role;
 import app.infrastructure.persistence.entities.DealershipEntity;
 import app.infrastructure.persistence.entities.EmployeeEntity;
@@ -22,12 +21,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-
 import app.support.AbstractIntegrationTest;
 
 @Transactional
@@ -54,7 +50,6 @@ class MonitoringControllerIntegrationTest extends AbstractIntegrationTest {
     @WithMockUser(roles = "ADMIN")
     @DisplayName("GET /monitoring/messenger/{id}/activity should return summary and timeline")
     void shouldReturnMessengerActivitySummary() throws Exception {
-        // Given: Create a messenger
         EmployeeEntity messenger = new EmployeeEntity();
         messenger.setDocument(99998888L);
         messenger.setFullName("Test Messenger");
@@ -63,7 +58,6 @@ class MonitoringControllerIntegrationTest extends AbstractIntegrationTest {
         messenger.setPhone("3000000000");
         entityManager.persist(messenger);
 
-        // Create a dealership
         DealershipEntity dealership = new DealershipEntity();
         dealership.setName("Dealership Monitoring Test");
         dealership.setAddress("Calle 100 # 15-20, Bogotá");
@@ -71,13 +65,11 @@ class MonitoringControllerIntegrationTest extends AbstractIntegrationTest {
         dealership.setZone("Norte");
         entityManager.persist(dealership);
 
-        // Create a plate
         PlateEntity plate = new PlateEntity();
         plate.setPlateNumber("MON123");
         plate.setPlateType(PlateType.CAR);
         entityManager.persist(plate);
 
-        // Create a service delivery
         ServiceDeliveryEntity service = new ServiceDeliveryEntity();
         service.setMessenger(messenger);
         service.setDealership(dealership);
@@ -86,7 +78,6 @@ class MonitoringControllerIntegrationTest extends AbstractIntegrationTest {
         service.setCreatedAt(LocalDateTime.now());
         entityManager.persist(service);
 
-        // Add history for today
         StatusHistoryEntity history = new StatusHistoryEntity();
         history.setServiceDelivery(service);
         history.setNewStatus(Status.DELIVERED);
@@ -96,7 +87,6 @@ class MonitoringControllerIntegrationTest extends AbstractIntegrationTest {
         history.setDeliveryLongitude(-74.0);
         entityManager.persist(history);
 
-        // Ensure bidirectional consistency for mapper
         service.getHistory().add(history);
         entityManager.merge(service);
 
@@ -104,7 +94,6 @@ class MonitoringControllerIntegrationTest extends AbstractIntegrationTest {
 
         String today = LocalDate.now().toString();
 
-        // When/Then
         mockMvc.perform(get("/monitoring/messenger/" + messenger.getIdEmployee() + "/activity")
                 .param("date", today))
                 .andExpect(status().isOk())

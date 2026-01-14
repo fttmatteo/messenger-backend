@@ -3,7 +3,6 @@ package app.domain.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
-
 import app.domain.model.Plate;
 import app.domain.ports.PlatePort;
 import org.junit.jupiter.api.DisplayName;

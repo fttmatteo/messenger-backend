@@ -30,10 +30,10 @@ class StatusHistoryTest {
     void shouldReturnNullWhenCoordinatesMissing() {
         StatusHistory history = new StatusHistory();
 
-        assertNull(history.getDeliveryLocation()); // Both null
+        assertNull(history.getDeliveryLocation());
 
         history.setDeliveryLatitude(4.0);
-        assertNull(history.getDeliveryLocation()); // Long is null
+        assertNull(history.getDeliveryLocation());
     }
 
     @Test

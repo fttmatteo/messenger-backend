@@ -2,7 +2,6 @@ package app.infrastructure.helper;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
 import app.domain.exception.UnauthorizedException;
 import app.domain.model.Employee;
 import app.domain.model.enums.Role;
@@ -19,7 +18,6 @@ import org.mockito.quality.Strictness;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-
 import java.util.Collections;
 
 @ExtendWith(MockitoExtension.class)

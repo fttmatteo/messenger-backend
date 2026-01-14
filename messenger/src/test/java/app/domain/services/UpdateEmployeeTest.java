@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import app.domain.exception.BusinessException;
 import app.domain.model.Employee;
 import app.domain.model.enums.Role;
@@ -53,7 +52,7 @@ class UpdateEmployeeTest {
      */
     void shouldUpdateFieldsAndPassword() throws Exception {
         Employee income = new Employee();
-        income.setDocument(999L); // Changes
+        income.setDocument(999L);
         income.setFullName("Pedro");
         income.setPhone("222");
         income.setRole(Role.ADMIN);

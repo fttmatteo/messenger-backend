@@ -54,7 +54,7 @@ This guide documents the complete deployment process of the Messenger backend to
 ### Accounts & Access
 
 - ✅ Google Cloud Platform account with billing enabled
-- ✅ Aiven account (free MySQL)
+- ✅ Cloud SQL instance (MySQL 8)
 - ✅ Redis Cloud account (free Redis)
 - ✅ Google Maps API Key
 - ✅ Google Cloud Storage Bucket
@@ -84,9 +84,9 @@ This guide documents the complete deployment process of the Messenger backend to
         ┌─────────────────┴─────────────────┐
         ↓                                    ↓
 ┌──────────────────┐              ┌──────────────────┐
-│  Aiven MySQL     │              │  Redis Cloud     │
-│  (Free Tier)     │              │  (Free 30MB)     │
-│  - defaultdb     │              │  - Cache/Session │
+│  Cloud SQL       │              │  Redis Cloud     │
+│  (MySQL 8)       │              │  (Free 30MB)     │
+│  - messenger     │              │  - Cache/Session │
 └──────────────────┘              └──────────────────┘
         ↓
 ┌──────────────────┐              ┌──────────────────┐
@@ -98,7 +98,7 @@ This guide documents the complete deployment process of the Messenger backend to
 **Data Flow:**
 1. Client → Cloud Run (HTTPS)
 2. Cloud Run → Secret Manager (credentials)
-3. Spring Boot → Aiven MySQL (persistent data)
+3. Spring Boot → Cloud SQL (persistent data)
 4. Spring Boot → Redis Cloud (cache/sessions)
 5. Spring Boot → Cloud Storage (files)
 6. Spring Boot → Cloud Vision (OCR)
@@ -176,33 +176,53 @@ gcloud artifacts repositories list --location=us-central1
 
 ## External Services
 
-### MySQL Database (Aiven - Free Tier)
+### MySQL Database (Cloud SQL)
 
-**Why Aiven?** Google Cloud SQL costs ~$15 USD/month. Aiven offers free MySQL with 1GB storage.
+Cloud SQL is Google's fully managed MySQL service, providing automatic backups, high availability, and seamless integration with Cloud Run.
 
 #### Steps:
 
-1. **Registration**: [aiven.io](https://aiven.io/)
-2. **Create service**:
-   - Product: **MySQL 8**
-   - Cloud Provider: **Google Cloud Platform**
-   - Region: **us-east-1** (or nearby)
-   - Plan: **Free** ✅
-3. **Get credentials**:
-   - Service URI: `mysql://avnadmin:PASSWORD@HOST:PORT/defaultdb?ssl-mode=REQUIRED`
-   - Host: `mysql-xxxxx.aivencloud.com`
-   - Port: `28433` (example)
-   - Database: `defaultdb`
-   - Username: `avnadmin`
-   - Password: (auto-generated)
+1. **Enable Cloud SQL API**:
+   ```bash
+   gcloud services enable sqladmin.googleapis.com
+   ```
 
-**Convert to JDBC format:**
+2. **Create Cloud SQL Instance**:
+   ```bash
+   gcloud sql instances create messenger-db \
+     --database-version=MYSQL_8_0 \
+     --tier=db-f1-micro \
+     --region=us-central1 \
+     --root-password=YOUR_ROOT_PASSWORD \
+     --storage-size=10GB \
+     --storage-type=SSD
+   ```
+   **Estimated time:** 5-10 minutes
+
+3. **Create Database and User**:
+   ```bash
+   # Create database
+   gcloud sql databases create messenger --instance=messenger-db
+   
+   # Create user
+   gcloud sql users create app_user \
+     --instance=messenger-db \
+     --password=YOUR_APP_PASSWORD
+   ```
+
+4. **Get Connection Name**:
+   ```bash
+   gcloud sql instances describe messenger-db --format='value(connectionName)'
+   # Output: PROJECT_ID:us-central1:messenger-db
+   ```
+
+**JDBC Connection String (for Cloud Run):**
 ```
-jdbc:mysql://mysql-xxxxx.aivencloud.com:28433/defaultdb?sslMode=REQUIRED
+jdbc:mysql:///messenger?cloudSqlInstance=PROJECT_ID:us-central1:messenger-db&socketFactory=com.google.cloud.sql.mysql.SocketFactory&user=app_user&password=YOUR_APP_PASSWORD
 ```
 
 > [!IMPORTANT]
-> Save these credentials, you'll need them in the Secrets section.
+> Cloud Run connects to Cloud SQL via Unix sockets (no IP needed). Save the connection name for the Secrets section.
 
 ### Redis Cache (Redis Cloud - Free Tier)
 
@@ -262,12 +282,12 @@ gsutil iam ch allUsers:objectViewer gs://messenger-backend-photos
 # 1. JWT Secret (generate a random long one)
 echo -n "$(openssl rand -base64 32)" | gcloud secrets create JWT_SECRET --data-file=-
 
-# 2. MySQL Database (Aiven)
-echo -n "jdbc:mysql://YOUR_AIVEN_HOST:YOUR_PORT/defaultdb?sslMode=REQUIRED" | \
+# 2. MySQL Database (Cloud SQL)
+echo -n "jdbc:mysql:///messenger?cloudSqlInstance=YOUR_PROJECT:us-central1:messenger-db&socketFactory=com.google.cloud.sql.mysql.SocketFactory" | \
   gcloud secrets create DB_URL --data-file=-
 
-echo -n "avnadmin" | gcloud secrets create DB_USERNAME --data-file=-
-echo -n "YOUR_AIVEN_PASSWORD" | gcloud secrets create DB_PASSWORD --data-file=-
+echo -n "app_user" | gcloud secrets create DB_USERNAME --data-file=-
+echo -n "YOUR_APP_PASSWORD" | gcloud secrets create DB_PASSWORD --data-file=-
 
 # 3. Redis Cache (Redis Cloud)
 echo -n "YOUR_REDIS_HOST" | gcloud secrets create REDIS_HOST --data-file=-
@@ -299,6 +319,11 @@ done
 gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
   --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
   --role="roles/storage.objectAdmin"
+
+# Grant access to Cloud SQL
+gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
+  --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
+  --role="roles/cloudsql.client"
 
 # Grant access to Cloud Vision
 gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
@@ -342,6 +367,7 @@ gcloud run deploy messenger-backend \
   --min-instances 0 \
   --max-instances 10 \
   --timeout 300 \
+  --add-cloudsql-instances YOUR_PROJECT_ID:us-central1:messenger-db \
   --set-secrets="JWT_SECRET=JWT_SECRET:latest,DB_URL=DB_URL:latest,DB_USERNAME=DB_USERNAME:latest,DB_PASSWORD=DB_PASSWORD:latest,REDIS_HOST=REDIS_HOST:latest,REDIS_PORT=REDIS_PORT:latest,REDIS_PASSWORD=REDIS_PASSWORD:latest,GOOGLE_MAPS_API_KEY=GOOGLE_MAPS_API_KEY:latest,GCS_BUCKET_NAME=GCS_BUCKET_NAME:latest" \
   --set-env-vars="SPRING_PROFILES_ACTIVE=prod,GCP_PROJECT_ID=YOUR_PROJECT_ID,WEBSOCKET_ALLOWED_ORIGINS=*,CORS_ALLOWED_ORIGINS=*"
 ```
@@ -448,12 +474,17 @@ Could not open JDBC Connection
 ```
 
 **Solution:**
-1. Verify Aiven MySQL is active
-2. Verify `DB_URL` format:
+1. Verify Cloud SQL instance is running:
+   ```bash
+   gcloud sql instances describe messenger-db --format='value(state)'
    ```
-   jdbc:mysql://HOST:PORT/defaultdb?sslMode=REQUIRED
+2. Verify Cloud Run has the `--add-cloudsql-instances` flag set
+3. Verify `roles/cloudsql.client` permission is granted
+4. Verify `DB_URL` format:
    ```
-3. Verify credentials in Secret Manager
+   jdbc:mysql:///messenger?cloudSqlInstance=PROJECT:REGION:INSTANCE&socketFactory=com.google.cloud.sql.mysql.SocketFactory
+   ```
+5. Verify credentials in Secret Manager
 
 ### Problem 3: Out of memory
 
@@ -486,18 +517,18 @@ gcloud run services update messenger-backend \
 
 ## Cost Optimization
 
-### Cost Estimation (Maximum Free Tier Usage)
+### Cost Estimation
 
 | Service | Plan | Monthly Cost |
 |---------|------|--------------|
 | **Cloud Run** | 0-1 instances, <2M requests | **$0 - $2** |
-| **Aiven MySQL** | Free Tier (1GB) | **$0** |
+| **Cloud SQL** | db-f1-micro (MySQL 8) | **~$9** |
 | **Redis Cloud** | Free Tier (30MB) | **$0** |
 | **Cloud Storage** | <5GB | **$0.10** |
 | **Cloud Build** | <120 builds/month | **$0** |
 | **Secret Manager** | <10 secrets | **$0** |
 | **Cloud Vision** | <1000 requests/month | **$0** |
-| **TOTAL** | | **~$0.10 - $2.10 USD/month** |
+| **TOTAL** | | **~$9 - $12 USD/month** |
 
 ### Recommendations to Minimize Costs
 
@@ -513,11 +544,12 @@ gcloud run services update messenger-backend \
 
 ### Database Migration Status
 
-**Configuration:** `spring.jpa.hibernate.ddl-auto=validate`
+**Configuration:** `spring.jpa.hibernate.ddl-auto=none`
 
-- ✅ **Hibernate in validation mode** - Only validates schema, doesn't modify
-- ✅ **Existing tables** - Previously created
-- ✅ **Flyway auto-executed** - Configured to run migrations on startup (`spring.flyway.enabled=true`)
+- ✅ **Hibernate in none mode** - Does not modify schema at all
+- ✅ **Flyway enabled** - Manages all schema migrations (`spring.flyway.enabled=true`)
+- ✅ **Flyway validation** - Validates migrations on startup (`spring.flyway.validate-on-migrate=true`)
+- ✅ **Baseline on migrate** - Supports existing databases (`spring.flyway.baseline-on-migrate=true`)
 
 **For future migrations:**
 1. Create new SQL script in `src/main/resources/db/migration` (e.g., `V2__Add_Column.sql`)
@@ -668,7 +700,7 @@ Esta guía documenta el proceso completo de despliegue del backend Messenger en 
 ### Cuentas & Accesos
 
 - ✅ Cuenta de Google Cloud Platform con facturación habilitada
-- ✅ Cuenta Aiven (MySQL gratuito)
+- ✅ Cloud SQL instance (MySQL 8)
 - ✅ Cuenta Redis Cloud (Redis gratuito)
 - ✅ Google Maps API Key
 - ✅ Google Cloud Storage Bucket
@@ -698,9 +730,9 @@ Esta guía documenta el proceso completo de despliegue del backend Messenger en 
         ┌─────────────────┴─────────────────┐
         ↓                                    ↓
 ┌──────────────────┐              ┌──────────────────┐
-│  Aiven MySQL     │              │  Redis Cloud     │
-│  (Free Tier)     │              │  (Free 30MB)     │
-│  - defaultdb     │              │  - Cache/Session │
+│  Cloud SQL       │              │  Redis Cloud     │
+│  (MySQL 8)       │              │  (Free 30MB)     │
+│  - messenger     │              │  - Cache/Session │
 └──────────────────┘              └──────────────────┘
         ↓
 ┌──────────────────┐              ┌──────────────────┐
@@ -712,7 +744,7 @@ Esta guía documenta el proceso completo de despliegue del backend Messenger en 
 **Flujo de Datos:**
 1. Cliente → Cloud Run (HTTPS)
 2. Cloud Run → Secret Manager (credenciales)
-3. Spring Boot → Aiven MySQL (datos persistentes)
+3. Spring Boot → Cloud SQL (datos persistentes)
 4. Spring Boot → Redis Cloud (caché/sesiones)
 5. Spring Boot → Cloud Storage (archivos)
 6. Spring Boot → Cloud Vision (OCR)
@@ -790,33 +822,53 @@ gcloud artifacts repositories list --location=us-central1
 
 ## Servicios Externos
 
-### MySQL Database (Aiven - Free Tier)
+### MySQL Database (Cloud SQL)
 
-**¿Por qué Aiven?** Google Cloud SQL cuesta ~$15 USD/mes. Aiven ofrece MySQL gratis con 1GB de almacenamiento.
+Cloud SQL es el servicio de MySQL completamente administrado de Google, que proporciona respaldos automáticos, alta disponibilidad e integración perfecta con Cloud Run.
 
 #### Pasos:
 
-1. **Registro**: [aiven.io](https://aiven.io/)
-2. **Crear servicio**:
-   - Producto: **MySQL 8**
-   - Cloud Provider: **Google Cloud Platform**
-   - Región: **us-east-1** (o cercana)
-   - Plan: **Free** ✅
-3. **Obtener credenciales**:
-   - Service URI: `mysql://avnadmin:PASSWORD@HOST:PORT/defaultdb?ssl-mode=REQUIRED`
-   - Host: `mysql-xxxxx.aivencloud.com`
-   - Port: `28433` (ejemplo)
-   - Database: `defaultdb`
-   - Username: `avnadmin`
-   - Password: (auto-generado)
+1. **Habilitar Cloud SQL API**:
+   ```bash
+   gcloud services enable sqladmin.googleapis.com
+   ```
 
-**Convertir a formato JDBC:**
+2. **Crear instancia Cloud SQL**:
+   ```bash
+   gcloud sql instances create messenger-db \
+     --database-version=MYSQL_8_0 \
+     --tier=db-f1-micro \
+     --region=us-central1 \
+     --root-password=TU_PASSWORD_ROOT \
+     --storage-size=10GB \
+     --storage-type=SSD
+   ```
+   **Tiempo estimado:** 5-10 minutos
+
+3. **Crear Base de Datos y Usuario**:
+   ```bash
+   # Crear base de datos
+   gcloud sql databases create messenger --instance=messenger-db
+   
+   # Crear usuario
+   gcloud sql users create app_user \
+     --instance=messenger-db \
+     --password=TU_PASSWORD_APP
+   ```
+
+4. **Obtener Nombre de Conexión**:
+   ```bash
+   gcloud sql instances describe messenger-db --format='value(connectionName)'
+   # Output: PROJECT_ID:us-central1:messenger-db
+   ```
+
+**Cadena de Conexión JDBC (para Cloud Run):**
 ```
-jdbc:mysql://mysql-xxxxx.aivencloud.com:28433/defaultdb?sslMode=REQUIRED
+jdbc:mysql:///messenger?cloudSqlInstance=PROJECT_ID:us-central1:messenger-db&socketFactory=com.google.cloud.sql.mysql.SocketFactory&user=app_user&password=TU_PASSWORD
 ```
 
 > [!IMPORTANT]
-> Guarda estas credenciales, las necesitarás en la sección de Secretos.
+> Cloud Run se conecta a Cloud SQL mediante sockets Unix (no necesita IP). Guarda el nombre de conexión para la sección de Secretos.
 
 ### Redis Cache (Redis Cloud - Free Tier)
 
@@ -876,12 +928,12 @@ gsutil iam ch allUsers:objectViewer gs://messenger-backend-photos
 # 1. JWT Secret (genera uno aleatorio largo)
 echo -n "$(openssl rand -base64 32)" | gcloud secrets create JWT_SECRET --data-file=-
 
-# 2. Base de Datos MySQL (Aiven)
-echo -n "jdbc:mysql://TU_HOST_AIVEN:TU_PUERTO/defaultdb?sslMode=REQUIRED" | \
+# 2. Base de Datos MySQL (Cloud SQL)
+echo -n "jdbc:mysql:///messenger?cloudSqlInstance=TU_PROYECTO:us-central1:messenger-db&socketFactory=com.google.cloud.sql.mysql.SocketFactory" | \
   gcloud secrets create DB_URL --data-file=-
 
-echo -n "avnadmin" | gcloud secrets create DB_USERNAME --data-file=-
-echo -n "TU_PASSWORD_AIVEN" | gcloud secrets create DB_PASSWORD --data-file=-
+echo -n "app_user" | gcloud secrets create DB_USERNAME --data-file=-
+echo -n "TU_PASSWORD_APP" | gcloud secrets create DB_PASSWORD --data-file=-
 
 # 3. Redis Cache (Redis Cloud)
 echo -n "TU_HOST_REDIS" | gcloud secrets create REDIS_HOST --data-file=-
@@ -913,6 +965,11 @@ done
 gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
   --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
   --role="roles/storage.objectAdmin"
+
+# Dar acceso a Cloud SQL
+gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
+  --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
+  --role="roles/cloudsql.client"
 
 # Dar acceso a Cloud Vision
 gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
@@ -956,6 +1013,7 @@ gcloud run deploy messenger-backend \
   --min-instances 0 \
   --max-instances 10 \
   --timeout 300 \
+  --add-cloudsql-instances TU_PROJECT_ID:us-central1:messenger-db \
   --set-secrets="JWT_SECRET=JWT_SECRET:latest,DB_URL=DB_URL:latest,DB_USERNAME=DB_USERNAME:latest,DB_PASSWORD=DB_PASSWORD:latest,REDIS_HOST=REDIS_HOST:latest,REDIS_PORT=REDIS_PORT:latest,REDIS_PASSWORD=REDIS_PASSWORD:latest,GOOGLE_MAPS_API_KEY=GOOGLE_MAPS_API_KEY:latest,GCS_BUCKET_NAME=GCS_BUCKET_NAME:latest" \
   --set-env-vars="SPRING_PROFILES_ACTIVE=prod,GCP_PROJECT_ID=TU_PROJECT_ID,WEBSOCKET_ALLOWED_ORIGINS=*,CORS_ALLOWED_ORIGINS=*"
 ```
@@ -1062,12 +1120,17 @@ Could not open JDBC Connection
 ```
 
 **Solución:**
-1. Verificar que Aiven MySQL esté activo
-2. Verificar formato de `DB_URL`:
+1. Verificar que la instancia Cloud SQL esté activa:
+   ```bash
+   gcloud sql instances describe messenger-db --format='value(state)'
    ```
-   jdbc:mysql://HOST:PORT/defaultdb?sslMode=REQUIRED
+2. Verificar que Cloud Run tiene el flag `--add-cloudsql-instances`
+3. Verificar que el permiso `roles/cloudsql.client` esté otorgado
+4. Verificar formato de `DB_URL`:
    ```
-3. Verificar credenciales en Secret Manager
+   jdbc:mysql:///messenger?cloudSqlInstance=PROYECTO:REGION:INSTANCIA&socketFactory=com.google.cloud.sql.mysql.SocketFactory
+   ```
+5. Verificar credenciales en Secret Manager
 
 ### Problema 3: Out of memory
 
@@ -1100,26 +1163,25 @@ gcloud run services update messenger-backend \
 
 ## Optimización de Costos
 
-### Estimación de Costos (Free Tier Máximo)
+### Estimación de Costos
 
 | Servicio | Plan | Costo Mensual |
 |----------|------|---------------|
 | **Cloud Run** | 0-1 instancias, <2M requests | **$0 - $2** |
-| **Aiven MySQL** | Free Tier (1GB) | **$0** |
+| **Cloud SQL** | db-f1-micro (MySQL 8) | **~$9** |
 | **Redis Cloud** | Free Tier (30MB) | **$0** |
 | **Cloud Storage** | <5GB | **$0.10** |
 | **Cloud Build** | <120 builds/mes | **$0** |
 | **Secret Manager** | <10 secretos | **$0** |
 | **Cloud Vision** | <1000 requests/mes | **$0** |
-| **TOTAL** | | **~$0.10 - $2.10 USD/mes** |
+| **TOTAL** | | **~$9 - $12 USD/mes** |
 
 ### Recomendaciones para Minimizar Costos
 
 1. **Mantener `min-instances=0`** - Escala a cero cuando no hay tráfico
-2. **Usar Free Tiers** - Aiven + Redis Cloud son gratis
-3. **Optimizar imágenes** - Imagen Alpine Linux (~200MB vs 400MB+)
-4. **Caché agresivo** - Redis reduce queries a MySQL
-5. **Comprimir responses** - `server.compression.enabled=true`
+2. **Optimizar imágenes** - Imagen Alpine Linux (~200MB vs 400MB+)
+3. **Caché agresivo** - Redis reduce queries a MySQL
+4. **Comprimir responses** - `server.compression.enabled=true`
 
 ---
 
@@ -1127,11 +1189,12 @@ gcloud run services update messenger-backend \
 
 ### Estado de Migraciones de Base de Datos
 
-**Configuración:** `spring.jpa.hibernate.ddl-auto=validate`
+**Configuración:** `spring.jpa.hibernate.ddl-auto=none`
 
-- ✅ **Hibernate en modo validación** - Solo valida esquema, no modifica
-- ✅ **Tablas existentes** - Creadas previamente
-- ✅ **Flyway activo** - Ejecuta migraciones automáticamente (`spring.flyway.enabled=true`)
+- ✅ **Hibernate en modo none** - No modifica el esquema en absoluto
+- ✅ **Flyway habilitado** - Gestiona todas las migraciones (`spring.flyway.enabled=true`)
+- ✅ **Validación Flyway** - Valida migraciones al iniciar (`spring.flyway.validate-on-migrate=true`)
+- ✅ **Baseline on migrate** - Soporta bases de datos existentes (`spring.flyway.baseline-on-migrate=true`)
 
 **Para futuras migraciones:**
 1. Crear nuevo script SQL en `src/main/resources/db/migration` (ej: `V2__Add_Column.sql`)

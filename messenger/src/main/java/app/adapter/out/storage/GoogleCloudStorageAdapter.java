@@ -21,6 +21,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
+import java.time.Instant;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -31,6 +33,10 @@ import java.util.concurrent.TimeUnit;
 public class GoogleCloudStorageAdapter implements StoragePort {
 
     private static final Logger logger = LoggerFactory.getLogger(GoogleCloudStorageAdapter.class);
+    private record CachedUrl(String url, Instant expiresAt) {
+    }
+    private final ConcurrentHashMap<String, CachedUrl> signedUrlCache = new ConcurrentHashMap<>();
+    private static final int CACHE_EXPIRATION_MARGIN_HOURS = 1;
 
     private final Storage storage;
     private final String bucketName;
@@ -87,12 +93,30 @@ public class GoogleCloudStorageAdapter implements StoragePort {
 
     /**
      * Genera una nueva URL firmada con expiración renovada.
+     * Uses an in-memory cache to avoid repeated IAM API calls.
      */
     public String regenerateSignedUrl(String objectName, int expirationHours) {
-        return regenerateSignedUrl(objectName, expirationHours, this.credentials);
+        CachedUrl cached = signedUrlCache.get(objectName);
+        if (cached != null) {
+            Instant safeExpirationTime = Instant.now().plusSeconds(CACHE_EXPIRATION_MARGIN_HOURS * 3600L);
+            if (cached.expiresAt().isAfter(safeExpirationTime)) {
+                return cached.url();
+            }
+        }
+
+        String newUrl = generateSignedUrlInternal(objectName, expirationHours, this.credentials);
+
+        Instant expiresAt = Instant.now().plusSeconds(expirationHours * 3600L);
+        signedUrlCache.put(objectName, new CachedUrl(newUrl, expiresAt));
+
+        return newUrl;
     }
 
-    private String regenerateSignedUrl(String objectName, int expirationHours, GoogleCredentials creds) {
+    /**
+     * Internal method to generate signed URL without caching.
+     * Separated to allow the caching logic to be clean.
+     */
+    private String generateSignedUrlInternal(String objectName, int expirationHours, GoogleCredentials creds) {
         BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName).build();
 
         Storage.SignUrlOption signUrlOption;

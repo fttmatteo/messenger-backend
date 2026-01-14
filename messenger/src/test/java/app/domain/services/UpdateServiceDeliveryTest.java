@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import app.domain.exception.BusinessException;
 import app.domain.model.Employee;
 import app.domain.model.Photo;
@@ -153,8 +152,6 @@ class UpdateServiceDeliveryTest {
     @Test
     @DisplayName("Debe permitir MESSENGER actualizar desde cualquier estado no final")
     void shouldAllowMessengerToUpdateFromAnyNonFinalState() throws Exception {
-        // Con las nuevas reglas simplificadas, el mensajero puede cambiar desde
-        // cualquier estado no final
         service.setCurrentStatus(Status.PENDING);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(1L)).thenReturn(messenger);
@@ -209,7 +206,6 @@ class UpdateServiceDeliveryTest {
     @Test
     @DisplayName("Debe permitir cambiar estado DELIVERED sin restricción de tiempo")
     void shouldAllowDeliveredUpdateWithoutTimeRestriction() throws Exception {
-        // Con las nuevas reglas simplificadas, no hay restricción de 72 horas
         service.setCurrentStatus(Status.DELIVERED);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(2L)).thenReturn(admin);

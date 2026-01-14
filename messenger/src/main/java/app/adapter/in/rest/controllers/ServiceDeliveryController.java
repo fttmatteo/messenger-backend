@@ -247,7 +247,8 @@ public class ServiceDeliveryController {
                     .collect(Collectors.toList());
         }
 
-        List<ServiceDeliveryResponse> responses = services.stream()
+        // Use parallel stream to speed up signed URL generation
+        List<ServiceDeliveryResponse> responses = services.parallelStream()
                 .map(responseMapper::toResponse)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(responses);
@@ -287,7 +288,17 @@ public class ServiceDeliveryController {
                     page, size, sortBy, sortDirection, search, statusEnums);
         }
 
-        Page<ServiceDeliveryResponse> responsePage = servicePage.map(responseMapper::toResponse);
+        // Use parallel stream to speed up signed URL generation
+        List<ServiceDeliveryResponse> mappedContent = servicePage.getContent()
+                .parallelStream()
+                .map(responseMapper::toResponse)
+                .collect(Collectors.toList());
+
+        // Create a new Page with the mapped content
+        Page<ServiceDeliveryResponse> responsePage = new org.springframework.data.domain.PageImpl<>(
+                mappedContent,
+                servicePage.getPageable(),
+                servicePage.getTotalElements());
         PageResponse<ServiceDeliveryResponse> pageResponse = PageResponse.from(responsePage);
 
         return ResponseEntity.ok(pageResponse);

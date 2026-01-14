@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import app.domain.exception.BusinessException;
 import app.domain.model.Dealership;
 import app.domain.ports.DealershipPort;
@@ -100,7 +99,7 @@ class UpdateDealershipTest {
     @DisplayName("No debe validar nombre si no cambia")
     void shouldNotValidateNameIfSame() throws Exception {
         Dealership newData = new Dealership();
-        newData.setName("Original Name"); // Same name
+        newData.setName("Original Name");
         newData.setAddress("Calle 2");
 
         when(dealershipPort.findById(1L)).thenReturn(existingDealership);
