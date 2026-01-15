@@ -39,16 +39,17 @@ public class ServiceDeliveryMapper {
         entity.setDeletedAt(serviceDelivery.getDeletedAt());
         entity.setLockedAt(serviceDelivery.getLockedAt());
 
-        if (serviceDelivery.getSignature() != null) {
-            SignatureEntity sigEntity = new SignatureEntity();
-            sigEntity.setIdSignature(serviceDelivery.getSignature().getIdSignature());
-            sigEntity.setSignaturePath(serviceDelivery.getSignature().getSignaturePath());
-            sigEntity.setUploadDate(serviceDelivery.getSignature().getUploadDate());
-            entity.setSignature(sigEntity);
-        }
-
         Map<Long, PhotoEntity> existingPhotoCache = new HashMap<>();
         Map<Photo, PhotoEntity> newPhotoCache = new IdentityHashMap<>();
+        Map<Long, SignatureEntity> existingSignatureCache = new HashMap<>();
+        Map<Signature, SignatureEntity> newSignatureCache = new IdentityHashMap<>();
+
+        if (serviceDelivery.getSignature() != null) {
+            SignatureEntity sigEntity = getOrCreateSignatureEntity(serviceDelivery.getSignature(),
+                    existingSignatureCache,
+                    newSignatureCache);
+            entity.setSignature(sigEntity);
+        }
 
         if (serviceDelivery.getPhotos() != null) {
             entity.setPhotos(serviceDelivery.getPhotos().stream().map(p -> {
@@ -72,10 +73,8 @@ public class ServiceDeliveryMapper {
                 hEntity.setObservation(h.getObservation());
 
                 if (h.getSignature() != null) {
-                    SignatureEntity sEntity = new SignatureEntity();
-                    sEntity.setIdSignature(h.getSignature().getIdSignature());
-                    sEntity.setSignaturePath(h.getSignature().getSignaturePath());
-                    sEntity.setUploadDate(h.getSignature().getUploadDate());
+                    SignatureEntity sEntity = getOrCreateSignatureEntity(h.getSignature(), existingSignatureCache,
+                            newSignatureCache);
                     hEntity.setSignature(sEntity);
                 }
 
@@ -92,6 +91,33 @@ public class ServiceDeliveryMapper {
         }
 
         return entity;
+    }
+
+    private SignatureEntity getOrCreateSignatureEntity(Signature s, Map<Long, SignatureEntity> existingCache,
+            Map<Signature, SignatureEntity> newCache) {
+        if (s.getIdSignature() != null) {
+            if (existingCache.containsKey(s.getIdSignature())) {
+                return existingCache.get(s.getIdSignature());
+            }
+            SignatureEntity entity = mapSignatureBasic(s);
+            existingCache.put(s.getIdSignature(), entity);
+            return entity;
+        } else {
+            if (newCache.containsKey(s)) {
+                return newCache.get(s);
+            }
+            SignatureEntity entity = mapSignatureBasic(s);
+            newCache.put(s, entity);
+            return entity;
+        }
+    }
+
+    private SignatureEntity mapSignatureBasic(Signature s) {
+        SignatureEntity sigEntity = new SignatureEntity();
+        sigEntity.setIdSignature(s.getIdSignature());
+        sigEntity.setSignaturePath(s.getSignaturePath());
+        sigEntity.setUploadDate(s.getUploadDate());
+        return sigEntity;
     }
 
     private PhotoEntity getOrCreatePhotoEntity(Photo p, Map<Long, PhotoEntity> existingCache,
