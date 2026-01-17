@@ -26,7 +26,7 @@ public class OpenApiConfig {
                                                 .version("1.7.2")
                                                 .description("API REST para la gestión de mensajeros, entregas y seguimiento en tiempo real.")
                                                 .contact(new Contact()
-                                                                .name("Equipo de Desarrollo")
+                                                                .name("PLAK")
                                                                 .url("https://plak.digital")
                                                                 .email("contacto@plak.digital"))
                                                 .license(new License().name("Apache 2.0").url("http://springdoc.org")))
