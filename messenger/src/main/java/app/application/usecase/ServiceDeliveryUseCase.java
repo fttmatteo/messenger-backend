@@ -130,7 +130,8 @@ public class ServiceDeliveryUseCase {
      * firmas).
      */
     public ServiceDelivery updateStatusWithFiles(Long serviceId, Status newStatus, String observation,
-            File signatureFile, List<File> photoFiles, Long userId, Double latitude, Double longitude)
+            File signatureFile, File signatureGifFile, List<File> photoFiles, Long userId, Double latitude,
+            Double longitude)
             throws Exception {
 
         ServiceDelivery service = searchService.findById(serviceId);
@@ -146,6 +147,13 @@ public class ServiceDeliveryUseCase {
             savedPaths.add(path);
             signature = new Signature();
             signature.setSignaturePath(path);
+        }
+
+        if (signatureGifFile != null && signature != null) {
+            String gifFileName = "signature-gif_" + plateNumber + "_" + newStatus.name() + "_" + timestamp;
+            String gifPath = storagePort.save(signatureGifFile, "signature-gifs", gifFileName);
+            savedPaths.add(gifPath);
+            signature.setGifPath(gifPath);
         }
 
         List<Photo> photos = new ArrayList<>();

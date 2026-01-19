@@ -21,6 +21,9 @@ public class SignatureEntity {
     @Column(name = "upload_date", nullable = false)
     private LocalDateTime uploadDate;
 
+    @Column(name = "gif_path", length = 2048)
+    private String gifPath;
+
     public Long getIdSignature() {
         return idSignature;
     }
@@ -43,5 +46,13 @@ public class SignatureEntity {
 
     public void setUploadDate(LocalDateTime uploadDate) {
         this.uploadDate = uploadDate;
+    }
+
+    public String getGifPath() {
+        return gifPath;
+    }
+
+    public void setGifPath(String gifPath) {
+        this.gifPath = gifPath;
     }
 }

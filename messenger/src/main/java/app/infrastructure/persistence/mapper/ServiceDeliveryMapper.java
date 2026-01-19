@@ -117,6 +117,7 @@ public class ServiceDeliveryMapper {
         sigEntity.setIdSignature(s.getIdSignature());
         sigEntity.setSignaturePath(s.getSignaturePath());
         sigEntity.setUploadDate(s.getUploadDate());
+        sigEntity.setGifPath(s.getGifPath());
         return sigEntity;
     }
 
@@ -165,6 +166,7 @@ public class ServiceDeliveryMapper {
             signature.setIdSignature(entity.getSignature().getIdSignature());
             signature.setSignaturePath(entity.getSignature().getSignaturePath());
             signature.setUploadDate(entity.getSignature().getUploadDate());
+            signature.setGifPath(entity.getSignature().getGifPath());
             serviceDelivery.setSignature(signature);
         }
 
@@ -191,6 +193,7 @@ public class ServiceDeliveryMapper {
                     signature.setIdSignature(h.getSignature().getIdSignature());
                     signature.setSignaturePath(h.getSignature().getSignaturePath());
                     signature.setUploadDate(h.getSignature().getUploadDate());
+                    signature.setGifPath(h.getSignature().getGifPath());
                     history.setSignature(signature);
                 }
                 if (h.getPhotos() != null) {
