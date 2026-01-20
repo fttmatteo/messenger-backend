@@ -260,9 +260,8 @@ public class ServiceDeliveryController {
                     .collect(Collectors.toList());
         }
 
-        // Use parallel stream to speed up signed URL generation
         List<ServiceDeliveryResponse> responses = services.parallelStream()
-                .map(responseMapper::toResponse)
+                .map(responseMapper::toSummaryResponse)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(responses);
     }
@@ -301,13 +300,11 @@ public class ServiceDeliveryController {
                     page, size, sortBy, sortDirection, search, statusEnums);
         }
 
-        // Use parallel stream to speed up signed URL generation
         List<ServiceDeliveryResponse> mappedContent = servicePage.getContent()
                 .parallelStream()
-                .map(responseMapper::toResponse)
+                .map(responseMapper::toSummaryResponse)
                 .collect(Collectors.toList());
 
-        // Create a new Page with the mapped content
         Page<ServiceDeliveryResponse> responsePage = new org.springframework.data.domain.PageImpl<>(
                 mappedContent,
                 servicePage.getPageable(),
@@ -341,7 +338,7 @@ public class ServiceDeliveryController {
 
         List<ServiceDelivery> services = serviceDeliveryUseCase.findDeleted();
         List<ServiceDeliveryResponse> responses = services.stream()
-                .map(responseMapper::toResponse)
+                .map(responseMapper::toSummaryResponse)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(responses);
