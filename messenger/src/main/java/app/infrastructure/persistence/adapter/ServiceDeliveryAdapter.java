@@ -201,4 +201,17 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
                 .map(app.domain.model.DailyStatistics::fromRaw)
                 .collect(Collectors.toList());
     }
+
+    /**
+     * Busca servicios de un mensajero que tengan actividad en una fecha específica.
+     */
+    @Override
+    public List<ServiceDelivery> findByMessengerAndDate(Long messengerId, java.time.LocalDate date) {
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
+
+        return repository.findByMessengerAndDate(messengerId, startOfDay, endOfDay).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
 }

@@ -105,4 +105,71 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
         p.setPlateType(PlateType.CAR);
         return p;
     }
+
+    @Test
+    @DisplayName("Should find services by messenger and date")
+    /**
+     * Verifica que se filtren correctamente los servicios por mensajero, fecha de
+     * creación
+     * o fecha de cambio de estado.
+     */
+    void shouldFindServicesByMessengerAndDate() {
+        EmployeeEntity messenger = createEmployee("888888", "Target Messenger");
+        entityManager.persist(messenger);
+
+        EmployeeEntity otherMessenger = createEmployee("777777", "Other Messenger");
+        entityManager.persist(otherMessenger);
+
+        DealershipEntity dealership = createDealership("Target Dealer");
+        entityManager.persist(dealership);
+
+        PlateEntity plate = createPlate("TGT999");
+        entityManager.persist(plate);
+
+        LocalDateTime targetDate = LocalDateTime.of(2025, 1, 15, 10, 0);
+        LocalDateTime otherDate = LocalDateTime.of(2025, 1, 16, 10, 0);
+
+        // 1. Service created on target date
+        createAndPersistService(messenger, dealership, plate, Status.ASSIGNED, targetDate);
+
+        // 2. Service created on other date, but STATUS CHANGED on target date
+        ServiceDeliveryEntity serviceWithHistory = new ServiceDeliveryEntity();
+        serviceWithHistory.setMessenger(messenger);
+        serviceWithHistory.setDealership(dealership);
+        serviceWithHistory.setPlate(plate);
+        serviceWithHistory.setCurrentStatus(Status.DELIVERED);
+        serviceWithHistory.setCreatedAt(otherDate); // Created tomorrow
+        serviceWithHistory.setDeleted(false);
+        entityManager.persist(serviceWithHistory);
+
+        app.infrastructure.persistence.entities.StatusHistoryEntity history = new app.infrastructure.persistence.entities.StatusHistoryEntity();
+        history.setServiceDelivery(serviceWithHistory);
+        history.setNewStatus(Status.DELIVERED);
+        history.setChangeDate(targetDate); // Changed today
+        history.setChangedBy(messenger);
+        history.setDeliveryLatitude(1.0);
+        history.setDeliveryLongitude(1.0);
+        entityManager.persist(history);
+
+        serviceWithHistory.getHistory().add(history);
+        entityManager.merge(serviceWithHistory);
+
+        // 3. Service created on other date (Should NOT be found)
+        createAndPersistService(messenger, dealership, plate, Status.PENDING, otherDate);
+
+        // 4. Service for OTHER messenger on target date (Should NOT be found)
+        createAndPersistService(otherMessenger, dealership, plate, Status.ASSIGNED, targetDate);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<ServiceDeliveryEntity> results = repository.findByMessengerAndDate(
+                messenger.getIdEmployee(),
+                targetDate.toLocalDate().atStartOfDay(),
+                targetDate.toLocalDate().plusDays(1).atStartOfDay());
+
+        assertThat(results).hasSize(2);
+        assertThat(results).extracting(s -> s.getMessenger().getIdEmployee())
+                .containsOnly(messenger.getIdEmployee());
+    }
 }
