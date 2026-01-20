@@ -296,7 +296,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | `POST` | `/services/createService` | Crear servicio (multipart: imagen + datos) |
-| `PUT` | `/services/updateService/{id}` | Actualizar estado (multipart: estado + evidencias) |
+| `PUT` | `/services/updateService/{id}` | Actualizar estado (multipart: estado + evidencias + GIF) |
 | `PUT` | `/services/reassign/{id}` | Reasignar a otro mensajero (ADMIN/CANCELED) |
 | `GET` | `/services/findByServiceId/{id}` | Obtener servicio por ID |
 | `GET` | `/services/allServices` | Listar servicios (filtrado por rol) |
@@ -307,6 +307,12 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `POST` | `/services/trash/restore/{id}` | Restaurar desde papelera (ADMIN) |
 | `DELETE` | `/services/trash/empty` | Vaciar papelera permanentemente (ADMIN) |
 | `DELETE` | `/services/trash/{id}` | Eliminación individual permanente (ADMIN) |
+
+> [!CAUTION]
+> **Restricciones de Archivos**:
+> - **Imágenes**: Máx 10MB (JPEG/PNG)
+> - **GIFs**: Máx 5MB (GIF87a/GIF89a)
+> - **Firmas**: Máx 2MB (SVG/PNG)
 
 ---
 
@@ -334,7 +340,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| `GET` | `/files/{filename}` | Descargar archivo protegido (fotos/firmas) |
+| `GET` | `/files/{filename}` | Descargar archivo protegido (fotos/firmas/GIFs) |
 
 ---
 
@@ -407,6 +413,7 @@ erDiagram
     signatures {
         Long id_signature PK
         String file_path
+        String gif_path
     }
     
     photos {
@@ -526,8 +533,8 @@ URL de conexión: `ws://localhost:8080/ws/tracking`
 
 > [!NOTE]
 > **Requisitos de Evidencia**
-> - **DELIVERED**: Firma de recibido obligatoria.
-> - **PENDING**: Firma, al menos una foto y observación obligatorias.
+> - **DELIVERED**: Firma y verificación GIF obligatorias.
+> - **PENDING**: Firma, verificación GIF, al menos una foto y observación obligatorias.
 > - **RETURNED**: Al menos una foto y observación obligatorias (no requiere firma).
 > - **CANCELED** & **RESOLVED**: No requieren evidencia adicional.
 
@@ -627,6 +634,7 @@ flowchart LR
 - 🔒 **Stateless**: No se almacenan tokens en el servidor (Redis solo para caché de datos)
 - ⏱️ **Expiración Automática**: Tokens expire automáticamente
 - 🛡️ **HMAC-SHA256**: Algoritmo robusto de firma digital
+- 🕵️ **Validación de Archivos**: Verificación de Magic Bytes para evitar suplantación de contenido
 
 ### Rate Limiting Distribuido
 
@@ -658,12 +666,11 @@ flowchart LR
 
 ### Endpoints de Monitoreo (Actuator)
 
-| Endpoint | Descripción | Perfil |
-|----------|-------------|--------|
-| `/actuator/health` | Estado de salud (DB, Redis, Disco) | Todos |
-| `/actuator/metrics` | Métricas de JVM y HTTP | `dev`, `prod` |
-| `/actuator/env` | Variables de entorno | `dev` |
-| `/actuator/info` | Información de la build | Todos |
+| Endpoint | Descripción | Perfil | Acceso |
+|----------|-------------|--------|--------|
+| `/actuator/health` | Estado de salud (DB, Redis, Disco) | Todos | Público |
+| `/actuator/metrics` | Métricas de JVM y HTTP | `dev`, `local` | Privado (JWT) |
+| `/actuator/info` | Información de la build | Todos | Privado (JWT) |
 
 ### Optimización para Cloud Run
 

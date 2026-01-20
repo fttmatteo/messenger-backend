@@ -91,4 +91,9 @@ public interface ServiceDeliveryPort {
                         Long messengerId,
                         java.time.LocalDate from,
                         java.time.LocalDate to);
+
+        /**
+         * Busca servicios de un mensajero que tengan actividad en una fecha específica.
+         */
+        List<ServiceDelivery> findByMessengerAndDate(Long messengerId, java.time.LocalDate date);
 }

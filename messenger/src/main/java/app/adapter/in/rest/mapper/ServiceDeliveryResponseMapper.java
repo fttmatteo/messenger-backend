@@ -36,6 +36,41 @@ public class ServiceDeliveryResponseMapper {
         return path;
     }
 
+    /**
+     * Mapea un ServiceDelivery a una respuesta resumida (ligera).
+     * Excluye relaciones pesadas como historial y fotos para evitar consultas N+1.
+     */
+    public ServiceDeliveryResponse toSummaryResponse(ServiceDelivery service) {
+        if (service == null) {
+            return null;
+        }
+
+        ServiceDeliveryResponse response = new ServiceDeliveryResponse();
+        response.setIdServiceDelivery(service.getIdServiceDelivery());
+        response.setCurrentStatus(service.getCurrentStatus());
+        response.setObservation(service.getObservation());
+        response.setCreatedAt(service.getCreatedAt());
+
+        response.setLockedAt(service.getLockedAt());
+        response.setLocked(false);
+
+        response.setDeleted(service.isDeleted());
+        response.setDeletedAt(service.getDeletedAt());
+
+        if (service.getPlate() != null) {
+            Plate plate = service.getPlate();
+            response.setPlate(new ServiceDeliveryResponse.PlateResponse(
+                    plate.getIdPlate(),
+                    plate.getPlateNumber(),
+                    plate.getPlateType()));
+        }
+
+        response.setDealership(dealershipMapper.toResponse(service.getDealership()));
+        response.setMessenger(employeeMapper.toResponse(service.getMessenger()));
+
+        return response;
+    }
+
     public ServiceDeliveryResponse toResponse(ServiceDelivery service) {
         if (service == null) {
             return null;
@@ -67,10 +102,12 @@ public class ServiceDeliveryResponseMapper {
         if (service.getSignature() != null) {
             Signature sig = service.getSignature();
             String signedUrl = getFileUrl(sig.getSignaturePath());
+            String gifSignedUrl = getFileUrl(sig.getGifPath());
             response.setSignature(new SignatureResponse(
                     sig.getIdSignature(),
                     signedUrl,
-                    sig.getUploadDate()));
+                    sig.getUploadDate(),
+                    gifSignedUrl));
         }
 
         if (service.getPhotos() != null) {
@@ -104,6 +141,14 @@ public class ServiceDeliveryResponseMapper {
                                             p.getUploadDate(),
                                             p.getPhotoType()))
                                     .collect(Collectors.toList()));
+                        }
+                        if (h.getSignature() != null) {
+                            Signature sig = h.getSignature();
+                            historyResponse.setSignature(new SignatureResponse(
+                                    sig.getIdSignature(),
+                                    getFileUrl(sig.getSignaturePath()),
+                                    sig.getUploadDate(),
+                                    getFileUrl(sig.getGifPath())));
                         }
                         return historyResponse;
                     })

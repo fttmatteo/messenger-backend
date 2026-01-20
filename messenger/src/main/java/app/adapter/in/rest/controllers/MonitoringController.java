@@ -38,7 +38,7 @@ public class MonitoringController {
             @PathVariable Long messengerId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 
-        List<ServiceDelivery> allServices = serviceDeliveryPort.findByMessengerId(messengerId);
+        List<ServiceDelivery> allServices = serviceDeliveryPort.findByMessengerAndDate(messengerId, date);
 
         int assigned = 0;
         int delivered = 0;

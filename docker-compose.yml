@@ -22,6 +22,8 @@ services:
       - REDIS_HOST=messenger-redis
       # Credenciales de Google Cloud dentro del contenedor
       - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
+      # Limitar consumo de RAM (Min 256MB, Max 512MB)
+      - JAVA_OPTS=-Duser.timezone=America/Bogota -Xms256m -Xmx512m
     volumes:
       # Montar credenciales de Google Cloud (ruta definida en .env)
       - "${GOOGLE_APPLICATION_CREDENTIALS}:/app/credentials.json:ro"
@@ -34,7 +36,7 @@ services:
       - messenger-network
     restart: unless-stopped
     healthcheck:
-      test: "curl --fail --silent http://localhost:8080/actuator/health | grep UP || exit 1"
+      test: "wget -q -O - http://localhost:8080/actuator/health | grep UP || exit 1"
       interval: 30s
       timeout: 10s
       retries: 5
@@ -80,7 +82,7 @@ services:
 
   # CACHE: Redis
   messenger-redis:
-    image: redis:alpine
+    image: redis:7-alpine
     container_name: messenger-redis
     ports:
       - "6379:6379"

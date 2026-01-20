@@ -602,7 +602,13 @@
                                 },
                                 {
                                     "key": "signature",
-                                    "description": "Mandatory for PENDING",
+                                    "description": "Mandatory for PENDING/DELIVERED",
+                                    "type": "file",
+                                    "src": []
+                                },
+                                {
+                                    "key": "signatureGif",
+                                    "description": "Evidence GIF (Mandatory for PENDING/DELIVERED)",
                                     "type": "file",
                                     "src": []
                                 },
