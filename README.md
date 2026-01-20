@@ -295,7 +295,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/services/createService` | Create service (multipart: image + data) |
-| `PUT` | `/services/updateService/{id}` | Update status (multipart: status + evidence) |
+| `PUT` | `/services/updateService/{id}` | Update status (multipart: status + evidence + GIF) |
 | `PUT` | `/services/reassign/{id}` | Reassign to another messenger (ADMIN/CANCELED) |
 | `GET` | `/services/findByServiceId/{id}` | Get service by ID |
 | `GET` | `/services/allServices` | List services (filtered by role) |
@@ -306,6 +306,12 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `POST` | `/services/trash/restore/{id}` | Restore from trash (ADMIN) |
 | `DELETE` | `/services/trash/empty` | Empty trash permanently (ADMIN) |
 | `DELETE` | `/services/trash/{id}` | Permanent delete individual item (ADMIN) |
+
+> [!CAUTION]
+> **File Constraints**:
+> - **Images**: Max 10MB (JPEG/PNG)
+> - **GIFs**: Max 5MB (GIF87a/GIF89a)
+> - **Signatures**: Max 2MB (SVG/PNG)
 
 ---
 
@@ -333,7 +339,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/files/{filename}` | Download protected file (photos/signatures) |
+| `GET` | `/files/{filename}` | Download protected file (photos/signatures/GIFs) |
 
 ---
 
@@ -406,6 +412,7 @@ erDiagram
     signatures {
         Long id_signature PK
         String file_path
+        String gif_path
     }
     
     photos {
@@ -525,8 +532,8 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 
 > [!NOTE]
 > **Evidence Requirements**
-> - **DELIVERED**: Signature is mandatory.
-> - **PENDING**: Signature, at least one photo, and observation are mandatory.
+> - **DELIVERED**: Signature and GIF verification are mandatory.
+> - **PENDING**: Signature, GIF verification, at least one photo, and observation are mandatory.
 > - **RETURNED**: At least one photo and observation are mandatory (no signature required).
 > - **CANCELED** & **RESOLVED**: No additional evidence required.
 
@@ -627,6 +634,7 @@ flowchart LR
 - 🔒 **Stateless**: No tokens stored server-side (Redis only for data caching)
 - ⏱️ **Auto Expiration**: Tokens expire automatically
 - 🛡️ **HMAC-SHA256**: Robust digital signature algorithm
+- 🕵️ **File Validation**: Magic bytes check for GIF/Images to prevent content spoofing
 
 ### Distributed Rate Limiting
 
