@@ -17,6 +17,7 @@ public class StatusHistoryResponse {
     private Double deliveryLatitude;
     private Double deliveryLongitude;
     private String observation;
+    private SignatureResponse signature;
 
     public StatusHistoryResponse() {
     }
@@ -104,5 +105,13 @@ public class StatusHistoryResponse {
 
     public void setObservation(String observation) {
         this.observation = observation;
+    }
+
+    public SignatureResponse getSignature() {
+        return signature;
+    }
+
+    public void setSignature(SignatureResponse signature) {
+        this.signature = signature;
     }
 }

@@ -281,7 +281,6 @@
 						-Ddocker.api.version=1.44
 					</argLine>
 					<environmentVariables>
-						<DOCKER_HOST>unix:///var/run/docker.sock</DOCKER_HOST>
 						<TESTCONTAINERS_RYUK_DISABLED>true</TESTCONTAINERS_RYUK_DISABLED>
 						<TESTCONTAINERS_HOST_OVERRIDE>localhost</TESTCONTAINERS_HOST_OVERRIDE>
 					</environmentVariables>

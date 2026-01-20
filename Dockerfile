@@ -22,8 +22,6 @@ WORKDIR /app
 # Crear un usuario no root por seguridad (mejor práctica profesional)
 # Si hackean la app, no tienen permisos de root en el contenedor.
 RUN addgroup -S messenger && adduser -S springuser -G messenger
-# Instalar curl para healthchecks (opcional pero recomendado)
-RUN apk add --no-cache curl
 USER springuser:messenger
 
 # Copiar el .jar compilado desde la etapa de BUILD

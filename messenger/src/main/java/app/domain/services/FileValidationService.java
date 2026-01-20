@@ -27,12 +27,15 @@ public class FileValidationService {
     private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of(
             "image/jpeg",
             "image/png",
-            "image/webp"
-    );
+            "image/webp");
 
-    private static final long MAX_IMAGE_SIZE = 10 * 1024 * 1024; 
-    private static final long MAX_SIGNATURE_SIZE = 5 * 1024 * 1024; 
-    private static final long MAX_PHOTO_SIZE = 20 * 1024 * 1024; 
+    private static final Set<String> ALLOWED_GIF_TYPES = Set.of(
+            "image/gif");
+
+    private static final long MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+    private static final long MAX_SIGNATURE_SIZE = 5 * 1024 * 1024;
+    private static final long MAX_PHOTO_SIZE = 20 * 1024 * 1024;
+    private static final long MAX_GIF_SIZE = 2 * 1024 * 1024;
     private static final int MAX_IMAGE_DIMENSION = 4096;
 
     /**
@@ -43,7 +46,6 @@ public class FileValidationService {
         if (file == null) {
             throw new SecurityException("Archivo no proporcionado");
         }
-
 
         if (file.isEmpty()) {
             throw new SecurityException("Archivo vacío");
@@ -76,7 +78,6 @@ public class FileValidationService {
             throw new SecurityException("Archivo de firma no proporcionado");
         }
 
-
         if (file.isEmpty()) {
             throw new SecurityException("Archivo de firma vacío");
         }
@@ -108,7 +109,6 @@ public class FileValidationService {
             throw new SecurityException("Archivo de foto no proporcionado");
         }
 
-
         if (file.isEmpty()) {
             throw new SecurityException("Archivo de foto vacío");
         }
@@ -129,6 +129,34 @@ public class FileValidationService {
 
         validateImageContent(file);
 
+    }
+
+    /**
+     * Valida archivos GIF de captura de firma.
+     * Usado para: GIFs de captura durante firma
+     */
+    public void validateGifFile(MultipartFile file) throws SecurityException {
+        if (file == null) {
+            throw new SecurityException("Archivo GIF no proporcionado");
+        }
+
+        if (file.isEmpty()) {
+            throw new SecurityException("Archivo GIF vacío");
+        }
+
+        if (file.getSize() > MAX_GIF_SIZE) {
+            logger.warn("Archivo GIF excede tamaño máximo: {} bytes",
+                    file.getSize());
+            throw new SecurityException(
+                    String.format("GIF demasiado grande. Máximo: %dMB",
+                            MAX_GIF_SIZE / (1024 * 1024)));
+        }
+
+        String detectedType = detectMimeType(file);
+        if (!ALLOWED_GIF_TYPES.contains(detectedType)) {
+            logger.warn("Tipo de GIF no permitido: {}", detectedType);
+            throw new SecurityException("Tipo de archivo GIF no permitido");
+        }
     }
 
     /**
@@ -182,6 +210,13 @@ public class FileValidationService {
                     bytes[10] == 0x42 && bytes[11] == 0x50) {
                 return "image/webp";
             }
+        }
+
+        if (bytes.length >= 6 &&
+                bytes[0] == 0x47 && bytes[1] == 0x49 && bytes[2] == 0x46 &&
+                bytes[3] == 0x38 && (bytes[4] == 0x37 || bytes[4] == 0x39) &&
+                bytes[5] == 0x61) {
+            return "image/gif";
         }
 
         return null;

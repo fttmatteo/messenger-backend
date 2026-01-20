@@ -131,6 +131,7 @@ public class ServiceDeliveryController {
             @RequestParam("status") String status,
             @RequestParam(value = "observation", required = false) String observation,
             @RequestParam(value = "signature", required = false) MultipartFile signature,
+            @RequestParam(value = "signatureGif", required = false) MultipartFile signatureGif,
             @RequestParam(value = "photos", required = false) List<MultipartFile> photos,
             @RequestParam(value = "latitude", required = false) Double latitude,
             @RequestParam(value = "longitude", required = false) Double longitude) throws Exception {
@@ -158,6 +159,17 @@ public class ServiceDeliveryController {
                 tempFiles.add(signatureFile);
             }
 
+            File signatureGifFile = null;
+            if (signatureGif != null && !signatureGif.isEmpty()) {
+                try {
+                    fileValidationService.validateGifFile(signatureGif);
+                } catch (SecurityException e) {
+                    throw new InputsException("Error en GIF de captura: " + e.getMessage());
+                }
+                signatureGifFile = fileHelper.convertToFile(signatureGif);
+                tempFiles.add(signatureGifFile);
+            }
+
             List<File> photoFiles = new ArrayList<>();
             if (photos != null && !photos.isEmpty()) {
                 for (MultipartFile photo : photos) {
@@ -175,7 +187,8 @@ public class ServiceDeliveryController {
 
             ServiceDelivery updated = serviceDeliveryUseCase.updateStatusWithFiles(id, data.getStatus(),
                     data.getObservation(),
-                    signatureFile, photoFiles, data.getUserId(), data.getLatitude(), data.getLongitude());
+                    signatureFile, signatureGifFile, photoFiles, data.getUserId(), data.getLatitude(),
+                    data.getLongitude());
 
             return ResponseEntity.ok(responseMapper.toResponse(updated));
         } finally {
