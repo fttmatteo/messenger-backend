@@ -666,12 +666,11 @@ flowchart LR
 
 ### Monitoring Endpoints (Actuator)
 
-| Endpoint | Description | Profile |
-|----------|-------------|---------|
-| `/actuator/health` | Health status (DB, Redis, Disk) | All |
-| `/actuator/metrics` | JVM and HTTP metrics | `dev`, `prod` |
-| `/actuator/env` | Environment variables | `dev` |
-| `/actuator/info` | Build information | All |
+| Endpoint | Description | Profile | Access |
+|----------|-------------|---------|--------|
+| `/actuator/health` | Health status (DB, Redis, Disk) | All | Public |
+| `/actuator/metrics` | JVM and HTTP metrics | `dev`, `local` | Private (JWT) |
+| `/actuator/info` | Build information | All | Private (JWT) |
 
 ### Cloud Run Optimization
 
