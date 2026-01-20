@@ -93,7 +93,7 @@ class ServiceDeliveryControllerTest {
         void shouldReturnAllServices() throws Exception {
             when(securityHelper.getCurrentUser()).thenReturn(messengerUser);
             when(serviceDeliveryUseCase.findAll()).thenReturn(Arrays.asList(sampleService));
-            when(responseMapper.toResponse(sampleService)).thenReturn(sampleResponse);
+            when(responseMapper.toSummaryResponse(sampleService)).thenReturn(sampleResponse);
 
             mockMvc.perform(get("/services/allServices"))
                     .andExpect(status().isOk())
