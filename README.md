@@ -499,7 +499,7 @@ GPS tracking system using **Redis** + **WebSocket** for messenger monitoring.
 | 🔴 **Live location** | Updates every 5-45 seconds (5s rate limit) |
 | 📍 **Delivery validation** | Maximum 200m radius from destination [Next Implementation] |
 | 🎯 **Technical accuracy** | < 100m GPS error filtered for history |
-| 📊 **Complete history** | 30-day retention |
+| 📊 **Complete history** | Permanent retention (Historical Archive) |
 | ⚡ **Low latency** | Redis for location caching |
 | 🌐 **WebSocket** | Real-time push notifications |
 

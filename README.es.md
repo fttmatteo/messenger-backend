@@ -501,7 +501,7 @@ Sistema de tracking GPS usando **Redis** + **WebSocket** para monitoreo de mensa
 | 🔴 **Ubicación en vivo** | Actualización cada 5-45 seg (mín. 5s) |
 | 📍 **Validación de entrega** | Radio máximo de 200m del destino [Proxima Implementación] |
 | 🎯 **Precisión técnica** | Filtro de error GPS < 100m para historial |
-| 📊 **Historial completo** | Retención de 30 días |
+| 📊 **Historial completo** | Retención permanente (Archivado histórico) |
 | ⚡ **Baja latencia** | Redis para caché de ubicaciones |
 | 🌐 **WebSocket** | Notificaciones push en tiempo real |
 
