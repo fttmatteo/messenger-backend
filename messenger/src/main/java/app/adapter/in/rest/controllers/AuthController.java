@@ -22,6 +22,7 @@ import app.domain.model.auth.TokenResponse;
 import app.domain.services.LoginRateLimitService;
 import app.infrastructure.audit.AuditableAction;
 import app.infrastructure.logging.LogSanitizer;
+import app.infrastructure.security.TurnstileValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +41,8 @@ public class AuthController {
     private LoginUseCase loginUseCase;
     @Autowired
     private LoginRateLimitService rateLimitService;
+    @Autowired
+    private TurnstileValidationService turnstileValidationService;
 
     @Value("${jwt.expiration:1800000}")
     private long accessTokenExpiration;
@@ -59,6 +62,20 @@ public class AuthController {
 
         Long document = credentials.getDocument();
         LogSanitizer.maskDocument(document);
+
+        // Validar token de Turnstile (anti-bot)
+        if (!turnstileValidationService.validateToken(credentials.getTurnstileToken())) {
+            logger.warn("Login rechazado - validación de Turnstile fallida para documento: {}",
+                    LogSanitizer.maskDocument(document));
+
+            LoginResponse errorResponse = new LoginResponse(
+                    null,
+                    "Verificación anti-bot fallida. Por favor, recarga la página e intenta de nuevo.",
+                    null);
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(errorResponse);
+        }
 
         if (rateLimitService.isBlocked(document)) {
             logger.warn("Login rechazado - documento bloqueado por rate limit: {}",

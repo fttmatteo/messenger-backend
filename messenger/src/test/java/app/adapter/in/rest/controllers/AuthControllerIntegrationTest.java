@@ -21,6 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import app.support.AbstractIntegrationTest;
+import app.infrastructure.security.TurnstileValidationService;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 @DisplayName("AuthController Integration Tests")
 @Transactional
@@ -34,6 +38,9 @@ class AuthControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Autowired
         private EntityManager entityManager;
+
+        @MockitoBean
+        private TurnstileValidationService turnstileValidationService;
 
         private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -65,6 +72,9 @@ class AuthControllerIntegrationTest extends AbstractIntegrationTest {
                 AuthCredentials credentials = new AuthCredentials();
                 credentials.setDocument(12345678L);
                 credentials.setPassword("secret123");
+                credentials.setTurnstileToken("valid-token");
+
+                when(turnstileValidationService.validateToken(anyString())).thenReturn(true);
 
                 mockMvc.perform(post("/auth/login")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -93,6 +103,9 @@ class AuthControllerIntegrationTest extends AbstractIntegrationTest {
                 AuthCredentials credentials = new AuthCredentials();
                 credentials.setDocument(87654321L);
                 credentials.setPassword("wrongpassword");
+                credentials.setTurnstileToken("valid-token");
+
+                when(turnstileValidationService.validateToken(anyString())).thenReturn(true);
                 mockMvc.perform(post("/auth/login")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(credentials)))
@@ -116,6 +129,9 @@ class AuthControllerIntegrationTest extends AbstractIntegrationTest {
                 AuthCredentials credentials = new AuthCredentials();
                 credentials.setDocument(11112222L);
                 credentials.setPassword("secret123");
+                credentials.setTurnstileToken("valid-token");
+
+                when(turnstileValidationService.validateToken(anyString())).thenReturn(true);
 
                 MvcResult loginResult = mockMvc.perform(post("/auth/login")
                                 .contentType(MediaType.APPLICATION_JSON)

@@ -8,6 +8,9 @@
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.9-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Redis](https://img.shields.io/badge/Redis-7.0+-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
+[![Google Cloud](https://img.shields.io/badge/Google_Cloud-1.0+-4479A1?style=for-the-badge&logo=google&logoColor=white)](https://cloud.google.com/)
+[![License](https://img.shields.io/badge/Licencia-Propietaria-red?style=for-the-badge)](LICENSE)
+
 
 **Sistema de entregas con reconocimiento automático de placas vehiculares mediante OCR.**
 
@@ -116,7 +119,7 @@ graph LR
 | **Base de Datos** | MySQL 8.0+ |
 | **Migraciones** | Flyway |
 | **Cache/Streaming** | Redis |
-| **Seguridad** | JWT + BCrypt + Bucket4j (Rate Limiting Distribuido con Redis) |
+| **Seguridad** | JWT + BCrypt + Cloudflare Turnstile (Protección contra Bots) + Bucket4j (Rate Limiting Distribuido con Redis) |
 | **Documentación** | OpenAPI / Swagger UI |
 | **OCR** | Google Cloud Vision API |
 | **Almacenamiento** | Google Cloud Storage |
@@ -259,7 +262,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| `POST` | `/auth/login` | Iniciar sesión y obtener tokens de acceso + refresh |
+| `POST` | `/auth/login` | Iniciar sesión y obtener tokens de acceso + refresh (Requiere `turnstileToken`) |
 | `POST` | `/auth/refresh` | Renovar token de acceso con refresh token |
 
 ---
@@ -638,6 +641,7 @@ flowchart LR
 
 ### Rate Limiting Distribuido
 
+- **Cloudflare Turnstile**: Protección obligatoria contra bots en todos los intentos de inicio de sesión para evitar ataques automatizados.
 - **Limitación en Redis**:
   - Protección global sincronizada entre múltiples instancias (Cloud Run).
   - `AUTENTICACIÓN`: 10 peticiones / minuto (Protección brute-force).
@@ -780,6 +784,7 @@ AUDIT | timestamp | documento_usuario | accion | metodo | parametros | estado | 
 | `JWT_SECRET` | Clave 256-bit para Tokens | `openssl rand -base64 64` |
 | `GOOGLE_MAPS_API_KEY` | Key de Google Maps | `AIza...` |
 | `GCS_BUCKET_NAME` | Bucket para evidencias | `plak-evidence` |
+| `TURNSTILE_SECRET_KEY`| Cloudflare Secret Key | `0x4AAAAAA...` |
 | `CORS_ALLOWED_ORIGINS`| URLs de frontend permitidas | `http://localhost:5173` |
 
 </details>
