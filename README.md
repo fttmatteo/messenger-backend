@@ -302,7 +302,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `GET` | `/services/findByServiceId/{id}` | Get service by ID |
 | `GET` | `/services/allServices` | List services (filtered by role) |
 | `GET` | `/services/allServicesPageable` | List services with **pagination & search** |
-| `GET` | `/services/stats/daily` | Daily stats (requires messengerId, from, to) |
+| `GET` | `/services/stats/daily` | DISABLED - Daily stats (requires messengerId, from, to) |
 | `DELETE` | `/services/deleteService/{id}` | Move to trash (ADMIN) |
 | `GET` | `/services/trash` | List deleted services (ADMIN) |
 | `POST` | `/services/trash/restore/{id}` | Restore from trash (ADMIN) |
@@ -331,7 +331,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/locations/geocode` | Address to coordinates |
-| `POST` | `/locations/route` | Calculate optimized route |
+| `POST` | `/locations/route` | DISABLED - Calculate optimized route |
 | `GET` | `/locations/distance` | Distance + time estimate between points |
 | `GET` | `/locations/reverse` | Coordinates to address |
 
@@ -349,7 +349,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/tracking/update` | Update messenger live location |
+| `POST` | `/tracking/update` | DISABLED - Update messenger live location |
 | `GET` | `/tracking/messenger/{id}` | Get last known location (ADMIN) |
 | `GET` | `/tracking/active` | Get all active messengers (ADMIN) |
 | `GET` | `/tracking/history/{id}` | Get history by date (`?date=YYYY-MM-DD`) |
@@ -501,7 +501,7 @@ GPS tracking system using **Redis** + **WebSocket** for messenger monitoring.
 | 🎯 **Technical accuracy** | < 100m GPS error filtered for history |
 | 📊 **Complete history** | Permanent retention (Historical Archive) |
 | ⚡ **Low latency** | Redis for location caching |
-| 🌐 **WebSocket** | Real-time push notifications |
+| 🌐 **WebSocket** | Real-time data updates (Server Push) |
 
 ### WebSocket API
 
@@ -517,7 +517,7 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 ### Google Maps Integration
 
 - **Geocoding**: Address ↔ Coordinates
-- **Directions API**: Optimized routes
+- **Directions API**: DISABLED - Optimized routes
 - **Distance Matrix**: Time estimation
 - **Reverse Geocoding**: Coordinates → Address
 
