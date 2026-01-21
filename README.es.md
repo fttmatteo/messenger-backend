@@ -304,7 +304,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `GET` | `/services/findByServiceId/{id}` | Obtener servicio por ID |
 | `GET` | `/services/allServices` | Listar servicios (filtrado por rol) |
 | `GET` | `/services/allServicesPageable` | Listar servicios con **paginación y búsqueda** |
-| `GET` | `/services/stats/daily` | Estadísticas diarias (requiere messengerId, from, to) |
+| `GET` | `/services/stats/daily` | INHABILITADO - Estadísticas diarias (requiere messengerId, from, to) |
 | `DELETE` | `/services/deleteService/{id}` | Mover a papelera (ADMIN) |
 | `GET` | `/services/trash` | Listar servicios eliminados (ADMIN) |
 | `POST` | `/services/trash/restore/{id}` | Restaurar desde papelera (ADMIN) |
@@ -333,7 +333,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | `POST` | `/locations/geocode` | Dirección a coordenadas |
-| `POST` | `/locations/route` | Calcular ruta optimizada |
+| `POST` | `/locations/route` | INHABILITADO - Calcular ruta optimizada |
 | `GET` | `/locations/distance` | Distancia + tiempo estimado entre puntos |
 | `GET` | `/locations/reverse` | Coordenadas a dirección |
 
@@ -351,7 +351,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| `POST` | `/tracking/update` | Actualizar ubicación en vivo del mensajero |
+| `POST` | `/tracking/update` | INHABILITADO - Actualizar ubicación en vivo del mensajero |
 | `GET` | `/tracking/messenger/{id}` | Obtener última ubicación conocida (ADMIN) |
 | `GET` | `/tracking/active` | Listar todos los mensajeros activos (ADMIN) |
 | `GET` | `/tracking/history/{id}` | Obtener historial por fecha (`?date=YYYY-MM-DD`) |
@@ -499,11 +499,11 @@ Sistema de tracking GPS usando **Redis** + **WebSocket** para monitoreo de mensa
 | Feature | Descripción |
 |---------|-------------|
 | 🔴 **Ubicación en vivo** | Actualización cada 5-45 seg (mín. 5s) |
-| 📍 **Validación de entrega** | Radio máximo de 200m del destino [Proxima Implementación] |
+| 📍 **Validación de entrega** | INHABILITADO - Radio máximo de 200m del destino |
 | 🎯 **Precisión técnica** | Filtro de error GPS < 100m para historial |
-| 📊 **Historial completo** | Retención de 30 días |
+| 📊 **Historial completo** | Retención permanente (Archivado histórico) |
 | ⚡ **Baja latencia** | Redis para caché de ubicaciones |
-| 🌐 **WebSocket** | Notificaciones push en tiempo real |
+| 🌐 **WebSocket** | Actualizaciones de datos en tiempo real (Server Push) |
 
 ### API WebSocket
 
@@ -519,7 +519,7 @@ URL de conexión: `ws://localhost:8080/ws/tracking`
 ### Integración Google Maps
 
 - **Geocoding**: Dirección ↔ Coordenadas
-- **Directions API**: Rutas optimizadas
+- **Directions API**: INHABILITADO - Rutas optimizadas
 - **Distance Matrix**: Estimación de tiempos
 - **Reverse Geocoding**: Coordenadas → Dirección
 
