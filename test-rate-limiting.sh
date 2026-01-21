@@ -19,7 +19,7 @@ test_login() {
     echo "Attempt $attempt:"
     response=$(curl -s -w "\n%{http_code}" -X POST "$API_URL/auth/login" \
         -H "Content-Type: application/json" \
-        -d "{\"document\": $DOCUMENT, \"password\": \"$WRONG_PASSWORD\"}")
+        -d "{\"document\": $DOCUMENT, \"password\": \"$WRONG_PASSWORD\", \"turnstileToken\": \"dummy-token-for-testing\"}")
     
     http_code=$(echo "$response" | tail -n 1)
     body=$(echo "$response" | head -n -1)

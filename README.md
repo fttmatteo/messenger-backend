@@ -8,6 +8,8 @@
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.9-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Redis](https://img.shields.io/badge/Redis-7.0+-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
+[![Google Cloud](https://img.shields.io/badge/Google_Cloud-1.0+-4479A1?style=for-the-badge&logo=google&logoColor=white)](https://cloud.google.com/)
+[![License](https://img.shields.io/badge/License-Proprietary-red?style=for-the-badge)](LICENSE)
 
 **Delivery management system with automatic license plate recognition via OCR.**
 
@@ -116,7 +118,7 @@ graph LR
 | **Database** | MySQL 8.0+ |
 | **Migrations** | Flyway |
 | **Cache/Streaming** | Redis |
-| **Security** | JWT + BCrypt + Bucket4j (Distributed Rate Limiting with Redis) |
+| **Security** | JWT + BCrypt + Cloudflare Turnstile (Bot Protection) + Bucket4j (Distributed Rate Limiting with Redis) |
 | **Documentation** | OpenAPI / Swagger UI |
 | **OCR** | Google Cloud Vision API |
 | **Storage** | Google Cloud Storage |
@@ -258,7 +260,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/auth/login` | Login and receive access + refresh tokens |
+| `POST` | `/auth/login` | Login and receive access + refresh tokens (Requires `turnstileToken`) |
 | `POST` | `/auth/refresh` | Renew access token with refresh token |
 
 ---
@@ -638,6 +640,7 @@ flowchart LR
 
 ### Distributed Rate Limiting
 
+- **Cloudflare Turnstile**: Mandatory bot protection for all login attempts to prevent automated attacks.
 - **Redis-Backed Throttling**:
   - Global enforcement across multiple instances (Cloud Run compatible).
   - `AUTH`: 10 requests / minute (Brute-force protection).
@@ -780,6 +783,7 @@ AUDIT | timestamp | user_document | action | method | params | status | duration
 | `JWT_SECRET` | 256-bit Key for Tokens | `openssl rand -base64 64` |
 | `GOOGLE_MAPS_API_KEY` | Google Maps Platform Key | `AIza...` |
 | `GCS_BUCKET_NAME` | Bucket for evidence | `plak-evidence` |
+| `TURNSTILE_SECRET_KEY`| Cloudflare Secret Key | `0x4AAAAAA...` |
 | `CORS_ALLOWED_ORIGINS`| Allowed Frontend URLs | `http://localhost:5173` |
 
 </details>

@@ -297,6 +297,9 @@ echo -n "YOUR_REDIS_PASSWORD" | gcloud secrets create REDIS_PASSWORD --data-file
 # 4. Google APIs
 echo -n "YOUR_GOOGLE_MAPS_API_KEY" | gcloud secrets create GOOGLE_MAPS_API_KEY --data-file=-
 echo -n "messenger-backend-photos" | gcloud secrets create GCS_BUCKET_NAME --data-file=-
+
+# 5. Cloudflare Turnstile
+echo -n "YOUR_TURNSTILE_SECRET_KEY" | gcloud secrets create TURNSTILE_SECRET_KEY --data-file=-
 ```
 
 ### Grant Permissions to Cloud Run
@@ -309,7 +312,7 @@ PROJECT_NUMBER=$(gcloud projects describe $(gcloud config get-value project) \
 # Grant access to Secret Manager (ALL secrets)
 for SECRET in JWT_SECRET DB_URL DB_USERNAME DB_PASSWORD \
               REDIS_HOST REDIS_PORT REDIS_PASSWORD \
-              GOOGLE_MAPS_API_KEY GCS_BUCKET_NAME; do
+              GOOGLE_MAPS_API_KEY GCS_BUCKET_NAME TURNSTILE_SECRET_KEY; do
   gcloud secrets add-iam-policy-binding $SECRET \
     --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
     --role="roles/secretmanager.secretAccessor"
@@ -368,7 +371,7 @@ gcloud run deploy messenger-backend \
   --max-instances 10 \
   --timeout 300 \
   --add-cloudsql-instances YOUR_PROJECT_ID:us-central1:messenger-db \
-  --set-secrets="JWT_SECRET=JWT_SECRET:latest,DB_URL=DB_URL:latest,DB_USERNAME=DB_USERNAME:latest,DB_PASSWORD=DB_PASSWORD:latest,REDIS_HOST=REDIS_HOST:latest,REDIS_PORT=REDIS_PORT:latest,REDIS_PASSWORD=REDIS_PASSWORD:latest,GOOGLE_MAPS_API_KEY=GOOGLE_MAPS_API_KEY:latest,GCS_BUCKET_NAME=GCS_BUCKET_NAME:latest" \
+  --set-secrets="JWT_SECRET=JWT_SECRET:latest,DB_URL=DB_URL:latest,DB_USERNAME=DB_USERNAME:latest,DB_PASSWORD=DB_PASSWORD:latest,REDIS_HOST=REDIS_HOST:latest,REDIS_PORT=REDIS_PORT:latest,REDIS_PASSWORD=REDIS_PASSWORD:latest,GOOGLE_MAPS_API_KEY=GOOGLE_MAPS_API_KEY:latest,GCS_BUCKET_NAME=GCS_BUCKET_NAME:latest,TURNSTILE_SECRET_KEY=TURNSTILE_SECRET_KEY:latest" \
   --set-env-vars="SPRING_PROFILES_ACTIVE=prod,GCP_PROJECT_ID=YOUR_PROJECT_ID,WEBSOCKET_ALLOWED_ORIGINS=*,CORS_ALLOWED_ORIGINS=*"
 ```
 
@@ -943,6 +946,9 @@ echo -n "TU_PASSWORD_REDIS" | gcloud secrets create REDIS_PASSWORD --data-file=-
 # 4. Google APIs
 echo -n "TU_GOOGLE_MAPS_API_KEY" | gcloud secrets create GOOGLE_MAPS_API_KEY --data-file=-
 echo -n "messenger-backend-photos" | gcloud secrets create GCS_BUCKET_NAME --data-file=-
+
+# 5. Cloudflare Turnstile
+echo -n "TU_TURNSTILE_SECRET_KEY" | gcloud secrets create TURNSTILE_SECRET_KEY --data-file=-
 ```
 
 ### Otorgar Permisos a Cloud Run
@@ -955,7 +961,7 @@ PROJECT_NUMBER=$(gcloud projects describe $(gcloud config get-value project) \
 # Dar acceso a Secret Manager (TODOS los secretos)
 for SECRET in JWT_SECRET DB_URL DB_USERNAME DB_PASSWORD \
               REDIS_HOST REDIS_PORT REDIS_PASSWORD \
-              GOOGLE_MAPS_API_KEY GCS_BUCKET_NAME; do
+              GOOGLE_MAPS_API_KEY GCS_BUCKET_NAME TURNSTILE_SECRET_KEY; do
   gcloud secrets add-iam-policy-binding $SECRET \
     --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
     --role="roles/secretmanager.secretAccessor"
@@ -1014,7 +1020,7 @@ gcloud run deploy messenger-backend \
   --max-instances 10 \
   --timeout 300 \
   --add-cloudsql-instances TU_PROJECT_ID:us-central1:messenger-db \
-  --set-secrets="JWT_SECRET=JWT_SECRET:latest,DB_URL=DB_URL:latest,DB_USERNAME=DB_USERNAME:latest,DB_PASSWORD=DB_PASSWORD:latest,REDIS_HOST=REDIS_HOST:latest,REDIS_PORT=REDIS_PORT:latest,REDIS_PASSWORD=REDIS_PASSWORD:latest,GOOGLE_MAPS_API_KEY=GOOGLE_MAPS_API_KEY:latest,GCS_BUCKET_NAME=GCS_BUCKET_NAME:latest" \
+  --set-secrets="JWT_SECRET=JWT_SECRET:latest,DB_URL=DB_URL:latest,DB_USERNAME=DB_USERNAME:latest,DB_PASSWORD=DB_PASSWORD:latest,REDIS_HOST=REDIS_HOST:latest,REDIS_PORT=REDIS_PORT:latest,REDIS_PASSWORD=REDIS_PASSWORD:latest,GOOGLE_MAPS_API_KEY=GOOGLE_MAPS_API_KEY:latest,GCS_BUCKET_NAME=GCS_BUCKET_NAME:latest,TURNSTILE_SECRET_KEY=TURNSTILE_SECRET_KEY:latest" \
   --set-env-vars="SPRING_PROFILES_ACTIVE=prod,GCP_PROJECT_ID=TU_PROJECT_ID,WEBSOCKET_ALLOWED_ORIGINS=*,CORS_ALLOWED_ORIGINS=*"
 ```
 
