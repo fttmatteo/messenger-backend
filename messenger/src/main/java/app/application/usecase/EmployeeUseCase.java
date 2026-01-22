@@ -51,7 +51,11 @@ public class EmployeeUseCase {
      * Busca un empleado por su ID.
      */
     public Employee findById(Long id) {
-        return searchEmployee.findById(id);
+        Employee employee = searchEmployee.findById(id);
+        if (employee == null) {
+            throw new RuntimeException("Empleado no encontrado con ID: " + id);
+        }
+        return employee;
     }
 
     /**
