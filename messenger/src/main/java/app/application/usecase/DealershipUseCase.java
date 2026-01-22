@@ -50,7 +50,11 @@ public class DealershipUseCase {
      * Busca un concesionario por su ID.
      */
     public Dealership findById(Long id) throws Exception {
-        return searchDealership.findById(id);
+        Dealership dealership = searchDealership.findById(id);
+        if (dealership == null) {
+            throw new RuntimeException("Concesionario no encontrado con ID: " + id);
+        }
+        return dealership;
     }
 
     /**

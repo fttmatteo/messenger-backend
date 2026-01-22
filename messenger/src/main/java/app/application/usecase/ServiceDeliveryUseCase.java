@@ -137,6 +137,9 @@ public class ServiceDeliveryUseCase {
             throws Exception {
 
         ServiceDelivery service = searchService.findById(serviceId);
+        if (service == null) {
+            throw new RuntimeException("Servicio no encontrado con ID: " + serviceId);
+        }
         String plateNumber = service.getPlate().getPlateNumber();
         String timestamp = LocalDateTime.now().format(DATE_FORMAT);
 
