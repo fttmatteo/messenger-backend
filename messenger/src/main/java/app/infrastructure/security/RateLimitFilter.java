@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Filtro de rate limiting basado en IP usando Bucket4j.
@@ -31,7 +30,15 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private ProxyManager<byte[]> proxyManager;
 
     // Cache local para fallback en caso de que Redis no esté disponible.
-    private final Map<String, Bucket> localFallbackCache = new ConcurrentHashMap<>();
+    // Limitamos el tamaño para evitar OutOfMemory si Redis falla durante un ataque
+    // masivo.
+    private final Map<String, Bucket> localFallbackCache = java.util.Collections.synchronizedMap(
+            new java.util.LinkedHashMap<String, Bucket>(101, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<String, Bucket> eldest) {
+                    return size() > 1000; // Límite de 1000 IPs concurrentes en fallback local
+                }
+            });
 
     private static final int GENERAL_REQUESTS_PER_MINUTE = 100;
     private static final int AUTH_REQUESTS_PER_MINUTE = 10;

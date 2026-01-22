@@ -118,6 +118,7 @@ public class ServiceDeliveryUseCase {
     /**
      * Actualiza el estado de un servicio existente.
      */
+    @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "UPDATE_STATUS", description = "Actualizar estado de servicio")
     public ServiceDelivery updateStatus(Long serviceId, Status newStatus, String observation,
             Signature signature, List<Photo> photos, Long userId, Double latitude, Double longitude) throws Exception {
@@ -129,6 +130,7 @@ public class ServiceDeliveryUseCase {
      * Actualiza el estado de un servicio incluyendo la carga de archivos (fotos,
      * firmas).
      */
+    @Transactional(rollbackFor = Exception.class)
     public ServiceDelivery updateStatusWithFiles(Long serviceId, Status newStatus, String observation,
             File signatureFile, File signatureGifFile, List<File> photoFiles, Long userId, Double latitude,
             Double longitude)
