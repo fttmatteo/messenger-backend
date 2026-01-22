@@ -40,6 +40,14 @@ public class TurnstileValidationService {
      * @return true si el token es válido, false en caso contrario
      */
     public boolean validateToken(String token) {
+        // Bypass para desarrollo si se usa la clave de prueba de Cloudflare
+        // Site key: 1x00000000000000000000AA
+        // Secret key: 1x00000000000000000000000000000000AA
+        if ("1x00000000000000000000000000000000AA".equals(secretKey)) {
+            logger.info("Bypass de Turnstile detectado (usando clave de prueba de Cloudflare)");
+            return true;
+        }
+
         if (token == null || token.isBlank()) {
             logger.warn("Token de Turnstile vacío o nulo");
             return false;
