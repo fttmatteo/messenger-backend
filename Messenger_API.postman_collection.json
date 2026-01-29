@@ -505,6 +505,46 @@
             "name": "🚚 Service Deliveries",
             "item": [
                 {
+                    "name": "Extract Plate (OCR Preview)",
+                    "description": "Extracts plate number from image using OCR. Used for previewing the detected plate before creating a service. Returns plate number for confirmation/editing.",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "image",
+                                    "description": "Image of the license plate to process with OCR",
+                                    "type": "file",
+                                    "src": []
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/services/extractPlate",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "extractPlate"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
                     "name": "Create Service",
                     "request": {
                         "auth": {
@@ -558,13 +598,13 @@
                             ]
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/serviceDelivery/create",
+                            "raw": "{{baseUrl}}/services/createService",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "serviceDelivery",
-                                "create"
+                                "services",
+                                "createService"
                             ]
                         }
                     },

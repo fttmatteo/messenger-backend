@@ -101,6 +101,28 @@ class ServiceDeliveryUseCaseTest {
 
             verify(createService, never()).create(anyString(), anyString(), anyLong(), anyLong(), any(), any());
         }
+
+        @Test
+        @DisplayName("Debe extraer placa exitosamente para preview")
+        void shouldExtractPlateForPreview() throws Exception {
+            when(ocrPort.extractText(mockImageFile)).thenReturn("ABC123");
+
+            String result = serviceDeliveryUseCase.extractPlateFromImage(mockImageFile);
+
+            assertEquals("ABC123", result);
+            verify(ocrPort).extractText(mockImageFile);
+        }
+
+        @Test
+        @DisplayName("Debe retornar string vacio si OCR falla en preview")
+        void shouldReturnEmptyStringIfOcrFailsInPreview() throws Exception {
+            when(ocrPort.extractText(mockImageFile)).thenThrow(new RuntimeException("OCR Error"));
+
+            String result = serviceDeliveryUseCase.extractPlateFromImage(mockImageFile);
+
+            assertEquals("", result);
+            verify(ocrPort).extractText(mockImageFile);
+        }
     }
 
     @Nested

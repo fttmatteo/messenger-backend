@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 
 /**
- * Mock adapter de OCR para desarrollo sin Google Vision.
+ * Mock adapter de OCR para desarrollo sin API externa.
  */
 @Component
 @ConditionalOnProperty(name = "app.ocr.mode", havingValue = "mock", matchIfMissing = true)

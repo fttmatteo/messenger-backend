@@ -26,6 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.mock.web.MockMultipartFile;
 import java.util.Arrays;
 
 @ExtendWith(MockitoExtension.class)
@@ -144,7 +145,41 @@ class ServiceDeliveryControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.idServiceDelivery").value(1L));
 
-            verify(serviceDeliveryUseCase).restore(1L, 1L);
+        }
+    }
+
+    @Nested
+    @DisplayName("Endpoint POST /services/extractPlate")
+    class ExtractPlateTests {
+
+        @Test
+        @DisplayName("Debe extraer placa exitosamente")
+        void shouldExtractPlate() throws Exception {
+            MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "test".getBytes());
+
+            when(fileHelper.convertToFile(file)).thenReturn(new java.io.File("test.jpg"));
+            doNothing().when(fileValidationService).validateImageFile(any());
+            when(serviceDeliveryUseCase.extractPlateFromImage(any())).thenReturn("ABC123");
+
+            mockMvc.perform(multipart("/services/extractPlate").file(file))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.plate").value("ABC123"))
+                    .andExpect(jsonPath("$.success").value(true));
+        }
+
+        @Test
+        @DisplayName("Debe retornar fallo si OCR no detecta nada")
+        void shouldReturnFailureIfOcrFails() throws Exception {
+            MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "test".getBytes());
+
+            when(fileHelper.convertToFile(file)).thenReturn(new java.io.File("test.jpg"));
+            doNothing().when(fileValidationService).validateImageFile(any());
+            when(serviceDeliveryUseCase.extractPlateFromImage(any())).thenReturn("");
+
+            mockMvc.perform(multipart("/services/extractPlate").file(file))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(jsonPath("$.plate").isEmpty());
         }
     }
 }

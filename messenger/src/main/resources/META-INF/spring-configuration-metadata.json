@@ -30,8 +30,19 @@
         {
             "name": "app.ocr.mode",
             "type": "java.lang.String",
-            "description": "Modo de operación del OCR. Valores: 'mock' (acepta todo), 'google-vision' (usa API real).",
+            "description": "Modo de operación del OCR. Valores: 'mock' (acepta todo), 'plate-recognizer' (especializado en placas).",
             "defaultValue": "mock"
+        },
+        {
+            "name": "app.plate-recognizer.token",
+            "type": "java.lang.String",
+            "description": "Token de API de Plate Recognizer. Obtener en: https://platerecognizer.com/"
+        },
+        {
+            "name": "app.plate-recognizer.region",
+            "type": "java.lang.String",
+            "description": "Código de región para Plate Recognizer (ej: 'co' para Colombia).",
+            "defaultValue": "co"
         },
         {
             "name": "spring.flyway.enabled",
@@ -171,8 +182,8 @@
                     "description": "Simulación de OCR (acepta cualquier imagen)."
                 },
                 {
-                    "value": "google-vision",
-                    "description": "Usa Google Cloud Vision API real."
+                    "value": "plate-recognizer",
+                    "description": "Plate Recognizer - API especializada en placas vehiculares (recomendado)."
                 }
             ]
         },
