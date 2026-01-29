@@ -58,6 +58,24 @@ public class ServiceDeliveryUseCase {
     private OcrPort ocrPort;
 
     /**
+     * Extrae la placa de una imagen sin crear el servicio.
+     * Permite previsualizar la placa detectada y corregirla si es necesario.
+     * 
+     * @param imageFile Archivo de imagen con la placa
+     * @return Placa detectada o string vacío si no se pudo detectar
+     */
+    public String extractPlateFromImage(File imageFile) {
+        try {
+            String extractedText = ocrPort.extractText(imageFile);
+            logger.info("Placa extraída para preview: {}", extractedText);
+            return extractedText != null ? extractedText : "";
+        } catch (Exception e) {
+            logger.error("Error extrayendo placa para preview: {}", e.getMessage());
+            return "";
+        }
+    }
+
+    /**
      * Crea un servicio a partir de una imagen de placa procesada por OCR.
      */
     @Transactional(rollbackFor = Exception.class)

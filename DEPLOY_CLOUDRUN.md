@@ -5,7 +5,7 @@
 # 🚀 Deployment Guide - Google Cloud Run
 
 **Messenger Backend** | Spring Boot 3.5 | Cloud Run Serverless  
-Documentation updated: January 2026
+Documentation updated: January 28, 2026
 
 [🇪🇸 Español](#-tabla-de-contenidos) • [🇺🇸 English](#-table-of-contents)
 
@@ -40,6 +40,7 @@ This guide documents the complete deployment process of the Messenger backend to
 - ✅ **Automatic SSL/HTTPS** - No certificates needed
 - ✅ **Centralized logs** in Google Cloud Logging
 - ✅ **High availability** with built-in load balancing
+- ✅ **OCR Preview** - Includes advanced plate detection before creation
 
 ---
 
@@ -57,6 +58,7 @@ This guide documents the complete deployment process of the Messenger backend to
 - ✅ Cloud SQL instance (MySQL 8)
 - ✅ Redis Cloud account (free Redis)
 - ✅ Google Maps API Key
+- ✅ Plate Recognizer API Token (for specialized OCR)
 - ✅ Google Cloud Storage Bucket
 
 ### Recommended Knowledge
@@ -88,9 +90,9 @@ This guide documents the complete deployment process of the Messenger backend to
 │  (MySQL 8)       │              │  (Free 30MB)     │
 │  - messenger     │              │  - Cache/Session │
 └──────────────────┘              └──────────────────┘
-        ↓
+        ↓                                    ↓
 ┌──────────────────┐              ┌──────────────────┐
-│  Cloud Storage   │              │  Cloud Vision    │
+│  Cloud Storage   │              │ Plate Recognizer │
 │  - Photos/Files  │              │  - OCR/Plates    │
 └──────────────────┘              └──────────────────┘
 ```
@@ -101,7 +103,7 @@ This guide documents the complete deployment process of the Messenger backend to
 3. Spring Boot → Cloud SQL (persistent data)
 4. Spring Boot → Redis Cloud (cache/sessions)
 5. Spring Boot → Cloud Storage (files)
-6. Spring Boot → Cloud Vision (OCR)
+6. Spring Boot → Plate Recognizer API (OCR)
 
 ---
 
@@ -300,6 +302,9 @@ echo -n "messenger-backend-photos" | gcloud secrets create GCS_BUCKET_NAME --dat
 
 # 5. Cloudflare Turnstile
 echo -n "YOUR_TURNSTILE_SECRET_KEY" | gcloud secrets create TURNSTILE_SECRET_KEY --data-file=-
+
+# 6. Plate Recognizer (OCR)
+echo -n "YOUR_PLATE_RECOGNIZER_TOKEN" | gcloud secrets create PLATE_RECOGNIZER_TOKEN --data-file=-
 ```
 
 ### Grant Permissions to Cloud Run
@@ -312,7 +317,8 @@ PROJECT_NUMBER=$(gcloud projects describe $(gcloud config get-value project) \
 # Grant access to Secret Manager (ALL secrets)
 for SECRET in JWT_SECRET DB_URL DB_USERNAME DB_PASSWORD \
               REDIS_HOST REDIS_PORT REDIS_PASSWORD \
-              GOOGLE_MAPS_API_KEY GCS_BUCKET_NAME TURNSTILE_SECRET_KEY; do
+              GOOGLE_MAPS_API_KEY GCS_BUCKET_NAME TURNSTILE_SECRET_KEY \
+              PLATE_RECOGNIZER_TOKEN; do
   gcloud secrets add-iam-policy-binding $SECRET \
     --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
     --role="roles/secretmanager.secretAccessor"
@@ -328,7 +334,7 @@ gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
   --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
   --role="roles/cloudsql.client"
 
-# Grant access to Cloud Vision
+# Grant access to Cloud Vision (Optional fallback)
 gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
   --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
   --role="roles/serviceusage.serviceUsageConsumer"
@@ -371,7 +377,7 @@ gcloud run deploy messenger-backend \
   --max-instances 10 \
   --timeout 300 \
   --add-cloudsql-instances YOUR_PROJECT_ID:us-central1:messenger-db \
-  --set-secrets="JWT_SECRET=JWT_SECRET:latest,DB_URL=DB_URL:latest,DB_USERNAME=DB_USERNAME:latest,DB_PASSWORD=DB_PASSWORD:latest,REDIS_HOST=REDIS_HOST:latest,REDIS_PORT=REDIS_PORT:latest,REDIS_PASSWORD=REDIS_PASSWORD:latest,GOOGLE_MAPS_API_KEY=GOOGLE_MAPS_API_KEY:latest,GCS_BUCKET_NAME=GCS_BUCKET_NAME:latest,TURNSTILE_SECRET_KEY=TURNSTILE_SECRET_KEY:latest" \
+  --set-secrets="JWT_SECRET=JWT_SECRET:latest,DB_URL=DB_URL:latest,DB_USERNAME=DB_USERNAME:latest,DB_PASSWORD=DB_PASSWORD:latest,REDIS_HOST=REDIS_HOST:latest,REDIS_PORT=REDIS_PORT:latest,REDIS_PASSWORD=REDIS_PASSWORD:latest,GOOGLE_MAPS_API_KEY=GOOGLE_MAPS_API_KEY:latest,GCS_BUCKET_NAME=GCS_BUCKET_NAME:latest,TURNSTILE_SECRET_KEY=TURNSTILE_SECRET_KEY:latest,PLATE_RECOGNIZER_TOKEN=PLATE_RECOGNIZER_TOKEN:latest" \
   --set-env-vars="SPRING_PROFILES_ACTIVE=prod,GCP_PROJECT_ID=YOUR_PROJECT_ID,WEBSOCKET_ALLOWED_ORIGINS=*,CORS_ALLOWED_ORIGINS=*"
 ```
 
@@ -405,9 +411,13 @@ echo "Service deployed at: $SERVICE_URL"
 # Verify health check
 curl $SERVICE_URL/actuator/health
 
-# Expected response:
-# {"error": "Unauthorized", "message": "Access denied..."}
 # ☝️ This is CORRECT - Spring Security is active
+
+# Verify OCR Preview endpoint (authenticated)
+# Replace YOUR_JWT_TOKEN with a valid token
+curl -X POST -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -F "image=@/path/to/plate.jpg" \
+  $SERVICE_URL/services/extractPlate
 ```
 
 ### View Logs
@@ -530,7 +540,7 @@ gcloud run services update messenger-backend \
 | **Cloud Storage** | <5GB | **$0.10** |
 | **Cloud Build** | <120 builds/month | **$0** |
 | **Secret Manager** | <10 secrets | **$0** |
-| **Cloud Vision** | <1000 requests/month | **$0** |
+| **Plate Recognizer** | <2500 requests/month | **$0** |
 | **TOTAL** | | **~$9 - $12 USD/month** |
 
 ### Recommendations to Minimize Costs
@@ -661,7 +671,7 @@ jobs:
 # Guía Profesional de Despliegue - Google Cloud Run
 
 **Messenger Backend** | Spring Boot 3.5 | Cloud Run Serverless  
-Documentación actualizada: Enero 2026
+Documentación actualizada: 28 de enero de 2026
 
 ---
 
@@ -689,6 +699,7 @@ Esta guía documenta el proceso completo de despliegue del backend Messenger en 
 - ✅ **SSL/HTTPS automático** - Sin necesidad de certificados
 - ✅ **Logs centralizados** en Google Cloud Logging
 - ✅ **Alta disponibilidad** con balanceo de carga incluido
+- ✅ **OCR Preview** - Incluye detección avanzada de placas antes de la creación
 
 ---
 
@@ -706,6 +717,7 @@ Esta guía documenta el proceso completo de despliegue del backend Messenger en 
 - ✅ Cloud SQL instance (MySQL 8)
 - ✅ Cuenta Redis Cloud (Redis gratuito)
 - ✅ Google Maps API Key
+- ✅ Token de API Plate Recognizer (para OCR especializado)
 - ✅ Google Cloud Storage Bucket
 
 ### Conocimientos Recomendados
@@ -737,9 +749,9 @@ Esta guía documenta el proceso completo de despliegue del backend Messenger en 
 │  (MySQL 8)       │              │  (Free 30MB)     │
 │  - messenger     │              │  - Cache/Session │
 └──────────────────┘              └──────────────────┘
-        ↓
+        ↓                                    ↓
 ┌──────────────────┐              ┌──────────────────┐
-│  Cloud Storage   │              │  Cloud Vision    │
+│  Cloud Storage   │              │ Plate Recognizer │
 │  - Photos/Files  │              │  - OCR/Plates    │
 └──────────────────┘              └──────────────────┘
 ```
@@ -750,7 +762,7 @@ Esta guía documenta el proceso completo de despliegue del backend Messenger en 
 3. Spring Boot → Cloud SQL (datos persistentes)
 4. Spring Boot → Redis Cloud (caché/sesiones)
 5. Spring Boot → Cloud Storage (archivos)
-6. Spring Boot → Cloud Vision (OCR)
+6. Spring Boot → API Plate Recognizer (OCR)
 
 ---
 
@@ -949,6 +961,9 @@ echo -n "messenger-backend-photos" | gcloud secrets create GCS_BUCKET_NAME --dat
 
 # 5. Cloudflare Turnstile
 echo -n "TU_TURNSTILE_SECRET_KEY" | gcloud secrets create TURNSTILE_SECRET_KEY --data-file=-
+
+# 6. Plate Recognizer (OCR)
+echo -n "TU_PLATE_RECOGNIZER_TOKEN" | gcloud secrets create PLATE_RECOGNIZER_TOKEN --data-file=-
 ```
 
 ### Otorgar Permisos a Cloud Run
@@ -961,7 +976,8 @@ PROJECT_NUMBER=$(gcloud projects describe $(gcloud config get-value project) \
 # Dar acceso a Secret Manager (TODOS los secretos)
 for SECRET in JWT_SECRET DB_URL DB_USERNAME DB_PASSWORD \
               REDIS_HOST REDIS_PORT REDIS_PASSWORD \
-              GOOGLE_MAPS_API_KEY GCS_BUCKET_NAME TURNSTILE_SECRET_KEY; do
+              GOOGLE_MAPS_API_KEY GCS_BUCKET_NAME TURNSTILE_SECRET_KEY \
+              PLATE_RECOGNIZER_TOKEN; do
   gcloud secrets add-iam-policy-binding $SECRET \
     --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
     --role="roles/secretmanager.secretAccessor"
@@ -977,7 +993,7 @@ gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
   --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
   --role="roles/cloudsql.client"
 
-# Dar acceso a Cloud Vision
+# Dar acceso a Cloud Vision (Fallback opcional)
 gcloud projects add-iam-policy-binding $(gcloud config get-value project) \
   --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
   --role="roles/serviceusage.serviceUsageConsumer"
@@ -1020,7 +1036,7 @@ gcloud run deploy messenger-backend \
   --max-instances 10 \
   --timeout 300 \
   --add-cloudsql-instances TU_PROJECT_ID:us-central1:messenger-db \
-  --set-secrets="JWT_SECRET=JWT_SECRET:latest,DB_URL=DB_URL:latest,DB_USERNAME=DB_USERNAME:latest,DB_PASSWORD=DB_PASSWORD:latest,REDIS_HOST=REDIS_HOST:latest,REDIS_PORT=REDIS_PORT:latest,REDIS_PASSWORD=REDIS_PASSWORD:latest,GOOGLE_MAPS_API_KEY=GOOGLE_MAPS_API_KEY:latest,GCS_BUCKET_NAME=GCS_BUCKET_NAME:latest,TURNSTILE_SECRET_KEY=TURNSTILE_SECRET_KEY:latest" \
+  --set-secrets="JWT_SECRET=JWT_SECRET:latest,DB_URL=DB_URL:latest,DB_USERNAME=DB_USERNAME:latest,DB_PASSWORD=DB_PASSWORD:latest,REDIS_HOST=REDIS_HOST:latest,REDIS_PORT=REDIS_PORT:latest,REDIS_PASSWORD=REDIS_PASSWORD:latest,GOOGLE_MAPS_API_KEY=GOOGLE_MAPS_API_KEY:latest,GCS_BUCKET_NAME=GCS_BUCKET_NAME:latest,TURNSTILE_SECRET_KEY=TURNSTILE_SECRET_KEY:latest,PLATE_RECOGNIZER_TOKEN=PLATE_RECOGNIZER_TOKEN:latest" \
   --set-env-vars="SPRING_PROFILES_ACTIVE=prod,GCP_PROJECT_ID=TU_PROJECT_ID,WEBSOCKET_ALLOWED_ORIGINS=*,CORS_ALLOWED_ORIGINS=*"
 ```
 
@@ -1054,9 +1070,13 @@ echo "Servicio desplegado en: $SERVICE_URL"
 # Verificar health check
 curl $SERVICE_URL/actuator/health
 
-# Respuesta esperada:
-# {"error": "Unauthorized", "message": "Acceso denegado..."}
 # ☝️ Esto es CORRECTO - Spring Security está activo
+
+# Verificar endpoint de OCR Preview (autenticado)
+# Reemplaza TU_JWT_TOKEN con un token válido
+curl -X POST -H "Authorization: Bearer TU_JWT_TOKEN" \
+  -F "image=@/ruta/a/placa.jpg" \
+  $SERVICE_URL/services/extractPlate
 ```
 
 ### Ver Logs
@@ -1179,7 +1199,7 @@ gcloud run services update messenger-backend \
 | **Cloud Storage** | <5GB | **$0.10** |
 | **Cloud Build** | <120 builds/mes | **$0** |
 | **Secret Manager** | <10 secretos | **$0** |
-| **Cloud Vision** | <1000 requests/mes | **$0** |
+| **Plate Recognizer** | <2500 requests/mes | **$0** |
 | **TOTAL** | | **~$9 - $12 USD/mes** |
 
 ### Recomendaciones para Minimizar Costos

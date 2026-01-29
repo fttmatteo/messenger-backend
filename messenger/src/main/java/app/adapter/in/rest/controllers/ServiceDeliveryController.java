@@ -13,6 +13,7 @@ import app.adapter.in.rest.request.ServiceDeliveryCreateRequest;
 import app.adapter.in.rest.request.ServiceDeliveryUpdateStatusRequest;
 import app.adapter.in.rest.response.DailyStatsResponse;
 import app.adapter.in.rest.response.PageResponse;
+import app.adapter.in.rest.response.PlateExtractionResponse;
 import app.adapter.in.rest.response.ServiceDeliveryResponse;
 import app.domain.exception.InputsException;
 import app.domain.exception.ResourceNotFoundException;
@@ -59,6 +60,37 @@ public class ServiceDeliveryController {
     private FileHelper fileHelper;
     @Autowired
     private FileValidationService fileValidationService;
+
+    /**
+     * Extrae la placa de una imagen mediante OCR sin crear el servicio.
+     * Permite previsualizar la placa detectada antes de confirmar la creación.
+     * 
+     * @param image Imagen de la placa a procesar
+     * @return Respuesta con la placa detectada o mensaje de error
+     */
+    @PostMapping("/extractPlate")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<PlateExtractionResponse> extractPlate(
+            @RequestParam("image") MultipartFile image) throws Exception {
+
+        try {
+            fileValidationService.validateImageFile(image);
+        } catch (SecurityException e) {
+            return ResponseEntity.badRequest()
+                    .body(PlateExtractionResponse.failure("Archivo de imagen inválido: " + e.getMessage()));
+        }
+
+        return fileHelper.withTempFile(image, imageFile -> {
+            String extractedPlate = serviceDeliveryUseCase.extractPlateFromImage(imageFile);
+
+            if (extractedPlate == null || extractedPlate.isEmpty()) {
+                return ResponseEntity.ok(PlateExtractionResponse.failure(
+                        "No se pudo detectar la placa. Por favor ingresa la placa manualmente."));
+            }
+
+            return ResponseEntity.ok(PlateExtractionResponse.success(extractedPlate));
+        });
+    }
 
     /**
      * Crea un nuevo servicio de entrega.

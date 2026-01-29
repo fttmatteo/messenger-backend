@@ -98,7 +98,7 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void handleExternalServiceException_ShouldReturn503() {
-        ExternalServiceException exception = new ExternalServiceException("Google Vision no disponible");
+        ExternalServiceException exception = new ExternalServiceException("Servicio OCR no disponible");
 
         ResponseEntity<ErrorResponse> response = exceptionHandler.handleExternalServiceException(exception,
                 mockRequest);

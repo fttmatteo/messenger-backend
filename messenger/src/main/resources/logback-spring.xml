@@ -175,7 +175,7 @@
         <appender-ref ref="CONSOLE"/>
     </logger>
 
-    <!-- Logger para servicios externos (Google Maps, Vision, Cloud Storage) -->
+    <!-- Logger para servicios externos (Google Maps, Plate Recognizer, Cloud Storage) -->
     <logger name="app.adapter.out.maps" level="INFO" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>

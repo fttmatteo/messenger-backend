@@ -23,7 +23,7 @@ public class OpenApiConfig {
                 return new OpenAPI()
                                 .info(new Info()
                                                 .title("Messenger Backend API")
-                                                .version("1.7.2")
+                                                .version("1.9.0")
                                                 .description("API REST para la gestión de mensajeros, entregas y seguimiento en tiempo real.")
                                                 .contact(new Contact()
                                                                 .name("PLAK")

@@ -121,7 +121,7 @@ graph LR
 | **Cache/Streaming** | Redis |
 | **Seguridad** | JWT + BCrypt + Cloudflare Turnstile (Protección contra Bots) + Bucket4j (Rate Limiting Distribuido con Redis) |
 | **Documentación** | OpenAPI / Swagger UI |
-| **OCR** | Google Cloud Vision API |
+| **OCR** | Plate Recognizer API |
 | **Almacenamiento** | Google Cloud Storage |
 | **Mapas** | Google Maps Platform |
 | **Tiempo Real** | WebSocket + Redis |
@@ -151,7 +151,7 @@ messenger/
 │   │   │   └── websocket/               # Tracking en tiempo real
 │   │   └── out/                         # Adaptadores de salida
 │   │       ├── maps/                    # Google Maps Integration
-│   │       ├── ocr/                     # Google Vision OCR
+│   │       ├── ocr/                     # Plate Recognizer OCR
 │   │       ├── persistence/             # Adaptadores JPA
 │   │       ├── security/                # JWT Adapter
 │   │       ├── storage/                 # Google Cloud Storage
@@ -298,6 +298,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
+| `POST` | `/services/extractPlate` | Extraer placa de imagen usando OCR (preview antes de crear) |
 | `POST` | `/services/createService` | Crear servicio (multipart: imagen + datos) |
 | `PUT` | `/services/updateService/{id}` | Actualizar estado (multipart: estado + evidencias + GIF) |
 | `PUT` | `/services/reassign/{id}` | Reasignar a otro mensajero (ADMIN/CANCELED) |
