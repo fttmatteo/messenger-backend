@@ -157,8 +157,11 @@ class ServiceDeliveryControllerTest {
         void shouldExtractPlate() throws Exception {
             MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "test".getBytes());
 
-            when(fileHelper.convertToFile(file)).thenReturn(new java.io.File("test.jpg"));
             doNothing().when(fileValidationService).validateImageFile(any());
+            when(fileHelper.withTempFile(any(), any())).thenAnswer(invocation -> {
+                FileHelper.FileOperation<?> operation = invocation.getArgument(1);
+                return operation.execute(new java.io.File("test.jpg"));
+            });
             when(serviceDeliveryUseCase.extractPlateFromImage(any())).thenReturn("ABC123");
 
             mockMvc.perform(multipart("/services/extractPlate").file(file))
@@ -172,8 +175,11 @@ class ServiceDeliveryControllerTest {
         void shouldReturnFailureIfOcrFails() throws Exception {
             MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "test".getBytes());
 
-            when(fileHelper.convertToFile(file)).thenReturn(new java.io.File("test.jpg"));
             doNothing().when(fileValidationService).validateImageFile(any());
+            when(fileHelper.withTempFile(any(), any())).thenAnswer(invocation -> {
+                FileHelper.FileOperation<?> operation = invocation.getArgument(1);
+                return operation.execute(new java.io.File("test.jpg"));
+            });
             when(serviceDeliveryUseCase.extractPlateFromImage(any())).thenReturn("");
 
             mockMvc.perform(multipart("/services/extractPlate").file(file))
