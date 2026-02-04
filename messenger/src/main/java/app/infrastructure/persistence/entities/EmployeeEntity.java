@@ -2,12 +2,16 @@ package app.infrastructure.persistence.entities;
 
 import app.domain.model.enums.Role;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * Entidad JPA que representa la tabla 'employees'.
+ * Cacheable en L2 para reducir consultas frecuentes a BD.
  */
 @Entity
 @Table(name = "employees")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "employees")
 public class EmployeeEntity {
 
     @Id

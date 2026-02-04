@@ -1,12 +1,16 @@
 package app.infrastructure.persistence.entities;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * Entidad JPA para representar un concesionario.
+ * Cacheable en L2 para reducir consultas frecuentes a BD.
  */
 @Entity
 @Table(name = "dealerships")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "dealerships")
 public class DealershipEntity {
 
     @Id

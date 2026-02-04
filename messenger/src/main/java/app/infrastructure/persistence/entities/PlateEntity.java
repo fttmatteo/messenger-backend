@@ -2,13 +2,17 @@ package app.infrastructure.persistence.entities;
 
 import app.domain.model.enums.PlateType;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import java.time.LocalDateTime;
 
 /**
  * Entidad JPA que representa la tabla 'plates'.
+ * Cacheable en L2 - Las placas son prácticamente inmutables.
  */
 @Entity
 @Table(name = "plates")
+@Cache(usage = CacheConcurrencyStrategy.READ_ONLY, region = "plates")
 public class PlateEntity {
 
     @Id

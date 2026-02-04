@@ -4,6 +4,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import app.domain.model.Employee;
 import app.domain.services.CreateEmployee;
@@ -32,6 +34,7 @@ public class EmployeeUseCase {
     /**
      * Crea un nuevo empleado.
      */
+    @CacheEvict(value = "employees", allEntries = true)
     @AuditableAction(action = "CREATE_EMPLOYEE", description = "Crear nuevo empleado")
     public Employee create(Employee employee) throws Exception {
         Employee created = createEmployee.create(employee);
@@ -41,6 +44,7 @@ public class EmployeeUseCase {
     /**
      * Actualiza los datos de un empleado existente.
      */
+    @CacheEvict(value = "employees", allEntries = true)
     @AuditableAction(action = "UPDATE_EMPLOYEE", description = "Actualizar empleado")
     public Employee update(Long id, Employee employee) throws Exception {
         Employee updated = updateEmployee.update(id, employee);
@@ -50,6 +54,7 @@ public class EmployeeUseCase {
     /**
      * Busca un empleado por su ID.
      */
+    @Cacheable(value = "employees", key = "'id:' + #id")
     public Employee findById(Long id) {
         Employee employee = searchEmployee.findById(id);
         if (employee == null) {
@@ -68,6 +73,7 @@ public class EmployeeUseCase {
     /**
      * Lista todos los empleados registrados.
      */
+    @Cacheable(value = "employees", key = "'all'")
     public List<Employee> findAll() {
         return searchEmployee.findAll();
     }
@@ -75,6 +81,7 @@ public class EmployeeUseCase {
     /**
      * Elimina un empleado del sistema.
      */
+    @CacheEvict(value = "employees", allEntries = true)
     @AuditableAction(action = "DELETE_EMPLOYEE", description = "Eliminar empleado")
     public void deleteById(Long id) throws Exception {
         deleteEmployee.deleteById(id);
