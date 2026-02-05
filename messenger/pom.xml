@@ -36,7 +36,7 @@
 			<dependency>
 				<groupId>com.google.cloud</groupId>
 				<artifactId>libraries-bom</artifactId>
-				<version>26.74.0</version>
+				<version>26.75.0</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -203,6 +203,17 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+
+		<!-- Hibernate L2 Cache con Redisson -->
+		<dependency>
+			<groupId>org.hibernate.orm</groupId>
+			<artifactId>hibernate-jcache</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.redisson</groupId>
+			<artifactId>redisson-hibernate-6</artifactId>
+			<version>3.31.0</version>
 		</dependency>
 
 		<!-- Actuator (Health/Metrics) -->
