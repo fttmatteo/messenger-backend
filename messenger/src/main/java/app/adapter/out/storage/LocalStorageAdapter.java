@@ -1,11 +1,13 @@
 package app.adapter.out.storage;
 
 import app.domain.ports.StoragePort;
+import app.infrastructure.storage.ImageOptimizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,10 +21,13 @@ import java.nio.file.StandardCopyOption;
 public class LocalStorageAdapter implements StoragePort {
 
     private final Path storagePath;
+    private final ImageOptimizer imageOptimizer;
 
     public LocalStorageAdapter(
-            @Value("${app.storage.path:./uploads}") String storagePath) throws IOException {
+            @Value("${app.storage.path:./uploads}") String storagePath,
+            ImageOptimizer imageOptimizer) throws IOException {
         this.storagePath = Paths.get(storagePath).toAbsolutePath();
+        this.imageOptimizer = imageOptimizer;
         Files.createDirectories(this.storagePath);
     }
 
@@ -36,7 +41,21 @@ public class LocalStorageAdapter implements StoragePort {
         String extension = getExtension(file.getName());
         String fileName = customFileName + extension;
         Path targetPath = subDirPath.resolve(fileName);
-        Files.copy(file.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+
+        // Optimizar si es imagen (JPEG/PNG)
+        String format = extension.toLowerCase().replace(".", "");
+        if ("jpg".equals(format) || "jpeg".equals(format) || "png".equals(format)) {
+            try (InputStream originalStream = Files.newInputStream(file.toPath());
+                    InputStream optimizedStream = imageOptimizer.optimize(originalStream, extension)) {
+                Files.copy(optimizedStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
+            } catch (Exception e) {
+                // Si falla la optimización, copiar original como fallback
+                Files.copy(file.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } else {
+            Files.copy(file.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+        }
+
         String relativePath = subDirectory + "/" + fileName;
         return relativePath;
     }
