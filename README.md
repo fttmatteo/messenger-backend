@@ -302,8 +302,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `PUT` | `/services/updateService/{id}` | Update status (multipart: status + evidence + GIF) |
 | `PUT` | `/services/reassign/{id}` | Reassign to another messenger (ADMIN/CANCELED) |
 | `GET` | `/services/findByServiceId/{id}` | Get service by ID |
-| `GET` | `/services/allServices` | List services (filtered by role) |
-| `GET` | `/services/allServicesPageable` | List services with **pagination & search** |
+| `GET` | `/services/allServicesPageable` | List services with **pagination, search & sorting** (Recommended) |
 | `GET` | `/services/stats/daily` | DISABLED - Daily stats (requires messengerId, from, to) |
 | `DELETE` | `/services/deleteService/{id}` | Move to trash (ADMIN) |
 | `GET` | `/services/trash` | List deleted services (ADMIN) |
@@ -775,6 +774,16 @@ AUDIT | timestamp | user_document | action | method | params | status | duration
  
  - **Lazy Loading**: Most relationships in `ServiceDeliveryEntity` are configured as `FetchType.LAZY` to avoid loading unnecessary data.
  - **Entity Graphs**: Explicit `@EntityGraph` definitions in repositories to solve the N+1 problem by fetching only required associations in a single query.
+
+ ### 🖼️ Image Optimization
+
+ - **Automatic Resizing**: Images are automatically resized to a maximum of 1280px preserving aspect ratio.
+ - **Smart Compression**: Quality reduction to 75% for JPEG files using the `Thumbnailator` library.
+
+ ### 🔌 Connection Pool Tuning (HikariCP)
+
+ - **Optimized for Cloud SQL**: Fine-tuned parameters for low-resource environments (db-f1-micro).
+ - **Leak Detection**: Active threshold to identify and prevent connection leaks.
  
  ---
 

@@ -304,8 +304,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `PUT` | `/services/updateService/{id}` | Actualizar estado (multipart: estado + evidencias + GIF) |
 | `PUT` | `/services/reassign/{id}` | Reasignar a otro mensajero (ADMIN/CANCELED) |
 | `GET` | `/services/findByServiceId/{id}` | Obtener servicio por ID |
-| `GET` | `/services/allServices` | Listar servicios (filtrado por rol) |
-| `GET` | `/services/allServicesPageable` | Listar servicios con **paginación y búsqueda** |
+| `GET` | `/services/allServicesPageable` | Listar servicios con **paginación, búsqueda y ordenamiento** (Recomendado) |
 | `GET` | `/services/stats/daily` | INHABILITADO - Estadísticas diarias (requiere messengerId, from, to) |
 | `DELETE` | `/services/deleteService/{id}` | Mover a papelera (ADMIN) |
 | `GET` | `/services/trash` | Listar servicios eliminados (ADMIN) |
@@ -776,6 +775,17 @@ El sistema incluye múltiples capas de optimización para garantizar un alto ren
 
 - **Lazy Loading (Carga Perezosa)**: La mayoría de las relaciones en `ServiceDeliveryEntity` están configuradas como `FetchType.LAZY` para evitar cargar datos innecesarios.
 - **Entity Graphs**: Definiciones explícitas de `@EntityGraph` en los repositorios para resolver el problema N+1, cargando solo las asociaciones requeridas en una única consulta.
+
+### 🖼️ Optimización de Imágenes
+
+- **Redimensionamiento Automático**: Las imágenes se redimensionan automáticamente a un máximo de 1280px (ancho o alto) preservando la relación de aspecto.
+- **Compresión Inteligente**: Reducción de calidad al 75% para archivos JPEG usando la librería `Thumbnailator`, reduciendo significativamente el uso de almacenamiento y ancho de banda sin pérdida de detalle perceptible.
+
+### 🔌 Tuning del Pool de Conexiones (HikariCP)
+
+- **Optimizado para Cloud SQL**: Parámetros ajustados para entornos de recursos limitados (db-f1-micro).
+- **Detección de Fugas**: Umbral activo para identificar y prevenir fugas de conexiones.
+- **Caché de Statements**: Habilitado para mejorar el rendimiento de ejecución de consultas.
 
 ---
 
