@@ -36,7 +36,8 @@
 - [Configuración e Instalación](#️-configuración-e-instalación)
 - [CI/CD](#-cicd)
 - [Testing](#-testing)
-- [Colección Postman](#-colección-postman)
+- [Optimización de Rendimiento](#-optimización-de-rendimiento)
+ - [Colección Postman](#-colección-postman)
 
 ---
 
@@ -130,7 +131,7 @@ graph LR
 | **Auditoría** | JPA Callbacks + AOP (Aspect Oriented Programming) |
 | **CI/CD** | GitHub Actions |
 | **Tests de Arquitectura** | ArchUnit |
-| **Rendimiento** | Índices de Base de Datos (Optimización para paginación) |
+| **Rendimiento** | Spring Cache + Redis, Hibernate L2 Cache, Lazy Loading, Índices de Base de Datos |
 
 ---
 
@@ -757,8 +758,28 @@ AUDIT | timestamp | documento_usuario | accion | metodo | parametros | estado | 
 - **Salida a Archivo:** Opcional, habilitar `AUDIT_FILE` appender en `logback-spring.xml`
 
 ---
+ 
+ ## ⚡ Optimización de Rendimiento
 
-## ⚙️ Configuración e Instalación
+El sistema incluye múltiples capas de optimización para garantizar un alto rendimiento y baja latencia.
+
+### 🚀 Estrategia de Caché (Redis)
+
+- **Abstracción de Spring Cache**: Caché a nivel de aplicación usando `@Cacheable` y `@CacheEvict`.
+  - `Dealerships` (Concesionarios): TTL 30 minutos.
+  - `Employees` (Empleados): TTL 15 minutos.
+- **Hibernate Second-Level Cache (L2)**: Caché a nivel de entidad vía Redisson para reducir la carga en la base de datos.
+  - Habilitado para `DealershipEntity`, `EmployeeEntity`, y `PlateEntity`.
+- **Serialización Personalizada**: `ObjectMapper` optimizado con soporte para `JavaTimeModule` para manejar `LocalDateTime`.
+
+### 📉 Optimización de Carga de Datos
+
+- **Lazy Loading (Carga Perezosa)**: La mayoría de las relaciones en `ServiceDeliveryEntity` están configuradas como `FetchType.LAZY` para evitar cargar datos innecesarios.
+- **Entity Graphs**: Definiciones explícitas de `@EntityGraph` en los repositorios para resolver el problema N+1, cargando solo las asociaciones requeridas en una única consulta.
+
+---
+
+ ## ⚙️ Configuración e Instalación
 
 > 🚀 **¿Desplegar en Producción?** Consulta la guía completa de [**Despliegue en Cloud Run**](./DEPLOY_CLOUDRUN.md) con instrucciones paso a paso para desplegar en Google Cloud.
 

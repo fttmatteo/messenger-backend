@@ -35,7 +35,8 @@
 - [Setup & Installation](#️-setup--installation)
 - [CI/CD](#-cicd)
 - [Testing](#-testing)
-- [Postman Collection](#-postman-collection)
+- [Performance Optimization](#-performance-optimization)
+ - [Postman Collection](#-postman-collection)
 
 ---
 
@@ -129,7 +130,7 @@ graph LR
 | **Auditing** | JPA Callbacks + AOP (Aspect Oriented Programming) |
 | **CI/CD** | GitHub Actions |
 | **Architecture Testing** | ArchUnit |
-| **Performance** | Database Indices (Optimization for pagination) |
+| **Performance** | Spring Cache + Redis, Hibernate L2 Cache, Lazy Loading, Database Indices |
 
 ---
 
@@ -756,8 +757,28 @@ AUDIT | timestamp | user_document | action | method | params | status | duration
 - **File Output:** Optional, enable `AUDIT_FILE` appender in `logback-spring.xml`
 
 ---
+ 
+ ## ⚡ Performance Optimization
+ 
+ The system includes multiple optimization layers to ensure high performance and low latency.
+ 
+ ### 🚀 Caching Strategy (Redis)
+ 
+ - **Spring Cache Abstraction**: Application-level caching using `@Cacheable` and `@CacheEvict`.
+   - `Dealerships`: TTL 30 minutes.
+   - `Employees`: TTL 15 minutes.
+ - **Hibernate Second-Level Cache (L2)**: Entity-level caching via Redisson to reduce database load.
+   - Enabled for `DealershipEntity`, `EmployeeEntity`, and `PlateEntity`.
+ - **Custom Serialization**: Optimized `ObjectMapper` with `JavaTimeModule` support for `LocalDateTime`.
+ 
+ ### 📉 Data Fetching Optimization
+ 
+ - **Lazy Loading**: Most relationships in `ServiceDeliveryEntity` are configured as `FetchType.LAZY` to avoid loading unnecessary data.
+ - **Entity Graphs**: Explicit `@EntityGraph` definitions in repositories to solve the N+1 problem by fetching only required associations in a single query.
+ 
+ ---
 
-## ⚙️ Setup & Installation
+ ## ⚙️ Setup & Installation
 
 > 🚀 **Deploying to Production?** See the complete [**Cloud Run Deployment Guide**](./DEPLOY_CLOUDRUN.md) for step-by-step instructions on deploying to Google Cloud.
 
