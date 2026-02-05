@@ -27,11 +27,6 @@ public interface ServiceDeliveryPort {
         ServiceDelivery findById(Long idServiceDelivery);
 
         /**
-         * Recupera todos los servicios (incluyendo eliminados).
-         */
-        List<ServiceDelivery> findAll();
-
-        /**
          * Busca servicios activos asociados a una placa.
          */
         List<ServiceDelivery> findByPlateNumber(String plateNumber);
@@ -40,11 +35,6 @@ public interface ServiceDeliveryPort {
          * Busca servicios asignados a un mensajero.
          */
         List<ServiceDelivery> findByMessengerId(Long messengerId);
-
-        /**
-         * Recupera todos los servicios activos.
-         */
-        List<ServiceDelivery> findAllActive();
 
         /**
          * Busca un servicio activo por ID.

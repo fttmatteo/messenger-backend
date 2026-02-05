@@ -27,7 +27,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.mock.web.MockMultipartFile;
-import java.util.Arrays;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ServiceDeliveryController Unit Tests")
@@ -83,26 +82,6 @@ class ServiceDeliveryControllerTest {
         sampleResponse = new ServiceDeliveryResponse();
         sampleResponse.setIdServiceDelivery(1L);
         sampleResponse.setCurrentStatus(Status.ASSIGNED);
-    }
-
-    @Nested
-    @DisplayName("Endpoint GET /services/allServices")
-    class FindAllTests {
-
-        @Test
-        @DisplayName("Debe retornar 200 y lista de servicios")
-        void shouldReturnAllServices() throws Exception {
-            when(securityHelper.getCurrentUser()).thenReturn(messengerUser);
-            when(serviceDeliveryUseCase.findAll()).thenReturn(Arrays.asList(sampleService));
-            when(responseMapper.toSummaryResponse(sampleService)).thenReturn(sampleResponse);
-
-            mockMvc.perform(get("/services/allServices"))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$[0].idServiceDelivery").value(1L))
-                    .andExpect(jsonPath("$[0].currentStatus").value("ASSIGNED"));
-
-            verify(serviceDeliveryUseCase).findAll();
-        }
     }
 
     @Nested

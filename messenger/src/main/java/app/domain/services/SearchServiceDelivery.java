@@ -20,20 +20,6 @@ public class SearchServiceDelivery {
     private ServiceDeliveryPort serviceDeliveryPort;
 
     /**
-     * Retorna todos los servicios activos (excluye los eliminados).
-     */
-    public List<ServiceDelivery> findAll() {
-        return serviceDeliveryPort.findAllActive();
-    }
-
-    /**
-     * Retorna todos los servicios incluyendo los eliminados.
-     */
-    public List<ServiceDelivery> findAllIncludingDeleted() {
-        return serviceDeliveryPort.findAll();
-    }
-
-    /**
      * Busca un servicio por ID (excluye los eliminados).
      */
     public ServiceDelivery findById(Long id) throws BusinessException {

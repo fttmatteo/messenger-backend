@@ -226,14 +226,6 @@ public class ServiceDeliveryUseCase {
     }
 
     /**
-     * Recupera todos los servicios registrados.
-     */
-    @Transactional(readOnly = true)
-    public List<ServiceDelivery> findAll() {
-        return searchService.findAll();
-    }
-
-    /**
      * Recupera todos los servicios con paginación, ordenamiento y filtro de estado.
      */
     @Transactional(readOnly = true)
