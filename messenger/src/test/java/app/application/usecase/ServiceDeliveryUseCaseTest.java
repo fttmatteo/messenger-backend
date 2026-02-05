@@ -205,16 +205,6 @@ class ServiceDeliveryUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe buscar todos los servicios")
-        void shouldFindAll() {
-            when(searchService.findAll()).thenReturn(List.of(sampleService));
-
-            List<ServiceDelivery> result = serviceDeliveryUseCase.findAll();
-
-            assertEquals(1, result.size());
-        }
-
-        @Test
         @DisplayName("Debe buscar por placa")
         void shouldFindByPlate() {
             when(searchService.findByPlate("ABC123")).thenReturn(List.of(sampleService));

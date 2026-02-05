@@ -274,31 +274,6 @@ public class ServiceDeliveryController {
     }
 
     /**
-     * Obtiene todos los servicios.
-     * Los mensajeros solo ven sus propios servicios asignados.
-     */
-    @GetMapping("/allServices")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<ServiceDeliveryResponse>> findAll() {
-        Employee currentUser = securityHelper.getCurrentUser();
-
-        List<ServiceDelivery> services = serviceDeliveryUseCase.findAll();
-
-        if (currentUser.getRole() == Role.MESSENGER) {
-            Long messengerId = currentUser.getIdEmployee();
-            services = services.stream()
-                    .filter(s -> s.getMessenger() != null &&
-                            s.getMessenger().getIdEmployee().equals(messengerId))
-                    .collect(Collectors.toList());
-        }
-
-        List<ServiceDeliveryResponse> responses = services.parallelStream()
-                .map(responseMapper::toSummaryResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(responses);
-    }
-
-    /**
      * Obtiene todos los servicios con paginación.
      * Los mensajeros solo ven sus propios servicios asignados.
      */

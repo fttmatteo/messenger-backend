@@ -1,6 +1,7 @@
 package app.adapter.out.storage;
 
 import app.domain.ports.StoragePort;
+import app.infrastructure.storage.ImageOptimizer;
 import com.google.auth.ServiceAccountSigner;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -33,8 +35,10 @@ import java.util.concurrent.TimeUnit;
 public class GoogleCloudStorageAdapter implements StoragePort {
 
     private static final Logger logger = LoggerFactory.getLogger(GoogleCloudStorageAdapter.class);
+
     private record CachedUrl(String url, Instant expiresAt) {
     }
+
     private final ConcurrentHashMap<String, CachedUrl> signedUrlCache = new ConcurrentHashMap<>();
     private static final int CACHE_EXPIRATION_MARGIN_HOURS = 1;
 
@@ -42,16 +46,19 @@ public class GoogleCloudStorageAdapter implements StoragePort {
     private final String bucketName;
     private final int defaultUrlExpirationHours;
     private final GoogleCredentials credentials;
+    private final ImageOptimizer imageOptimizer;
 
     public GoogleCloudStorageAdapter(
             @Value("${google.cloud.storage.bucket-name}") String bucketName,
             @Value("${google.cloud.storage.project-id}") String projectId,
-            @Value("${google.cloud.storage.signed-url-expiration-hours:24}") int urlExpirationHours)
+            @Value("${google.cloud.storage.signed-url-expiration-hours:24}") int urlExpirationHours,
+            ImageOptimizer imageOptimizer)
             throws IOException {
 
         this.bucketName = bucketName;
         this.defaultUrlExpirationHours = urlExpirationHours;
         this.credentials = GoogleCredentials.getApplicationDefault();
+        this.imageOptimizer = imageOptimizer;
         this.storage = StorageOptions.newBuilder()
                 .setProjectId(projectId)
                 .setCredentials(credentials)
@@ -80,10 +87,31 @@ public class GoogleCloudStorageAdapter implements StoragePort {
             contentType = "application/octet-stream";
         }
 
+        String extension = getExtension(fileName);
+        String format = extension.toLowerCase().replace(".", "");
+
         BlobId blobId = BlobId.of(bucketName, objectName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
                 .setContentType(contentType)
                 .build();
+
+        // Optimizar si es imagen (JPEG/PNG)
+        if ("jpg".equals(format) || "jpeg".equals(format) || "png".equals(format)) {
+            try (InputStream originalStream = Files.newInputStream(file.toPath());
+                    InputStream optimizedStream = imageOptimizer.optimize(originalStream, extension)) {
+
+                // Si optimizamos, el contenido será image/jpeg (porque ImageOptimizer convierte
+                // a jpg)
+                blobInfo = BlobInfo.newBuilder(blobId)
+                        .setContentType("image/jpeg")
+                        .build();
+
+                storage.createFrom(blobInfo, optimizedStream);
+                return objectName;
+            } catch (Exception e) {
+                logger.warn("Falló optimización de imagen, se sube original: {}", e.getMessage());
+            }
+        }
 
         byte[] fileBytes = Files.readAllBytes(file.toPath());
         storage.create(blobInfo, fileBytes);

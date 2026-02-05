@@ -36,7 +36,8 @@
 - [Configuración e Instalación](#️-configuración-e-instalación)
 - [CI/CD](#-cicd)
 - [Testing](#-testing)
-- [Colección Postman](#-colección-postman)
+- [Optimización de Rendimiento](#-optimización-de-rendimiento)
+ - [Colección Postman](#-colección-postman)
 
 ---
 
@@ -130,7 +131,7 @@ graph LR
 | **Auditoría** | JPA Callbacks + AOP (Aspect Oriented Programming) |
 | **CI/CD** | GitHub Actions |
 | **Tests de Arquitectura** | ArchUnit |
-| **Rendimiento** | Índices de Base de Datos (Optimización para paginación) |
+| **Rendimiento** | Spring Cache + Redis, Hibernate L2 Cache, Lazy Loading, Índices de Base de Datos |
 
 ---
 
@@ -303,8 +304,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `PUT` | `/services/updateService/{id}` | Actualizar estado (multipart: estado + evidencias + GIF) |
 | `PUT` | `/services/reassign/{id}` | Reasignar a otro mensajero (ADMIN/CANCELED) |
 | `GET` | `/services/findByServiceId/{id}` | Obtener servicio por ID |
-| `GET` | `/services/allServices` | Listar servicios (filtrado por rol) |
-| `GET` | `/services/allServicesPageable` | Listar servicios con **paginación y búsqueda** |
+| `GET` | `/services/allServicesPageable` | Listar servicios con **paginación, búsqueda y ordenamiento** (Recomendado) |
 | `GET` | `/services/stats/daily` | INHABILITADO - Estadísticas diarias (requiere messengerId, from, to) |
 | `DELETE` | `/services/deleteService/{id}` | Mover a papelera (ADMIN) |
 | `GET` | `/services/trash` | Listar servicios eliminados (ADMIN) |
@@ -757,8 +757,39 @@ AUDIT | timestamp | documento_usuario | accion | metodo | parametros | estado | 
 - **Salida a Archivo:** Opcional, habilitar `AUDIT_FILE` appender en `logback-spring.xml`
 
 ---
+ 
+ ## ⚡ Optimización de Rendimiento
 
-## ⚙️ Configuración e Instalación
+El sistema incluye múltiples capas de optimización para garantizar un alto rendimiento y baja latencia.
+
+### 🚀 Estrategia de Caché (Redis)
+
+- **Abstracción de Spring Cache**: Caché a nivel de aplicación usando `@Cacheable` y `@CacheEvict`.
+  - `Dealerships` (Concesionarios): TTL 30 minutos.
+  - `Employees` (Empleados): TTL 15 minutos.
+- **Hibernate Second-Level Cache (L2)**: Caché a nivel de entidad vía Redisson para reducir la carga en la base de datos.
+  - Habilitado para `DealershipEntity`, `EmployeeEntity`, y `PlateEntity`.
+- **Serialización Personalizada**: `ObjectMapper` optimizado con soporte para `JavaTimeModule` para manejar `LocalDateTime`.
+
+### 📉 Optimización de Carga de Datos
+
+- **Lazy Loading (Carga Perezosa)**: La mayoría de las relaciones en `ServiceDeliveryEntity` están configuradas como `FetchType.LAZY` para evitar cargar datos innecesarios.
+- **Entity Graphs**: Definiciones explícitas de `@EntityGraph` en los repositorios para resolver el problema N+1, cargando solo las asociaciones requeridas en una única consulta.
+
+### 🖼️ Optimización de Imágenes
+
+- **Redimensionamiento Automático**: Las imágenes se redimensionan automáticamente a un máximo de 1280px (ancho o alto) preservando la relación de aspecto.
+- **Compresión Inteligente**: Reducción de calidad al 75% para archivos JPEG usando la librería `Thumbnailator`, reduciendo significativamente el uso de almacenamiento y ancho de banda sin pérdida de detalle perceptible.
+
+### 🔌 Tuning del Pool de Conexiones (HikariCP)
+
+- **Optimizado para Cloud SQL**: Parámetros ajustados para entornos de recursos limitados (db-f1-micro).
+- **Detección de Fugas**: Umbral activo para identificar y prevenir fugas de conexiones.
+- **Caché de Statements**: Habilitado para mejorar el rendimiento de ejecución de consultas.
+
+---
+
+ ## ⚙️ Configuración e Instalación
 
 > 🚀 **¿Desplegar en Producción?** Consulta la guía completa de [**Despliegue en Cloud Run**](./DEPLOY_CLOUDRUN.md) con instrucciones paso a paso para desplegar en Google Cloud.
 

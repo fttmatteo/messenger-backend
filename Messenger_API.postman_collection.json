@@ -506,7 +506,6 @@
             "item": [
                 {
                     "name": "Extract Plate (OCR Preview)",
-                    "description": "Extracts plate number from image using OCR. Used for previewing the detected plate before creating a service. Returns plate number for confirmation/editing.",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -525,7 +524,7 @@
                             "formdata": [
                                 {
                                     "key": "image",
-                                    "description": "Image of the license plate to process with OCR",
+                                    "description": "Image of the license plate",
                                     "type": "file",
                                     "src": []
                                 }
@@ -564,7 +563,6 @@
                             "formdata": [
                                 {
                                     "key": "image",
-                                    "description": "Evidence photo (mandatory for creation)",
                                     "type": "file",
                                     "src": []
                                 },
@@ -576,23 +574,11 @@
                                 {
                                     "key": "messengerId",
                                     "value": "",
-                                    "description": "Optional: Assign to messenger immediately",
                                     "type": "text"
                                 },
                                 {
                                     "key": "manualPlateNumber",
-                                    "value": "ABC123",
-                                    "description": "Optional: Manual plate if OCR fails",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "latitude",
-                                    "value": "4.6789",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "longitude",
-                                    "value": "-74.0567",
+                                    "value": "",
                                     "type": "text"
                                 }
                             ]
@@ -612,7 +598,6 @@
                 },
                 {
                     "name": "Update Service Status",
-                    "description": "Updates status (PENDING, DELIVERED, etc.) with evidence.",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -632,52 +617,61 @@
                                 {
                                     "key": "status",
                                     "value": "DELIVERED",
-                                    "description": "Required",
                                     "type": "text"
                                 },
                                 {
                                     "key": "observation",
-                                    "value": "Entregado en recepción",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "signature",
-                                    "description": "Mandatory for PENDING/DELIVERED",
-                                    "type": "file",
-                                    "src": []
-                                },
-                                {
-                                    "key": "signatureGif",
-                                    "description": "Evidence GIF (Mandatory for PENDING/DELIVERED)",
-                                    "type": "file",
-                                    "src": []
-                                },
-                                {
-                                    "key": "photos",
-                                    "description": "Mandatory for RETURNED",
-                                    "type": "file",
-                                    "src": []
-                                },
-                                {
-                                    "key": "latitude",
-                                    "value": "4.6789",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "longitude",
-                                    "value": "-74.0567",
+                                    "value": "Entregado a cliente",
                                     "type": "text"
                                 }
                             ]
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/serviceDelivery/updateService/1",
+                            "raw": "{{baseUrl}}/services/updateService/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "serviceDelivery",
+                                "services",
                                 "updateService",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Reassign Messenger (Admin)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"messengerId\": 2\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/services/reassign/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "reassign",
                                 "1"
                             ]
                         }
@@ -700,13 +694,127 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "{{baseUrl}}/serviceDelivery/1",
+                            "raw": "{{baseUrl}}/services/findByServiceId/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "serviceDelivery",
+                                "services",
+                                "findByServiceId",
                                 "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get All Services (Paginated)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/services/allServicesPageable?page=0&size=10&sortBy=createdAt&sortDirection=desc",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "allServicesPageable"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "0"
+                                },
+                                {
+                                    "key": "size",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "sortBy",
+                                    "value": "createdAt"
+                                },
+                                {
+                                    "key": "sortDirection",
+                                    "value": "desc"
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "ASSIGNED",
+                                    "disabled": true
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Service (To Trash)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/services/deleteService/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "deleteService",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Trash (Deleted Services)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/services/trash",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "trash"
                             ]
                         }
                     },
@@ -728,12 +836,12 @@
                         "method": "POST",
                         "header": [],
                         "url": {
-                            "raw": "{{baseUrl}}/serviceDelivery/trash/restore/1",
+                            "raw": "{{baseUrl}}/services/trash/restore/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "serviceDelivery",
+                                "services",
                                 "trash",
                                 "restore",
                                 "1"
@@ -743,7 +851,7 @@
                     "response": []
                 },
                 {
-                    "name": "Trash: Delete Permanent",
+                    "name": "Trash: Empty Trash",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -758,15 +866,86 @@
                         "method": "DELETE",
                         "header": [],
                         "url": {
-                            "raw": "{{baseUrl}}/serviceDelivery/trash/permanent/1",
+                            "raw": "{{baseUrl}}/services/trash/empty",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
-                                "serviceDelivery",
+                                "services",
                                 "trash",
-                                "permanent",
+                                "empty"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Trash: Permanent Delete",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/services/trash/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "trash",
                                 "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Daily Stats",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/services/stats/daily?messengerId=1&from=2024-01-01&to=2024-01-31",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "stats",
+                                "daily"
+                            ],
+                            "query": [
+                                {
+                                    "key": "messengerId",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "from",
+                                    "value": "2024-01-01"
+                                },
+                                {
+                                    "key": "to",
+                                    "value": "2024-01-31"
+                                }
                             ]
                         }
                     },

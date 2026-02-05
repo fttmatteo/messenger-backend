@@ -52,38 +52,6 @@ class SearchServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe buscar todos los servicios activos (excluyendo eliminados)")
-    /**
-     * Verifica que findAll solo retorne servicios que no han sido eliminados.
-     */
-    void shouldFindAllActive() {
-        when(serviceDeliveryPort.findAllActive()).thenReturn(Arrays.asList(new ServiceDelivery()));
-
-        List<ServiceDelivery> result = searchServiceDelivery.findAll();
-
-        assertEquals(1, result.size());
-    }
-
-    @Test
-    @DisplayName("Debe buscar todos los servicios incluyendo eliminados")
-    /**
-     * Verifica que findAllIncludingDeleted retorne tanto activos como eliminados.
-     */
-    void shouldFindAllIncludingDeleted() {
-        ServiceDelivery active = new ServiceDelivery();
-        active.setIdServiceDelivery(1L);
-        ServiceDelivery deleted = new ServiceDelivery();
-        deleted.setIdServiceDelivery(2L);
-        deleted.setDeleted(true);
-
-        when(serviceDeliveryPort.findAll()).thenReturn(Arrays.asList(active, deleted));
-
-        List<ServiceDelivery> result = searchServiceDelivery.findAllIncludingDeleted();
-
-        assertEquals(2, result.size());
-    }
-
-    @Test
     @DisplayName("Debe buscar servicios por placa")
     void shouldFindByPlateNumber() {
         when(serviceDeliveryPort.findByPlateNumber("ABC-123")).thenReturn(Arrays.asList(new ServiceDelivery()));

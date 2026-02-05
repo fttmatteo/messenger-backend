@@ -12,7 +12,6 @@ import app.infrastructure.persistence.mapper.ServiceDeliveryMapper;
 import app.infrastructure.persistence.repository.ServiceDeliveryRepository;
 import app.infrastructure.persistence.adapter.ServiceDeliveryAdapter;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -64,28 +63,6 @@ class ServiceDeliveryAdapterTest {
         ServiceDelivery found = serviceDeliveryAdapter.findById(1L);
         assertNotNull(found);
         assertEquals(Status.PENDING, found.getCurrentStatus());
-    }
-
-    @Test
-    @DisplayName("Debe listar todos")
-    /**
-     * Verifica listado de todos los servicios.
-     */
-    void shouldFindAll() {
-        ServiceDeliveryEntity e1 = new ServiceDeliveryEntity();
-        ServiceDeliveryEntity e2 = new ServiceDeliveryEntity();
-
-        ServiceDelivery s1 = new ServiceDelivery();
-        ServiceDelivery s2 = new ServiceDelivery();
-
-        when(repository.findAll()).thenReturn(Arrays.asList(e1, e2));
-        when(mapper.toDomain(e1)).thenReturn(s1);
-        when(mapper.toDomain(e2)).thenReturn(s2);
-
-        List<ServiceDelivery> all = serviceDeliveryAdapter.findAll();
-
-        assertEquals(2, all.size());
-        verify(repository).findAll();
     }
 
     @Test

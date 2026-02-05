@@ -56,16 +56,6 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     }
 
     /**
-     * Busca todos los servicios de entrega.
-     */
-    @Override
-    public List<ServiceDelivery> findAll() {
-        return repository.findAll().stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
-    }
-
-    /**
      * Busca todos los servicios de entrega por placa.
      */
     @Override
@@ -81,16 +71,6 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     @Override
     public List<ServiceDelivery> findByMessengerId(Long messengerId) {
         return repository.findByMessenger_IdEmployee(messengerId).stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Busca todos los servicios de entrega activos.
-     */
-    @Override
-    public List<ServiceDelivery> findAllActive() {
-        return repository.findByDeletedFalse().stream()
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
