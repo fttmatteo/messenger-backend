@@ -308,7 +308,7 @@ public class ServiceDeliveryController {
         }
 
         List<ServiceDeliveryResponse> mappedContent = servicePage.getContent()
-                .parallelStream()
+                .stream()
                 .map(responseMapper::toSummaryResponse)
                 .collect(Collectors.toList());
 
