@@ -1,5 +1,7 @@
 package app.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import app.domain.model.enums.Status;
 import java.time.LocalDateTime;
 
@@ -103,6 +105,7 @@ public class StatusHistory {
     /**
      * Reconstruye el objeto Location a partir de la latitud y longitud almacenadas.
      */
+    @JsonIgnore
     public Location getDeliveryLocation() {
         if (deliveryLatitude == null || deliveryLongitude == null) {
             return null;

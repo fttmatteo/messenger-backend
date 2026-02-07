@@ -22,6 +22,7 @@ public class DealershipMapper {
         entity.setLatitude(dealership.getLatitude());
         entity.setLongitude(dealership.getLongitude());
         entity.setIsGeolocated(dealership.getIsGeolocated());
+        entity.setWhatsappPin(dealership.getWhatsappPin());
         return entity;
     }
 
@@ -37,6 +38,7 @@ public class DealershipMapper {
         dealership.setLatitude(entity.getLatitude());
         dealership.setLongitude(entity.getLongitude());
         dealership.setIsGeolocated(entity.getIsGeolocated());
+        dealership.setWhatsappPin(entity.getWhatsappPin());
         return dealership;
     }
 }

@@ -8,6 +8,7 @@ public class DealershipRequest {
     private String address;
     private String phone;
     private String zone;
+    private String whatsappPin;
 
     public String getName() {
         return name;
@@ -39,5 +40,13 @@ public class DealershipRequest {
 
     public void setZone(String zone) {
         this.zone = zone;
+    }
+
+    public String getWhatsappPin() {
+        return whatsappPin;
+    }
+
+    public void setWhatsappPin(String whatsappPin) {
+        this.whatsappPin = whatsappPin;
     }
 }

@@ -1,5 +1,6 @@
 package app.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import app.domain.model.enums.TrackingStatus;
 import java.time.LocalDateTime;
 
@@ -38,6 +39,7 @@ public class LiveTracking {
      * Verifica si el tracking está activo (última actualización hace menos de X
      * minutos).
      */
+    @JsonIgnore
     public boolean isActive(int maxMinutesInactive) {
         if (lastUpdate == null) {
             return false;
@@ -48,6 +50,7 @@ public class LiveTracking {
     /**
      * Obtiene la dirección cardinal basada en el heading.
      */
+    @JsonIgnore
     public String getCardinalDirection() {
         if (heading == null) {
             return "Desconocido";

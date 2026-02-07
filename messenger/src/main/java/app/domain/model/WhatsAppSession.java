@@ -1,5 +1,6 @@
 package app.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 
 /**
@@ -53,6 +54,7 @@ public class WhatsAppSession {
         this.createdAt = createdAt;
     }
 
+    @JsonIgnore
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(expiresAt);
     }

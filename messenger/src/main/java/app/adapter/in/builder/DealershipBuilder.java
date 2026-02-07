@@ -21,6 +21,7 @@ public class DealershipBuilder {
         dealership.setAddress(validator.addressValidator(request.getAddress()));
         dealership.setPhone(validator.phoneValidator(request.getPhone()));
         dealership.setZone(validator.zoneValidator(request.getZone()));
+        dealership.setWhatsappPin(request.getWhatsappPin());
         return dealership;
     }
 }

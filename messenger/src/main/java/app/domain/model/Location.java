@@ -1,11 +1,14 @@
 package app.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
 
 /**
  * Value Object que representa una ubicación geográfica.
  * Incluye cálculos de distancia usando la fórmula Haversine.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Location {
     private Double latitude;
     private Double longitude;
@@ -79,6 +82,7 @@ public class Location {
         return distance != null && distance <= radiusMeters;
     }
 
+    @JsonIgnore
     public boolean isValid() {
         return latitude != null && longitude != null &&
                 latitude >= -90 && latitude <= 90 &&

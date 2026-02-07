@@ -19,7 +19,8 @@ public class DealershipResponseMapper {
                 dealership.getName(),
                 dealership.getAddress(),
                 dealership.getPhone(),
-                dealership.getZone());
+                dealership.getZone(),
+                dealership.getWhatsappPin());
         response.setLatitude(dealership.getLatitude());
         response.setLongitude(dealership.getLongitude());
         response.setIsGeolocated(dealership.getIsGeolocated());
