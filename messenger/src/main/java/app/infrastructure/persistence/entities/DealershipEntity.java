@@ -10,7 +10,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "dealerships")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "dealerships")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "dealerships_v2")
 public class DealershipEntity {
 
     @Id
