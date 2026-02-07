@@ -12,6 +12,8 @@ import app.domain.model.enums.Status;
 import app.domain.ports.ArchivePort;
 import app.domain.ports.EmployeePort;
 import app.domain.ports.ServiceDeliveryPort;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Servicio para eliminar (soft delete) servicios de entrega.
@@ -19,7 +21,10 @@ import app.domain.ports.ServiceDeliveryPort;
 @Service
 public class DeleteServiceDelivery {
 
+    private static final Logger logger = LoggerFactory.getLogger(DeleteServiceDelivery.class);
+
     @Autowired
+
     private ServiceDeliveryPort serviceDeliveryPort;
 
     @Autowired
@@ -143,8 +148,7 @@ public class DeleteServiceDelivery {
             try {
                 archivePort.archiveService(service, null, "Manual trash empty");
             } catch (Exception e) {
-                System.err
-                        .println("Error archivando servicio " + service.getIdServiceDelivery() + ": " + e.getMessage());
+                logger.error("Error archivando servicio {}: {}", service.getIdServiceDelivery(), e.getMessage());
             }
         }
 
