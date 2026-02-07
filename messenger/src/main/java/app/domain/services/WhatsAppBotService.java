@@ -173,6 +173,13 @@ public class WhatsAppBotService {
                         sendPendingList(from, dealershipId, dealershipName);
                         sendMenu(from, dealershipName);
                     }
+                    case "0" -> {
+                        sessionPort.deleteByPhoneNumber(from);
+                        conversationStates.remove(from);
+                        cancelTimeout(from);
+                        messagePort.sendTextMessage(from,
+                                "✅ Sesión cerrada correctamente.\n\nPara ingresar de nuevo, solo escribe un mensaje.");
+                    }
                     default -> {
                         // Si parece una placa, buscarla directamente
                         if (looksLikePlate(text)) {
@@ -199,7 +206,7 @@ public class WhatsAppBotService {
 
     private void sendMenu(String from, String dealershipName) {
         String menu = String.format(
-                "🛞 *%s*\n\n📋 *¿Qué deseas consultar?*\n_Ingrese el número correspondiente:_\n\n- 1️⃣ Consultar una placa específica\n- 2️⃣ Consultar todas las placas programadas",
+                "🛞 *%s*\n\n📋 *¿Qué deseas consultar?*\n_Ingrese el número correspondiente:_\n\n- 1️⃣ Consultar una placa específica\n- 2️⃣ Consultar todas las placas programadas\n- 0️⃣ Cerrar sesión y salir",
                 dealershipName);
         messagePort.sendTextMessage(from, menu);
     }
