@@ -38,6 +38,9 @@ public class DealershipEntity {
     @Column(name = "is_geolocated")
     private Boolean isGeolocated = false;
 
+    @Column(name = "whatsapp_pin")
+    private String whatsappPin;
+
     public Long getIdDealership() {
         return idDealership;
     }
@@ -100,5 +103,13 @@ public class DealershipEntity {
 
     public void setIsGeolocated(Boolean isGeolocated) {
         this.isGeolocated = isGeolocated;
+    }
+
+    public String getWhatsappPin() {
+        return whatsappPin;
+    }
+
+    public void setWhatsappPin(String whatsappPin) {
+        this.whatsappPin = whatsappPin;
     }
 }

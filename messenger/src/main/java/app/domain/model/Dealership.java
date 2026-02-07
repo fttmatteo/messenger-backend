@@ -13,6 +13,7 @@ public class Dealership {
     private Double latitude;
     private Double longitude;
     private Boolean isGeolocated = false;
+    private String whatsappPin;
 
     public Long getIdDealership() {
         return idDealership;
@@ -76,6 +77,14 @@ public class Dealership {
 
     public void setIsGeolocated(Boolean isGeolocated) {
         this.isGeolocated = isGeolocated;
+    }
+
+    public String getWhatsappPin() {
+        return whatsappPin;
+    }
+
+    public void setWhatsappPin(String whatsappPin) {
+        this.whatsappPin = whatsappPin;
     }
 
     /**

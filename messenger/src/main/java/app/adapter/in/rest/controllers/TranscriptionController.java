@@ -35,8 +35,6 @@ public class TranscriptionController {
     public ResponseEntity<TranscriptionResponse> transcribe(
             @RequestParam("audio") MultipartFile audio,
             @RequestParam(value = "language", defaultValue = "es-CO") String language) {
-        logger.info("DIAGNÓSTICO: Petición recibida en /api/transcribe (tamaño: {} bytes)",
-                audio != null ? audio.getSize() : "null");
         try {
             // Validar archivo
             if (audio.isEmpty()) {
