@@ -142,41 +142,41 @@ public class WhatsAppBotService {
     }
 
     private void sendPlateDetails(String from, List<ServiceDelivery> services) {
-        StringBuilder sb = new StringBuilder();
         for (ServiceDelivery s : services) {
-            sb.append(formatServiceDetail(s));
+            // 1. Enviar detalle de texto
+            messagePort.sendTextMessage(from, formatServiceDetail(s));
+
+            // 2. Enviar ubicación nativa si existe GPS para el estado actual
+            if (s.getHistory() != null && !s.getHistory().isEmpty()) {
+                Optional<StatusHistory> lastUpdate = s.getHistory().stream()
+                        .filter(h -> h.getNewStatus() == s.getCurrentStatus())
+                        .max((h1, h2) -> h1.getChangeDate().compareTo(h2.getChangeDate()));
+
+                if (lastUpdate.isPresent() && lastUpdate.get().getDeliveryLatitude() != null
+                        && lastUpdate.get().getDeliveryLongitude() != null) {
+                    String statusName = getStatusName(s.getCurrentStatus());
+                    messagePort.sendLocation(from,
+                            lastUpdate.get().getDeliveryLatitude(),
+                            lastUpdate.get().getDeliveryLongitude(),
+                            "Ubicación: " + statusName,
+                            s.getPlate().getPlateNumber());
+                }
+            }
         }
-        messagePort.sendTextMessage(from, sb.toString().trim());
     }
 
     private String formatServiceDetail(ServiceDelivery s) {
         String statusEmoji = getStatusEmoji(s.getCurrentStatus());
         String statusName = getStatusName(s.getCurrentStatus());
 
-        // Buscar ubicación en el historial para el estado actual
-        String locationInfo = "";
-        if (s.getHistory() != null && !s.getHistory().isEmpty()) {
-            Optional<StatusHistory> lastUpdate = s.getHistory().stream()
-                    .filter(h -> h.getNewStatus() == s.getCurrentStatus())
-                    .max((h1, h2) -> h1.getChangeDate().compareTo(h2.getChangeDate()));
-
-            if (lastUpdate.isPresent() && lastUpdate.get().getDeliveryLatitude() != null
-                    && lastUpdate.get().getDeliveryLongitude() != null) {
-                locationInfo = String.format("\n📍 *Ubicación:* https://www.google.com/maps?q=%f,%f",
-                        lastUpdate.get().getDeliveryLatitude(),
-                        lastUpdate.get().getDeliveryLongitude());
-            }
-        }
-
         return String.format(
-                "🚗 *Placa: %s*\n*Estado:* %s %s\n*Mensajero:* %s\n*Concesionario:* %s\n*Fecha:* %s%s\n\n",
+                "🚗 *Placa: %s*\n*Estado:* %s %s\n*Mensajero:* %s\n*Concesionario:* %s\n*Fecha:* %s\n\n",
                 s.getPlate().getPlateNumber(),
                 statusEmoji,
                 statusName,
                 s.getMessenger() != null ? s.getMessenger().getFullName() : "Sin asignar",
                 s.getDealership().getName(),
-                s.getCreatedAt() != null ? s.getCreatedAt().format(DATE_FORMAT) : "No disponible",
-                locationInfo);
+                s.getCreatedAt() != null ? s.getCreatedAt().format(DATE_FORMAT) : "No disponible");
     }
 
     private String getStatusName(Status status) {
