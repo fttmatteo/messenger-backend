@@ -13,8 +13,17 @@ public class WhatsAppConfig {
     private String phoneNumberId;
     private String accessToken;
     private String verifyToken;
+    private String appSecret;
     private String apiUrl = "https://graph.facebook.com/v21.0";
     private int sessionExpirationHours = 12;
+
+    public String getAppSecret() {
+        return appSecret;
+    }
+
+    public void setAppSecret(String appSecret) {
+        this.appSecret = appSecret;
+    }
 
     public String getPhoneNumberId() {
         return phoneNumberId;
