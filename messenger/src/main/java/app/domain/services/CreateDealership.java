@@ -15,14 +15,19 @@ public class CreateDealership {
     @Autowired
     private DealershipPort dealershipPort;
 
-    /**
-     * Crea un nuevo concesionario, validando que el nombre sea único.
-     */
     public Dealership create(Dealership dealership) throws Exception {
         Dealership existing = dealershipPort.findByName(dealership.getName());
         if (existing != null) {
             throw new BusinessException("Ya existe un concesionario con el nombre " + dealership.getName());
         }
+
+        if (dealership.getWhatsappPin() != null && !dealership.getWhatsappPin().isBlank()) {
+            Dealership withPin = dealershipPort.findByWhatsappPin(dealership.getWhatsappPin());
+            if (withPin != null) {
+                throw new BusinessException("El PIN de WhatsApp " + dealership.getWhatsappPin() + " ya está en uso.");
+            }
+        }
+
         Dealership saved = dealershipPort.save(dealership);
         return saved;
     }

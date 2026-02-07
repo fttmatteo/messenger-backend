@@ -2,12 +2,11 @@ package app.domain.services;
 
 import app.domain.model.Dealership;
 import app.domain.model.ServiceDelivery;
+import app.domain.model.StatusHistory;
 import app.domain.model.WhatsAppSession;
 import app.domain.model.enums.Status;
 import app.domain.ports.WhatsAppMessagePort;
 import app.domain.ports.WhatsAppSessionPort;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.format.DateTimeFormatter;
@@ -24,7 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class WhatsAppBotService {
 
-    private static final Logger logger = LoggerFactory.getLogger(WhatsAppBotService.class);
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     private final WhatsAppMessagePort messagePort;
@@ -52,7 +50,6 @@ public class WhatsAppBotService {
      */
     @Transactional
     public void processMessage(String from, String messageBody) {
-        logger.info("Mensaje recibido de {}: {}", from, messageBody);
         String text = messageBody.trim();
 
         // 1. Verificar si tiene sesión activa
@@ -77,14 +74,14 @@ public class WhatsAppBotService {
                 sessionPort.createSession(from, dealership, sessionPort.getSessionExpirationHours());
                 conversationStates.put(from, ConversationState.MENU);
                 sendMenu(from, dealership.getName());
-                logger.info("Sesión creada para {} - {}", from, dealership.getName());
             } else {
                 messagePort.sendTextMessage(from, "❌ PIN incorrecto. Intenta de nuevo:");
             }
         } else {
             // Solicitar PIN
             conversationStates.put(from, ConversationState.AWAITING_PIN);
-            messagePort.sendTextMessage(from, "🔒 Ingresa el PIN de tu concesionario:");
+            messagePort.sendTextMessage(from,
+                    "Hola, 🔒 Ingresa el PIN de 4 digitos proporcionado por tu concesionario para continuar:");
         }
     }
 
@@ -103,7 +100,7 @@ public class WhatsAppBotService {
                     sendPlateDetails(from, services);
                 }
                 conversationStates.put(from, ConversationState.MENU);
-                sendMenuReminder(from);
+                sendMenu(from, dealershipName);
             }
             case MENU -> {
                 switch (text) {
@@ -113,20 +110,19 @@ public class WhatsAppBotService {
                     }
                     case "2" -> {
                         sendPendingList(from, dealershipId, dealershipName);
-                        sendMenuReminder(from);
+                        sendMenu(from, dealershipName);
                     }
-                    case "0", "menu" -> sendMenu(from, dealershipName);
                     default -> {
                         // Si parece una placa, buscarla directamente
                         if (looksLikePlate(text)) {
                             List<ServiceDelivery> services = searchService.findByPlateAndDealership(text, dealershipId);
                             if (!services.isEmpty()) {
                                 sendPlateDetails(from, services);
-                                sendMenuReminder(from);
+                                sendMenu(from, dealershipName);
                             } else {
                                 messagePort.sendTextMessage(from,
-                                        "❌ Placa *" + text.toUpperCase() + "* no encontrada.\n\n" +
-                                                "📋 *Menú*\n1️⃣ Buscar placa\n2️⃣ Ver pendientes");
+                                        "❌ No se encontró la placa *" + text.toUpperCase() + "* en " + dealershipName);
+                                sendMenu(from, dealershipName);
                             }
                         } else {
                             sendMenu(from, dealershipName);
@@ -140,53 +136,74 @@ public class WhatsAppBotService {
 
     private void sendMenu(String from, String dealershipName) {
         String menu = String.format(
-                "✅ *%s*\n\n📋 *¿Qué deseas consultar?*\n1️⃣ Buscar placa específica\n2️⃣ Ver todas las placas pendientes",
+                "✅ *%s*\n\n📋 *¿Qué deseas consultar?*\n- 1️⃣ Buscar una placa específica\n- 2️⃣ Ver todas las placas asignadas",
                 dealershipName);
         messagePort.sendTextMessage(from, menu);
-    }
-
-    private void sendMenuReminder(String from) {
-        messagePort.sendTextMessage(from,
-                "📋 Escribe *1* para buscar otra placa, *2* para ver pendientes, o *0* para ver el menú.");
     }
 
     private void sendPlateDetails(String from, List<ServiceDelivery> services) {
         StringBuilder sb = new StringBuilder();
         for (ServiceDelivery s : services) {
-            String statusEmoji = getStatusEmoji(s.getCurrentStatus());
-            sb.append(String.format(
-                    "🚗 *Placa: %s*\n├ Estado: %s %s\n├ Mensajero: %s\n├ Concesionario: %s\n└ Fecha: %s\n\n",
-                    s.getPlate().getPlateNumber(),
-                    statusEmoji,
-                    s.getCurrentStatus().name(),
-                    s.getMessenger() != null ? s.getMessenger().getFullName() : "Sin asignar",
-                    s.getDealership().getName(),
-                    s.getCreatedAt().format(DATE_FORMAT)));
+            sb.append(formatServiceDetail(s));
         }
         messagePort.sendTextMessage(from, sb.toString().trim());
+    }
+
+    private String formatServiceDetail(ServiceDelivery s) {
+        String statusEmoji = getStatusEmoji(s.getCurrentStatus());
+        String statusName = getStatusName(s.getCurrentStatus());
+
+        // Buscar ubicación en el historial para el estado actual
+        String locationInfo = "";
+        if (s.getHistory() != null && !s.getHistory().isEmpty()) {
+            Optional<StatusHistory> lastUpdate = s.getHistory().stream()
+                    .filter(h -> h.getNewStatus() == s.getCurrentStatus())
+                    .max((h1, h2) -> h1.getChangeDate().compareTo(h2.getChangeDate()));
+
+            if (lastUpdate.isPresent() && lastUpdate.get().getDeliveryLatitude() != null
+                    && lastUpdate.get().getDeliveryLongitude() != null) {
+                locationInfo = String.format("\n📍 *Ubicación:* https://www.google.com/maps?q=%f,%f",
+                        lastUpdate.get().getDeliveryLatitude(),
+                        lastUpdate.get().getDeliveryLongitude());
+            }
+        }
+
+        return String.format(
+                "🚗 *Placa: %s*\n*Estado:* %s %s\n*Mensajero:* %s\n*Concesionario:* %s\n*Fecha:* %s%s\n\n",
+                s.getPlate().getPlateNumber(),
+                statusEmoji,
+                statusName,
+                s.getMessenger() != null ? s.getMessenger().getFullName() : "Sin asignar",
+                s.getDealership().getName(),
+                s.getCreatedAt() != null ? s.getCreatedAt().format(DATE_FORMAT) : "No disponible",
+                locationInfo);
+    }
+
+    private String getStatusName(Status status) {
+        return switch (status) {
+            case PENDING -> "PENDIENTE";
+            case ASSIGNED -> "ASIGNADO";
+            case DELIVERED -> "ENTREGADO";
+            case RETURNED -> "DEVUELTO";
+            case CANCELED -> "CANCELADO";
+            case RESOLVED -> "RESUELTO";
+            case FAILED -> "FALLIDO";
+            case DELETED -> "ELIMINADO";
+        };
     }
 
     private void sendPendingList(String from, Long dealershipId, String dealershipName) {
         List<ServiceDelivery> pending = searchService.findPendingByDealership(dealershipId);
 
         if (pending.isEmpty()) {
-            messagePort.sendTextMessage(from, "✅ No hay placas pendientes en " + dealershipName);
+            messagePort.sendTextMessage(from, "✅ Todavia no hay placa(s) asignada(s) para " + dealershipName);
             return;
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("📦 *Placas pendientes - ").append(dealershipName).append("*\n\n");
-
-        int count = 1;
+        StringBuilder sb = new StringBuilder("📦 *Placas asignada(s) a " + dealershipName + "*\n\n");
         for (ServiceDelivery s : pending) {
-            String statusEmoji = getStatusEmoji(s.getCurrentStatus());
-            sb.append(String.format("%d. %s - %s %s\n",
-                    count++,
-                    s.getPlate().getPlateNumber(),
-                    statusEmoji,
-                    s.getCurrentStatus().name()));
+            sb.append(formatServiceDetail(s));
         }
-
         messagePort.sendTextMessage(from, sb.toString().trim());
     }
 
@@ -204,7 +221,9 @@ public class WhatsAppBotService {
     }
 
     private boolean looksLikePlate(String text) {
-        // Placa colombiana: 3 letras + 3 números (o variantes)
-        return text.matches("(?i)^[A-Z]{3}\\d{3}$") || text.matches("(?i)^[A-Z]{3}-?\\d{3}$");
+        // Acepta los 3 formatos del sistema:
+        return text.matches("(?i)^[A-Z]{3}-?\\d{3}$") ||
+                text.matches("(?i)^\\d{3}-?[A-Z]{3}$") ||
+                text.matches("(?i)^[A-Z]{3}-?\\d{2}[A-Z]$");
     }
 }

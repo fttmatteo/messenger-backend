@@ -74,4 +74,13 @@ public class DealershipAdapter implements DealershipPort {
         }
         return null;
     }
+
+    @Override
+    /**
+     * Busca un concesionario por su PIN de WhatsApp.
+     */
+    public Dealership findByWhatsappPin(String whatsappPin) {
+        Optional<DealershipEntity> entity = repository.findByWhatsappPin(whatsappPin);
+        return entity.map(mapper::toDomain).orElse(null);
+    }
 }
