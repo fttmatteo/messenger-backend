@@ -32,4 +32,9 @@ public interface DealershipPort {
      * Recupera todos los concesionarios registrados.
      */
     List<Dealership> findAll();
+
+    /**
+     * Busca un concesionario por su PIN de WhatsApp.
+     */
+    Dealership findByWhatsappPin(String whatsappPin);
 }

@@ -32,6 +32,15 @@ public class UpdateDealership {
             existingDealership.setName(incomingData.getName());
         }
 
+        if (incomingData.getWhatsappPin() != null && !incomingData.getWhatsappPin().isBlank() &&
+                (existingDealership.getWhatsappPin() == null ||
+                        !existingDealership.getWhatsappPin().equals(incomingData.getWhatsappPin()))) {
+            Dealership withPin = dealershipPort.findByWhatsappPin(incomingData.getWhatsappPin());
+            if (withPin != null && !withPin.getIdDealership().equals(existingDealership.getIdDealership())) {
+                throw new BusinessException("El PIN de WhatsApp " + incomingData.getWhatsappPin() + " ya está en uso.");
+            }
+        }
+
         existingDealership.setAddress(incomingData.getAddress());
         existingDealership.setPhone(incomingData.getPhone());
         existingDealership.setZone(incomingData.getZone());

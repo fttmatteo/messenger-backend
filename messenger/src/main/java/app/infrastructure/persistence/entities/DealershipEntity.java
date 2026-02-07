@@ -38,7 +38,7 @@ public class DealershipEntity {
     @Column(name = "is_geolocated")
     private Boolean isGeolocated = false;
 
-    @Column(name = "whatsapp_pin")
+    @Column(name = "whatsapp_pin", unique = true)
     private String whatsappPin;
 
     public Long getIdDealership() {

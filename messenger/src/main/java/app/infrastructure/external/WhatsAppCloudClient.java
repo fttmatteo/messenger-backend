@@ -30,7 +30,25 @@ public class WhatsAppCloudClient implements WhatsAppMessagePort {
     /**
      * Envía un mensaje de texto a un número de WhatsApp.
      */
+    @Override
     public boolean sendTextMessage(String to, String message) {
+        return sendMessage(to, "text", Map.of("body", message));
+    }
+
+    /**
+     * Envía una ubicación geográfica nativa a un número de WhatsApp.
+     */
+    @Override
+    public boolean sendLocation(String to, double latitude, double longitude, String name, String address) {
+        Map<String, Object> location = new HashMap<>();
+        location.put("latitude", latitude);
+        location.put("longitude", longitude);
+        location.put("name", name);
+        location.put("address", address);
+        return sendMessage(to, "location", location);
+    }
+
+    private boolean sendMessage(String to, String type, Object data) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -39,11 +57,8 @@ public class WhatsAppCloudClient implements WhatsAppMessagePort {
             Map<String, Object> body = new HashMap<>();
             body.put("messaging_product", "whatsapp");
             body.put("to", to);
-            body.put("type", "text");
-
-            Map<String, String> text = new HashMap<>();
-            text.put("body", message);
-            body.put("text", text);
+            body.put("type", type);
+            body.put(type, data);
 
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
@@ -54,14 +69,14 @@ public class WhatsAppCloudClient implements WhatsAppMessagePort {
                     String.class);
 
             if (response.getStatusCode().is2xxSuccessful()) {
-                logger.info("Mensaje enviado a {}", to);
+                logger.info("Mensaje {} enviado a {}", type, to);
                 return true;
             } else {
-                logger.error("Error enviando mensaje: {}", response.getBody());
+                logger.error("Error enviando mensaje {}: {}", type, response.getBody());
                 return false;
             }
         } catch (Exception e) {
-            logger.error("Error enviando mensaje a WhatsApp: {}", e.getMessage());
+            logger.error("Error enviando mensaje {} a WhatsApp: {}", type, e.getMessage());
             return false;
         }
     }

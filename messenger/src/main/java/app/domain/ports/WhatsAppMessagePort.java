@@ -7,6 +7,18 @@ package app.domain.ports;
 public interface WhatsAppMessagePort {
 
     /**
+     * Envía una ubicación geográfica nativa a un número de WhatsApp.
+     * 
+     * @param to        Número de teléfono destino
+     * @param latitude  Latitud
+     * @param longitude Longitud
+     * @param name      Nombre del lugar (ej. "Ubicación de entrega")
+     * @param address   Dirección del lugar
+     * @return true si el envío fue exitoso
+     */
+    boolean sendLocation(String to, double latitude, double longitude, String name, String address);
+
+    /**
      * Envía un mensaje de texto a un número de WhatsApp.
      * 
      * @param to      Número de teléfono destino
