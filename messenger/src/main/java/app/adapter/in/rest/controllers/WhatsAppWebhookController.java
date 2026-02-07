@@ -49,7 +49,18 @@ public class WhatsAppWebhookController {
      * Recepción de mensajes entrantes.
      */
     @PostMapping("/webhook")
-    public ResponseEntity<String> receiveMessage(@RequestBody WebhookPayload payload) {
+    public ResponseEntity<String> receiveMessage(
+            @RequestBody String rawBody,
+            @RequestHeader(value = "X-Hub-Signature-256", required = false) String signature,
+            @RequestBody WebhookPayload payload) {
+
+        logger.debug("Webhook recibido. Firma: {}", signature);
+
+        if (!isValidSignature(rawBody, signature)) {
+            logger.error("Firma de webhook inválida. Petición rechazada.");
+            return ResponseEntity.status(403).body("Invalid signature");
+        }
+
         try {
             if (payload.getEntry() != null) {
                 for (WebhookPayload.Entry entry : payload.getEntry()) {
@@ -72,7 +83,45 @@ public class WhatsAppWebhookController {
             logger.error("Error procesando webhook: {}", e.getMessage(), e);
         }
 
-        // Siempre responder 200 para evitar reintentos
         return ResponseEntity.ok("EVENT_RECEIVED");
+    }
+
+    private boolean isValidSignature(String payload, String signatureWithPrefix) {
+        if (signatureWithPrefix == null || !signatureWithPrefix.startsWith("sha256=")) {
+            return false;
+        }
+
+        try {
+            String signature = signatureWithPrefix.substring(7); // Quitar "sha256="
+            String appSecret = config.getAppSecret();
+
+            if (appSecret == null || appSecret.isEmpty()) {
+                logger.warn("App Secret no configurado. Saltando validación de firma.");
+                return true; // Si no hay secreto, permitimos (para facilitar transición)
+            }
+
+            javax.crypto.spec.SecretKeySpec signingKey = new javax.crypto.spec.SecretKeySpec(
+                    appSecret.getBytes(java.nio.charset.StandardCharsets.UTF_8),
+                    "HmacSHA256");
+
+            javax.crypto.Mac mac = javax.crypto.Mac.getInstance("HmacSHA256");
+            mac.init(signingKey);
+
+            byte[] rawHmac = mac.doFinal(payload.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            String expectedSignature = bytesToHex(rawHmac);
+
+            return expectedSignature.equalsIgnoreCase(signature);
+        } catch (Exception e) {
+            logger.error("Error validando firma: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    private String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
     }
 }

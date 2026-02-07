@@ -5,7 +5,7 @@
 # 🚀 Messenger Backend API
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
-[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.9-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.10-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Redis](https://img.shields.io/badge/Redis-7.0+-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 [![Google Cloud](https://img.shields.io/badge/Google_Cloud-1.0+-4479A1?style=for-the-badge&logo=google&logoColor=white)](https://cloud.google.com/)
@@ -50,6 +50,8 @@ graph LR
     USER((👤 User/App))
     MAPS{{G-Maps}}
     GCS{{GCS}}
+    WAPP{{WhatsApp}}
+    OCR_EXT{{OCR API}}
     DB[(MySQL)]
     REDIS[(Redis)]
 
@@ -75,6 +77,8 @@ graph LR
         direction TB
         PERS[💾 Persistence]
         CLD[☁️ Cloud Services]
+        WABA[📱 WhatsApp]
+        VIS[👁️ Vision/OCR]
         SEC[🔐 Security]
     end
 
@@ -90,11 +94,15 @@ graph LR
     %% Outbound Flow (Dependency Inversion)
     PERS -.-> PORTS
     CLD -.-> PORTS
+    WABA -.-> PORTS
+    VIS -.-> PORTS
     SEC -.-> PORTS
 
     %% Infrastructure Connections
     PERS --> DB
     CLD --> GCS & MAPS
+    WABA --> WAPP
+    VIS --> OCR_EXT
     SEC --> REDIS
 
     %% Styling
@@ -105,7 +113,7 @@ graph LR
     style OUT fill:#2d1a05,stroke:#f0883e,color:#c9d1d9
     
     classDef actor fill:#21262d,stroke:#8b949e,color:#c9d1d9
-    class USER,MAPS,GCS,DB,REDIS actor
+    class USER,MAPS,GCS,WAPP,OCR_EXT,DB,REDIS actor
 ```
 
 ---
@@ -114,7 +122,7 @@ graph LR
 
 | Component | Technology |
 |-----------|------------|
-| **Framework** | Spring Boot 3.5.9 |
+| **Framework** | Spring Boot 3.5.10 |
 | **Language** | Java 17 |
 | **Database** | MySQL 8.0+ |
 | **Migrations** | Flyway |
@@ -125,6 +133,7 @@ graph LR
 | **Speech-to-Text** | Google Cloud Speech-to-Text |
 | **Storage** | Google Cloud Storage |
 | **Maps** | Google Maps Platform |
+| **WhatsApp** | WhatsApp Cloud API (Meta) |
 | **Real-Time** | WebSocket + Redis |
 | **Build** | Maven 3.9+ |
 | **Monitoring** | Spring Boot Actuator (Health, Metrics) |
@@ -155,14 +164,15 @@ messenger/
 │   │       ├── persistence/             # JPA Adapters
 │   │       ├── security/                # JWT Adapter
 │   │       ├── storage/                 # Google Cloud Storage
-│   │       └── tracking/                # Location Tracking
+│   │       ├── tracking/                # Location Tracking
+│   │       └── whatsapp/                # WhatsApp Cloud API
 │   ├── application/
 │   │   └── usecase/                     # 11 Use Cases (Monitoring, Settings, Location...)
 │   ├── domain/
 │   │   ├── exception/                   # BusinessException, InputsException...
-│   │   ├── model/                       # 12+ Models + 7 Enums + Auth
+│   │   ├── model/                       # 14+ Models + 7 Enums + Auth
 │   │   │   └── enums/                   # Role, Status, PlateType...
-│   │   ├── ports/                       # 10 Ports (interfaces)
+│   │   ├── ports/                       # 14 Ports (interfaces)
 │   │   └── services/                    # Domain Services
 │   └── infrastructure/
 │       ├── audit/                       # AOP Audit System
@@ -264,6 +274,8 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 |--------|----------|-------------|
 | `POST` | `/auth/login` | Login and receive access + refresh tokens (Requires `turnstileToken`) |
 | `POST` | `/auth/refresh` | Renew access token with refresh token |
+| `GET` | `/auth/ws-token` | Get temporary token for WebSocket connection |
+| `POST` | `/auth/logout` | Logout and clear authentication cookies |
 
 ---
 
@@ -290,7 +302,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `PUT` | `/dealerships/updateDealership/{id}` | Update dealership (ADMIN) |
 | `DELETE` | `/dealerships/deleteDealership/{id}` | Delete dealership (ADMIN) |
 | `POST` | `/dealerships/geocodeDealership/{id}` | Geocode dealership address (ADMIN) |
-| `GET` | `/dealerships/findByDealershipName/{name}` | Get by Name |
 
 ---
 
@@ -303,7 +314,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `PUT` | `/services/updateService/{id}` | Update status (multipart: status + evidence + GIF) |
 | `PUT` | `/services/reassign/{id}` | Reassign to another messenger (ADMIN/CANCELED) |
 | `GET` | `/services/findByServiceId/{id}` | Get service by ID |
-| `GET` | `/services/allServicesPageable` | List services with **pagination, search & sorting** (Recommended) |
+| `GET` | `/services/allServicesPageable` | List services with **pagination, search & sorting** |
 | `GET` | `/services/stats/daily` | DISABLED - Daily stats (requires messengerId, from, to) |
 | `DELETE` | `/services/deleteService/{id}` | Move to trash (ADMIN) |
 | `GET` | `/services/trash` | List deleted services (ADMIN) |
@@ -315,9 +326,23 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 ### Transcription (`/api/transcribe`)
 
+| `POST` | `/api/transcribe` | Transcribe audio file to text using Google Cloud STT |
+
+---
+
+### WhatsApp (`/api/whatsapp`)
+
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/transcribe` | Transcribe audio file to text using Google Cloud STT |
+| `GET`  | `/api/whatsapp/webhook` | Webhook verification (required by Meta) |
+| `POST` | `/api/whatsapp/webhook` | Receive incoming messages (Validated with HMAC-SHA256) |
+
+> [!TIP]
+> **WhatsApp Bot Workflow**:
+> 1. User sends a message.
+> 2. Bot requests a 4-digit PIN (requested every 12 hours).
+> 3. After authentication, the user can query plate status or list pending deliveries.
+
 
 > [!CAUTION]
 > **File Constraints**:
@@ -355,11 +380,12 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 ---
 
-### Real-Time Tracking (`/tracking`)
+### Real-Time Tracking (`/tracking` & WebSocket)
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/tracking/update` | DISABLED - Update messenger live location |
+| `WS` | `/ws/tracking/update` | Update location via WebSocket (with Heartbeat) |
+| `POST` | `/tracking/update` | DISABLED - REST alternative for location updates |
 | `GET` | `/tracking/messenger/{id}` | Get last known location (ADMIN) |
 | `GET` | `/tracking/active` | Get all active messengers (ADMIN) |
 | `GET` | `/tracking/history/{id}` | Get history by date (`?date=YYYY-MM-DD`) |
@@ -398,6 +424,7 @@ erDiagram
         Double latitude
         Double longitude
         Boolean is_geolocated
+        String whatsapp_pin UK
     }
     
     plates {
@@ -418,21 +445,22 @@ erDiagram
         LocalDateTime created_at
         Boolean deleted
         LocalDateTime deleted_at
-        LocalDateTime locked_at
     }
     
     signatures {
         Long id_signature PK
-        String file_path
+        String signature_path
         String gif_path
+        LocalDateTime upload_date
     }
     
     photos {
         Long id_photo PK
-        String file_path
+        String photo_path
         PhotoType photo_type
         Long service_delivery_id FK
         Long status_history_id FK
+        LocalDateTime upload_date
     }
     
     status_history {
@@ -471,6 +499,14 @@ erDiagram
         String deletion_reason
         String original_data_json
     }
+
+    wa_sessions {
+        Long id PK
+        String phone_number
+        Long dealership_id FK
+        LocalDateTime expires_at
+        LocalDateTime created_at
+    }
     
     employees ||--o{ service_deliveries : "delivers"
     dealerships ||--o{ service_deliveries : "receives"
@@ -483,6 +519,7 @@ erDiagram
     status_history ||--o| signatures : "verified_by"
     employees ||--o{ tracking_history : "tracked"
     service_deliveries ||--o{ tracking_history : "route"
+    dealerships ||--o{ wa_sessions : "authorized"
 ```
 
 ### Enums
@@ -491,8 +528,8 @@ erDiagram
 |------|--------|
 | **Role** | `ADMIN`, `MESSENGER` |
 | **PlateType** | `CAR` (ABC 123), `MOTORCYCLE` (ABC 12A), `MOTORCAR` (123 ABC) |
-| **Status** | `ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED` |
-| **PhotoType** | `EVIDENCE`, `SIGNATURE`, `PLATE` |
+| **Status** | `ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED`, `FAILED`(DISABLED), `DELETED` |
+| **PhotoType** | `PLATE_DETECTION`, `EVIDENCE` |
 | **TrackingStatus** | `ACTIVE`, `INACTIVE`, `OFFLINE` |
 | **TrackingSource** | `GPS`, `NETWORK`, `MANUAL` |
 
@@ -506,8 +543,8 @@ GPS tracking system using **Redis** + **WebSocket** for messenger monitoring.
 
 | Feature | Description |
 |---------|-------------|
-| 🔴 **Live location** | Updates every 5-45 seconds (5s rate limit) |
-| 📍 **Delivery validation** | Maximum 200m radius from destination [Next Implementation] |
+| 🔴 **Live location** | Updates every 45 seconds (5s rate limit) |
+| 📍 **Delivery validation** | DISABLED - Maximum 200m radius from destination |
 | 🎯 **Technical accuracy** | < 100m GPS error filtered for history |
 | 📊 **Complete history** | Permanent retention (Historical Archive) |
 | ⚡ **Low latency** | Redis for location caching |
@@ -659,6 +696,10 @@ flowchart LR
   - Automatic fallback to in-memory rate limiting if Redis is unavailable.
   - Memory-efficient TTL management for Redis keys.
 - **WebSocket Throttling**: 5 seconds minimum interval between updates per messenger.
+- **WhatsApp Security**:
+  - **Webhook validation**: Uses HMAC-SHA256 with Meta's App Secret to verify request origin.
+  - **PIN Protection**: 4-digit PIN authentication required to access dealership data.
+  - **Brute-force protection**: Bot access is blocked for 15 minutes after 3 failed PIN attempts, with progressive delays between attempts.
 - Response headers: `X-Rate-Limit-Remaining`, `X-Rate-Limit-Retry-After-Seconds`
 
 ### Roles & Permissions
@@ -825,6 +866,10 @@ AUDIT | timestamp | user_document | action | method | params | status | duration
 | `GCS_BUCKET_NAME` | Bucket for evidence | `plak-evidence` |
 | `TURNSTILE_SECRET_KEY`| Cloudflare Secret Key | `0x4AAAAAA...` |
 | `CORS_ALLOWED_ORIGINS`| Allowed Frontend URLs | `http://localhost:5173` |
+| `WHATSAPP_PHONE_NUMBER_ID`| WhatsApp Phone ID | `123456789...` |
+| `WHATSAPP_ACCESS_TOKEN`| Meta Permanent Token | `EAAG...` |
+| `WHATSAPP_VERIFY_TOKEN`| Custom Webhook Token | `my_secret_token` |
+| `WHATSAPP_APP_SECRET`  | Meta App Secret | `abc123...` |
 
 </details>
 
@@ -887,9 +932,9 @@ Automated pipeline with **GitHub Actions**:
 # .github/workflows/maven.yml
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "main", "develop" ]
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "main", "develop" ]
 ```
 
 ### Features
@@ -931,7 +976,7 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 - ✅ **Environment variables** preconfigured (`baseUrl`, `token`, `refreshToken`)
 - ✅ **Automated tests** that save tokens to collection variables
 - ✅ **Payload examples** for all endpoints
-- ✅ **7 controllers** fully documented:
+- ✅ **10 controllers** fully documented:
   - 🔐 Authentication (Login + Refresh)
   - 👥 Employees
   - 🏢 Dealerships
@@ -939,6 +984,9 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
   - 📡 Tracking
   - 📦 Service Deliveries
   - 📁 Files
+  - 📊 Monitoring
+  - ⚙️ System Settings
+  - 🎙️ Transcription
 
 ### Usage
 

@@ -5,7 +5,7 @@
 # 🚀 Messenger Backend API
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
-[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.9-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.10-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Redis](https://img.shields.io/badge/Redis-7.0+-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 [![Google Cloud](https://img.shields.io/badge/Google_Cloud-1.0+-4479A1?style=for-the-badge&logo=google&logoColor=white)](https://cloud.google.com/)
@@ -51,6 +51,8 @@ graph LR
     USER((👤 Usuario/App))
     MAPS{{G-Maps}}
     GCS{{GCS}}
+    WAPP{{WhatsApp}}
+    OCR_EXT{{OCR API}}
     DB[(MySQL)]
     REDIS[(Redis)]
 
@@ -76,6 +78,8 @@ graph LR
         direction TB
         PERS[💾 Persistencia]
         CLD[☁️ Servicios Cloud]
+        WABA[📱 WhatsApp]
+        VIS[👁️ Visión/OCR]
         SEC[🔐 Seguridad]
     end
 
@@ -91,11 +95,15 @@ graph LR
     %% Flujo de Salida (Inversión de Dependencia)
     PERS -.-> PORTS
     CLD -.-> PORTS
+    WABA -.-> PORTS
+    VIS -.-> PORTS
     SEC -.-> PORTS
 
     %% Conexiones de Infraestructura
     PERS --> DB
     CLD --> GCS & MAPS
+    WABA --> WAPP
+    VIS --> OCR_EXT
     SEC --> REDIS
 
     %% Estilos
@@ -106,7 +114,7 @@ graph LR
     style OUT fill:#2d1a05,stroke:#f0883e,color:#c9d1d9
     
     classDef actor fill:#21262d,stroke:#8b949e,color:#c9d1d9
-    class USER,MAPS,GCS,DB,REDIS actor
+    class USER,MAPS,GCS,WAPP,OCR_EXT,DB,REDIS actor
 ```
 
 ---
@@ -115,7 +123,7 @@ graph LR
 
 | Componente | Tecnología |
 |------------|------------|
-| **Framework** | Spring Boot 3.5.9 |
+| **Framework** | Spring Boot 3.5.10 |
 | **Lenguaje** | Java 17 |
 | **Base de Datos** | MySQL 8.0+ |
 | **Migraciones** | Flyway |
@@ -126,6 +134,7 @@ graph LR
 | **Speech-to-Text** | Google Cloud Speech-to-Text |
 | **Almacenamiento** | Google Cloud Storage |
 | **Mapas** | Google Maps Platform |
+| **WhatsApp** | WhatsApp Cloud API (Meta) |
 | **Tiempo Real** | WebSocket + Redis |
 | **Build** | Maven 3.9+ |
 | **Monitoreo** | Spring Boot Actuator (Health, Metrics) |
@@ -157,14 +166,15 @@ messenger/
 │   │       ├── persistence/             # Adaptadores JPA
 │   │       ├── security/                # JWT Adapter
 │   │       ├── storage/                 # Google Cloud Storage
-│   │       └── tracking/                # Location Tracking
+│   │       ├── tracking/                # Location Tracking
+│   │       └── whatsapp/                # WhatsApp Cloud API
 │   ├── application/
-│   │   └── usecase/                     # 11 Casos de Uso
+│   │   └── usecase/                     # 11 Casos de Uso (Monitoreo, Location, Tracking...)
 │   ├── domain/
 │   │   ├── exception/                   # BusinessException, InputsException...
-│   │   ├── model/                       # 12+ Modelos + 7 Enums + Auth
+│   │   ├── model/                       # 14+ Modelos + 7 Enums + Auth
 │   │   │   └── enums/                   # Role, Status, PlateType...
-│   │   ├── ports/                       # 10 Puertos (interfaces)
+│   │   ├── ports/                       # 14 Puertos (interfaces)
 │   │   └── services/                    # Servicios de dominio
 │   └── infrastructure/
 │       ├── audit/                       # Sistema de Auditoría AOP
@@ -266,6 +276,8 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 |--------|----------|-------------|
 | `POST` | `/auth/login` | Iniciar sesión y obtener tokens de acceso + refresh (Requiere `turnstileToken`) |
 | `POST` | `/auth/refresh` | Renovar token de acceso con refresh token |
+| `GET` | `/auth/ws-token` | Obtener token temporal para conexión WebSocket |
+| `POST` | `/auth/logout` | Cerrar sesión y limpiar cookies de autenticación |
 
 ---
 
@@ -292,7 +304,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `PUT` | `/dealerships/updateDealership/{id}` | Actualizar concesionario (ADMIN) |
 | `DELETE` | `/dealerships/deleteDealership/{id}` | Eliminar concesionario (ADMIN) |
 | `POST` | `/dealerships/geocodeDealership/{id}` | Geocodificar dirección de concesionario (ADMIN) |
-| `GET` | `/dealerships/findByDealershipName/{name}` | Obtener por Nombre |
 
 ---
 
@@ -305,7 +316,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `PUT` | `/services/updateService/{id}` | Actualizar estado (multipart: estado + evidencias + GIF) |
 | `PUT` | `/services/reassign/{id}` | Reasignar a otro mensajero (ADMIN/CANCELED) |
 | `GET` | `/services/findByServiceId/{id}` | Obtener servicio por ID |
-| `GET` | `/services/allServicesPageable` | Listar servicios con **paginación, búsqueda y ordenamiento** (Recomendado) |
+| `GET` | `/services/allServicesPageable` | Listar servicios con **paginación, búsqueda y ordenamiento** |
 | `GET` | `/services/stats/daily` | INHABILITADO - Estadísticas diarias (requiere messengerId, from, to) |
 | `DELETE` | `/services/deleteService/{id}` | Mover a papelera (ADMIN) |
 | `GET` | `/services/trash` | Listar servicios eliminados (ADMIN) |
@@ -317,9 +328,23 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 ### Transcripción (`/api/transcribe`)
 
+| `POST` | `/api/transcribe` | Transcribir archivo de audio a texto usando Google Cloud STT |
+
+---
+
+### WhatsApp (`/api/whatsapp`)
+
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| `POST` | `/api/transcribe` | Transcribir archivo de audio a texto usando Google Cloud STT |
+| `GET`  | `/api/whatsapp/webhook` | Verificación de webhook (requerido por Meta) |
+| `POST` | `/api/whatsapp/webhook` | Recepción de mensajes entrantes (Validado con HMAC-SHA256) |
+
+> [!TIP]
+> **Flujo del Bot de WhatsApp**:
+> 1. El usuario envía un mensaje.
+> 2. El bot solicita un PIN de acceso de 4 dígitos (se solicita cada 12 horas).
+> 3. Tras la autenticación, el usuario puede consultar estados de placas o listar entregas pendientes.
+
 
 > [!CAUTION]
 > **Restricciones de Archivos**:
@@ -357,11 +382,12 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 ---
 
-### Tracking en Tiempo Real (`/tracking`)
+### Tracking en Tiempo Real (`/tracking` & WebSocket)
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| `POST` | `/tracking/update` | INHABILITADO - Actualizar ubicación en vivo del mensajero |
+| `WS` | `/ws/tracking/update` | Actualizar ubicación vía WebSocket (con Heartbeat) |
+| `POST` | `/tracking/update` | INHABILITADO - Alternativa REST para actualizar ubicación |
 | `GET` | `/tracking/messenger/{id}` | Obtener última ubicación conocida (ADMIN) |
 | `GET` | `/tracking/active` | Listar todos los mensajeros activos (ADMIN) |
 | `GET` | `/tracking/history/{id}` | Obtener historial por fecha (`?date=YYYY-MM-DD`) |
@@ -400,6 +426,7 @@ erDiagram
         Double latitude
         Double longitude
         Boolean is_geolocated
+        String whatsapp_pin UK
     }
     
     plates {
@@ -420,21 +447,22 @@ erDiagram
         LocalDateTime created_at
         Boolean deleted
         LocalDateTime deleted_at
-        LocalDateTime locked_at
     }
     
     signatures {
         Long id_signature PK
-        String file_path
+        String signature_path
         String gif_path
+        LocalDateTime upload_date
     }
     
     photos {
         Long id_photo PK
-        String file_path
+        String photo_path
         PhotoType photo_type
         Long service_delivery_id FK
         Long status_history_id FK
+        LocalDateTime upload_date
     }
     
     status_history {
@@ -473,6 +501,14 @@ erDiagram
         String deletion_reason
         String original_data_json
     }
+
+    wa_sessions {
+        Long id PK
+        String phone_number
+        Long dealership_id FK
+        LocalDateTime expires_at
+        LocalDateTime created_at
+    }
     
     employees ||--o{ service_deliveries : "delivers"
     dealerships ||--o{ service_deliveries : "receives"
@@ -485,6 +521,7 @@ erDiagram
     status_history ||--o| signatures : "verified_by"
     employees ||--o{ tracking_history : "tracked"
     service_deliveries ||--o{ tracking_history : "route"
+    dealerships ||--o{ wa_sessions : "authorized"
 ```
 
 ### Enums
@@ -493,8 +530,8 @@ erDiagram
 |------|---------|
 | **Role** | `ADMIN`, `MESSENGER` |
 | **PlateType** | `CAR` (ABC 123), `MOTORCYCLE` (ABC 12A), `MOTORCAR` (123 ABC) |
-| **Status** | `ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED` |
-| **PhotoType** | `EVIDENCE`, `SIGNATURE`, `PLATE` |
+| **Status** | `ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED`, `FAILED`(INHABILITADO), `DELETED` |
+| **PhotoType** | `PLATE_DETECTION`, `EVIDENCE` |
 | **TrackingStatus** | `ACTIVE`, `INACTIVE`, `OFFLINE` |
 | **TrackingSource** | `GPS`, `NETWORK`, `MANUAL` |
 
@@ -508,7 +545,7 @@ Sistema de tracking GPS usando **Redis** + **WebSocket** para monitoreo de mensa
 
 | Feature | Descripción |
 |---------|-------------|
-| 🔴 **Ubicación en vivo** | Actualización cada 5-45 seg (mín. 5s) |
+| 🔴 **Ubicación en vivo** | Actualización cada 45 seg (mín. 5s) |
 | 📍 **Validación de entrega** | INHABILITADO - Radio máximo de 200m del destino |
 | 🎯 **Precisión técnica** | Filtro de error GPS < 100m para historial |
 | 📊 **Historial completo** | Retención permanente (Archivado histórico) |
@@ -660,6 +697,10 @@ flowchart LR
   - Fallback automático a memoria local si Redis no está disponible.
   - Gestión eficiente de memoria mediante TTL dinámico en Redis.
 - **Limitación WebSocket**: Intervalo mínimo de 5 segundos entre actualizaciones por mensajero.
+- **Seguridad WhatsApp**:
+  - **Validación de Webhook**: Usa HMAC-SHA256 con el App Secret de Meta para verificar el origen de la petición.
+  - **Protección por PIN**: Autenticación por PIN de 4 dígitos requerida para acceder a los datos de concesionarios.
+  - **Protección Fuerza Bruta**: El acceso al bot se bloquea por 15 minutos tras 3 intentos fallidos de PIN, con delays progresivos entre intentos.
 - Headers de respuesta: `X-Rate-Limit-Remaining`, `X-Rate-Limit-Retry-After-Seconds`
 
 ### Roles y Permisos
@@ -767,7 +808,7 @@ AUDIT | timestamp | documento_usuario | accion | metodo | parametros | estado | 
 
 ---
  
- ## ⚡ Optimización de Rendimiento
+## ⚡ Optimización de Rendimiento
 
 El sistema incluye múltiples capas de optimización para garantizar un alto rendimiento y baja latencia.
 
@@ -798,7 +839,7 @@ El sistema incluye múltiples capas de optimización para garantizar un alto ren
 
 ---
 
- ## ⚙️ Configuración e Instalación
+## ⚙️ Configuración e Instalación
 
 > 🚀 **¿Desplegar en Producción?** Consulta la guía completa de [**Despliegue en Cloud Run**](./DEPLOY_CLOUDRUN.md) con instrucciones paso a paso para desplegar en Google Cloud.
 
@@ -827,6 +868,10 @@ El sistema incluye múltiples capas de optimización para garantizar un alto ren
 | `GCS_BUCKET_NAME` | Bucket para evidencias | `plak-evidence` |
 | `TURNSTILE_SECRET_KEY`| Cloudflare Secret Key | `0x4AAAAAA...` |
 | `CORS_ALLOWED_ORIGINS`| URLs de frontend permitidas | `http://localhost:5173` |
+| `WHATSAPP_PHONE_NUMBER_ID`| ID del Teléfono de WhatsApp | `123456789...` |
+| `WHATSAPP_ACCESS_TOKEN`| Token Permanente de Meta | `EAAG...` |
+| `WHATSAPP_VERIFY_TOKEN`| Token de Verificación Webhook | `mi_token_secreto` |
+| `WHATSAPP_APP_SECRET`  | App Secret de Meta | `abc123...` |
 
 </details>
 
@@ -889,9 +934,9 @@ Pipeline automatizado con **GitHub Actions**:
 # .github/workflows/maven.yml
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "main", "develop" ]
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "main", "develop" ]
 ```
 
 ### Características
@@ -933,7 +978,7 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 - ✅ **Variables de entorno** preconfiguradas (`baseUrl`, `token`, `refreshToken`)
 - ✅ **Tests automáticos** que guardan tokens en variables de colección
 - ✅ **Ejemplos de payloads** para todos los endpoints
-- ✅ **7 controladores** completamente documentados:
+- ✅ **10 controladores** completamente documentados:
   - 🔐 Authentication (Login + Refresh)
   - 👥 Employees
   - 🏢 Dealerships
@@ -941,6 +986,9 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
   - 📡 Tracking
   - 📦 Service Deliveries
   - 📁 Files
+  - 📊 Monitoring
+  - ⚙️ System Settings
+  - 🎙️ Transcription
 
 ### Uso
 

@@ -4,6 +4,8 @@ import app.domain.model.Dealership;
 import app.domain.model.ServiceDelivery;
 import app.domain.model.StatusHistory;
 import app.domain.model.Location;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import app.domain.model.WhatsAppSession;
 import app.domain.model.enums.Status;
 import app.domain.ports.LocationPort;
@@ -27,6 +29,7 @@ import java.util.concurrent.*;
 @Service
 public class WhatsAppBotService {
 
+    private static final Logger logger = LoggerFactory.getLogger(WhatsAppBotService.class);
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final Map<String, ScheduledFuture<?>> scheduledTimeouts = new ConcurrentHashMap<>();
@@ -36,6 +39,7 @@ public class WhatsAppBotService {
     private final SearchServiceDelivery searchService;
     private final LocationPort locationPort;
     private final Map<String, ConversationState> conversationStates = new ConcurrentHashMap<>();
+    private final Map<String, Integer> failedAttempts = new ConcurrentHashMap<>();
 
     private enum ConversationState {
         AWAITING_PIN, AWAITING_PLATE, MENU
@@ -88,16 +92,49 @@ public class WhatsAppBotService {
         ConversationState state = conversationStates.get(from);
 
         if (state == ConversationState.AWAITING_PIN) {
+            // 1. Verificar si está bloqueado por demasiados intentos
+            int attempts = failedAttempts.getOrDefault(from, 0);
+            if (attempts >= 3) {
+                logger.warn("Usuario {} bloqueado por exceso de intentos de PIN.", from);
+                messagePort.sendTextMessage(from,
+                        "⚠️ Has superado el límite de intentos. Por seguridad, tu acceso ha sido pausado por 15 minutos.");
+                return;
+            }
+
             // Intentar autenticar con el PIN
             Optional<Dealership> dealershipOpt = sessionPort.findDealershipByPin(text);
 
             if (dealershipOpt.isPresent()) {
+                // Éxito: Resetear intentos y crear sesión
+                failedAttempts.remove(from);
                 Dealership dealership = dealershipOpt.get();
                 sessionPort.createSession(from, dealership, sessionPort.getSessionExpirationHours());
                 conversationStates.put(from, ConversationState.MENU);
                 sendMenu(from, dealership.getName());
             } else {
-                messagePort.sendTextMessage(from, "❌ PIN incorrecto. Intenta de nuevo:");
+                // Fallo: Incrementar intentos y aplicar delay progresivo
+                attempts++;
+                failedAttempts.put(from, attempts);
+
+                // Aplicar delay progresivo (ej. 2s por cada fallo)
+                try {
+                    Thread.sleep(attempts * 2000L);
+                } catch (InterruptedException ignored) {
+                }
+
+                if (attempts >= 3) {
+                    messagePort.sendTextMessage(from,
+                            "❌ PIN incorrecto. Has alcanzado el máximo de intentos permitidos. Por seguridad, tu acceso se ha bloqueado por 15 minutos.");
+
+                    // Programar desbloqueo automático en 15 minutos
+                    scheduler.schedule(() -> {
+                        failedAttempts.remove(from);
+                        logger.info("Bloqueo de PIN expirado para {}", from);
+                    }, 15, TimeUnit.MINUTES);
+                } else {
+                    messagePort.sendTextMessage(from,
+                            "❌ PIN incorrecto. Intenta de nuevo (Intento " + attempts + " de 3):");
+                }
             }
         } else {
             conversationStates.put(from, ConversationState.AWAITING_PIN);
@@ -136,6 +173,13 @@ public class WhatsAppBotService {
                         sendPendingList(from, dealershipId, dealershipName);
                         sendMenu(from, dealershipName);
                     }
+                    case "0" -> {
+                        sessionPort.deleteByPhoneNumber(from);
+                        conversationStates.remove(from);
+                        cancelTimeout(from);
+                        messagePort.sendTextMessage(from,
+                                "✅ Sesión cerrada correctamente.\n\nPara ingresar de nuevo, solo escribe un mensaje.");
+                    }
                     default -> {
                         // Si parece una placa, buscarla directamente
                         if (looksLikePlate(text)) {
@@ -162,7 +206,7 @@ public class WhatsAppBotService {
 
     private void sendMenu(String from, String dealershipName) {
         String menu = String.format(
-                "✅ *%s*\n\n📋 *¿Qué deseas consultar?*\n\n- 1️⃣ Consultar una placa específica\n- 2️⃣ Consultar todas las placas programadas",
+                "🛞 *%s*\n\n📋 *¿Qué deseas consultar?*\n_Ingrese el número correspondiente:_\n\n- 1️⃣ Consultar una placa específica\n- 2️⃣ Consultar todas las placas programadas\n- 0️⃣ Cerrar sesión y salir",
                 dealershipName);
         messagePort.sendTextMessage(from, menu);
     }
@@ -188,7 +232,7 @@ public class WhatsAppBotService {
                     messagePort.sendLocation(from,
                             lat,
                             lon,
-                            "Dirección: ",
+                            "Dirección",
                             address != null ? address : s.getPlate().getPlateNumber());
                 }
             }
@@ -200,7 +244,7 @@ public class WhatsAppBotService {
         String statusName = getStatusName(s.getCurrentStatus());
 
         return String.format(
-                "🚗 *Placa: %s*\n\n*Estado:* %s %s\n📅 *Fecha de asignación:* %s\n🛵 *Mensajero:* %s\n🛞 *Concesionario:* %s",
+                "🚗 Placa: %s\n\n✏️ *Estado:* %s %s\n📅 *Fecha de asignación:* %s\n🛵 *Mensajero:* %s\n🛞 *Concesionario:* %s",
                 s.getPlate().getPlateNumber(),
                 statusEmoji,
                 statusName,
@@ -218,7 +262,7 @@ public class WhatsAppBotService {
         }
 
         // Enviamos el encabezado primero
-        messagePort.sendTextMessage(from, "📦 *Placas programada(s) para " + dealershipName + "*");
+        messagePort.sendTextMessage(from, "📦 *Placa(s) programada(s) para " + dealershipName + "*");
 
         // Delegamos a sendPlateDetails para que cada placa muestre su detalle y
         // ubicación individualmente
@@ -260,7 +304,7 @@ public class WhatsAppBotService {
     private void scheduleTimeout(String from) {
         ScheduledFuture<?> future = scheduler.schedule(() -> {
             messagePort.sendTextMessage(from,
-                    "Han pasado 5 minutos desde tú ultimo mensaje, Avisame cuando quieras volver a consultar.");
+                    "⏰ Por inactividad, hemos finalizado el chat. Si necesitas realizar una nueva consulta, ¡escríbeme! 👋");
             timeoutNotified.add(from);
             scheduledTimeouts.remove(from);
         }, 5, TimeUnit.MINUTES);
