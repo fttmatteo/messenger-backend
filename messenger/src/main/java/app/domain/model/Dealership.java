@@ -1,5 +1,7 @@
 package app.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Representa un concesionario donde se entregan vehículos.
  * Contiene información de contacto y ubicación geográfica.
@@ -90,6 +92,7 @@ public class Dealership {
     /**
      * Convierte los campos de lat/lng en un objeto Location.
      */
+    @JsonIgnore
     public Location getLocation() {
         if (latitude == null || longitude == null) {
             return null;

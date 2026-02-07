@@ -1,5 +1,7 @@
 package app.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,14 +31,17 @@ public class Route {
         this.polyline = polyline;
     }
 
+    @JsonIgnore
     public Double getDistanceKilometers() {
         return distanceMeters != null ? distanceMeters / 1000.0 : null;
     }
 
+    @JsonIgnore
     public boolean hasWaypoints() {
         return waypoints != null && !waypoints.isEmpty();
     }
 
+    @JsonIgnore
     public int getTotalStops() {
         return 2 + (waypoints != null ? waypoints.size() : 0);
     }

@@ -35,6 +35,7 @@ public class UpdateDealership {
         existingDealership.setAddress(incomingData.getAddress());
         existingDealership.setPhone(incomingData.getPhone());
         existingDealership.setZone(incomingData.getZone());
+        existingDealership.setWhatsappPin(incomingData.getWhatsappPin());
 
         Dealership updated = dealershipPort.save(existingDealership);
         return updated;

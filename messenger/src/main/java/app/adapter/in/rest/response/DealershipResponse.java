@@ -12,16 +12,19 @@ public class DealershipResponse {
     private Double latitude;
     private Double longitude;
     private Boolean isGeolocated;
+    private String whatsappPin;
 
     public DealershipResponse() {
     }
 
-    public DealershipResponse(Long idDealership, String name, String address, String phone, String zone) {
+    public DealershipResponse(Long idDealership, String name, String address, String phone, String zone,
+            String whatsappPin) {
         this.idDealership = idDealership;
         this.name = name;
         this.address = address;
         this.phone = phone;
         this.zone = zone;
+        this.whatsappPin = whatsappPin;
     }
 
     public Long getIdDealership() {
@@ -86,5 +89,13 @@ public class DealershipResponse {
 
     public void setIsGeolocated(Boolean isGeolocated) {
         this.isGeolocated = isGeolocated;
+    }
+
+    public String getWhatsappPin() {
+        return whatsappPin;
+    }
+
+    public void setWhatsappPin(String whatsappPin) {
+        this.whatsappPin = whatsappPin;
     }
 }
