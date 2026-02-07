@@ -3,6 +3,8 @@ package app.infrastructure.config;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
+import org.redisson.config.ConstantDelay;
+import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,7 +48,7 @@ public class RedissonConfig {
                 .setConnectTimeout(10000)
                 .setTimeout(5000)
                 .setRetryAttempts(3)
-                .setRetryInterval(1500)
+                .setRetryDelay(new ConstantDelay(Duration.ofMillis(1500)))
                 .setClientName("hibernate-cache");
 
         return Redisson.create(config);
