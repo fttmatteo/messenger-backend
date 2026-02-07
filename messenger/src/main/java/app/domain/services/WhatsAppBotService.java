@@ -68,7 +68,7 @@ public class WhatsAppBotService {
 
         if (wasTimedOut) {
             if (sessionOpt.isPresent()) {
-                messagePort.sendTextMessage(from, "¡Hola de nuevo! 👋 ¿En qué puedo ayudarte hoy?.");
+                messagePort.sendTextMessage(from, "¡Hola de nuevo! 👋");
             } else {
                 conversationStates.remove(from);
             }
@@ -217,11 +217,12 @@ public class WhatsAppBotService {
             return;
         }
 
-        StringBuilder sb = new StringBuilder("📦 *Placas programada(s) para " + dealershipName + "*\n\n");
-        for (ServiceDelivery s : pending) {
-            sb.append(formatServiceDetail(s));
-        }
-        messagePort.sendTextMessage(from, sb.toString().trim());
+        // Enviamos el encabezado primero
+        messagePort.sendTextMessage(from, "📦 *Placas programada(s) para " + dealershipName + "*");
+
+        // Delegamos a sendPlateDetails para que cada placa muestre su detalle y
+        // ubicación individualmente
+        sendPlateDetails(from, pending);
     }
 
     private String getStatusName(Status status) {
@@ -258,7 +259,8 @@ public class WhatsAppBotService {
 
     private void scheduleTimeout(String from) {
         ScheduledFuture<?> future = scheduler.schedule(() -> {
-            messagePort.sendTextMessage(from, "Han pasado 5 minutos desde tú ultimo mensaje, Avisame cuando quieras volver a consultar.");
+            messagePort.sendTextMessage(from,
+                    "Han pasado 5 minutos desde tú ultimo mensaje, Avisame cuando quieras volver a consultar.");
             timeoutNotified.add(from);
             scheduledTimeouts.remove(from);
         }, 5, TimeUnit.MINUTES);
