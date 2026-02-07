@@ -35,6 +35,8 @@ public class TranscriptionController {
     public ResponseEntity<TranscriptionResponse> transcribe(
             @RequestParam("audio") MultipartFile audio,
             @RequestParam(value = "language", defaultValue = "es-CO") String language) {
+        logger.info("DIAGNÓSTICO: Petición recibida en /api/transcribe (tamaño: {} bytes)",
+                audio != null ? audio.getSize() : "null");
         try {
             // Validar archivo
             if (audio.isEmpty()) {
@@ -46,7 +48,6 @@ public class TranscriptionController {
                 return ResponseEntity.badRequest()
                         .body(TranscriptionResponse.error("El archivo excede el tamaño máximo (10MB)"));
             }
-
 
             // Transcribir
             String transcript = speechToTextService.transcribe(audio.getBytes(), language, audio.getContentType());
