@@ -3,6 +3,7 @@ package app.adapter.in.rest.controllers;
 import app.adapter.in.rest.request.WebhookPayload;
 import app.domain.services.WhatsAppBotService;
 import app.infrastructure.config.WhatsAppConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +20,12 @@ public class WhatsAppWebhookController {
 
     private final WhatsAppBotService botService;
     private final WhatsAppConfig config;
+    private final ObjectMapper objectMapper;
 
-    public WhatsAppWebhookController(WhatsAppBotService botService, WhatsAppConfig config) {
+    public WhatsAppWebhookController(WhatsAppBotService botService, WhatsAppConfig config, ObjectMapper objectMapper) {
         this.botService = botService;
         this.config = config;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -51,8 +54,7 @@ public class WhatsAppWebhookController {
     @PostMapping("/webhook")
     public ResponseEntity<String> receiveMessage(
             @RequestBody String rawBody,
-            @RequestHeader(value = "X-Hub-Signature-256", required = false) String signature,
-            @RequestBody WebhookPayload payload) {
+            @RequestHeader(value = "X-Hub-Signature-256", required = false) String signature) {
 
         logger.debug("Webhook recibido. Firma: {}", signature);
 
@@ -62,6 +64,7 @@ public class WhatsAppWebhookController {
         }
 
         try {
+            WebhookPayload payload = objectMapper.readValue(rawBody, WebhookPayload.class);
             if (payload.getEntry() != null) {
                 for (WebhookPayload.Entry entry : payload.getEntry()) {
                     if (entry.getChanges() != null) {
