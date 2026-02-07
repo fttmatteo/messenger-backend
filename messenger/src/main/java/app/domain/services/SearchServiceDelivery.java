@@ -82,4 +82,19 @@ public class SearchServiceDelivery {
             java.time.LocalDate to) {
         return serviceDeliveryPort.findDailyStatsByMessenger(messengerId, from, to);
     }
+
+    /**
+     * Busca servicios por número de placa filtrado por concesionario.
+     */
+    public List<ServiceDelivery> findByPlateAndDealership(String plateNumber, Long dealershipId) {
+        String normalized = plateNumber.trim().toUpperCase();
+        return serviceDeliveryPort.findByPlateNumberAndDealershipId(normalized, dealershipId);
+    }
+
+    /**
+     * Retorna todos los servicios pendientes de un concesionario.
+     */
+    public List<ServiceDelivery> findPendingByDealership(Long dealershipId) {
+        return serviceDeliveryPort.findPendingByDealershipId(dealershipId);
+    }
 }

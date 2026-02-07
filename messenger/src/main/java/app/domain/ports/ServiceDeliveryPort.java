@@ -86,4 +86,14 @@ public interface ServiceDeliveryPort {
          * Busca servicios de un mensajero que tengan actividad en una fecha específica.
          */
         List<ServiceDelivery> findByMessengerAndDate(Long messengerId, java.time.LocalDate date);
+
+        /**
+         * Busca servicios por número de placa filtrado por concesionario.
+         */
+        List<ServiceDelivery> findByPlateNumberAndDealershipId(String plateNumber, Long dealershipId);
+
+        /**
+         * Busca servicios pendientes (no entregados) de un concesionario.
+         */
+        List<ServiceDelivery> findPendingByDealershipId(Long dealershipId);
 }

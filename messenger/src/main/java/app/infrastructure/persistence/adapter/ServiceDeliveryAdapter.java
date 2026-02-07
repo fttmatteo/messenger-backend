@@ -194,4 +194,29 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
+
+    /**
+     * Busca servicios por número de placa filtrado por concesionario.
+     */
+    @Override
+    public List<ServiceDelivery> findByPlateNumberAndDealershipId(String plateNumber, Long dealershipId) {
+        return repository.findByPlate_PlateNumberAndDealership_IdDealershipAndDeletedFalse(plateNumber, dealershipId)
+                .stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Busca servicios pendientes (no entregados) de un concesionario.
+     */
+    @Override
+    public List<ServiceDelivery> findPendingByDealershipId(Long dealershipId) {
+        List<app.domain.model.enums.Status> pendingStatuses = List.of(
+                app.domain.model.enums.Status.ASSIGNED,
+                app.domain.model.enums.Status.PENDING);
+        return repository.findByDealership_IdDealershipAndCurrentStatusInAndDeletedFalse(dealershipId, pendingStatuses)
+                .stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
 }

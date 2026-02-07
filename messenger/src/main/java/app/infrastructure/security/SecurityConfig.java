@@ -46,6 +46,7 @@ public class SecurityConfig {
                                 .csrf(csrf -> csrf
                                                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                                                 .ignoringRequestMatchers("/auth/**", "/api/files/**",
+                                                                "/api/whatsapp/**",
                                                                 "/actuator/health", "/v3/api-docs/**", "/swagger-ui/**")
                                                 .ignoringRequestMatchers(request -> {
                                                         String authHeader = request.getHeader("Authorization");
@@ -92,6 +93,7 @@ public class SecurityConfig {
                                                 .requestMatchers("/dealerships/**").authenticated()
                                                 .requestMatchers("/services/**").authenticated()
                                                 .requestMatchers("/api/files/**").permitAll()
+                                                .requestMatchers("/api/whatsapp/**").permitAll()
                                                 .requestMatchers(org.springframework.http.HttpMethod.GET,
                                                                 "/settings/status-colors")
                                                 .permitAll()
