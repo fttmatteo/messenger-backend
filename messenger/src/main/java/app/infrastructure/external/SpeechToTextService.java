@@ -21,7 +21,7 @@ public class SpeechToTextService {
 
     private static final Logger logger = LoggerFactory.getLogger(SpeechToTextService.class);
     private static final int MAX_AUDIO_SIZE_BYTES = 10 * 1024 * 1024;
-    private static final int MIN_AUDIO_SIZE_BYTES = 1000;
+    private static final int MIN_AUDIO_SIZE_BYTES = 500; // Reducido para permitir palabras cortas
 
     private SpeechClient speechClient;
 
@@ -42,6 +42,10 @@ public class SpeechToTextService {
     }
 
     public String transcribe(byte[] audioBytes, String languageCode) throws IOException {
+        return transcribe(audioBytes, languageCode, "audio/webm");
+    }
+
+    public String transcribe(byte[] audioBytes, String languageCode, String mimeType) throws IOException {
         if (audioBytes == null || audioBytes.length == 0) {
             throw new IllegalArgumentException("El audio no puede estar vacío");
         }
@@ -68,15 +72,34 @@ public class SpeechToTextService {
                     .setContent(ByteString.copyFrom(audioBytes))
                     .build();
 
-            RecognitionConfig config = RecognitionConfig.newBuilder()
-                    .setEncoding(RecognitionConfig.AudioEncoding.WEBM_OPUS)
-                    .setSampleRateHertz(48000)
+            // Determinar codificación basada en el MIME type
+            RecognitionConfig.AudioEncoding encoding = RecognitionConfig.AudioEncoding.WEBM_OPUS;
+            int sampleRate = 48000;
+
+            if (mimeType != null) {
+                if (mimeType.contains("mp4") || mimeType.contains("aac") || mimeType.contains("m4a")) {
+                    // Para MP4/AAC a menudo es mejor dejar que Google detecte o usar v1p1beta1
+                    // Pero en v1, ENCODING_UNSPECIFIED suele funcionar si el contenedor es
+                    // reconocido
+                    encoding = RecognitionConfig.AudioEncoding.ENCODING_UNSPECIFIED;
+                    sampleRate = 0; // Dejar que se detecte
+                } else if (mimeType.contains("ogg")) {
+                    encoding = RecognitionConfig.AudioEncoding.OGG_OPUS;
+                    sampleRate = 16000;
+                }
+            }
+
+            RecognitionConfig.Builder configBuilder = RecognitionConfig.newBuilder()
+                    .setEncoding(encoding)
                     .setLanguageCode(languageCode)
                     .setModel("command_and_search")
-                    .setEnableAutomaticPunctuation(false)
-                    .build();
+                    .setEnableAutomaticPunctuation(false);
 
-            RecognizeResponse response = speechClient.recognize(config, audio);
+            if (sampleRate > 0) {
+                configBuilder.setSampleRateHertz(sampleRate);
+            }
+
+            RecognizeResponse response = speechClient.recognize(configBuilder.build(), audio);
 
             StringBuilder transcript = new StringBuilder();
             for (SpeechRecognitionResult result : response.getResultsList()) {
@@ -88,15 +111,16 @@ public class SpeechToTextService {
             return transcript.toString().trim();
 
         } catch (ApiException e) {
-            logger.error("Error Speech API: {}", e.getMessage());
-            throw new IOException("Error del servicio de transcripción", e);
+            logger.error("Error en Google Speech API. Status: {}, Reason: {}, Message: {}",
+                    e.getStatusCode().getCode(), e.getReason(), e.getMessage());
+            throw new IOException("Error del servicio de transcripción (GCP): " + e.getReason(), e);
         } catch (Exception e) {
-            logger.error("Error transcripción: {}", e.getMessage());
-            throw new IOException("Error al transcribir audio", e);
+            logger.error("Error inesperado durante la transcripción. ", e);
+            throw new IOException("Error interno al procesar el audio: " + e.getMessage(), e);
         }
     }
 
     public String transcribe(byte[] audioBytes) throws IOException {
-        return transcribe(audioBytes, "es-CO");
+        return transcribe(audioBytes, "es-CO", "audio/webm");
     }
 }

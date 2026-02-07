@@ -47,10 +47,9 @@ public class TranscriptionController {
                         .body(TranscriptionResponse.error("El archivo excede el tamaño máximo (10MB)"));
             }
 
-            logger.info("Transcribiendo audio: {} bytes, idioma: {}", audio.getSize(), language);
 
             // Transcribir
-            String transcript = speechToTextService.transcribe(audio.getBytes(), language);
+            String transcript = speechToTextService.transcribe(audio.getBytes(), language, audio.getContentType());
 
             if (transcript.isEmpty()) {
                 return ResponseEntity.ok(TranscriptionResponse.error("No se detectó voz en el audio"));
