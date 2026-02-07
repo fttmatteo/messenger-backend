@@ -123,6 +123,7 @@ graph LR
 | **Seguridad** | JWT + BCrypt + Cloudflare Turnstile (Protección contra Bots) + Bucket4j (Rate Limiting Distribuido con Redis) |
 | **Documentación** | OpenAPI / Swagger UI |
 | **OCR** | Plate Recognizer API |
+| **Speech-to-Text** | Google Cloud Speech-to-Text |
 | **Almacenamiento** | Google Cloud Storage |
 | **Mapas** | Google Maps Platform |
 | **Tiempo Real** | WebSocket + Redis |
@@ -311,6 +312,14 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `POST` | `/services/trash/restore/{id}` | Restaurar desde papelera (ADMIN) |
 | `DELETE` | `/services/trash/empty` | Vaciar papelera permanentemente (ADMIN) |
 | `DELETE` | `/services/trash/{id}` | Eliminación individual permanente (ADMIN) |
+
+---
+
+### Transcripción (`/api/transcribe`)
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `POST` | `/api/transcribe` | Transcribir archivo de audio a texto usando Google Cloud STT |
 
 > [!CAUTION]
 > **Restricciones de Archivos**:
