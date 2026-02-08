@@ -8,6 +8,8 @@ import app.infrastructure.persistence.entities.DealershipEntity;
 import app.infrastructure.persistence.entities.WhatsAppSessionEntity;
 import app.infrastructure.persistence.repository.DealershipRepository;
 import app.infrastructure.persistence.repository.WhatsAppSessionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
@@ -20,6 +22,7 @@ import java.util.Optional;
 @Component
 public class WhatsAppSessionAdapter implements WhatsAppSessionPort {
 
+    private static final Logger logger = LoggerFactory.getLogger(WhatsAppSessionAdapter.class);
     private final WhatsAppSessionRepository sessionRepository;
     private final DealershipRepository dealershipRepository;
     private final WhatsAppConfig config;
@@ -56,6 +59,7 @@ public class WhatsAppSessionAdapter implements WhatsAppSessionPort {
         entity.setExpiresAt(LocalDateTime.now().plusHours(expirationHours));
 
         WhatsAppSessionEntity saved = sessionRepository.save(entity);
+        logger.debug("[DB] Sesión creada/actualizada para {}", maskPhone(phoneNumber));
         return toDomain(saved);
     }
 
@@ -63,6 +67,14 @@ public class WhatsAppSessionAdapter implements WhatsAppSessionPort {
     @Transactional
     public void deleteByPhoneNumber(String phoneNumber) {
         sessionRepository.deleteByPhoneNumber(phoneNumber);
+        logger.debug("[DB] Sesión eliminada para {}", maskPhone(phoneNumber));
+    }
+
+    private String maskPhone(String phone) {
+        if (phone == null || phone.length() <= 4) {
+            return phone;
+        }
+        return "****" + phone.substring(phone.length() - 4);
     }
 
     @Override
