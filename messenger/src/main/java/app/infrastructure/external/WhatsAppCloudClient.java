@@ -69,15 +69,22 @@ public class WhatsAppCloudClient implements WhatsAppMessagePort {
                     String.class);
 
             if (response.getStatusCode().is2xxSuccessful()) {
-                logger.info("Mensaje {} enviado a {}", type, to);
+                logger.info("[WhatsApp] Mensaje {} enviado a {}", type, maskPhone(to));
                 return true;
             } else {
-                logger.error("Error enviando mensaje {}: {}", type, response.getBody());
+                logger.error("[WhatsApp] Error enviando mensaje {}: {}", type, response.getBody());
                 return false;
             }
         } catch (Exception e) {
-            logger.error("Error enviando mensaje {} a WhatsApp: {}", type, e.getMessage());
+            logger.error("[WhatsApp] Error enviando mensaje {} a WhatsApp: {}", type, e.getMessage());
             return false;
         }
+    }
+
+    private String maskPhone(String phone) {
+        if (phone == null || phone.length() <= 4) {
+            return phone;
+        }
+        return "****" + phone.substring(phone.length() - 4);
     }
 }

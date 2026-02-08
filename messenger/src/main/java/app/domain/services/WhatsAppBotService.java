@@ -62,6 +62,12 @@ public class WhatsAppBotService {
     @Transactional
     public void processMessage(String from, String messageBody) {
         String text = messageBody.trim();
+        ConversationState currentState = conversationStates.getOrDefault(from, ConversationState.AWAITING_PIN);
+
+        // Logging seguro: enmascarar teléfono y ocultar PIN si aplica
+        String maskedFrom = maskPhone(from);
+        String logContent = (currentState == ConversationState.AWAITING_PIN) ? "****" : text;
+        logger.info("[WhatsApp] Mensaje recibido de {}: {}", maskedFrom, logContent);
 
         // Cancelar cualquier timeout previo
         cancelTimeout(from);
@@ -108,6 +114,8 @@ public class WhatsAppBotService {
                 // Éxito: Resetear intentos y crear sesión
                 failedAttempts.remove(from);
                 Dealership dealership = dealershipOpt.get();
+                logger.info("[Sesión] Login exitoso para {} en concesionario: {}", maskPhone(from),
+                        dealership.getName());
                 sessionPort.createSession(from, dealership, sessionPort.getSessionExpirationHours());
                 conversationStates.put(from, ConversationState.MENU);
                 sendMenu(from, dealership.getName());
@@ -139,8 +147,8 @@ public class WhatsAppBotService {
         } else {
             conversationStates.put(from, ConversationState.AWAITING_PIN);
             messagePort.sendTextMessage(from,
-                    "🚦 *Tránsito de Sabaneta - Matriculas Iniciales*\n\n _Área de mensajería_\n\n ¡Hola! 👋. Aquí podrás consultar el estado de las placas programadas para entrega.\n\n"
-                            + "`Nota: Por seguridad, el PIN se solicita cada 12 horas.`\n\n"
+                    "🚦 *Tránsito de Sabaneta*\n*Matrículas Iniciales* 🚦\n_Área de mensajería_\n\n¡Hola! 👋. Aquí podrás consultar el estado de las placas programadas para entrega.\n\n"
+                            + "`Por seguridad, el PIN se solicita cada 12 horas o cuando se cierre y se vuelva a abrir la sesión.`\n\n"
                             + "🔒 Ingresa el PIN de 4 dígitos proporcionado por tu concesionario para continuar:");
         }
     }
@@ -174,6 +182,7 @@ public class WhatsAppBotService {
                         sendMenu(from, dealershipName);
                     }
                     case "0" -> {
+                        logger.info("[Sesión] Usuario {} cerró sesión voluntariamente.", maskPhone(from));
                         sessionPort.deleteByPhoneNumber(from);
                         conversationStates.remove(from);
                         cancelTimeout(from);
@@ -232,7 +241,7 @@ public class WhatsAppBotService {
                     messagePort.sendLocation(from,
                             lat,
                             lon,
-                            "Dirección",
+                            "Ubicación del *estado* actual",
                             address != null ? address : s.getPlate().getPlateNumber());
                 }
             }
@@ -257,7 +266,8 @@ public class WhatsAppBotService {
         List<ServiceDelivery> pending = searchService.findPendingByDealership(dealershipId);
 
         if (pending.isEmpty()) {
-            messagePort.sendTextMessage(from, "✅ Todavia no hay placa(s) programada(s) para " + dealershipName);
+            messagePort.sendTextMessage(from,
+                    "Todavia no hay placa(s) programada(s) para " + dealershipName + "\n\nConsulte más tarde.");
             return;
         }
 
@@ -301,8 +311,16 @@ public class WhatsAppBotService {
                 text.matches("(?i)^[A-Z]{3}-?\\d{2}[A-Z]$");
     }
 
+    private String maskPhone(String phone) {
+        if (phone == null || phone.length() <= 4) {
+            return phone;
+        }
+        return "****" + phone.substring(phone.length() - 4);
+    }
+
     private void scheduleTimeout(String from) {
         ScheduledFuture<?> future = scheduler.schedule(() -> {
+            logger.info("[Sesión] Chat finalizado por inactividad para {}", maskPhone(from));
             messagePort.sendTextMessage(from,
                     "⏰ Por inactividad, hemos finalizado el chat. Si necesitas realizar una nueva consulta, ¡escríbeme! 👋");
             timeoutNotified.add(from);
