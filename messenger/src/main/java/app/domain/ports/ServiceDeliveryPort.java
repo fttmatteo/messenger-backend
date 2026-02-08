@@ -96,4 +96,10 @@ public interface ServiceDeliveryPort {
          * Busca servicios pendientes (no entregados) de un concesionario.
          */
         List<ServiceDelivery> findPendingByDealershipId(Long dealershipId);
+
+        /**
+         * Busca servicios por concesionario y una lista de estados específicos.
+         */
+        List<ServiceDelivery> findByDealershipIdAndStatuses(Long dealershipId,
+                        List<app.domain.model.enums.Status> statuses);
 }

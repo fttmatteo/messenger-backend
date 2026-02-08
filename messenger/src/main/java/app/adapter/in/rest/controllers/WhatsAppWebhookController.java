@@ -37,10 +37,8 @@ public class WhatsAppWebhookController {
             @RequestParam("hub.verify_token") String token,
             @RequestParam("hub.challenge") String challenge) {
 
-        logger.debug("Verificación de webhook: mode={}, token={}", mode, token);
 
         if ("subscribe".equals(mode) && config.getVerifyToken().equals(token)) {
-            logger.info("[Webhook] Verificación exitosa.");
             return ResponseEntity.ok(challenge);
         }
 
@@ -56,7 +54,6 @@ public class WhatsAppWebhookController {
             @RequestBody String rawBody,
             @RequestHeader(value = "X-Hub-Signature-256", required = false) String signature) {
 
-        logger.info("[Webhook] Petición recibida. Firma presente: {}", signature != null);
 
         if (!isValidSignature(rawBody, signature)) {
             logger.error("Firma de webhook inválida. Petición rechazada.");

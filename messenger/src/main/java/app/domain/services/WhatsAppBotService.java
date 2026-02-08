@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
  * Servicio principal del bot de WhatsApp.
@@ -90,8 +91,11 @@ public class WhatsAppBotService {
             handleUnauthenticatedUser(from, text);
         }
 
-        // Programar nuevo timeout de 5 minutos
-        scheduleTimeout(from);
+        // Programar nuevo timeout de 5 minutos solo si el usuario sigue en una
+        // conversación activa
+        if (conversationStates.containsKey(from)) {
+            scheduleTimeout(from);
+        }
     }
 
     private void handleUnauthenticatedUser(String from, String text) {
@@ -147,7 +151,7 @@ public class WhatsAppBotService {
         } else {
             conversationStates.put(from, ConversationState.AWAITING_PIN);
             messagePort.sendTextMessage(from,
-                    "🚦 *Tránsito de Sabaneta*\n*Matrículas Iniciales* 🚦\n_Área de mensajería_\n\n¡Hola! 👋. Aquí podrás consultar el estado de las placas programadas para entrega.\n\n"
+                    "🚦 *Tránsito de Sabaneta*\n*Matrículas Iniciales* 🚦\n_Área de mensajería_\n\n¡Hola! 👋. Aquí podrás consultar el estado de las placas.\n\n"
                             + "`Por seguridad, el PIN se solicita cada 12 horas o cuando se cierre y se vuelva a abrir la sesión.`\n\n"
                             + "🔒 Ingresa el PIN de 4 dígitos proporcionado por tu concesionario para continuar:");
         }
@@ -178,7 +182,23 @@ public class WhatsAppBotService {
                         messagePort.sendTextMessage(from, "Escribe el número de placa:");
                     }
                     case "2" -> {
-                        sendPendingList(from, dealershipId, dealershipName);
+                        sendFilteredList(from, dealershipId, dealershipName, "Placa(s) asignada(s)",
+                                List.of(Status.ASSIGNED));
+                        sendMenu(from, dealershipName);
+                    }
+                    case "3" -> {
+                        sendFilteredList(from, dealershipId, dealershipName, "Placa(s) devuelta(s)",
+                                List.of(Status.RETURNED));
+                        sendMenu(from, dealershipName);
+                    }
+                    case "4" -> {
+                        sendFilteredList(from, dealershipId, dealershipName, "Placa(s) pendiente(s)",
+                                List.of(Status.PENDING));
+                        sendMenu(from, dealershipName);
+                    }
+                    case "5" -> {
+                        sendFilteredList(from, dealershipId, dealershipName, "Placa(s) entregada(s)/revisada(s)",
+                                List.of(Status.DELIVERED, Status.RESOLVED));
                         sendMenu(from, dealershipName);
                     }
                     case "0" -> {
@@ -187,7 +207,7 @@ public class WhatsAppBotService {
                         conversationStates.remove(from);
                         cancelTimeout(from);
                         messagePort.sendTextMessage(from,
-                                "✅ Sesión cerrada correctamente.\n\nPara ingresar de nuevo, solo escribe un mensaje.");
+                                "✅ Sesión cerrada correctamente.\n\n¡Hasta pronto! 👋. Para ingresar de nuevo, solo escribe un mensaje.");
                     }
                     default -> {
                         // Si parece una placa, buscarla directamente
@@ -215,7 +235,13 @@ public class WhatsAppBotService {
 
     private void sendMenu(String from, String dealershipName) {
         String menu = String.format(
-                "🛞 *%s*\n\n📋 *¿Qué deseas consultar?*\n_Ingrese el número correspondiente:_\n\n- 1️⃣ Consultar una placa específica\n- 2️⃣ Consultar todas las placas programadas\n- 0️⃣ Cerrar sesión y salir",
+                "🛞 *%s*\n\n📋 *¿Qué deseas consultar?*\n_Ingrese el número correspondiente:_\n\n" +
+                        "- 1️⃣ Consultar una placa específica\n" +
+                        "- 2️⃣ Ver todas las placas asignadas para entrega\n" +
+                        "- 3️⃣ Ver todas las placas devueltas por intento fallido\n" +
+                        "- 4️⃣ Ver todas las placas pendientes por documentación\n" +
+                        "- 5️⃣ Ver todas las placas entregadas y revisadas\n" +
+                        "- 0️⃣ Cerrar sesión y salir",
                 dealershipName);
         messagePort.sendTextMessage(from, menu);
     }
@@ -241,7 +267,7 @@ public class WhatsAppBotService {
                     messagePort.sendLocation(from,
                             lat,
                             lon,
-                            "Ubicación del *estado* actual",
+                            "Ubicación por estado actual",
                             address != null ? address : s.getPlate().getPlateNumber());
                 }
             }
@@ -262,21 +288,43 @@ public class WhatsAppBotService {
                 s.getDealership().getName());
     }
 
-    private void sendPendingList(String from, Long dealershipId, String dealershipName) {
-        List<ServiceDelivery> pending = searchService.findPendingByDealership(dealershipId);
+    private void sendFilteredList(String from, Long dealershipId, String dealershipName, String title,
+            List<Status> statuses) {
+        List<ServiceDelivery> list = searchService.findByDealershipAndStatuses(dealershipId, statuses);
 
-        if (pending.isEmpty()) {
+        if (list.isEmpty()) {
             messagePort.sendTextMessage(from,
-                    "Todavia no hay placa(s) programada(s) para " + dealershipName + "\n\nConsulte más tarde.");
+                    "Todavía no hay " + title.toLowerCase() + " para " + dealershipName + ".\n\nConsulte más tarde.");
             return;
         }
 
-        // Enviamos el encabezado primero
-        messagePort.sendTextMessage(from, "📦 *Placa(s) programada(s) para " + dealershipName + "*");
+        // Ordenar por fecha reciente y limitar a 50 para evitar mensajes gigantes
+        List<ServiceDelivery> limitedList = list.stream()
+                .sorted((s1, s2) -> {
+                    if (s1.getCreatedAt() == null)
+                        return 1;
+                    if (s2.getCreatedAt() == null)
+                        return -1;
+                    return s2.getCreatedAt().compareTo(s1.getCreatedAt());
+                })
+                .limit(50)
+                .collect(Collectors.toList());
 
-        // Delegamos a sendPlateDetails para que cada placa muestre su detalle y
-        // ubicación individualmente
-        sendPlateDetails(from, pending);
+        StringBuilder sb = new StringBuilder();
+        sb.append("📦 *").append(title).append(" para ").append(dealershipName).append(".*\n\n");
+
+        for (ServiceDelivery s : limitedList) {
+            sb.append("• ").append(s.getPlate().getPlateNumber())
+                    .append(" (").append(getStatusName(s.getCurrentStatus())).append(")\n");
+        }
+
+        if (list.size() > 50) {
+            sb.append("\n`...mostrando las últimas 50 de ").append(list.size()).append(" placas.`");
+        }
+
+        sb.append("\n\nEscribe el número de placa para ver su detalle completo y ubicación.");
+
+        messagePort.sendTextMessage(from, sb.toString());
     }
 
     private String getStatusName(Status status) {

@@ -207,6 +207,19 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     }
 
     /**
+     * Busca servicios por concesionario y una lista de estados específicos (no
+     * eliminados).
+     */
+    @Override
+    public List<ServiceDelivery> findByDealershipIdAndStatuses(Long dealershipId,
+            List<app.domain.model.enums.Status> statuses) {
+        return repository.findByDealership_IdDealershipAndCurrentStatusInAndDeletedFalse(dealershipId, statuses)
+                .stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Busca servicios pendientes (no entregados) de un concesionario.
      */
     @Override
@@ -214,9 +227,6 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
         List<app.domain.model.enums.Status> pendingStatuses = List.of(
                 app.domain.model.enums.Status.ASSIGNED,
                 app.domain.model.enums.Status.PENDING);
-        return repository.findByDealership_IdDealershipAndCurrentStatusInAndDeletedFalse(dealershipId, pendingStatuses)
-                .stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
+        return findByDealershipIdAndStatuses(dealershipId, pendingStatuses);
     }
 }

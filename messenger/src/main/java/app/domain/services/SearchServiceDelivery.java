@@ -97,4 +97,13 @@ public class SearchServiceDelivery {
     public List<ServiceDelivery> findPendingByDealership(Long dealershipId) {
         return serviceDeliveryPort.findPendingByDealershipId(dealershipId);
     }
+
+    /**
+     * Retorna todos los servicios de un concesionario filtrados por una lista de
+     * estados.
+     */
+    public List<ServiceDelivery> findByDealershipAndStatuses(Long dealershipId,
+            List<app.domain.model.enums.Status> statuses) {
+        return serviceDeliveryPort.findByDealershipIdAndStatuses(dealershipId, statuses);
+    }
 }
