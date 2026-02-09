@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -37,7 +38,7 @@ public class WhatsAppBotService {
 
     private static final Logger logger = LoggerFactory.getLogger(WhatsAppBotService.class);
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
     private final Map<String, ScheduledFuture<?>> scheduledTimeouts = new ConcurrentHashMap<>();
     private final Set<String> timeoutNotified = ConcurrentHashMap.newKeySet();
     private final WhatsAppMessagePort messagePort;
@@ -286,7 +287,7 @@ public class WhatsAppBotService {
                     .findFirst()
                     .ifPresent(p -> {
                         String publicUrl = storagePort.getUrl(p.getPhotoPath());
-                        messagePort.sendImage(from, publicUrl, "📸 Foto de lectura");
+                        messagePort.sendImage(from, publicUrl, "Foto de lectura");
                         sleep(500); // Pequeña pausa para asegurar el orden visual
                     });
 
@@ -310,7 +311,7 @@ public class WhatsAppBotService {
                     messagePort.sendLocation(from,
                             lat,
                             lon,
-                            "📍 Ubicación del estado",
+                            "Ubicación del estado",
                             address != null ? address : s.getPlate().getPlateNumber());
                 }
             }
@@ -448,20 +449,34 @@ public class WhatsAppBotService {
     }
 
     private void scheduleTimeout(String from) {
-        ScheduledFuture<?> future = scheduler.schedule(() -> {
-            messagePort.sendTextMessage(from,
-                    "⏰ Por inactividad, hemos finalizado el chat. Si necesitas realizar una nueva consulta, ¡escríbeme! 👋");
-            timeoutNotified.add(from);
-            scheduledTimeouts.remove(from);
-        }, 5, TimeUnit.MINUTES);
-        scheduledTimeouts.put(from, future);
+        AtomicReference<ScheduledFuture<?>> self = new AtomicReference<>();
+        ScheduledFuture<?> future = scheduledTimeouts.compute(from, (key, existing) -> {
+            if (existing != null) {
+                existing.cancel(false);
+            }
+            return scheduler.schedule(() -> {
+                // remove(from, self.get()) garantiza que solo esta tarea específica (la más
+                // reciente)
+                // pueda limpiar el mapa y enviar el mensaje.
+                if (scheduledTimeouts.remove(from, self.get())) {
+                    messagePort.sendTextMessage(from,
+                            "⏰ Por inactividad, hemos finalizado el chat. Si necesitas realizar una nueva consulta, ¡escríbeme! 👋");
+                    timeoutNotified.add(from);
+                    conversationStates.remove(from);
+                    failedAttempts.remove(from);
+                }
+            }, 5, TimeUnit.MINUTES);
+        });
+        self.set(future);
     }
 
     private void cancelTimeout(String from) {
-        ScheduledFuture<?> future = scheduledTimeouts.remove(from);
-        if (future != null) {
-            future.cancel(false);
-        }
+        scheduledTimeouts.compute(from, (key, existingFuture) -> {
+            if (existingFuture != null) {
+                existingFuture.cancel(false);
+            }
+            return null;
+        });
     }
 
     @PreDestroy

@@ -4,6 +4,7 @@ import app.domain.ports.WhatsAppMessagePort;
 import app.infrastructure.config.WhatsAppConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -26,7 +27,10 @@ public class WhatsAppCloudClient implements WhatsAppMessagePort {
 
     public WhatsAppCloudClient(WhatsAppConfig config) {
         this.config = config;
-        this.restTemplate = new RestTemplate();
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(10000);
+        factory.setReadTimeout(10000);
+        this.restTemplate = new RestTemplate(factory);
     }
 
     /**
