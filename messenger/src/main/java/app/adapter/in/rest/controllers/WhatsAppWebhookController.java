@@ -78,6 +78,10 @@ public class WhatsAppWebhookController {
                                                 && interactive.getButtonReply() != null) {
                                             String buttonId = interactive.getButtonReply().getId();
                                             botService.processMessage(from, buttonId);
+                                        } else if ("list_reply".equals(interactive.getType())
+                                                && interactive.getListReply() != null) {
+                                            String rowId = interactive.getListReply().getId();
+                                            botService.processMessage(from, rowId);
                                         }
                                     }
                                 }
@@ -94,18 +98,18 @@ public class WhatsAppWebhookController {
     }
 
     private boolean isValidSignature(String payload, String signatureWithPrefix) {
+        String appSecret = config.getAppSecret();
+        if (appSecret == null || appSecret.isEmpty()) {
+            logger.warn("App Secret no configurado. Saltando validación de firma.");
+            return true;
+        }
+
         if (signatureWithPrefix == null || !signatureWithPrefix.startsWith("sha256=")) {
             return false;
         }
 
         try {
             String signature = signatureWithPrefix.substring(7); // Quitar "sha256="
-            String appSecret = config.getAppSecret();
-
-            if (appSecret == null || appSecret.isEmpty()) {
-                logger.warn("App Secret no configurado. Saltando validación de firma.");
-                return true; // Si no hay secreto, permitimos (para facilitar transición)
-            }
 
             javax.crypto.spec.SecretKeySpec signingKey = new javax.crypto.spec.SecretKeySpec(
                     appSecret.getBytes(java.nio.charset.StandardCharsets.UTF_8),

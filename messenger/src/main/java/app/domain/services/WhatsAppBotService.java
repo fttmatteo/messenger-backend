@@ -248,25 +248,25 @@ public class WhatsAppBotService {
     }
 
     private void sendMenu(String from, String dealershipName) {
-        String bodyText = String.format("🛞 *%s*\n\n📋 *¿Qué deseas consultar?*", dealershipName);
+        String bodyText = String.format("🛞 *%s*\n📋 *¿Qué deseas consultar?*", dealershipName);
         String buttonText = "Ver opciones";
         String listTitle = "Menú Principal";
 
         List<String> rowTitles = List.of(
-                "Consulta específica",
-                "Placas asignadas",
-                "Placas devueltas",
-                "Placas pendientes",
-                "Placas entregadas",
-                "Cerrar sesión");
+                "🔍 Consulta específica",
+                "⏳ Placas asignadas",
+                "↩️ Placas devueltas",
+                "📝 Placas pendientes",
+                "✅ Placas entregadas",
+                "🚪 Cerrar sesión");
 
         List<String> rowDescriptions = List.of(
-                "Consultar por placa",
-                "Programadas para hoy",
+                "Por placa",
+                "Para entrega",
                 "Por intento fallido",
                 "Por documentación",
                 "Consolidado final",
-                "Salir del sistema");
+                "Finalizar sesión actual");
 
         List<String> rowIds = List.of("1", "2", "3", "4", "5", "0");
 
@@ -306,7 +306,7 @@ public class WhatsAppBotService {
         String statusName = getStatusName(s.getCurrentStatus());
 
         return String.format(
-                "🚗 Placa: %s\n\n✏️ *Estado:* %s %s\n📅 *Fecha de asignación:* %s\n🛵 *Mensajero:* %s\n🛞 *Concesionario:* %s",
+                "*%s*\n\n✏️ *Estado:* %s %s\n📅 *Fecha de asignación:* %s\n🛵 *Mensajero:* %s\n🛞 *Concesionario:* %s",
                 s.getPlate().getPlateNumber(),
                 statusEmoji,
                 statusName,
