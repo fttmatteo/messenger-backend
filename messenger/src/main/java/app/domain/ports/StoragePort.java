@@ -17,4 +17,9 @@ public interface StoragePort {
      * Obtiene un archivo del sistema de almacenamiento.
      */
     File get(String path);
+
+    /**
+     * Obtiene una URL pública o firmada para acceder al archivo.
+     */
+    String getUrl(String path);
 }
