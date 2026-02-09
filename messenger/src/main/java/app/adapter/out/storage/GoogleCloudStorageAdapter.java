@@ -238,7 +238,14 @@ public class GoogleCloudStorageAdapter implements StoragePort {
     @Override
     public File get(String path) {
         throw new UnsupportedOperationException(
-                "Para GCS con URLs firmadas, usa directamente la URL almacenada en la base de datos.");
+                "Para GCS con URLs firmadas, usa directamente getUrl().");
+    }
+
+    @Override
+    public String getUrl(String path) {
+        if (path == null || path.isEmpty())
+            return null;
+        return regenerateSignedUrl(path);
     }
 
     /**

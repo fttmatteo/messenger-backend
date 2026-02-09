@@ -75,6 +75,11 @@ public class LocalStorageAdapter implements StoragePort {
         return null;
     }
 
+    @Override
+    public String getUrl(String path) {
+        return path;
+    }
+
     /**
      * Elimina un archivo del almacenamiento local.
      */

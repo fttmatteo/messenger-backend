@@ -11,6 +11,7 @@ import app.domain.model.enums.Status;
 import app.domain.ports.LocationPort;
 import app.domain.ports.WhatsAppMessagePort;
 import app.domain.ports.WhatsAppSessionPort;
+import app.domain.ports.StoragePort;
 import jakarta.annotation.PreDestroy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,6 +44,7 @@ public class WhatsAppBotService {
     private final WhatsAppSessionPort sessionPort;
     private final SearchServiceDelivery searchService;
     private final LocationPort locationPort;
+    private final StoragePort storagePort;
     private final Map<String, ConversationState> conversationStates = new ConcurrentHashMap<>();
     private final Map<String, Integer> failedAttempts = new ConcurrentHashMap<>();
 
@@ -54,11 +56,13 @@ public class WhatsAppBotService {
             WhatsAppMessagePort messagePort,
             WhatsAppSessionPort sessionPort,
             SearchServiceDelivery searchService,
-            LocationPort locationPort) {
+            LocationPort locationPort,
+            StoragePort storagePort) {
         this.messagePort = messagePort;
         this.sessionPort = sessionPort;
         this.searchService = searchService;
         this.locationPort = locationPort;
+        this.storagePort = storagePort;
     }
 
     /**
@@ -281,7 +285,8 @@ public class WhatsAppBotService {
                     .filter(p -> p.getPhotoType() == app.domain.model.enums.PhotoType.PLATE_DETECTION)
                     .findFirst()
                     .ifPresent(p -> {
-                        messagePort.sendImage(from, p.getPhotoPath(), "📸 Foto de lectura");
+                        String publicUrl = storagePort.getUrl(p.getPhotoPath());
+                        messagePort.sendImage(from, publicUrl, "📸 Foto de lectura");
                     });
 
             // 2. Enviar detalle de texto
