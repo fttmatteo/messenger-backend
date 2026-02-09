@@ -246,6 +246,8 @@ public class WebhookPayload {
         private String type;
         @JsonProperty("button_reply")
         private ButtonReply buttonReply;
+        @JsonProperty("list_reply")
+        private ListReply listReply;
 
         public String getType() {
             return type;
@@ -261,6 +263,45 @@ public class WebhookPayload {
 
         public void setButtonReply(ButtonReply buttonReply) {
             this.buttonReply = buttonReply;
+        }
+
+        public ListReply getListReply() {
+            return listReply;
+        }
+
+        public void setListReply(ListReply listReply) {
+            this.listReply = listReply;
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class ListReply {
+        private String id;
+        private String title;
+        private String description;
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
         }
     }
 
