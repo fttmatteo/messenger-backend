@@ -44,4 +44,10 @@ public interface WhatsAppSessionPort {
      * Busca todas las sesiones activas asociadas a un concesionario.
      */
     java.util.List<WhatsAppSession> findActiveSessionsByDealership(Long dealershipId);
+
+    /**
+     * Busca sesiones que han superado el umbral de inactividad y no han sido
+     * notificadas.
+     */
+    java.util.List<WhatsAppSession> findInactiveSessions(java.time.LocalDateTime threshold);
 }

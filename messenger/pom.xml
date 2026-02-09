@@ -279,6 +279,18 @@
 			<version>0.4.21</version>
 		</dependency>
 
+		<!-- ShedLock (Coordinación de Tareas Distribuidas) -->
+		<dependency>
+			<groupId>net.javacrumbs.shedlock</groupId>
+			<artifactId>shedlock-spring</artifactId>
+			<version>6.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>net.javacrumbs.shedlock</groupId>
+			<artifactId>shedlock-provider-redis-spring</artifactId>
+			<version>6.3.0</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

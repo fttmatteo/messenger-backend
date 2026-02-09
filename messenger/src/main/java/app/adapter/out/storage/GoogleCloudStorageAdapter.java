@@ -1,5 +1,6 @@
 package app.adapter.out.storage;
 
+import app.domain.ports.StorageCachePort;
 import app.domain.ports.StoragePort;
 import app.infrastructure.storage.ImageOptimizer;
 import com.google.auth.ServiceAccountSigner;
@@ -23,8 +24,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
-import java.time.Instant;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,10 +36,7 @@ public class GoogleCloudStorageAdapter implements StoragePort {
 
     private static final Logger logger = LoggerFactory.getLogger(GoogleCloudStorageAdapter.class);
 
-    private record CachedUrl(String url, Instant expiresAt) {
-    }
-
-    private final ConcurrentHashMap<String, CachedUrl> signedUrlCache = new ConcurrentHashMap<>();
+    private final StorageCachePort cachePort;
     private static final int CACHE_EXPIRATION_MARGIN_HOURS = 1;
 
     private final Storage storage;
@@ -52,13 +49,15 @@ public class GoogleCloudStorageAdapter implements StoragePort {
             @Value("${google.cloud.storage.bucket-name}") String bucketName,
             @Value("${google.cloud.storage.project-id}") String projectId,
             @Value("${google.cloud.storage.signed-url-expiration-hours:24}") int urlExpirationHours,
-            ImageOptimizer imageOptimizer)
+            ImageOptimizer imageOptimizer,
+            StorageCachePort cachePort)
             throws IOException {
 
         this.bucketName = bucketName;
         this.defaultUrlExpirationHours = urlExpirationHours;
         this.credentials = GoogleCredentials.getApplicationDefault();
         this.imageOptimizer = imageOptimizer;
+        this.cachePort = cachePort;
         this.storage = StorageOptions.newBuilder()
                 .setProjectId(projectId)
                 .setCredentials(credentials)
@@ -124,18 +123,17 @@ public class GoogleCloudStorageAdapter implements StoragePort {
      * Uses an in-memory cache to avoid repeated IAM API calls.
      */
     public String regenerateSignedUrl(String objectName, int expirationHours) {
-        CachedUrl cached = signedUrlCache.get(objectName);
-        if (cached != null) {
-            Instant safeExpirationTime = Instant.now().plusSeconds(CACHE_EXPIRATION_MARGIN_HOURS * 3600L);
-            if (cached.expiresAt().isAfter(safeExpirationTime)) {
-                return cached.url();
-            }
+        Optional<String> cachedUrl = cachePort.getUrl(objectName);
+        if (cachedUrl.isPresent()) {
+            return cachedUrl.get();
         }
 
         String newUrl = generateSignedUrlInternal(objectName, expirationHours, this.credentials);
 
-        Instant expiresAt = Instant.now().plusSeconds(expirationHours * 3600L);
-        signedUrlCache.put(objectName, new CachedUrl(newUrl, expiresAt));
+        // Cacheamos por (expirationHours - margen) para asegurar que no expire antes de
+        // ser usada
+        long ttlSeconds = (expirationHours - CACHE_EXPIRATION_MARGIN_HOURS) * 3600L;
+        cachePort.cacheUrl(objectName, newUrl, ttlSeconds);
 
         return newUrl;
     }
@@ -255,6 +253,7 @@ public class GoogleCloudStorageAdapter implements StoragePort {
         BlobId blobId = BlobId.of(bucketName, objectName);
         boolean deleted = storage.delete(blobId);
         if (deleted) {
+            cachePort.evictUrl(objectName);
         } else {
             logger.warn("No se pudo eliminar el objeto (posiblemente no existe)");
         }

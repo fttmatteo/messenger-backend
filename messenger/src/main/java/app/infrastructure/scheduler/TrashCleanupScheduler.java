@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import app.domain.model.ServiceDelivery;
 import app.domain.ports.ServiceDeliveryPort;
 import app.infrastructure.service.ArchiveServiceService;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 /**
  * Job programado para archivar servicios de la papelera después de 60 días.
@@ -33,6 +34,7 @@ public class TrashCleanupScheduler {
     private ArchiveServiceService archiveServiceService;
 
     @Scheduled(cron = "${app.trash.cleanup-cron:0 0 3 * * ?}")
+    @SchedulerLock(name = "trash_cleanup_lock", lockAtMostFor = "PT2H", lockAtLeastFor = "PT10M")
     public void cleanupExpiredTrash() {
 
         LocalDateTime expirationDate = LocalDateTime.now().minusDays(retentionDays);
@@ -41,7 +43,6 @@ public class TrashCleanupScheduler {
         if (expiredServices.isEmpty()) {
             return;
         }
-
 
         int archivedCount = 0;
         int errorCount = 0;

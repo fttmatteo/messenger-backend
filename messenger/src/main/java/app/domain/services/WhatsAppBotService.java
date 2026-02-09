@@ -11,8 +11,8 @@ import app.domain.model.enums.Status;
 import app.domain.ports.LocationPort;
 import app.domain.ports.WhatsAppMessagePort;
 import app.domain.ports.WhatsAppSessionPort;
+import app.domain.ports.WhatsAppRateLimitPort;
 import app.domain.ports.StoragePort;
-import jakarta.annotation.PreDestroy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -21,11 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicReference;
+import app.domain.model.enums.WhatsAppConversationState;
 import java.util.stream.Collectors;
 
 /**
@@ -38,32 +35,26 @@ public class WhatsAppBotService {
 
     private static final Logger logger = LoggerFactory.getLogger(WhatsAppBotService.class);
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
-    private final Map<String, ScheduledFuture<?>> scheduledTimeouts = new ConcurrentHashMap<>();
-    private final Set<String> timeoutNotified = ConcurrentHashMap.newKeySet();
     private final WhatsAppMessagePort messagePort;
     private final WhatsAppSessionPort sessionPort;
     private final SearchServiceDelivery searchService;
     private final LocationPort locationPort;
     private final StoragePort storagePort;
-    private final Map<String, ConversationState> conversationStates = new ConcurrentHashMap<>();
-    private final Map<String, Integer> failedAttempts = new ConcurrentHashMap<>();
-
-    private enum ConversationState {
-        AWAITING_PIN, AWAITING_PLATE, MENU
-    }
+    private final WhatsAppRateLimitPort rateLimitPort;
 
     public WhatsAppBotService(
             WhatsAppMessagePort messagePort,
             WhatsAppSessionPort sessionPort,
             SearchServiceDelivery searchService,
             LocationPort locationPort,
-            StoragePort storagePort) {
+            StoragePort storagePort,
+            WhatsAppRateLimitPort rateLimitPort) {
         this.messagePort = messagePort;
         this.sessionPort = sessionPort;
         this.searchService = searchService;
         this.locationPort = locationPort;
         this.storagePort = storagePort;
+        this.rateLimitPort = rateLimitPort;
     }
 
     /**
@@ -72,91 +63,81 @@ public class WhatsAppBotService {
     @Transactional
     public void processMessage(String from, String messageBody) {
         String text = messageBody.trim();
-        ConversationState currentState = conversationStates.getOrDefault(from, ConversationState.AWAITING_PIN);
+
+        // Verificar sesión
+        Optional<WhatsAppSession> sessionOpt = sessionPort.findActiveSession(from);
+        WhatsAppConversationState currentState = sessionOpt.map(WhatsAppSession::getConversationState)
+                .orElse(WhatsAppConversationState.AWAITING_PIN);
 
         // Logging seguro: enmascarar teléfono y ocultar PIN si aplica
         String maskedFrom = maskPhone(from);
-        String logContent = (currentState == ConversationState.AWAITING_PIN) ? "****" : text;
+        String logContent = (currentState == WhatsAppConversationState.AWAITING_PIN && sessionOpt.isEmpty()) ? "****"
+                : text;
         logger.info("[WhatsApp] Mensaje recibido de {}: {}", maskedFrom, logContent);
 
-        // Cancelar cualquier timeout previo
-        cancelTimeout(from);
-        // Verificar si venimos de un estado de inactividad
-        boolean wasTimedOut = timeoutNotified.remove(from);
-        // Verificar sesión
-        Optional<WhatsAppSession> sessionOpt = sessionPort.findActiveSession(from);
-
-        if (wasTimedOut) {
-            if (sessionOpt.isPresent()) {
-                messagePort.sendTextMessage(from, "¡Hola de nuevo! 👋");
-            } else {
-                conversationStates.remove(from);
-            }
-        }
-
         if (sessionOpt.isPresent()) {
-            handleAuthenticatedUser(from, text, sessionOpt.get());
+            WhatsAppSession session = sessionOpt.get();
+            // Verificar si venimos de un estado de inactividad
+            if (session.isTimeoutNotified()) {
+                messagePort.sendTextMessage(from, "¡Hola de nuevo! 👋");
+                session.setTimeoutNotified(false);
+            }
+            // Actualizar actividad
+            session.setLastActivityAt(java.time.LocalDateTime.now());
+            sessionPort.updateSession(session);
+
+            handleAuthenticatedUser(from, text, session);
         } else {
             handleUnauthenticatedUser(from, text);
-        }
-
-        // Programar nuevo timeout de 5 minutos solo si el usuario sigue en una
-        // conversación activa
-        if (conversationStates.containsKey(from)) {
-            scheduleTimeout(from);
         }
     }
 
     private void handleUnauthenticatedUser(String from, String text) {
-        ConversationState state = conversationStates.get(from);
+        // Verificar si está bloqueado por demasiados intentos (independiente del
+        // estado)
+        if (rateLimitPort.isBlocked(from)) {
+            logger.warn("Usuario {} bloqueado por exceso de intentos de PIN.", maskPhone(from));
+            messagePort.sendTextMessage(from,
+                    "⚠️ Has superado el límite de intentos. Por seguridad, tu acceso ha sido pausado por 15 minutos.");
+            return;
+        }
 
-        if (state == ConversationState.AWAITING_PIN) {
-            // Verificar si está bloqueado por demasiados intentos
-            int attempts = failedAttempts.getOrDefault(from, 0);
-            if (attempts >= 3) {
-                logger.warn("Usuario {} bloqueado por exceso de intentos de PIN.", from);
-                messagePort.sendTextMessage(from,
-                        "⚠️ Has superado el límite de intentos. Por seguridad, tu acceso ha sido pausado por 15 minutos.");
-                return;
-            }
-
+        // Heurística simple: si el texto parece un PIN (4 dígitos), intentamos
+        // autenticar.
+        // Si no, enviamos el saludo inicial.
+        if (text.matches("\\d{4}")) {
             // Intentar autenticar con el PIN
             Optional<Dealership> dealershipOpt = sessionPort.findDealershipByPin(text);
 
             if (dealershipOpt.isPresent()) {
                 // Éxito: Resetear intentos y crear sesión
-                failedAttempts.remove(from);
+                rateLimitPort.clearFailedAttempts(from);
                 Dealership dealership = dealershipOpt.get();
-                sessionPort.createSession(from, dealership, sessionPort.getSessionExpirationHours());
-                conversationStates.put(from, ConversationState.MENU);
+                WhatsAppSession session = sessionPort.createSession(from, dealership,
+                        sessionPort.getSessionExpirationHours());
+                session.setConversationState(WhatsAppConversationState.MENU);
+                sessionPort.updateSession(session);
                 sendMenu(from, dealership.getName());
             } else {
-                // Fallo: Incrementar intentos y aplicar delay progresivo
-                attempts++;
-                failedAttempts.put(from, attempts);
+                // Fallo: Registrar intento y aplicar delay progresivo
+                int remaining = rateLimitPort.recordFailedAttempt(from);
+                int attemptsDone = 3 - remaining;
 
-                // Aplicar delay progresivo (ej. 2s por cada fallo)
+                // Aplicar delay progresivo
                 try {
-                    Thread.sleep(attempts * 2000L);
+                    Thread.sleep(attemptsDone * 2000L);
                 } catch (InterruptedException ignored) {
                 }
 
-                if (attempts >= 3) {
+                if (remaining == 0) {
                     messagePort.sendTextMessage(from,
                             "❌ PIN incorrecto. Has alcanzado el máximo de intentos permitidos. Por seguridad, tu acceso se ha bloqueado por 15 minutos.");
-
-                    // Programar desbloqueo automático en 15 minutos
-                    scheduler.schedule(() -> {
-                        failedAttempts.remove(from);
-                        logger.info("Bloqueo de PIN expirado para {}", from);
-                    }, 15, TimeUnit.MINUTES);
                 } else {
                     messagePort.sendTextMessage(from,
-                            "❌ PIN incorrecto. Intenta de nuevo (Intento " + attempts + " de 3):");
+                            "❌ PIN incorrecto. Intenta de nuevo (Intento " + attemptsDone + " de 3):");
                 }
             }
         } else {
-            conversationStates.put(from, ConversationState.AWAITING_PIN);
             messagePort.sendTextMessage(from,
                     "🚦 *Tránsito de Sabaneta*\n*Matrículas Iniciales* 🚦\n_Área de Mensajería_\n\n¡Hola! 👋. Aquí podrás consultar el estado de las placas.\n\n"
                             + "`Por seguridad, el PIN se solicita cada 12 horas o cuando se cierre y se vuelve a abrir la sesión.`\n\n"
@@ -166,7 +147,7 @@ public class WhatsAppBotService {
     }
 
     private void handleAuthenticatedUser(String from, String text, WhatsAppSession session) {
-        ConversationState state = conversationStates.getOrDefault(from, ConversationState.MENU);
+        WhatsAppConversationState state = session.getConversationState();
         Long dealershipId = session.getDealership().getIdDealership();
         String dealershipName = session.getDealership().getName();
 
@@ -180,7 +161,8 @@ public class WhatsAppBotService {
                 } else {
                     sendPlateDetails(from, services);
                 }
-                conversationStates.put(from, ConversationState.MENU);
+                session.setConversationState(WhatsAppConversationState.MENU);
+                sessionPort.updateSession(session);
                 sendMenu(from, dealershipName);
             }
             case MENU -> {
@@ -205,7 +187,8 @@ public class WhatsAppBotService {
 
                 switch (text) {
                     case "1" -> {
-                        conversationStates.put(from, ConversationState.AWAITING_PLATE);
+                        session.setConversationState(WhatsAppConversationState.AWAITING_PLATE);
+                        sessionPort.updateSession(session);
                         messagePort.sendTextMessage(from, "Escribe el número de la placa:");
                     }
                     case "2" -> {
@@ -224,8 +207,6 @@ public class WhatsAppBotService {
                     case "0" -> {
                         logger.info("[Sesión] Usuario {} cerró sesión voluntariamente.", maskPhone(from));
                         sessionPort.deleteByPhoneNumber(from);
-                        conversationStates.remove(from);
-                        cancelTimeout(from);
                         messagePort.sendTextMessage(from,
                                 "🚪 Sesión cerrada correctamente.\n\n¡Hasta pronto! 👋. Para ingresar de nuevo, solo escribe un mensaje.");
                     }
@@ -446,49 +427,5 @@ public class WhatsAppBotService {
             return phone;
         }
         return "****" + phone.substring(phone.length() - 4);
-    }
-
-    private void scheduleTimeout(String from) {
-        AtomicReference<ScheduledFuture<?>> self = new AtomicReference<>();
-        ScheduledFuture<?> future = scheduledTimeouts.compute(from, (key, existing) -> {
-            if (existing != null) {
-                existing.cancel(false);
-            }
-            return scheduler.schedule(() -> {
-                // remove(from, self.get()) garantiza que solo esta tarea específica (la más
-                // reciente)
-                // pueda limpiar el mapa y enviar el mensaje.
-                if (scheduledTimeouts.remove(from, self.get())) {
-                    messagePort.sendTextMessage(from,
-                            "⏰ Por inactividad, hemos finalizado el chat. Si necesitas realizar una nueva consulta, ¡escríbeme! 👋");
-                    timeoutNotified.add(from);
-                    conversationStates.remove(from);
-                    failedAttempts.remove(from);
-                }
-            }, 5, TimeUnit.MINUTES);
-        });
-        self.set(future);
-    }
-
-    private void cancelTimeout(String from) {
-        scheduledTimeouts.compute(from, (key, existingFuture) -> {
-            if (existingFuture != null) {
-                existingFuture.cancel(false);
-            }
-            return null;
-        });
-    }
-
-    @PreDestroy
-    public void shutdown() {
-        scheduler.shutdown();
-        try {
-            if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
-                scheduler.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            scheduler.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
     }
 }
