@@ -276,10 +276,18 @@ public class WhatsAppBotService {
 
     private void sendPlateDetails(String from, List<ServiceDelivery> services) {
         for (ServiceDelivery s : services) {
-            // Enviar detalle de texto
+            // 1. Enviar foto de detección de placa si existe
+            s.getPhotos().stream()
+                    .filter(p -> p.getPhotoType() == app.domain.model.enums.PhotoType.PLATE_DETECTION)
+                    .findFirst()
+                    .ifPresent(p -> {
+                        messagePort.sendImage(from, p.getPhotoPath(), "📸 Foto de lectura");
+                    });
+
+            // 2. Enviar detalle de texto
             messagePort.sendTextMessage(from, formatServiceDetail(s));
 
-            // Enviar ubicación nativa si existe GPS para el estado actual
+            // 3. Enviar ubicación nativa si existe GPS para el estado actual
             if (s.getHistory() != null && !s.getHistory().isEmpty()) {
                 Optional<StatusHistory> lastUpdate = s.getHistory().stream()
                         .filter(h -> h.getNewStatus() == s.getCurrentStatus())

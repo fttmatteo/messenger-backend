@@ -108,6 +108,19 @@ public class WhatsAppCloudClient implements WhatsAppMessagePort {
         return sendMessage(to, "interactive", interactive);
     }
 
+    /**
+     * Envía una imagen a un número de WhatsApp.
+     */
+    @Override
+    public boolean sendImage(String to, String imageUrl, String caption) {
+        Map<String, Object> image = new HashMap<>();
+        image.put("link", imageUrl);
+        if (caption != null && !caption.isEmpty()) {
+            image.put("caption", caption);
+        }
+        return sendMessage(to, "image", image);
+    }
+
     private boolean sendMessage(String to, String type, Object data) {
         try {
             HttpHeaders headers = new HttpHeaders();
