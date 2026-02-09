@@ -15,6 +15,8 @@ import app.domain.ports.DealershipPort;
 import app.domain.ports.EmployeePort;
 import app.domain.ports.PlatePort;
 import app.domain.ports.ServiceDeliveryPort;
+import org.springframework.context.ApplicationEventPublisher;
+import app.domain.events.PlateStatusChangedEvent;
 
 /**
  * Servicio para crear nuevos servicios de entrega con reconocimiento de placa.
@@ -34,6 +36,8 @@ public class CreateServiceDelivery {
     private PlateRecognition plateRecognition;
     @Autowired
     private app.domain.ports.TrackingPort trackingPort;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     /**
      * Crea un nuevo servicio de entrega, asocia la placa (creándola si no existe)
@@ -112,6 +116,8 @@ public class CreateServiceDelivery {
             tracking.setSource(app.domain.model.enums.TrackingSource.MANUAL);
             trackingPort.saveTrackingHistory(tracking);
         }
+
+        eventPublisher.publishEvent(new PlateStatusChangedEvent(saved, null, Status.ASSIGNED));
 
         return saved;
     }
