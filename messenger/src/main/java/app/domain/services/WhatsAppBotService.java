@@ -287,10 +287,12 @@ public class WhatsAppBotService {
                     .ifPresent(p -> {
                         String publicUrl = storagePort.getUrl(p.getPhotoPath());
                         messagePort.sendImage(from, publicUrl, "📸 Foto de lectura");
+                        sleep(500); // Pequeña pausa para asegurar el orden visual
                     });
 
             // 2. Enviar detalle de texto
             messagePort.sendTextMessage(from, formatServiceDetail(s));
+            sleep(500);
 
             // 3. Enviar ubicación nativa si existe GPS para el estado actual
             if (s.getHistory() != null && !s.getHistory().isEmpty()) {
@@ -308,10 +310,18 @@ public class WhatsAppBotService {
                     messagePort.sendLocation(from,
                             lat,
                             lon,
-                            "Ubicación del estado",
+                            "📍 Ubicación del estado",
                             address != null ? address : s.getPlate().getPlateNumber());
                 }
             }
+        }
+    }
+
+    private void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -320,7 +330,7 @@ public class WhatsAppBotService {
         String statusName = getStatusName(s.getCurrentStatus());
 
         return String.format(
-                "🟡 *%s* 🟡\n\n✏️ *Estado:* %s %s\n📅 *Fecha de asignación:* %s\n🛵 *Mensajero:* %s\n🛞 *Concesionario:* %s",
+                "🟡 *%s*\n\n✏️ *Estado:* %s %s\n📅 *Fecha de asignación:* %s\n🛵 *Mensajero:* %s\n🛞 *Concesionario:* %s",
                 s.getPlate().getPlateNumber(),
                 statusEmoji,
                 statusName,
