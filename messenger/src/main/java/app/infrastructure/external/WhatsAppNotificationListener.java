@@ -37,8 +37,8 @@ public class WhatsAppNotificationListener {
         }
 
         String message = String.format(
-                "🔔 *Notificación de Cambio de Estado*\n\n" +
-                        "La placa *%s* para el concesionario *%s* ha cambiado su estado a:\n" +
+                "🔔 *Notificación de cambio de estado*\n\n" +
+                        "La placa *%s* para el concesionario *%s* ha cambiado su estado a:\n\n" +
                         "➡️ *%s*\n\n" +
                         "_Consulte el menú para más detalles._",
                 plateNumber, dealershipName, newStatusName);

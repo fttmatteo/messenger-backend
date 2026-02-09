@@ -26,6 +26,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CreateServiceDelivery Unit Tests")
@@ -44,6 +45,9 @@ class CreateServiceDeliveryTest {
 
     @Mock
     private app.domain.ports.TrackingPort trackingPort;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private CreateServiceDelivery createServiceDelivery;
@@ -114,6 +118,8 @@ class CreateServiceDeliveryTest {
 
         verify(serviceDeliveryPort).save(argThat(service -> service.getPlate().getPlateNumber().equals("NNN999") &&
                 service.getCurrentStatus() == Status.ASSIGNED));
+
+        verify(eventPublisher).publishEvent(any(app.domain.events.PlateStatusChangedEvent.class));
     }
 
     @Test
