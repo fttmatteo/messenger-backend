@@ -122,8 +122,6 @@ public class WhatsAppBotService {
                 // Éxito: Resetear intentos y crear sesión
                 failedAttempts.remove(from);
                 Dealership dealership = dealershipOpt.get();
-                logger.info("[Sesión] Login exitoso para {} en concesionario: {}", maskPhone(from),
-                        dealership.getName());
                 sessionPort.createSession(from, dealership, sessionPort.getSessionExpirationHours());
                 conversationStates.put(from, ConversationState.MENU);
                 sendMenu(from, dealership.getName());
@@ -259,7 +257,7 @@ public class WhatsAppBotService {
                 "Placas asignadas",
                 "Placas devueltas",
                 "Placas pendientes",
-                "Placas entregadas y revisadas",
+                "Placas entregadas",
                 "Cerrar sesión");
 
         List<String> rowDescriptions = List.of(
