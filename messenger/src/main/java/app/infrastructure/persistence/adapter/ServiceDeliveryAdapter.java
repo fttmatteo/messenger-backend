@@ -229,4 +229,16 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
                 app.domain.model.enums.Status.PENDING);
         return findByDealershipIdAndStatuses(dealershipId, pendingStatuses);
     }
+
+    /**
+     * Busca servicios por concesionario y una lista de estados específicos con
+     * paginación.
+     */
+    @Override
+    public Page<ServiceDelivery> findByDealershipIdAndStatusesPaginated(Long dealershipId,
+            List<app.domain.model.enums.Status> statuses, Pageable pageable) {
+        return repository
+                .findByDealership_IdDealershipAndCurrentStatusInAndDeletedFalse(dealershipId, statuses, pageable)
+                .map(mapper::toDomain);
+    }
 }

@@ -27,6 +27,12 @@ public class WhatsAppSessionEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "current_page")
+    private Integer currentPage;
+
+    @Column(name = "last_filter_statuses", length = 500)
+    private String lastFilterStatuses;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -70,5 +76,21 @@ public class WhatsAppSessionEntity {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Integer getCurrentPage() {
+        return currentPage;
+    }
+
+    public void setCurrentPage(Integer currentPage) {
+        this.currentPage = currentPage;
+    }
+
+    public String getLastFilterStatuses() {
+        return lastFilterStatuses;
+    }
+
+    public void setLastFilterStatuses(String lastFilterStatuses) {
+        this.lastFilterStatuses = lastFilterStatuses;
     }
 }

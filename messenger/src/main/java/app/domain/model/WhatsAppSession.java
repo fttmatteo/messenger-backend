@@ -13,6 +13,8 @@ public class WhatsAppSession {
     private Dealership dealership;
     private LocalDateTime expiresAt;
     private LocalDateTime createdAt;
+    private Integer currentPage; // Nueva página actual para paginación
+    private String lastFilterStatuses; // Últimos estados filtrados (serializados)
 
     public Long getId() {
         return id;
@@ -52,6 +54,22 @@ public class WhatsAppSession {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Integer getCurrentPage() {
+        return currentPage != null ? currentPage : 0;
+    }
+
+    public void setCurrentPage(Integer currentPage) {
+        this.currentPage = currentPage;
+    }
+
+    public String getLastFilterStatuses() {
+        return lastFilterStatuses;
+    }
+
+    public void setLastFilterStatuses(String lastFilterStatuses) {
+        this.lastFilterStatuses = lastFilterStatuses;
     }
 
     @JsonIgnore

@@ -106,4 +106,13 @@ public class SearchServiceDelivery {
             List<app.domain.model.enums.Status> statuses) {
         return serviceDeliveryPort.findByDealershipIdAndStatuses(dealershipId, statuses);
     }
+
+    /**
+     * Retorna todos los servicios de un concesionario filtrados por una lista de
+     * estados con paginación.
+     */
+    public Page<ServiceDelivery> findByDealershipAndStatusesPaginated(Long dealershipId,
+            List<app.domain.model.enums.Status> statuses, Pageable pageable) {
+        return serviceDeliveryPort.findByDealershipIdAndStatusesPaginated(dealershipId, statuses, pageable);
+    }
 }

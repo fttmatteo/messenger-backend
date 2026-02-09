@@ -7,7 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,6 +48,64 @@ public class WhatsAppCloudClient implements WhatsAppMessagePort {
         location.put("name", name);
         location.put("address", address);
         return sendMessage(to, "location", location);
+    }
+
+    @Override
+    public boolean sendReplyButtons(String to, String bodyText, List<String> buttonTitles, List<String> buttonIds) {
+        if (buttonTitles == null || buttonIds == null || buttonTitles.size() != buttonIds.size()) {
+            logger.error("[WhatsApp] Error en parámetros de botones: títulos e IDs no coinciden.");
+            return false;
+        }
+
+        List<Map<String, Object>> buttons = new ArrayList<>();
+        for (int i = 0; i < buttonTitles.size(); i++) {
+            Map<String, Object> button = Map.of(
+                    "type", "reply",
+                    "reply", Map.of(
+                            "id", buttonIds.get(i),
+                            "title", buttonTitles.get(i)));
+            buttons.add(button);
+        }
+
+        Map<String, Object> interactive = Map.of(
+                "type", "button",
+                "body", Map.of("text", bodyText),
+                "action", Map.of("buttons", buttons));
+
+        return sendMessage(to, "interactive", interactive);
+    }
+
+    @Override
+    public boolean sendListMessage(String to, String bodyText, String buttonText, String listTitle,
+            List<String> rowTitles, List<String> rowDescriptions, List<String> rowIds) {
+        if (rowTitles == null || rowIds == null || rowTitles.size() != rowIds.size()) {
+            logger.error("[WhatsApp] Error en parámetros de lista: títulos e IDs no coinciden.");
+            return false;
+        }
+
+        List<Map<String, Object>> rows = new ArrayList<>();
+        for (int i = 0; i < rowTitles.size(); i++) {
+            Map<String, Object> row = new HashMap<>();
+            row.put("id", rowIds.get(i));
+            row.put("title", rowTitles.get(i));
+            if (rowDescriptions != null && i < rowDescriptions.size() && rowDescriptions.get(i) != null) {
+                row.put("description", rowDescriptions.get(i));
+            }
+            rows.add(row);
+        }
+
+        Map<String, Object> section = Map.of(
+                "title", listTitle,
+                "rows", rows);
+
+        Map<String, Object> interactive = Map.of(
+                "type", "list",
+                "body", Map.of("text", bodyText),
+                "action", Map.of(
+                        "button", buttonText,
+                        "sections", List.of(section)));
+
+        return sendMessage(to, "interactive", interactive);
     }
 
     private boolean sendMessage(String to, String type, Object data) {

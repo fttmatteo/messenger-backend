@@ -8,22 +8,23 @@ public interface WhatsAppMessagePort {
 
     /**
      * Envía una ubicación geográfica nativa a un número de WhatsApp.
-     * 
-     * @param to        Número de teléfono destino
-     * @param latitude  Latitud
-     * @param longitude Longitud
-     * @param name      Nombre del lugar (ej. "Ubicación de entrega")
-     * @param address   Dirección del lugar
-     * @return true si el envío fue exitoso
      */
     boolean sendLocation(String to, double latitude, double longitude, String name, String address);
 
     /**
      * Envía un mensaje de texto a un número de WhatsApp.
-     * 
-     * @param to      Número de teléfono destino
-     * @param message Contenido del mensaje
-     * @return true si el envío fue exitoso
      */
     boolean sendTextMessage(String to, String message);
+
+    /**
+     * Envía un mensaje interactivo con botones de respuesta rápida.
+     */
+    boolean sendReplyButtons(String to, String bodyText, java.util.List<String> buttonTitles,
+            java.util.List<String> buttonIds);
+
+    /**
+     * Envía un mensaje interactivo con una lista de opciones (menú desplegable).
+     */
+    boolean sendListMessage(String to, String bodyText, String buttonText, String listTitle,
+            java.util.List<String> rowTitles, java.util.List<String> rowDescriptions, java.util.List<String> rowIds);
 }

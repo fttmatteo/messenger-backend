@@ -13,7 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Adaptador de persistencia para sesiones de WhatsApp.
@@ -70,6 +72,19 @@ public class WhatsAppSessionAdapter implements WhatsAppSessionPort {
         logger.debug("[DB] Sesión eliminada para {}", maskPhone(phoneNumber));
     }
 
+    @Override
+    @Transactional
+    public void updateSession(WhatsAppSession session) {
+        WhatsAppSessionEntity entity = sessionRepository.findById(session.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Session not found"));
+
+        entity.setCurrentPage(session.getCurrentPage());
+        entity.setLastFilterStatuses(session.getLastFilterStatuses());
+        entity.setExpiresAt(session.getExpiresAt());
+
+        sessionRepository.save(entity);
+    }
+
     private String maskPhone(String phone) {
         if (phone == null || phone.length() <= 4) {
             return phone;
@@ -88,6 +103,15 @@ public class WhatsAppSessionAdapter implements WhatsAppSessionPort {
         return config.getSessionExpirationHours();
     }
 
+    @Override
+    public List<WhatsAppSession> findActiveSessionsByDealership(Long dealershipId) {
+        return sessionRepository
+                .findByDealership_IdDealershipAndExpiresAtAfter(dealershipId, LocalDateTime.now())
+                .stream()
+                .map(this::toDomain)
+                .collect(Collectors.toList());
+    }
+
     private WhatsAppSession toDomain(WhatsAppSessionEntity entity) {
         WhatsAppSession session = new WhatsAppSession();
         session.setId(entity.getId());
@@ -95,6 +119,8 @@ public class WhatsAppSessionAdapter implements WhatsAppSessionPort {
         session.setDealership(dealershipToDomain(entity.getDealership()));
         session.setExpiresAt(entity.getExpiresAt());
         session.setCreatedAt(entity.getCreatedAt());
+        session.setCurrentPage(entity.getCurrentPage());
+        session.setLastFilterStatuses(entity.getLastFilterStatuses());
         return session;
     }
 

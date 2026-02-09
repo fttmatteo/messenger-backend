@@ -34,4 +34,14 @@ public interface WhatsAppSessionPort {
      * Obtiene las horas de expiración de sesión configuradas.
      */
     int getSessionExpirationHours();
+
+    /**
+     * Actualiza una sesión existente (ej. para guardar estado de paginación).
+     */
+    void updateSession(WhatsAppSession session);
+
+    /**
+     * Busca todas las sesiones activas asociadas a un concesionario.
+     */
+    java.util.List<WhatsAppSession> findActiveSessionsByDealership(Long dealershipId);
 }
