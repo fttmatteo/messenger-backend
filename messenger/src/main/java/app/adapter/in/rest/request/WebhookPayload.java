@@ -190,6 +190,7 @@ public class WebhookPayload {
         private String timestamp;
         private String type;
         private Text text;
+        private Interactive interactive;
 
         public String getFrom() {
             return from;
@@ -229,6 +230,59 @@ public class WebhookPayload {
 
         public void setText(Text text) {
             this.text = text;
+        }
+
+        public Interactive getInteractive() {
+            return interactive;
+        }
+
+        public void setInteractive(Interactive interactive) {
+            this.interactive = interactive;
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Interactive {
+        private String type;
+        @JsonProperty("button_reply")
+        private ButtonReply buttonReply;
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public ButtonReply getButtonReply() {
+            return buttonReply;
+        }
+
+        public void setButtonReply(ButtonReply buttonReply) {
+            this.buttonReply = buttonReply;
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class ButtonReply {
+        private String id;
+        private String title;
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
         }
     }
 

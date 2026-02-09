@@ -34,6 +34,8 @@ class UpdateServiceDeliveryTest {
     private ServiceDeliveryPort serviceDeliveryPort;
     @Mock
     private EmployeePort employeePort;
+    @Mock
+    private org.springframework.context.ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private UpdateServiceDelivery updateServiceDelivery;

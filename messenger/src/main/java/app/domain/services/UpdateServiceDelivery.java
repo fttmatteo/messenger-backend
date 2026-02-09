@@ -16,6 +16,8 @@ import app.domain.model.enums.Role;
 import app.domain.model.enums.Status;
 import app.domain.ports.EmployeePort;
 import app.domain.ports.ServiceDeliveryPort;
+import org.springframework.context.ApplicationEventPublisher;
+import app.domain.events.PlateStatusChangedEvent;
 
 /**
  * Servicio para actualizar estado de servicios con validación de reglas de
@@ -39,6 +41,8 @@ public class UpdateServiceDelivery {
     private EmployeePort employeePort;
     @Autowired
     private app.domain.ports.TrackingPort trackingPort;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     /**
      * Actualiza el estado de un servicio (Sobrecarga para compatibilidad sin
@@ -122,7 +126,9 @@ public class UpdateServiceDelivery {
             trackingPort.saveTrackingHistory(tracking);
         }
 
-        return serviceDeliveryPort.save(service);
+        ServiceDelivery saved = serviceDeliveryPort.save(service);
+        eventPublisher.publishEvent(new PlateStatusChangedEvent(saved, previousStatus, newStatus));
+        return saved;
     }
 
     /**
@@ -165,7 +171,9 @@ public class UpdateServiceDelivery {
         history.setChangedBy(admin);
         service.addHistory(history);
 
-        return serviceDeliveryPort.save(service);
+        ServiceDelivery saved = serviceDeliveryPort.save(service);
+        eventPublisher.publishEvent(new PlateStatusChangedEvent(saved, previousStatus, Status.ASSIGNED));
+        return saved;
     }
 
     /**

@@ -12,14 +12,19 @@ import app.domain.ports.LocationPort;
 import app.domain.ports.WhatsAppMessagePort;
 import app.domain.ports.WhatsAppSessionPort;
 import jakarta.annotation.PreDestroy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
  * Servicio principal del bot de WhatsApp.
@@ -90,15 +95,18 @@ public class WhatsAppBotService {
             handleUnauthenticatedUser(from, text);
         }
 
-        // Programar nuevo timeout de 5 minutos
-        scheduleTimeout(from);
+        // Programar nuevo timeout de 5 minutos solo si el usuario sigue en una
+        // conversación activa
+        if (conversationStates.containsKey(from)) {
+            scheduleTimeout(from);
+        }
     }
 
     private void handleUnauthenticatedUser(String from, String text) {
         ConversationState state = conversationStates.get(from);
 
         if (state == ConversationState.AWAITING_PIN) {
-            // 1. Verificar si está bloqueado por demasiados intentos
+            // Verificar si está bloqueado por demasiados intentos
             int attempts = failedAttempts.getOrDefault(from, 0);
             if (attempts >= 3) {
                 logger.warn("Usuario {} bloqueado por exceso de intentos de PIN.", from);
@@ -147,9 +155,9 @@ public class WhatsAppBotService {
         } else {
             conversationStates.put(from, ConversationState.AWAITING_PIN);
             messagePort.sendTextMessage(from,
-                    "🚦 *Tránsito de Sabaneta*\n*Matrículas Iniciales* 🚦\n_Área de mensajería_\n\n¡Hola! 👋. Aquí podrás consultar el estado de las placas programadas para entrega.\n\n"
-                            + "`Por seguridad, el PIN se solicita cada 12 horas o cuando se cierre y se vuelva a abrir la sesión.`\n\n"
-                            + "🔒 Ingresa el PIN de 4 dígitos proporcionado por tu concesionario para continuar:");
+                    "🚦 *Tránsito de Sabaneta*\n*Matrículas Iniciales* 🚦\n_Área de mensajería_\n\n¡Hola! 👋. Aquí podrás consultar el estado de las placas.\n\n"
+                            + "`Por seguridad, el PIN se solicita cada 12 horas o cuando se cierre y se vuelva a abrir la sesión. Si quieres recibir notificaciones de cambios en el estado de las placas, por favor, mantén la sesión activa.`\n\n"
+                            + "🔒 Ingresa el PIN de 4 dígitos para continuar:");
         }
     }
 
@@ -172,14 +180,42 @@ public class WhatsAppBotService {
                 sendMenu(from, dealershipName);
             }
             case MENU -> {
+                if (text.startsWith("NEXT_PAGE")) {
+                    int nextPage = session.getCurrentPage() + 1;
+                    session.setCurrentPage(nextPage);
+                    sessionPort.updateSession(session);
+
+                    List<Status> statuses = deserializeStatuses(session.getLastFilterStatuses());
+                    String title = getTitleForStatuses(statuses);
+                    sendFilteredList(from, session, title, statuses);
+                    return;
+                }
+
+                if ("MENU_BACK".equals(text)) {
+                    session.setCurrentPage(0);
+                    session.setLastFilterStatuses("");
+                    sessionPort.updateSession(session);
+                    sendMenu(from, dealershipName);
+                    return;
+                }
+
                 switch (text) {
                     case "1" -> {
                         conversationStates.put(from, ConversationState.AWAITING_PLATE);
                         messagePort.sendTextMessage(from, "Escribe el número de placa:");
                     }
                     case "2" -> {
-                        sendPendingList(from, dealershipId, dealershipName);
-                        sendMenu(from, dealershipName);
+                        sendFilteredList(from, session, "Placa(s) asignada(s)", List.of(Status.ASSIGNED));
+                    }
+                    case "3" -> {
+                        sendFilteredList(from, session, "Placa(s) devuelta(s)", List.of(Status.RETURNED));
+                    }
+                    case "4" -> {
+                        sendFilteredList(from, session, "Placa(s) pendiente(s)", List.of(Status.PENDING));
+                    }
+                    case "5" -> {
+                        sendFilteredList(from, session, "Placa(s) entregada(s)/revisada(s)",
+                                List.of(Status.DELIVERED, Status.RESOLVED));
                     }
                     case "0" -> {
                         logger.info("[Sesión] Usuario {} cerró sesión voluntariamente.", maskPhone(from));
@@ -187,7 +223,7 @@ public class WhatsAppBotService {
                         conversationStates.remove(from);
                         cancelTimeout(from);
                         messagePort.sendTextMessage(from,
-                                "✅ Sesión cerrada correctamente.\n\nPara ingresar de nuevo, solo escribe un mensaje.");
+                                "Sesión cerrada correctamente.\n\n¡Hasta pronto! 👋. Para ingresar de nuevo, solo escribe un mensaje.");
                     }
                     default -> {
                         // Si parece una placa, buscarla directamente
@@ -214,10 +250,29 @@ public class WhatsAppBotService {
     }
 
     private void sendMenu(String from, String dealershipName) {
-        String menu = String.format(
-                "🛞 *%s*\n\n📋 *¿Qué deseas consultar?*\n_Ingrese el número correspondiente:_\n\n- 1️⃣ Consultar una placa específica\n- 2️⃣ Consultar todas las placas programadas\n- 0️⃣ Cerrar sesión y salir",
-                dealershipName);
-        messagePort.sendTextMessage(from, menu);
+        String bodyText = String.format("🛞 *%s*\n\n📋 *¿Qué deseas consultar?*", dealershipName);
+        String buttonText = "Ver opciones";
+        String listTitle = "Menú Principal";
+
+        List<String> rowTitles = List.of(
+                "Consulta específica",
+                "Placas asignadas",
+                "Placas devueltas",
+                "Placas pendientes",
+                "Placas entregadas y revisadas",
+                "Cerrar sesión");
+
+        List<String> rowDescriptions = List.of(
+                "Consultar por placa",
+                "Programadas para hoy",
+                "Por intento fallido",
+                "Por documentación",
+                "Consolidado final",
+                "Salir del sistema");
+
+        List<String> rowIds = List.of("1", "2", "3", "4", "5", "0");
+
+        messagePort.sendListMessage(from, bodyText, buttonText, listTitle, rowTitles, rowDescriptions, rowIds);
     }
 
     private void sendPlateDetails(String from, List<ServiceDelivery> services) {
@@ -241,7 +296,7 @@ public class WhatsAppBotService {
                     messagePort.sendLocation(from,
                             lat,
                             lon,
-                            "Ubicación del *estado* actual",
+                            "Ubicación por estado actual",
                             address != null ? address : s.getPlate().getPlateNumber());
                 }
             }
@@ -262,21 +317,73 @@ public class WhatsAppBotService {
                 s.getDealership().getName());
     }
 
-    private void sendPendingList(String from, Long dealershipId, String dealershipName) {
-        List<ServiceDelivery> pending = searchService.findPendingByDealership(dealershipId);
+    private void sendFilteredList(String from, WhatsAppSession session, String title, List<Status> statuses) {
+        Long dealershipId = session.getDealership().getIdDealership();
+        String dealershipName = session.getDealership().getName();
 
-        if (pending.isEmpty()) {
+        // Si es una consulta nueva (no paginación), resetear estado
+        String serializedStatuses = serializeStatuses(statuses);
+        if (!serializedStatuses.equals(session.getLastFilterStatuses())) {
+            session.setCurrentPage(0);
+            session.setLastFilterStatuses(serializedStatuses);
+            sessionPort.updateSession(session);
+        }
+
+        int page = session.getCurrentPage();
+        Page<ServiceDelivery> resultPage = searchService.findByDealershipAndStatusesPaginated(
+                dealershipId, statuses, PageRequest.of(page, 10, Sort.by("createdAt").descending()));
+
+        if (resultPage.isEmpty() && page == 0) {
             messagePort.sendTextMessage(from,
-                    "Todavia no hay placa(s) programada(s) para " + dealershipName + "\n\nConsulte más tarde.");
+                    "Todavía no hay " + title.toLowerCase() + " para " + dealershipName + ".\n\nConsulte más tarde.");
+            sendMenu(from, dealershipName);
             return;
         }
 
-        // Enviamos el encabezado primero
-        messagePort.sendTextMessage(from, "📦 *Placa(s) programada(s) para " + dealershipName + "*");
+        StringBuilder sb = new StringBuilder();
+        sb.append("📦 *").append(title).append("*\n");
+        sb.append("_Página ").append(page + 1).append(" de ").append(resultPage.getTotalPages()).append("_\n\n");
 
-        // Delegamos a sendPlateDetails para que cada placa muestre su detalle y
-        // ubicación individualmente
-        sendPlateDetails(from, pending);
+        for (ServiceDelivery s : resultPage.getContent()) {
+            sb.append("• ").append(s.getPlate().getPlateNumber())
+                    .append(" (").append(getStatusName(s.getCurrentStatus())).append(")\n");
+        }
+
+        sb.append("\n_Escribe el número de placa para ver detalle._");
+
+        if (resultPage.hasNext()) {
+            messagePort.sendReplyButtons(from, sb.toString(),
+                    List.of("Ver más", "Menú Principal"),
+                    List.of("NEXT_PAGE", "MENU_BACK"));
+        } else {
+            messagePort.sendReplyButtons(from, sb.toString(),
+                    List.of("Menú Principal"),
+                    List.of("MENU_BACK"));
+        }
+    }
+
+    private String serializeStatuses(List<Status> statuses) {
+        return statuses.stream().map(Enum::name).collect(Collectors.joining(","));
+    }
+
+    private List<Status> deserializeStatuses(String s) {
+        if (s == null || s.isEmpty())
+            return List.of();
+        return Arrays.stream(s.split(","))
+                .map(Status::valueOf)
+                .collect(Collectors.toList());
+    }
+
+    private String getTitleForStatuses(List<Status> statuses) {
+        if (statuses.contains(Status.ASSIGNED))
+            return "Placa(s) asignada(s)";
+        if (statuses.contains(Status.RETURNED))
+            return "Placa(s) devuelta(s)";
+        if (statuses.contains(Status.PENDING))
+            return "Placa(s) pendiente(s)";
+        if (statuses.contains(Status.DELIVERED))
+            return "Placa(s) entregada(s)/revisada(s)";
+        return "Listado de placas";
     }
 
     private String getStatusName(Status status) {
@@ -320,7 +427,6 @@ public class WhatsAppBotService {
 
     private void scheduleTimeout(String from) {
         ScheduledFuture<?> future = scheduler.schedule(() -> {
-            logger.info("[Sesión] Chat finalizado por inactividad para {}", maskPhone(from));
             messagePort.sendTextMessage(from,
                     "⏰ Por inactividad, hemos finalizado el chat. Si necesitas realizar una nueva consulta, ¡escríbeme! 👋");
             timeoutNotified.add(from);

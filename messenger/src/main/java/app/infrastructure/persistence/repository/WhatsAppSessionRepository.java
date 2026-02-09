@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -18,6 +19,11 @@ public interface WhatsAppSessionRepository extends JpaRepository<WhatsAppSession
      * Busca una sesión activa (no expirada) por número de teléfono.
      */
     Optional<WhatsAppSessionEntity> findByPhoneNumberAndExpiresAtAfter(String phoneNumber, LocalDateTime now);
+
+    /**
+     * Busca todas las sesiones activas (no expiradas) por ID de concesionario.
+     */
+    List<WhatsAppSessionEntity> findByDealership_IdDealershipAndExpiresAtAfter(Long dealershipId, LocalDateTime now);
 
     /**
      * Elimina sesiones expiradas (limpieza programada).
