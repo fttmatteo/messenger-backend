@@ -427,7 +427,6 @@ public class WhatsAppBotService {
 
     private void scheduleTimeout(String from) {
         ScheduledFuture<?> future = scheduler.schedule(() -> {
-            logger.info("[Sesión] Chat finalizado por inactividad para {}", maskPhone(from));
             messagePort.sendTextMessage(from,
                     "⏰ Por inactividad, hemos finalizado el chat. Si necesitas realizar una nueva consulta, ¡escríbeme! 👋");
             timeoutNotified.add(from);
