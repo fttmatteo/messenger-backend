@@ -288,7 +288,7 @@
 		<dependency>
 			<groupId>net.javacrumbs.shedlock</groupId>
 			<artifactId>shedlock-provider-redis-spring</artifactId>
-			<version>6.3.0</version>
+			<version>7.6.0</version>
 		</dependency>
 
 	</dependencies>
