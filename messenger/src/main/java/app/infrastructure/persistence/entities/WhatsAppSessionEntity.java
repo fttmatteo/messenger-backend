@@ -1,5 +1,6 @@
 package app.infrastructure.persistence.entities;
 
+import app.domain.model.enums.WhatsAppConversationState;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -33,9 +34,22 @@ public class WhatsAppSessionEntity {
     @Column(name = "last_filter_statuses", length = 500)
     private String lastFilterStatuses;
 
+    @Column(name = "last_activity_at")
+    private LocalDateTime lastActivityAt;
+
+    @Column(name = "timeout_notified")
+    private boolean timeoutNotified;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "conversation_state")
+    private WhatsAppConversationState conversationState = WhatsAppConversationState.MENU;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        if (lastActivityAt == null) {
+            lastActivityAt = createdAt;
+        }
     }
 
     public Long getId() {
@@ -92,5 +106,29 @@ public class WhatsAppSessionEntity {
 
     public void setLastFilterStatuses(String lastFilterStatuses) {
         this.lastFilterStatuses = lastFilterStatuses;
+    }
+
+    public LocalDateTime getLastActivityAt() {
+        return lastActivityAt;
+    }
+
+    public void setLastActivityAt(LocalDateTime lastActivityAt) {
+        this.lastActivityAt = lastActivityAt;
+    }
+
+    public boolean isTimeoutNotified() {
+        return timeoutNotified;
+    }
+
+    public void setTimeoutNotified(boolean timeoutNotified) {
+        this.timeoutNotified = timeoutNotified;
+    }
+
+    public WhatsAppConversationState getConversationState() {
+        return conversationState;
+    }
+
+    public void setConversationState(WhatsAppConversationState conversationState) {
+        this.conversationState = conversationState;
     }
 }

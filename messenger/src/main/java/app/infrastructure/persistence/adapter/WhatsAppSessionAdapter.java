@@ -81,6 +81,9 @@ public class WhatsAppSessionAdapter implements WhatsAppSessionPort {
         entity.setCurrentPage(session.getCurrentPage());
         entity.setLastFilterStatuses(session.getLastFilterStatuses());
         entity.setExpiresAt(session.getExpiresAt());
+        entity.setLastActivityAt(session.getLastActivityAt());
+        entity.setTimeoutNotified(session.isTimeoutNotified());
+        entity.setConversationState(session.getConversationState());
 
         sessionRepository.save(entity);
     }
@@ -112,6 +115,15 @@ public class WhatsAppSessionAdapter implements WhatsAppSessionPort {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<WhatsAppSession> findInactiveSessions(LocalDateTime threshold) {
+        return sessionRepository
+                .findByExpiresAtAfterAndLastActivityAtBeforeAndTimeoutNotifiedFalse(LocalDateTime.now(), threshold)
+                .stream()
+                .map(this::toDomain)
+                .collect(Collectors.toList());
+    }
+
     private WhatsAppSession toDomain(WhatsAppSessionEntity entity) {
         WhatsAppSession session = new WhatsAppSession();
         session.setId(entity.getId());
@@ -121,6 +133,9 @@ public class WhatsAppSessionAdapter implements WhatsAppSessionPort {
         session.setCreatedAt(entity.getCreatedAt());
         session.setCurrentPage(entity.getCurrentPage());
         session.setLastFilterStatuses(entity.getLastFilterStatuses());
+        session.setLastActivityAt(entity.getLastActivityAt());
+        session.setTimeoutNotified(entity.isTimeoutNotified());
+        session.setConversationState(entity.getConversationState());
         return session;
     }
 

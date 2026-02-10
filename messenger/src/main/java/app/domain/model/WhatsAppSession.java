@@ -1,5 +1,6 @@
 package app.domain.model;
 
+import app.domain.model.enums.WhatsAppConversationState;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 
@@ -15,6 +16,9 @@ public class WhatsAppSession {
     private LocalDateTime createdAt;
     private Integer currentPage; // Nueva página actual para paginación
     private String lastFilterStatuses; // Últimos estados filtrados (serializados)
+    private LocalDateTime lastActivityAt; // Última actividad detectada
+    private boolean timeoutNotified; // Si ya se notificó el timeout
+    private WhatsAppConversationState conversationState; // Estado actual del flujo
 
     public Long getId() {
         return id;
@@ -70,6 +74,30 @@ public class WhatsAppSession {
 
     public void setLastFilterStatuses(String lastFilterStatuses) {
         this.lastFilterStatuses = lastFilterStatuses;
+    }
+
+    public LocalDateTime getLastActivityAt() {
+        return lastActivityAt;
+    }
+
+    public void setLastActivityAt(LocalDateTime lastActivityAt) {
+        this.lastActivityAt = lastActivityAt;
+    }
+
+    public boolean isTimeoutNotified() {
+        return timeoutNotified;
+    }
+
+    public void setTimeoutNotified(boolean timeoutNotified) {
+        this.timeoutNotified = timeoutNotified;
+    }
+
+    public WhatsAppConversationState getConversationState() {
+        return conversationState != null ? conversationState : WhatsAppConversationState.MENU;
+    }
+
+    public void setConversationState(WhatsAppConversationState conversationState) {
+        this.conversationState = conversationState;
     }
 
     @JsonIgnore

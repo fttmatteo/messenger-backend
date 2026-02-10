@@ -9,9 +9,10 @@ import app.domain.model.enums.TrackingStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import app.adapter.out.tracking.config.RedisPubSubConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -37,7 +38,9 @@ public class TrackingWebSocketController {
     private final ConcurrentHashMap<Long, Long> lastUpdateTimestamps = new ConcurrentHashMap<>();
 
     @Autowired
-    private SimpMessagingTemplate messagingTemplate;
+    private StringRedisTemplate redisTemplate;
+    @Autowired
+    private ObjectMapper objectMapper;
     @Autowired
     private UpdateLiveTrackingUseCase updateLiveTracking;
 
@@ -86,18 +89,24 @@ public class TrackingWebSocketController {
         try {
             LiveTracking tracking = updateLiveTracking.execute(domainTracking);
             LiveTrackingResponse response = mapToResponse(tracking);
-            messagingTemplate.convertAndSend(
-                    "/topic/tracking/" + tracking.getMessengerId(),
-                    response);
-            messagingTemplate.convertAndSend("/topic/tracking/all", response);
-            logger.debug("Broadcast exitoso para messengerId: {}", messengerId);
+
+            // Publicar en Redis para que todas las instancias reciban y broadcasten
+            String jsonResponse = objectMapper.writeValueAsString(response);
+            redisTemplate.convertAndSend(RedisPubSubConfig.TRACKING_TOPIC, jsonResponse);
+
+            logger.debug("Mensaje publicado en Redis Pub/Sub para messengerId: {}", messengerId);
         } catch (Exception e) {
             logger.error("Error procesando tracking update para messengerId {}: {}", messengerId, e.getMessage());
-            LiveTrackingResponse fallbackResponse = new LiveTrackingResponse(
-                    messengerId, null,
-                    request.getLatitude(), request.getLongitude(),
-                    LocalDateTime.now(), null, request.getStatus(), null, null);
-            messagingTemplate.convertAndSend("/topic/tracking/all", fallbackResponse);
+            try {
+                LiveTrackingResponse fallbackResponse = new LiveTrackingResponse(
+                        messengerId, null,
+                        request.getLatitude(), request.getLongitude(),
+                        LocalDateTime.now(), null, request.getStatus(), null, null);
+                String jsonFallback = objectMapper.writeValueAsString(fallbackResponse);
+                redisTemplate.convertAndSend(RedisPubSubConfig.TRACKING_TOPIC, jsonFallback);
+            } catch (Exception ex) {
+                logger.error("Error enviando fallback a Redis: {}", ex.getMessage());
+            }
         }
     }
 
@@ -140,7 +149,12 @@ public class TrackingWebSocketController {
         LiveTracking tracking = updateLiveTracking.executeHeartbeat(domainTracking);
         LiveTrackingResponse response = mapToResponse(tracking);
 
-        messagingTemplate.convertAndSend("/topic/tracking/all", response);
+        try {
+            String jsonResponse = objectMapper.writeValueAsString(response);
+            redisTemplate.convertAndSend(RedisPubSubConfig.TRACKING_TOPIC, jsonResponse);
+        } catch (Exception e) {
+            logger.error("Error enviando heartbeat a Redis: {}", e.getMessage());
+        }
     }
 
     /**
@@ -148,9 +162,8 @@ public class TrackingWebSocketController {
      * tracking.
      */
     @MessageMapping("/tracking/subscribe/all")
-    @SendTo("/topic/tracking/all")
-    public String subscribeToAll() {
-        return "Suscrito a actualizaciones de todos los mensajeros";
+    public void subscribeToAll() {
+        logger.info("Cliente suscrito a actualizaciones de todos los mensajeros");
     }
 
     private LiveTrackingResponse mapToResponse(LiveTracking tracking) {

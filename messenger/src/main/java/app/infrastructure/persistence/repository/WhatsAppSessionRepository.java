@@ -33,6 +33,13 @@ public interface WhatsAppSessionRepository extends JpaRepository<WhatsAppSession
     int deleteExpiredSessions(LocalDateTime now);
 
     /**
+     * Busca sesiones que han superado el umbral de inactividad y no han sido
+     * notificadas.
+     */
+    List<WhatsAppSessionEntity> findByExpiresAtAfterAndLastActivityAtBeforeAndTimeoutNotifiedFalse(LocalDateTime now,
+            LocalDateTime threshold);
+
+    /**
      * Elimina todas las sesiones de un número de teléfono.
      */
     void deleteByPhoneNumber(String phoneNumber);
