@@ -65,8 +65,6 @@ public class ServiceDeliveryController {
      * Extrae la placa de una imagen mediante OCR sin crear el servicio.
      * Permite previsualizar la placa detectada antes de confirmar la creación.
      * 
-     * @param image Imagen de la placa a procesar
-     * @return Respuesta con la placa detectada o mensaje de error
      */
     @PostMapping("/extractPlate")
     @PreAuthorize("isAuthenticated()")

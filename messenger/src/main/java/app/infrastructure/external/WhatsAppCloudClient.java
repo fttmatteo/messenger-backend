@@ -153,7 +153,7 @@ public class WhatsAppCloudClient implements WhatsAppMessagePort {
                 return false;
             }
         } catch (Exception e) {
-            logger.error("[WhatsApp] Error enviando mensaje {} a WhatsApp: {}", type, e.getMessage());
+            logger.error("[WhatsApp] Error enviando mensaje {} a WhatsApp: {}", type, e.getMessage(), e);
             return false;
         }
     }

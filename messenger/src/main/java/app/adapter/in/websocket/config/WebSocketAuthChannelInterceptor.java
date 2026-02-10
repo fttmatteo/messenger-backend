@@ -1,7 +1,7 @@
 package app.adapter.in.websocket.config;
 
 import app.adapter.out.security.JwtAdapter;
-import app.infrastructure.logging.LogSanitizer;
+import app.domain.util.LogSanitizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.Message;

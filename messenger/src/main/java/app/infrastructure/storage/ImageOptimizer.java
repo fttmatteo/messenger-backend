@@ -31,11 +31,6 @@ public class ImageOptimizer {
      * Si la imagen es más grande que los límites, la redimensiona manteniendo el
      * aspecto.
      * Aplica compresión de calidad JPEG.
-     * 
-     * @param inputStream Stream de la imagen original
-     * @param extension   Extensión del archivo (jpg, png, etc.)
-     * @return InputStream de la imagen optimizada
-     * @throws IOException Si ocurre un error durante el procesamiento
      */
     public InputStream optimize(InputStream inputStream, String extension) throws IOException {
         String format = extension.toLowerCase().replace(".", "");
@@ -59,7 +54,7 @@ public class ImageOptimizer {
 
             return new ByteArrayInputStream(optimizedBytes);
         } catch (Exception e) {
-            log.error("Error optimizando imagen, se usará el archivo original: {}", e.getMessage());
+            log.error("Error optimizando imagen, se usará el archivo original: {}", e.getMessage(), e);
             // En caso de error, intentamos resetear el stream si es posible o devolver el
             // original
             // Nota: El original puede estar consumido, por lo que lo ideal es que el

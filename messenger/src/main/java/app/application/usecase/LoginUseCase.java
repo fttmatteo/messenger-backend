@@ -9,7 +9,7 @@ import app.domain.model.auth.TokenResponse;
 import app.domain.model.Employee;
 import app.domain.services.AuthenticationService;
 import app.domain.ports.EmployeePort;
-import app.infrastructure.logging.LogSanitizer;
+import app.domain.util.LogSanitizer;
 
 /**
  * Caso de uso para login de usuarios.

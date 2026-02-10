@@ -60,9 +60,6 @@ public class ServiceDeliveryUseCase {
     /**
      * Extrae la placa de una imagen sin crear el servicio.
      * Permite previsualizar la placa detectada y corregirla si es necesario.
-     * 
-     * @param imageFile Archivo de imagen con la placa
-     * @return Placa detectada o string vacío si no se pudo detectar
      */
     public String extractPlateFromImage(File imageFile) {
         try {
@@ -70,7 +67,7 @@ public class ServiceDeliveryUseCase {
             logger.info("Placa extraída para preview: {}", extractedText);
             return extractedText != null ? extractedText : "";
         } catch (Exception e) {
-            logger.error("Error extrayendo placa para preview: {}", e.getMessage());
+            logger.error("Error extrayendo placa para preview: {}", e.getMessage(), e);
             return "";
         }
     }
@@ -213,7 +210,6 @@ public class ServiceDeliveryUseCase {
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "REASSIGN_MESSENGER", description = "Reasignar servicio a otro mensajero")
     public ServiceDelivery reassignMessenger(Long serviceId, Long newMessengerId, Long adminUserId) throws Exception {
-        // ...existing code...
         return updateService.reassignMessenger(serviceId, newMessengerId, adminUserId);
     }
 
@@ -251,8 +247,9 @@ public class ServiceDeliveryUseCase {
     }
 
     /**
-     * Maps frontend sort fields to JPA entity property paths to avoid 500 Internal
-     * Server Errors.
+     * Mapea los campos de ordenamiento del frontend a las rutas de propiedades de
+     * la
+     * entidad JPA para evitar errores internos del servidor (500).
      */
     private String mapSortField(String sortBy) {
         if (sortBy == null)
