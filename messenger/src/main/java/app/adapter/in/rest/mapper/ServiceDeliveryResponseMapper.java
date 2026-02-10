@@ -29,7 +29,7 @@ public class ServiceDeliveryResponseMapper {
             try {
                 return storageAdapter.regenerateSignedUrl(path);
             } catch (Exception e) {
-                logger.warn("Failed to regenerate signed URL for path {}: {}", path, e.getMessage());
+                logger.warn("Error al regenerar el URL firmado para la ruta {}: {}", path, e.getMessage());
                 return null;
             }
         }

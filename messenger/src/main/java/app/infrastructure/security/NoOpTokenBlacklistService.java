@@ -6,10 +6,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 /**
- * No-op implementation of TokenBlacklistPort for test environments without
+ * Implementación no operativa (No-op) de TokenBlacklistPort para entornos de
+ * prueba sin
  * Redis.
- * This is used when redis.enabled=false.
- * In tests, token blacklist is not enforced.
+ * Se utiliza cuando redis.enabled=false.
+ * En las pruebas, no se aplica la lista negra de tokens.
  */
 @Service
 @ConditionalOnProperty(name = "redis.enabled", havingValue = "false")

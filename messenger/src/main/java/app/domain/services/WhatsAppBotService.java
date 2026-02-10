@@ -4,6 +4,7 @@ import app.domain.model.Dealership;
 import app.domain.model.ServiceDelivery;
 import app.domain.model.StatusHistory;
 import app.domain.model.Location;
+import app.domain.util.LogSanitizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import app.domain.model.WhatsAppSession;
@@ -69,11 +70,10 @@ public class WhatsAppBotService {
         WhatsAppConversationState currentState = sessionOpt.map(WhatsAppSession::getConversationState)
                 .orElse(WhatsAppConversationState.AWAITING_PIN);
 
-        // Logging seguro: enmascarar teléfono y ocultar PIN si aplica
-        String maskedFrom = maskPhone(from);
+        String maskedFrom = LogSanitizer.maskGeneric(from, 4);
         String logContent = (currentState == WhatsAppConversationState.AWAITING_PIN && sessionOpt.isEmpty()) ? "****"
-                : text;
-        logger.info("[WhatsApp] Mensaje recibido de {}: {}", maskedFrom, logContent);
+                : LogSanitizer.maskGeneric(text, 2);
+        logger.debug("[WhatsApp] Mensaje recibido de {}: {}", maskedFrom, logContent);
 
         if (sessionOpt.isPresent()) {
             WhatsAppSession session = sessionOpt.get();
@@ -93,20 +93,14 @@ public class WhatsAppBotService {
     }
 
     private void handleUnauthenticatedUser(String from, String text) {
-        // Verificar si está bloqueado por demasiados intentos (independiente del
-        // estado)
         if (rateLimitPort.isBlocked(from)) {
-            logger.warn("Usuario {} bloqueado por exceso de intentos de PIN.", maskPhone(from));
+            logger.warn("Usuario {} bloqueado por exceso de intentos de PIN.", LogSanitizer.maskGeneric(from, 4));
             messagePort.sendTextMessage(from,
                     "⚠️ Has superado el límite de intentos. Por seguridad, tu acceso ha sido pausado por 15 minutos.");
             return;
         }
 
-        // Heurística simple: si el texto parece un PIN (4 dígitos), intentamos
-        // autenticar.
-        // Si no, enviamos el saludo inicial.
         if (text.matches("\\d{4}")) {
-            // Intentar autenticar con el PIN
             Optional<Dealership> dealershipOpt = sessionPort.findDealershipByPin(text);
 
             if (dealershipOpt.isPresent()) {
@@ -205,7 +199,8 @@ public class WhatsAppBotService {
                                 List.of(Status.DELIVERED, Status.RESOLVED));
                     }
                     case "0" -> {
-                        logger.info("[Sesión] Usuario {} cerró sesión voluntariamente.", maskPhone(from));
+                        logger.info("[Sesión] Usuario {} cerró sesión voluntariamente.",
+                                LogSanitizer.maskGeneric(from, 4));
                         sessionPort.deleteByPhoneNumber(from);
                         messagePort.sendTextMessage(from,
                                 "🚪 Sesión cerrada correctamente.\n\n¡Hasta pronto! 👋. Para ingresar de nuevo, solo escribe un mensaje.");
@@ -420,12 +415,5 @@ public class WhatsAppBotService {
         return text.matches("(?i)^[A-Z]{3}-?\\d{3}$") ||
                 text.matches("(?i)^\\d{3}-?[A-Z]{3}$") ||
                 text.matches("(?i)^[A-Z]{3}-?\\d{2}[A-Z]$");
-    }
-
-    private String maskPhone(String phone) {
-        if (phone == null || phone.length() <= 4) {
-            return phone;
-        }
-        return "****" + phone.substring(phone.length() - 4);
     }
 }

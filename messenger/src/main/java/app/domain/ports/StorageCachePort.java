@@ -14,10 +14,6 @@ public interface StorageCachePort {
 
     /**
      * Almacena una URL en el caché.
-     * 
-     * @param objectName        Nombre del objeto (clave)
-     * @param url               URL firmada
-     * @param expirationSeconds Tiempo de vida en el caché
      */
     void cacheUrl(String objectName, String url, long expirationSeconds);
 

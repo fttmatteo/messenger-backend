@@ -12,9 +12,10 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Mock implementation of TrackingPort for test environments without Redis.
- * This is used when redis.enabled=false.
+ * Implementación simulada de TrackingPort para entornos de prueba sin Redis.
+ * Se utiliza cuando redis.enabled=false.
  */
+
 @Component
 @ConditionalOnProperty(name = "redis.enabled", havingValue = "false")
 public class NoOpTrackingAdapter implements TrackingPort {

@@ -21,7 +21,7 @@ import app.domain.model.auth.LoginResponse;
 import app.domain.model.auth.TokenResponse;
 import app.domain.services.LoginRateLimitService;
 import app.infrastructure.audit.AuditableAction;
-import app.infrastructure.logging.LogSanitizer;
+import app.domain.util.LogSanitizer;
 import app.infrastructure.security.TurnstileValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -177,10 +177,6 @@ public class AuthController {
 
         String username = loginUseCase.extractUsername(accessToken);
         String role = loginUseCase.extractRole(accessToken);
-        // Podemos extraer el ID si es necesario, por ahora enviamos null si no lo
-        // tenemos fácil
-        // O mejor: el JwtAdapter ya sabe extraerlo si ajustamos la interfaz o usamos
-        // claims directos
 
         String wsToken = loginUseCase.generateWsToken(username, role);
 

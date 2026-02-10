@@ -132,9 +132,6 @@ public class PlateRecognizerAdapter implements OcrPort {
                 .trim();
     }
 
-    // ======================= DTOs para deserializar respuesta
-    // =======================
-
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class PlateRecognizerResponse {
         @JsonProperty("results")

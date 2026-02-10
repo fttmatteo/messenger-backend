@@ -84,11 +84,6 @@ public class AuditAspect {
         return signature.getDeclaringType().getSimpleName() + "." + signature.getName();
     }
 
-    /**
-     * Extrae y formatea los argumentos del método para el log.
-     * Trunca la salida si es muy larga para evitar logs excesivos.
-     * Sanitiza información sensible como contraseñas.
-     */
     private String getParameters(JoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
         if (args == null || args.length == 0) {
@@ -97,10 +92,13 @@ public class AuditAspect {
 
         String params = Arrays.toString(args);
 
+        // Enmascarar información sensible
         params = params.replaceAll("(?i)(password[:=]\\s?['\"]?)([^,}\"\\s]+)(['\"]?)", "$1****$3");
+        params = params.replaceAll("(?i)(pin[:=]\\s?['\"]?)([^,}\"\\s]+)(['\"]?)", "$1****$3");
+        params = params.replaceAll("(?i)(token[:=]\\s?['\"]?)([^,}\"\\s]+)(['\"]?)", "$1****$3");
 
-        if (params.length() > 200) {
-            params = params.substring(0, 200) + "...";
+        if (params.length() > 500) {
+            params = params.substring(0, 500) + "...";
         }
         return params;
     }
