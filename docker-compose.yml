@@ -7,26 +7,35 @@
 # - Ver logs: docker-compose logs -f
 
 services:
+  # FRONTEND: Interfaz Web React/Vite
+  messenger-frontend:
+    build:
+      context: ../messenger-frontend
+      dockerfile: Dockerfile
+    container_name: messenger-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - messenger-backend
+    networks:
+      - messenger-network
+    restart: unless-stopped
+
   # APP: Backend Spring Boot
   messenger-backend:
     build: .
     container_name: messenger-backend
     ports:
       - "8080:8080"
-    # Cargar variables desde el archivo .env
-    env_file:
-      - ./.env
     environment:
-      # Sobreescribir hosts para conectar a servicios de Docker
+      # Perfil local para que funcione sin APIs externas
+      - SPRING_PROFILES_ACTIVE=local
       - DB_HOST=messenger-db
       - REDIS_HOST=messenger-redis
-      # Credenciales de Google Cloud dentro del contenedor
-      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
-      # Limitar consumo de RAM (Min 256MB, Max 512MB)
-      - JAVA_OPTS=-Duser.timezone=America/Bogota -Xms256m -Xmx512m
-    volumes:
-      # Montar credenciales de Google Cloud (ruta definida en .env)
-      - "${GOOGLE_APPLICATION_CREDENTIALS}:/app/credentials.json:ro"
+      # Secretos por defecto (no requieren .env manual)
+      - JWT_SECRET=esta-es-una-clave-secreta-de-prueba-para-distribucion-local-min-32-chars
+      - DB_NAME=messenger_dev
+      - DB_PASSWORD=secret123
     depends_on:
       messenger-db:
         condition: service_healthy
@@ -40,17 +49,15 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 40s
+      start_period: 90s
 
   # DATABASE: MySQL 8.0
   messenger-db:
     image: mysql:8.0
     container_name: messenger-db
-    env_file:
-      - ./.env
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}
+      - MYSQL_ROOT_PASSWORD=secret123
+      - MYSQL_DATABASE=messenger_dev
     ports:
       - "3306:3306"
     volumes:
@@ -73,7 +80,7 @@ services:
     environment:
       PMA_HOST: messenger-db
       PMA_PORT: 3306
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: secret123
     depends_on:
       - messenger-db
     networks:
@@ -86,9 +93,6 @@ services:
     container_name: messenger-redis
     ports:
       - "6379:6379"
-    command: redis-server --requirepass ${REDIS_PASSWORD}
-    env_file:
-      - ./.env
     networks:
       - messenger-network
     healthcheck:

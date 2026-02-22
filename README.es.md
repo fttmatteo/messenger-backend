@@ -204,16 +204,31 @@ messenger/
 | `test` | Testing automatizado (CI/CD) | MySQL (Docker) | Mock | 1 hora |
 | `prod` | Producción (Cloud Run) | Cloud SQL (MySQL 8) | Habilitado | 30 min |
 
-### Características por Perfil
+### 🚀 Inicio Rápido (Docker Zero-Config)
+
+Para una demostración rápida sin configurar dependencias, usa Docker Compose. Esto levantará el frontend, backend, base de datos y redis automáticamente.
+
+1. Navega a la raíz del backend: `cd messenger-backend`
+2. Ejecuta: `docker-compose up --build`
+3. Accede a: `http://localhost`
+
+> [!TIP]
+> Consulta la **[Guía de Inicio Rápido](./GUIA_RAPIDA.md)** para más detalles sobre credenciales de prueba y acceso a phpMyAdmin.
+
+---
+
+## 🌍 Perfiles de Ambiente
 
 <details>
 <summary><b>🏠 Local</b> - Sin dependencias externas</summary>
 
-- Base de datos MySQL Local
-- OCR simulado (placeholder)
-- Almacenamiento en sistema de archivos
+- Base de datos MySQL Local (Dockerizada)
+- **Zero-Config**: Perfil pre-configurado con llaves de prueba y Mocks
+- **Carga de Datos**: Inicialización automática de usuarios (Admin/Messenger) via `DataInitializer`
+- OCR simulado (MockOcrAdapter)
+- Almacenamiento local (LocalStorageAdapter)
 - Logs detallados
-- Perfecto para desarrollo offline
+- Perfecto para demostraciones rápidas y desarrollo offline
 
 </details>
 
