@@ -1,4 +1,4 @@
-# 🚀 Guía de Inicio Rápido (Zero-Config)
+# 🚀 Guía de Inicio Rápido
 
 Esta guía permite levantar el backend de **Messenger** y todo su ecosistema (incluyendo base de datos y herramientas) utilizando Docker de forma profesional.
 
