@@ -1,6 +1,6 @@
-# 🚀 Guía de Colaboración
+# 🚀 Guía de Colaboración - Backend
 
-Esta guia es para colaborar en el proyecto Messenger.
+Esta guía establece los estándares y reglas para contribuir al backend del proyecto Messenger.
 
 ## 🛠️ Stack Tecnológico
 * **Lenguaje:** Java 17+

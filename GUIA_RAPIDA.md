@@ -1,6 +1,6 @@
 # 🚀 Guía de Inicio Rápido (Zero-Config)
 
-Esta guía permite levantar el proyecto **Messenger** completo sin instalar Java, Node o Bases de Datos.
+Esta guía permite levantar el backend de **Messenger** y todo su ecosistema (incluyendo base de datos y herramientas) utilizando Docker de forma profesional.
 
 ## 📋 Requisitos Previos
 
@@ -12,9 +12,9 @@ Esta guía permite levantar el proyecto **Messenger** completo sin instalar Java
 1.  **Descargar el proyecto**: Asegúrate de tener las carpetas `messenger-backend` y `messenger-frontend` en el mismo directorio raíz.
 2.  **Abrir una terminal**: Navega hasta la carpeta `messenger-backend`.
 3.  **Ejecutar Docker**:
-    ```bash
+```bash
     docker-compose up --build
-    ```
+```
 4.  **Esperar a que inicie**: La primera vez puede tardar unos minutos descargando las imágenes y compilando el código.
 
 ## 🌐 Acceso a la Aplicación
@@ -33,7 +33,7 @@ Una vez que veas que los logs se detienen y el backend dice "Started MessengerAp
 
 ## 🔑 Credenciales de Prueba
 
-Como el sistema usa el **Perfil Local**, puedes usar estas credenciales para entrar:
+Utiliza estas credenciales para entrar al sistema en perfil **local**:
 
 -   **Administrador**:
     -   Documento: `123456`
