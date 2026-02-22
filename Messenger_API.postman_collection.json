@@ -23,12 +23,12 @@
         },
         {
             "key": "admin_document",
-            "value": "12345678",
+            "value": "123456",
             "type": "string"
         },
         {
             "key": "messenger_document",
-            "value": "87654321",
+            "value": "654321",
             "type": "string"
         },
         {

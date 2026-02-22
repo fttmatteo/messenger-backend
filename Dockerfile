@@ -19,9 +19,9 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-# Crear un usuario no root por seguridad (mejor práctica profesional)
-# Si hackean la app, no tienen permisos de root en el contenedor.
-RUN addgroup -S messenger && adduser -S springuser -G messenger
+# Crear un usuario no root y preparar directorios
+RUN addgroup -S messenger && adduser -S springuser -G messenger \
+    && mkdir -p /app/uploads && chown -R springuser:messenger /app
 USER springuser:messenger
 
 # Copiar el .jar compilado desde la etapa de BUILD

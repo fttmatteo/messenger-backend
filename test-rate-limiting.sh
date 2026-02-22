@@ -4,8 +4,8 @@
 # Uso: ./test-rate-limiting.sh
 
 API_URL="${1:-http://localhost:8080}"
-DOCUMENT="12345678"
-WRONG_PASSWORD="wrongpassword"
+DOCUMENT="123456"
+WRONG_PASSWORD="wrongpassword123"
 
 echo "=========================================="
 echo "Rate Limiting Test Script"

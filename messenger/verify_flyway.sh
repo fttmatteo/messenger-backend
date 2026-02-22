@@ -6,12 +6,16 @@
 echo "=== VERIFICACIÓN DE FLYWAY ==="
 echo ""
 echo "Por favor ingresa los datos de conexión a tu base de datos:"
-read -p "Host (ej: your-db-host.aivencloud.com): " DB_HOST
+read -p "Host (default: localhost): " DB_HOST
+DB_HOST=${DB_HOST:-localhost}
 read -p "Puerto (default: 3306): " DB_PORT
 DB_PORT=${DB_PORT:-3306}
-read -p "Database name: " DB_NAME
-read -p "Username: " DB_USER
-read -sp "Password: " DB_PASS
+read -p "Database name (default: messenger_dev): " DB_NAME
+DB_NAME=${DB_NAME:-messenger_dev}
+read -p "Username (default: root): " DB_USER
+DB_USER=${DB_USER:-root}
+read -p "Password (default: secret123): " -s DB_PASS
+DB_PASS=${DB_PASS:-secret123}
 echo ""
 echo ""
 
