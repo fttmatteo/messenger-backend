@@ -77,7 +77,7 @@ jobs:
 
       # 8. Subir reporte de cobertura de JaCoCo
       - name: 📊 Subir reporte de cobertura (JaCoCo)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: jacoco-report
           path: messenger/target/site/jacoco/
@@ -89,7 +89,7 @@ jobs:
 
       # 10. Subir el artefacto compilado (solo en rama main)
       - name: 📤 Subir artefacto JAR
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: github.ref == 'refs/heads/main'
         with:
           name: messenger-backend-${{ github.sha }}
