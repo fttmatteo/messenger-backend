@@ -134,9 +134,9 @@ public class WhatsAppBotService {
         } else {
             messagePort.sendTextMessage(from,
                     "🚦 *Tránsito de Sabaneta*\n*Matrículas Iniciales* 🚦\n_Área de Mensajería_\n\n¡Hola! 👋. Aquí podrás consultar el estado de las placas.\n\n"
-                            + "`Por seguridad, el PIN se solicita cada 12 horas o cuando se cierre y se vuelve a abrir la sesión.`\n\n"
-                            + "`Si quieres recibir notificaciones de cambios en el estado de las placas, por favor, mantén la sesión activa.`\n\n"
-                            + "🔒 Ingresa el PIN de 4 dígitos para continuar:");
+                            + "`PIN requerido cada 12h o al reiniciar sesión.`\n\n"
+                            + "*Mantén la sesión activa para recibir notificaciones de cambios en el estado de las placas.*\n\n"
+                            + "🔒 *Ingresa el PIN para continuar:* ");
         }
     }
 
