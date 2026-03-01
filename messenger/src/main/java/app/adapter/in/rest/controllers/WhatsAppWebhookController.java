@@ -6,8 +6,11 @@ import app.infrastructure.config.WhatsAppConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Duration;
 
 /**
  * Controlador para webhooks de WhatsApp Cloud API.
@@ -21,11 +24,17 @@ public class WhatsAppWebhookController {
     private final WhatsAppBotService botService;
     private final WhatsAppConfig config;
     private final ObjectMapper objectMapper;
+    private final RedisTemplate<String, String> redisTemplate;
 
-    public WhatsAppWebhookController(WhatsAppBotService botService, WhatsAppConfig config, ObjectMapper objectMapper) {
+    private static final String DEDUP_PREFIX = "wa:msg:dedup:";
+    private static final Duration DEDUP_TTL = Duration.ofMinutes(5);
+
+    public WhatsAppWebhookController(WhatsAppBotService botService, WhatsAppConfig config,
+            ObjectMapper objectMapper, RedisTemplate<String, String> redisTemplate) {
         this.botService = botService;
         this.config = config;
         this.objectMapper = objectMapper;
+        this.redisTemplate = redisTemplate;
     }
 
     /**
@@ -66,6 +75,9 @@ public class WhatsAppWebhookController {
                         for (WebhookPayload.Change change : entry.getChanges()) {
                             if (change.getValue() != null && change.getValue().getMessages() != null) {
                                 for (WebhookPayload.Message message : change.getValue().getMessages()) {
+                                    if (isDuplicate(message.getId())) {
+                                        continue;
+                                    }
                                     if ("text".equals(message.getType()) && message.getText() != null) {
                                         String from = message.getFrom();
                                         String text = message.getText().getBody();
@@ -134,5 +146,26 @@ public class WhatsAppWebhookController {
             sb.append(String.format("%02x", b));
         }
         return sb.toString();
+    }
+
+    /**
+     * Verifica si un mensaje ya fue procesado (deduplicación con Redis SETNX).
+     * Previene respuestas duplicadas durante reintentos de Meta por cold start.
+     */
+    private boolean isDuplicate(String messageId) {
+        if (messageId == null) {
+            return false;
+        }
+        try {
+            Boolean isNew = redisTemplate.opsForValue()
+                    .setIfAbsent(DEDUP_PREFIX + messageId, "1", DEDUP_TTL);
+            if (Boolean.FALSE.equals(isNew)) {
+                logger.info("[Webhook] Mensaje duplicado ignorado: {}", messageId);
+                return true;
+            }
+        } catch (Exception e) {
+            logger.warn("[Webhook] Error en deduplicación, procesando mensaje: {}", e.getMessage());
+        }
+        return false;
     }
 }

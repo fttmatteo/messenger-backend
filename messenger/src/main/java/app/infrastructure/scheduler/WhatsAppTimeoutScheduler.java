@@ -3,6 +3,7 @@ package app.infrastructure.scheduler;
 import app.domain.model.WhatsAppSession;
 import app.domain.ports.WhatsAppMessagePort;
 import app.domain.ports.WhatsAppSessionPort;
+import app.infrastructure.persistence.repository.WhatsAppSessionRepository;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,10 +27,13 @@ public class WhatsAppTimeoutScheduler {
 
     private final WhatsAppSessionPort sessionPort;
     private final WhatsAppMessagePort messagePort;
+    private final WhatsAppSessionRepository sessionRepository;
 
-    public WhatsAppTimeoutScheduler(WhatsAppSessionPort sessionPort, WhatsAppMessagePort messagePort) {
+    public WhatsAppTimeoutScheduler(WhatsAppSessionPort sessionPort, WhatsAppMessagePort messagePort,
+            WhatsAppSessionRepository sessionRepository) {
         this.sessionPort = sessionPort;
         this.messagePort = messagePort;
+        this.sessionRepository = sessionRepository;
     }
 
     /**
@@ -63,6 +67,19 @@ public class WhatsAppTimeoutScheduler {
                 logger.error("[Scheduler] Error procesando timeout para {}: {}", session.getPhoneNumber(),
                         e.getMessage());
             }
+        }
+    }
+
+    /**
+     * Limpia sesiones expiradas diariamente a las 4:00 AM.
+     */
+    @Scheduled(cron = "0 0 4 * * ?")
+    @Transactional
+    @SchedulerLock(name = "wa_session_cleanup_lock", lockAtMostFor = "PT10M", lockAtLeastFor = "PT5M")
+    public void cleanupExpiredSessions() {
+        int deleted = sessionRepository.deleteExpiredSessions(LocalDateTime.now());
+        if (deleted > 0) {
+            logger.info("[Scheduler] {} sesiones de WhatsApp expiradas eliminadas.", deleted);
         }
     }
 

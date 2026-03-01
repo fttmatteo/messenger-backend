@@ -3,6 +3,7 @@ package app.infrastructure.scheduler;
 import app.domain.model.WhatsAppSession;
 import app.domain.ports.WhatsAppMessagePort;
 import app.domain.ports.WhatsAppSessionPort;
+import app.infrastructure.persistence.repository.WhatsAppSessionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -18,13 +19,15 @@ class WhatsAppTimeoutSchedulerTest {
 
     private WhatsAppSessionPort sessionPort;
     private WhatsAppMessagePort messagePort;
+    private WhatsAppSessionRepository sessionRepository;
     private WhatsAppTimeoutScheduler scheduler;
 
     @BeforeEach
     void setUp() {
         sessionPort = mock(WhatsAppSessionPort.class);
         messagePort = mock(WhatsAppMessagePort.class);
-        scheduler = new WhatsAppTimeoutScheduler(sessionPort, messagePort);
+        sessionRepository = mock(WhatsAppSessionRepository.class);
+        scheduler = new WhatsAppTimeoutScheduler(sessionPort, messagePort, sessionRepository);
     }
 
     @Test
@@ -69,5 +72,25 @@ class WhatsAppTimeoutSchedulerTest {
         // Assert
         verify(messagePort, never()).sendTextMessage(anyString(), anyString());
         verify(sessionPort, never()).updateSession(any());
+    }
+
+    @Test
+    void testCleanupExpiredSessions_DeletesSessions() {
+        when(sessionRepository.deleteExpiredSessions(any(LocalDateTime.class)))
+                .thenReturn(5);
+
+        scheduler.cleanupExpiredSessions();
+
+        verify(sessionRepository).deleteExpiredSessions(any(LocalDateTime.class));
+    }
+
+    @Test
+    void testCleanupExpiredSessions_NothingToDelete() {
+        when(sessionRepository.deleteExpiredSessions(any(LocalDateTime.class)))
+                .thenReturn(0);
+
+        scheduler.cleanupExpiredSessions();
+
+        verify(sessionRepository).deleteExpiredSessions(any(LocalDateTime.class));
     }
 }
