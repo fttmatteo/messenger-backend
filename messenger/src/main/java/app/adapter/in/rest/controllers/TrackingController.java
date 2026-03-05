@@ -4,14 +4,17 @@ import app.adapter.in.rest.request.LiveTrackingRequest;
 import app.adapter.in.rest.response.LiveTrackingResponse;
 import app.adapter.in.rest.response.TrackingHistoryResponse;
 import app.adapter.in.rest.mapper.TrackingResponseMapper;
+import app.adapter.out.tracking.config.RedisPubSubConfig;
 import app.application.usecase.tracking.GetTrackingHistoryUseCase;
 import app.application.usecase.tracking.UpdateLiveTrackingUseCase;
 import app.domain.model.LiveTracking;
 import app.domain.model.Location;
 import app.domain.model.TrackingHistory;
 import app.domain.ports.TrackingPort;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,6 +44,10 @@ public class TrackingController {
     private TrackingPort trackingPort;
     @Autowired
     private TrackingResponseMapper responseMapper;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     /**
      * Actualiza la ubicación en tiempo real de un mensajero.
@@ -67,7 +74,17 @@ public class TrackingController {
         }
 
         LiveTracking tracking = updateLiveTracking.execute(domainTracking);
-        return ResponseEntity.ok(responseMapper.toResponse(tracking));
+        LiveTrackingResponse response = responseMapper.toResponse(tracking);
+
+        // Publicar en Redis Pub/Sub para notificar al admin en tiempo real
+        try {
+            String jsonResponse = objectMapper.writeValueAsString(response);
+            redisTemplate.convertAndSend(RedisPubSubConfig.TRACKING_TOPIC, jsonResponse);
+        } catch (Exception e) {
+            logger.warn("Error publicando tracking update en Redis Pub/Sub: {}", e.getMessage());
+        }
+
+        return ResponseEntity.ok(response);
     }
 
     /**
