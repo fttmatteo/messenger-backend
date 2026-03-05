@@ -36,11 +36,12 @@
 - [CI/CD](#-cicd)
 - [Testing](#-testing)
 - [Performance Optimization](#-performance-optimization)
- - [Postman Collection](#-postman-collection)
+- [Postman Collection](#-postman-collection)
 
 ---
 
 ## 🏗 Architecture
+<details>
 
 The project implements **Hexagonal Architecture (Ports & Adapters)** to keep the domain isolated from external dependencies.
 
@@ -115,10 +116,12 @@ graph LR
     classDef actor fill:#21262d,stroke:#8b949e,color:#c9d1d9
     class USER,MAPS,GCS,WAPP,OCR_EXT,DB,REDIS actor
 ```
+</details>
 
 ---
 
 ## 💻 Tech Stack
+<details>
 
 | Component | Technology |
 |-----------|------------|
@@ -141,10 +144,12 @@ graph LR
 | **CI/CD** | GitHub Actions |
 | **Architecture Testing** | ArchUnit |
 | **Performance** | Spring Cache + Redis, Hibernate L2 Cache, Lazy Loading, Database Indices |
+</details>
 
 ---
 
 ## 📁 Project Structure
+<details>
 
 ```
 messenger/
@@ -159,6 +164,7 @@ messenger/
 │   │   │   │   ├── request/             # Input DTOs
 │   │   │   │   └── response/            # Output DTOs
 │   │   │   └── websocket/               # Real-time tracking
+│   │   └── out/                         # Output Adapters
 │   │       ├── maps/                    # Google Maps Integration
 │   │       ├── ocr/                     # Plate Recognizer OCR
 │   │       ├── persistence/             # JPA Adapters
@@ -190,10 +196,12 @@ messenger/
     ├── application-prod.properties      # Production
     └── db/migration/                    # Flyway Migrations
 ```
+</details>
 
 ---
 
 ## 🌍 Environment Profiles
+<details>
 
 | Profile | Purpose | Database | External APIs | JWT Exp. |
 |---------|---------|----------|---------------|----------|
@@ -215,7 +223,7 @@ For a quick demonstration without manual setup, use Docker Compose. This will sp
 
 ---
 
-## 🌍 Environment Profiles
+### 🌍 Profiles
 
 <details>
 <summary><b>🏠 Local</b> - No external dependencies</summary>
@@ -278,10 +286,12 @@ export SPRING_PROFILES_ACTIVE=dev
 # Docker
 docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ```
+</details>
 
 ---
 
 ## 🔌 API Endpoints
+<details>
 
 ### Authentication (`/auth`)
 
@@ -413,10 +423,12 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/monitoring/messenger/{id}/activity` | Get daily activity timeline + stats for a messenger |
+</details>
 
 ---
 
 ## 🗄 Database Schema
+<details>
 
 ```mermaid
 erDiagram
@@ -547,10 +559,12 @@ erDiagram
 | **PhotoType** | `PLATE_DETECTION`, `EVIDENCE` |
 | **TrackingStatus** | `ACTIVE`, `INACTIVE`, `OFFLINE` |
 | **TrackingSource** | `GPS`, `NETWORK`, `MANUAL` |
+</details>
 
 ---
 
 ## 📡 Real-Time Tracking
+<details>
 
 GPS tracking system using **Redis** + **WebSocket** for messenger monitoring.
 
@@ -645,11 +659,12 @@ flowchart LR
 | Auto-Archive | Scheduled job (3 AM daily) | Archives services after 60 days |
 
 **Archive System**: Services are permanently archived to dedicated tables (`deleted_services`, `deleted_status_history`, `deleted_photos`, `deleted_tracking_history`, `deleted_signatures`) instead of being deleted. All historical data is preserved for auditing and analytics.
-
+</details>
 
 ---
 
 ## 🔐 Security
+<details>
 
 ### JWT Authentication with Refresh Tokens
 
@@ -728,10 +743,12 @@ flowchart LR
 - Cookies: `Secure`, `HttpOnly`, `SameSite=Strict`
 - CORS configured by origin
 - No stack trace exposure
+</details>
 
 ---
 
 ## 📊 Observability
+<details>
 
 ### Monitoring Endpoints (Actuator)
 
@@ -757,10 +774,12 @@ flowchart LR
 
 > [!TIP]
 > Swagger UI is publicly accessible in `dev` profile. In production, consider restricting access via security configuration.
+</details>
 
 ---
 
 ## 📝 Auditing
+<details>
 
 ### AOP-Based Audit System
 
@@ -783,14 +802,17 @@ The application includes a centralized **audit logging system** using Aspect-Ori
 | **EmployeeUseCase** | `CREATE_EMPLOYEE` | Create new employee |
 | | `UPDATE_EMPLOYEE` | Update employee information |
 | | `DELETE_EMPLOYEE` | Delete employee |
+</details>
 
 ---
 
 ## 🏗 Architecture Verification
+<details>
 
 The project includes **ArchUnit** tests to enforce structural integrity and ensure that the **Hexagonal Architecture** principles are never violated.
 
 ### Automated Rules
+
 - **Layer Isolation**: Domain and Application layers must never depend on Infrastructure.
 - **Dependency Flow**: Input adapters must only talk to Use Cases, and Use Cases must only interact with Domain services or Ports.
 - **Package Integrity**: Controllers, entities, and repositories must reside in their respective adapter/infrastructure packages.
@@ -819,40 +841,44 @@ AUDIT | timestamp | user_document | action | method | params | status | duration
 - **Level:** `WARN` (always visible in all environments)
 - **Output:** Console (Cloud Run captures stdout)
 - **File Output:** Optional, enable `AUDIT_FILE` appender in `logback-spring.xml`
+</details>
 
 ---
  
- ## ⚡ Performance Optimization
- 
- The system includes multiple optimization layers to ensure high performance and low latency.
- 
- ### 🚀 Caching Strategy (Redis)
- 
- - **Spring Cache Abstraction**: Application-level caching using `@Cacheable` and `@CacheEvict`.
-   - `Dealerships`: TTL 30 minutes.
-   - `Employees`: TTL 15 minutes.
- - **Hibernate Second-Level Cache (L2)**: Entity-level caching via Redisson to reduce database load.
-   - Enabled for `DealershipEntity`, `EmployeeEntity`, and `PlateEntity`.
- - **Custom Serialization**: Optimized `ObjectMapper` with `JavaTimeModule` support for `LocalDateTime`.
- 
- ### 📉 Data Fetching Optimization
- 
- - **Lazy Loading**: Most relationships in `ServiceDeliveryEntity` are configured as `FetchType.LAZY` to avoid loading unnecessary data.
- - **Entity Graphs**: Explicit `@EntityGraph` definitions in repositories to solve the N+1 problem by fetching only required associations in a single query.
+## ⚡ Performance Optimization
+<details>
 
- ### 🖼️ Image Optimization
-
- - **Automatic Resizing**: Images are automatically resized to a maximum of 1280px preserving aspect ratio.
- - **Smart Compression**: Quality reduction to 75% for JPEG files using the `Thumbnailator` library.
-
- ### 🔌 Connection Pool Tuning (HikariCP)
-
- - **Optimized for Cloud SQL**: Fine-tuned parameters for low-resource environments (db-f1-micro).
- - **Leak Detection**: Active threshold to identify and prevent connection leaks.
+The system includes multiple optimization layers to ensure high performance and low latency.
  
- ---
+### 🚀 Caching Strategy (Redis)
+ 
+- **Spring Cache Abstraction**: Application-level caching using `@Cacheable` and `@CacheEvict`.
+  - `Dealerships`: TTL 30 minutes.
+  - `Employees`: TTL 15 minutes.
+- **Hibernate Second-Level Cache (L2)**: Entity-level caching via Redisson to reduce database load.
+  - Enabled for `DealershipEntity`, `EmployeeEntity`, and `PlateEntity`.
+- **Custom Serialization**: Optimized `ObjectMapper` with `JavaTimeModule` support for `LocalDateTime`.
+ 
+### 📉 Data Fetching Optimization
+ 
+- **Lazy Loading**: Most relationships in `ServiceDeliveryEntity` are configured as `FetchType.LAZY` to avoid loading unnecessary data.
+- **Entity Graphs**: Explicit `@EntityGraph` definitions in repositories to solve the N+1 problem by fetching only required associations in a single query.
 
- ## ⚙️ Setup & Installation
+### 🖼️ Image Optimization
+
+- **Automatic Resizing**: Images are automatically resized to a maximum of 1280px preserving aspect ratio.
+- **Smart Compression**: Quality reduction to 75% for JPEG files using the `Thumbnailator` library.
+
+### 🔌 Connection Pool Tuning (HikariCP)
+
+- **Optimized for Cloud SQL**: Fine-tuned parameters for low-resource environments (db-f1-micro).
+- **Leak Detection**: Active threshold to identify and prevent connection leaks.
+</details>
+
+---
+
+## ⚙️ Setup & Installation
+<details>
 
 > 🚀 **Deploying to Production?** See the complete [**Cloud Run Deployment Guide**](./DEPLOY_CLOUDRUN.md) for step-by-step instructions on deploying to Google Cloud.
 
@@ -865,10 +891,7 @@ AUDIT | timestamp | user_document | action | method | params | status | duration
 | Redis | 6.0+ |
 | Maven | 3.9+ |
 
-### Environment Variables
-
-<details>
-<summary><b>🔐 Required Variables</b></summary>
+### 🔐 Environment Variables Required
 
 | Variable | Description | Default/Example |
 |----------|-------------|-----------------|
@@ -886,13 +909,12 @@ AUDIT | timestamp | user_document | action | method | params | status | duration
 | `WHATSAPP_VERIFY_TOKEN`| Custom Webhook Token | `my_secret_token` |
 | `WHATSAPP_APP_SECRET`  | Meta App Secret | `abc123...` |
 
-</details>
-
 ### Quick Start (Docker) - Recommended
 
 Run the full stack locally with one command.
 
 #### Prerequisites
+
 - Docker & Docker Compose
 - Git
 
@@ -936,10 +958,12 @@ redis-server
 ```
 
 API available at `http://localhost:8080`
+</details>
 
 ---
 
 ## 🔄 CI/CD
+<details>
 
 Automated pipeline with **GitHub Actions**:
 
@@ -969,19 +993,23 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 
 > [!NOTE]
 > The CI pipeline uses an ephemeral **Docker** environment (MySQL + Redis) for integration tests, ensuring maximum parity with production. No external DB secrets are required.
+</details>
 
 ---
 
 ## 🧪 Testing
+<details>
 
 - **Unit Tests**: Broad coverage for adapters and domain models
 - **Integration Tests**: Domain services and persistence with real MySQL/Redis via Docker
 - **Test Profile**: Environment identical to production via local containers
 - **CI/CD**: Continuous Integration on GitHub Actions with ephemeral Docker services
+</details>
 
 ---
 
 ## 📬 Postman Collection
+<details>
 
 📄 **[Messenger_API.postman_collection.json](./Messenger_API.postman_collection.json)**
 
@@ -1011,6 +1039,7 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 4. Tokens (`token` and `refreshToken`) are saved automatically
 5. All other endpoints use the token automatically
 6. When access token expires, run **"Refresh Token"**
+</details>
 
 ---
 
@@ -1020,27 +1049,19 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 - [Spring Boot Documentation](https://spring.io/projects/spring-boot)
 - [Google Cloud Run](https://cloud.google.com/run/docs)
 
-### 📚 Documentation
+**Documentation:**
 - [🔐 **GitHub Secrets Guide**](./.github/SECRETS.md)
 - [🛡️ **Security Policy**](./.github/SECURITY.md)
 
 **Project Specific:**
 - Repository: `messenger-backend`
-- Author: Matteo
+- Author: Mateo Valencia Ardila
 - Email: contacto@plak.digital
 
 ---
 
 ## 📄 License
 
-See [LICENSE](./LICENSE) file for details.
-
----
-
-<div align="center">
-
-**Made with ❤️ using Spring Boot 3.5**
-
-</div>
+See [LICENSE](./LICENSE).
 
 > **Copyright (C) 2026 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**
