@@ -19,6 +19,9 @@ updates:
       - "dependencies"
       - "github-actions"
     open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   # Maven (dependencias de Java)
   - package-ecosystem: "maven"
@@ -34,6 +37,9 @@ updates:
       - "dependencies"
       - "java"
     open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     # Agrupar actualizaciones menores y de parche
     groups:
       # Agrupar actualizaciones del framework Spring
