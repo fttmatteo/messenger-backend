@@ -7,7 +7,7 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.5.11</version> 
 		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
+	</parent> 
 	<groupId>app</groupId> 
 	<artifactId>messenger</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
@@ -219,7 +219,7 @@
 		<dependency>
 			<groupId>org.redisson</groupId>
 			<artifactId>redisson-hibernate-6</artifactId>
-			<version>4.2.0</version>
+			<version>3.27.0</version>
 		</dependency>
 
 		<!-- Actuator (Health/Metrics) -->
