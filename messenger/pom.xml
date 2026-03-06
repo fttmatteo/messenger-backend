@@ -305,6 +305,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<argLine>
+						@{argLine}
 						-XX:+EnableDynamicAgentLoading
 						-Djdk.instrument.traceUsage
 						-Dnet.bytebuddy.experimental=true
