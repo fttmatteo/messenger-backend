@@ -70,6 +70,9 @@ class EmployeeUseCaseTest {
 
         @Test
         @DisplayName("Debe propagar excepción si documento duplicado")
+        /**
+         * Verifica que se propague la excepción si el documento está duplicado.
+         */
         void shouldPropagateExceptionOnDuplicateDocument() throws Exception {
             doThrow(new BusinessException("Documento ya registrado"))
                     .when(createEmployee).create(any());
@@ -85,6 +88,9 @@ class EmployeeUseCaseTest {
 
         @Test
         @DisplayName("Debe retornar todos los empleados")
+        /**
+         * Verifica que se listen todos los empleados utilizando el servicio de búsqueda.
+         */
         void shouldReturnAllEmployees() {
             Employee employee2 = new Employee();
             employee2.setDocument(987654321L);
@@ -101,6 +107,9 @@ class EmployeeUseCaseTest {
 
         @Test
         @DisplayName("Debe buscar empleado por ID")
+        /**
+         * Verifica que se pueda buscar un empleado por ID.
+         */
         void shouldFindEmployeeById() {
             when(searchEmployee.findById(1L)).thenReturn(sampleEmployee);
 

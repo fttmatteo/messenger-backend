@@ -51,6 +51,9 @@ class WhatsAppWebhookControllerTest {
         }
 
         @Test
+        /**
+         * Verifica que el webhook procese mensajes de texto.
+         */
         void shouldProcessTextMessage() throws Exception {
                 String json = "{" +
                                 "\"object\":\"whatsapp_business_account\"," +
@@ -83,6 +86,9 @@ class WhatsAppWebhookControllerTest {
         }
 
         @Test
+        /**
+         * Verifica que el webhook procese respuestas de botón.
+         */
         void shouldProcessButtonReply() throws Exception {
                 String json = "{" +
                                 "\"object\":\"whatsapp_business_account\"," +
@@ -114,6 +120,9 @@ class WhatsAppWebhookControllerTest {
         }
 
         @Test
+        /**
+         * Verifica que el webhook procese respuestas de lista.
+         */
         void shouldProcessListReply() throws Exception {
                 String json = "{" +
                                 "\"object\":\"whatsapp_business_account\"," +
@@ -145,6 +154,9 @@ class WhatsAppWebhookControllerTest {
         }
 
         @Test
+        /**
+         * Verifica que el webhook ignore mensajes duplicados.
+         */
         void shouldIgnoreDuplicateMessage() throws Exception {
                 when(valueOperations.setIfAbsent(anyString(), anyString(), any())).thenReturn(false);
 

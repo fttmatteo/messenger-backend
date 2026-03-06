@@ -68,6 +68,9 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe propagar excepción si creación falla")
+        /**
+         * Verifica que se propague la excepción si la creación falla.
+         */
         void shouldPropagateExceptionOnCreateFailure() throws Exception {
             doThrow(new BusinessException("Nombre duplicado"))
                     .when(createDealership).create(any());
@@ -102,6 +105,9 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe retornar lista vacía si no hay concesionarios")
+        /**
+         * Verifica que se retorne una lista vacía si no hay concesionarios.
+         */
         void shouldReturnEmptyListIfNoDealerships() {
             when(searchDealership.findAll()).thenReturn(List.of());
 
@@ -112,6 +118,9 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe buscar concesionario por ID")
+        /**
+         * Verifica que se pueda buscar un concesionario por ID.
+         */
         void shouldFindDealershipById() throws Exception {
             when(searchDealership.findById(1L)).thenReturn(sampleDealership);
 
@@ -123,6 +132,9 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe lanzar excepción si ID no existe")
+        /**
+         * Verifica que se lance una excepción si el ID no existe.
+         */
         void shouldThrowExceptionIfIdNotFound() {
             when(searchDealership.findById(999L))
                     .thenThrow(new ResourceNotFoundException("No encontrado"));
@@ -133,6 +145,9 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe buscar concesionario por nombre")
+        /**
+         * Verifica que se pueda buscar un concesionario por nombre.
+         */
         void shouldFindDealershipByName() throws Exception {
             when(searchDealership.findByName("Concesionario Test")).thenReturn(sampleDealership);
 
@@ -162,6 +177,9 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe propagar excepción si actualización falla")
+        /**
+         * Verifica que se propague la excepción si la actualización falla.
+         */
         void shouldPropagateExceptionOnUpdateFailure() throws Exception {
             doThrow(new BusinessException("Concesionario no existe"))
                     .when(updateDealership).update(anyLong(), any());
@@ -188,6 +206,10 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe lanzar excepción si tiene servicios activos")
+        /**
+         * Verifica que se lance una excepción si el concesionario tiene servicios
+         * activos.
+         */
         void shouldThrowExceptionIfHasActiveServices() throws Exception {
             doThrow(new BusinessException("Tiene servicios activos"))
                     .when(deleteDealership).deleteById(1L);

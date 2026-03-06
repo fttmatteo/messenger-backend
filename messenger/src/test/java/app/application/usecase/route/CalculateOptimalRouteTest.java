@@ -89,6 +89,9 @@ class CalculateOptimalRouteUseCaseTest {
 
     @Test
     @DisplayName("Debe calcular distancia")
+    /**
+     * Verifica el cálculo de distancia entre dos puntos.
+     */
     void shouldCalculateDistance() {
         Location origin = new Location(0.0, 0.0);
         Location dest = new Location(1.0, 1.0);

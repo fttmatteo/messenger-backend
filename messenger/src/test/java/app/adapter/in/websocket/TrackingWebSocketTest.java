@@ -51,6 +51,10 @@ class TrackingWebSocketTest {
 
     @Test
     @DisplayName("Should successfully connect to WebSocket and subscribe to tracking topic")
+    /**
+     * Verifica que el WebSocket se conecte correctamente y se suscriba al topic de
+     * seguimiento.
+     */
     void shouldConnectAndSubscribeSuccessfully() throws Exception {
         app.domain.model.auth.AuthCredentials credentials = new app.domain.model.auth.AuthCredentials();
         credentials.setDocument(12345678L);
@@ -80,6 +84,9 @@ class TrackingWebSocketTest {
 
     @Test
     @DisplayName("Should successfully connect to WebSocket using a cookie")
+    /**
+     * Verifica que el WebSocket se conecte correctamente usando una cookie.
+     */
     void shouldConnectWithCookieSuccessfully() throws Exception {
         app.domain.model.auth.AuthCredentials credentials = new app.domain.model.auth.AuthCredentials();
         credentials.setDocument(87654321L);
@@ -103,6 +110,10 @@ class TrackingWebSocketTest {
 
     @Test
     @DisplayName("Should successfully connect with WS token obtained from endpoint")
+    /**
+     * Verifica que el WebSocket se conecte correctamente usando un token WS
+     * obtenido desde el endpoint.
+     */
     void shouldConnectWithWsTokenFromEndpointSuccessfully() throws Exception {
         app.domain.model.auth.AuthCredentials credentials = new app.domain.model.auth.AuthCredentials();
         credentials.setDocument(55554444L);
@@ -137,6 +148,10 @@ class TrackingWebSocketTest {
 
     @Test
     @DisplayName("Should successfully connect with WS token in query parameter")
+    /**
+     * Verifica que el WebSocket se conecte correctamente usando un token WS en el
+     * parámetro de consulta.
+     */
     void shouldConnectWithWsTokenInQueryParamSuccessfully() throws Exception {
         app.domain.model.auth.AuthCredentials credentials = new app.domain.model.auth.AuthCredentials();
         credentials.setDocument(11223344L);

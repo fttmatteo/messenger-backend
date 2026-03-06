@@ -35,6 +35,10 @@ class UpdateLiveTrackingUseCaseTest {
 
     @Test
     @DisplayName("Should save live location and history when location has good accuracy")
+    /**
+     * Verifica que la ubicación en vivo y el historial se guarden cuando la
+     * precisión de la ubicación es buena.
+     */
     void shouldSaveLiveLocationAndHistoryWithGoodAccuracy() {
         LiveTracking incoming = new LiveTracking();
         incoming.setMessengerId(10L);
@@ -51,6 +55,10 @@ class UpdateLiveTrackingUseCaseTest {
 
     @Test
     @DisplayName("Should save only live location if accuracy is too low (> 100m)")
+    /**
+     * Verifica que solo se guarde la ubicación en vivo si la precisión de la
+     * ubicación es demasiado baja (> 100m).
+     */
     void shouldNotSaveHistoryIfAccuracyTooLow() {
         LiveTracking incoming = new LiveTracking();
         incoming.setMessengerId(10L);
@@ -63,6 +71,10 @@ class UpdateLiveTrackingUseCaseTest {
 
     @Test
     @DisplayName("Should save only live location if location is missing (keep alive ping)")
+    /**
+     * Verifica que solo se guarde la ubicación en vivo si la ubicación está
+     * ausente (ping de mantenimiento de vida).
+     */
     void shouldSaveOnlyLiveLocationIfLocationMissing() {
         LiveTracking incoming = new LiveTracking();
         incoming.setMessengerId(10L);
@@ -76,6 +88,9 @@ class UpdateLiveTrackingUseCaseTest {
 
     @Test
     @DisplayName("Should update only heartbeat when executeHeartbeat is called")
+    /**
+     * Verifica que solo se actualice el latido cuando se llama a executeHeartbeat.
+     */
     void shouldUpdateOnlyHeartbeatWithExecuteHeartbeat() {
         LiveTracking heartbeat = new LiveTracking();
         heartbeat.setMessengerId(10L);
@@ -93,6 +108,10 @@ class UpdateLiveTrackingUseCaseTest {
 
     @Test
     @DisplayName("Should preserve existing location data when heartbeat is received")
+    /**
+     * Verifica que los datos de ubicación existentes se conserven cuando se recibe
+     * un latido.
+     */
     void shouldPreserveExistingLocationOnHeartbeat() {
         LiveTracking existing = new LiveTracking();
         existing.setMessengerId(10L);
