@@ -880,8 +880,6 @@ The system includes multiple optimization layers to ensure high performance and 
 ## ⚙️ Setup & Installation
 <details>
 
-> 🚀 **Deploying to Production?** See the complete [**Cloud Run Deployment Guide**](./DEPLOY_CLOUDRUN.md) for step-by-step instructions on deploying to Google Cloud.
-
 ### Prerequisites
 
 | Requirement | Version |
@@ -1055,8 +1053,8 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 
 **Project Specific:**
 - Repository: `messenger-backend`
-- Author: Mateo Valencia Ardila
-- Email: contacto@plak.digital
+- Author: [Mateo Valencia Ardila](https://github.com/fttmatteo)
+- Email: [contacto@plak.digital](mailto:contacto@plak.digital)
 
 ---
 

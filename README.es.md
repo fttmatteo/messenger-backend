@@ -881,8 +881,6 @@ El sistema incluye múltiples capas de optimización para garantizar un alto ren
 ## ⚙️ Configuración e Instalación
 <details>
 
-> 🚀 **¿Desplegar en Producción?** Consulta la guía completa de [**Despliegue en Cloud Run**](./DEPLOY_CLOUDRUN.md) con instrucciones paso a paso para desplegar en Google Cloud.
-
 ### Prerrequisitos
 
 | Requisito | Versión |
@@ -1056,8 +1054,8 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 
 **Proyecto Específico:**
 - Repositorio: `messenger-backend`
-- Autor: Mateo Valencia Ardila
-- Email: contacto@plak.digital
+- Autor: [Mateo Valencia Ardila](https://github.com/fttmatteo)
+- Email: [contacto@plak.digital](mailto:contacto@plak.digital)
 
 ---
 
