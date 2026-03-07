@@ -47,3 +47,15 @@ Utiliza estas credenciales para entrar al sistema en perfil **local**:
 > - El **OCR** aceptará cualquier imagen y devolverá la placa `ABC123`.
 > - Las **Imágenes** se guardarán dentro del contenedor (carpeta `uploads`).
 > - No se requiere configuración de Google Cloud para esta demostración.
+
+## 🧪 Pruebas Automatizadas
+
+El sistema cuenta con una suite de pruebas robusta (370+ tests) que utiliza **Testcontainers**. No necesitas configurar bases de datos manualmente para los tests.
+
+1.  Navega a: `cd messenger`
+2.  Ejecuta: `./mvnw test`
+    -   *Nota: Requiere tener Docker iniciado.*
+
+> [!TIP]
+> **Mutation Testing**: Puedes medir la efectividad de los tests con:
+> `./mvnw org.pitest:pitest-maven:mutationCoverage`

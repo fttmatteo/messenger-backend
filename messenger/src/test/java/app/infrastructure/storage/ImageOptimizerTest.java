@@ -18,34 +18,24 @@ class ImageOptimizerTest {
     }
 
     @Test
+    /**
+     * Verifica que el optimizador no optimice archivos GIF.
+     */
     void shouldNotOptimizeGif() throws IOException {
-        // Arrange
         byte[] gifContent = "fake-gif-content".getBytes();
         InputStream inputStream = new ByteArrayInputStream(gifContent);
 
-        // Act
         InputStream result = imageOptimizer.optimize(inputStream, "gif");
 
-        // Assert
         assertSame(inputStream, result);
     }
 
     @Test
+    /**
+     * Verifica que el optimizador optimice archivos JPEG.
+     */
     void shouldOptimizeJpeg() throws IOException {
-        // We use a very small valid-ish stream or just mock the Thumbnails behavior if
-        // possible,
-        // but since it's a static-heavy library, we'll provide a minimal real stream if
-        // needed.
-        // For unit testing the logic, we check the extension handling.
-
-        // Arrange
-        byte[] imageContent = new byte[100]; // Dummy content, Thumbnails might fail if not valid image
-        // However, the test is to ensure it *attempts* optimization for non-gif.
-
-        // Act & Assert
-        // Since we don't have a real image, Thumbnails.of() will likely throw an
-        // exception,
-        // which verifies it's NOT returning the original stream (unlike the gif case).
+        byte[] imageContent = new byte[100];
         assertThrows(Exception.class, () -> {
             imageOptimizer.optimize(new ByteArrayInputStream(imageContent), "jpg");
         });

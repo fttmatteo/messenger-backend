@@ -208,7 +208,7 @@ messenger/
 |--------|-----------|---------------|---------------|----------|
 | `local` | Desarrollo local sin dependencias | MySQL Local | Mock/Deshabilitado | 8 horas |
 | `dev` | Desarrollo con servicios reales | MySQL | Habilitado | 8 horas |
-| `test` | Testing automatizado (CI/CD) | MySQL (Docker) | Mock | 1 hora |
+| `test` | Testing automatizado (CI/CD) | Testcontainers (MySQL/Redis) | Mock | 1 hora |
 | `prod` | Producción (Cloud Run) | Cloud SQL (MySQL 8) | Habilitado | 30 min |
 
 ### 🚀 Inicio Rápido (Docker Zero-Config)
@@ -253,11 +253,10 @@ Para una demostración rápida sin configurar dependencias, usa Docker Compose. 
 <details>
 <summary><b>🧪 Test</b> - Testing automatizado</summary>
 
-- MySQL & Redis en contenedores (Docker Compose)
-- Servicios externos mockeados
-- Aislamiento total por puerto (3307/6380)
-- Compatible con GitHub Actions
-- Migraciones Flyway reales
+- **Integración con Testcontainers**: Ciclo de vida automatizado para MySQL 8.0 y Redis 7.2.
+- **Patrón Singleton Jerárquico**: `BaseContainerTest` asegura que la infraestructura se inicie una sola vez por JVM.
+- **Aislamiento de Datos**: Cada ejecución ocurre en un entorno limpio y aislado.
+- **Paridad con Flyway**: Los tests corren contra el mismo esquema de migraciones que producción.
 
 </details>
 
@@ -999,10 +998,32 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 ## 🧪 Testing
 <details>
 
-- **Unit Tests**: Cobertura amplia para adaptadores y modelos
-- **Integration Tests**: Servicios de dominio y persistencia con MySQL/Redis reales vía Docker
-- **Test Profile**: Ambiente idéntico a producción mediante contenedores locales
-- **CI/CD**: Integración continua en GitHub Actions con servicios Docker efímeros
+El proyecto implementa una estrategia de pruebas robusta en todas las capas de la arquitectura hexagonal.
+
+| Nivel | Estrategia | Tecnología |
+|-------|------------|------------|
+| **Unitario** | Verificación lógica aislada | JUnit 5 + Mockito |
+| **Integración** | Validación de infra y servicios | Spring Boot Test + **Testcontainers** |
+| **Persistencia** | Validación de mapeos y queries | `@DataJpaTest` + MySQL Real |
+| **Arquitectura** | Cumplimiento de reglas hexagonales | **ArchUnit** |
+| **Mutación** | Medición de efectividad de tests | **Pitest** |
+
+### 🛠️ Características Clave
+
+- **Testcontainers (MySQL & Redis)**: No requiere configuración manual de Docker. Los tests descargan y gestionan los contenedores necesarios automáticamente.
+- **Patrón Singleton Jerárquico**: Uso de `BaseContainerTest` para compartir la infraestructura entre múltiples contextos de prueba, reduciendo drásticamente el tiempo de inicio.
+- **Pruebas de Mutación**: Métricas que van más allá de la cobertura de líneas, inyectando fallos para verificar que los asertos de los tests realmente detecten errores.
+- **Paridad con Flyway**: Los tests de integración corren exactamente sobre las mismas migraciones que se usan en producción.
+
+### 🚀 Ejecución de Pruebas
+
+```bash
+# Tests estándar (Unitarios + Integración)
+./mvnw test
+
+# Pruebas de Mutación (Pitest)
+./mvnw org.pitest:pitest-maven:mutationCoverage
+```
 </details>
 
 ---

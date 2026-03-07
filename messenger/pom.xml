@@ -14,7 +14,7 @@
 	<packaging>jar</packaging>
 	<name>PLAK</name>
 	<description>Sistema de gestión PLAK</description>
-	<url/>
+	<url/> 
 	<licenses>
 		<license/>
 	</licenses> 

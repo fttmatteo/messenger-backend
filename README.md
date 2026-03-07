@@ -207,7 +207,7 @@ messenger/
 |---------|---------|----------|---------------|----------|
 | `local` | Local development without dependencies | MySQL Local | Mock/Disabled | 8 hours |
 | `dev` | Development with real services | MySQL | Enabled | 8 hours |
-| `test` | Automated testing (CI/CD) | MySQL (Docker) | Mock | 1 hour |
+| `test` | Automated testing (CI/CD) | Testcontainers (MySQL/Redis) | Mock | 1 hour |
 | `prod` | Production (Cloud Run) | Cloud SQL (MySQL 8) | Enabled | 30 min |
 
 ### 🚀 Quick Start (Docker Zero-Config)
@@ -252,11 +252,10 @@ For a quick demonstration without manual setup, use Docker Compose. This will sp
 <details>
 <summary><b>🧪 Test</b> - Automated testing</summary>
 
-- MySQL & Redis in containers (Docker Compose)
-- Mocked external services
-- Total isolation via dedicated ports (3307/6380)
-- GitHub Actions compatible
-- Real Flyway migrations
+- **Testcontainers integration**: Automated lifecycle for MySQL 8.0 and Redis 7.2.
+- **Hierarchical Singleton Pattern**: BaseContainerTest ensures infrastructure starts once per JVM.
+- **Data Isolation**: Each execution environment is clean and isolated.
+- **Real Migrations**: Full parity with production database schema via Flyway.
 
 </details>
 
@@ -998,10 +997,32 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 ## 🧪 Testing
 <details>
 
-- **Unit Tests**: Broad coverage for adapters and domain models
-- **Integration Tests**: Domain services and persistence with real MySQL/Redis via Docker
-- **Test Profile**: Environment identical to production via local containers
-- **CI/CD**: Continuous Integration on GitHub Actions with ephemeral Docker services
+The project implements a robust testing strategy across all layers of the hexagonal architecture.
+
+| Level | Strategy | Technology |
+|-------|----------|------------|
+| **Unit** | Isolated logic verification | JUnit 5 + Mockito |
+| **Integration** | Infrastructure & Service validation | Spring Boot Test + **Testcontainers** |
+| **Persistence** | Data mapping & Query validation | `@DataJpaTest` + Real MySQL |
+| **Architecture** | Hexagonal rules enforcement | **ArchUnit** |
+| **Mutation** | Test effectiveness measurement | **Pitest** |
+
+### 🛠️ Key Features
+
+- **Testcontainers (MySQL & Redis)**: No manual Docker setup needed. Tests automatically pull and manage required containers.
+- **Hierarchical Singleton Pattern**: Using `BaseContainerTest` to share infrastructure across multiple test contexts, drastically reducing startup time and resource usage.
+- **Mutation Testing**: Metrics that go beyond simple line coverage by injecting faults to verify test assertions.
+- **Flyway Parity**: Integration tests run against the exact same migrations used in production.
+
+### 🚀 Running Tests
+
+```bash
+# Standard tests (Unit + Integration)
+./mvnw test
+
+# Mutation Testing (Pitest)
+./mvnw org.pitest:pitest-maven:mutationCoverage
+```
 </details>
 
 ---

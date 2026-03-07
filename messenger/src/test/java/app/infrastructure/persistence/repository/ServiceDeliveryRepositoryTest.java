@@ -21,6 +21,9 @@ import app.support.AbstractIntegrationTest;
 
 @Transactional
 @DisplayName("ServiceDeliveryRepository Integration Tests")
+/**
+ * Clase de pruebas integración para el repositorio de entregas de servicios.
+ */
 class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -129,23 +132,21 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
         LocalDateTime targetDate = LocalDateTime.of(2025, 1, 15, 10, 0);
         LocalDateTime otherDate = LocalDateTime.of(2025, 1, 16, 10, 0);
 
-        // 1. Service created on target date
         createAndPersistService(messenger, dealership, plate, Status.ASSIGNED, targetDate);
 
-        // 2. Service created on other date, but STATUS CHANGED on target date
         ServiceDeliveryEntity serviceWithHistory = new ServiceDeliveryEntity();
         serviceWithHistory.setMessenger(messenger);
         serviceWithHistory.setDealership(dealership);
         serviceWithHistory.setPlate(plate);
         serviceWithHistory.setCurrentStatus(Status.DELIVERED);
-        serviceWithHistory.setCreatedAt(otherDate); // Created tomorrow
+        serviceWithHistory.setCreatedAt(otherDate);
         serviceWithHistory.setDeleted(false);
         entityManager.persist(serviceWithHistory);
 
         app.infrastructure.persistence.entities.StatusHistoryEntity history = new app.infrastructure.persistence.entities.StatusHistoryEntity();
         history.setServiceDelivery(serviceWithHistory);
         history.setNewStatus(Status.DELIVERED);
-        history.setChangeDate(targetDate); // Changed today
+        history.setChangeDate(targetDate);
         history.setChangedBy(messenger);
         history.setDeliveryLatitude(1.0);
         history.setDeliveryLongitude(1.0);
@@ -154,10 +155,8 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
         serviceWithHistory.getHistory().add(history);
         entityManager.merge(serviceWithHistory);
 
-        // 3. Service created on other date (Should NOT be found)
         createAndPersistService(messenger, dealership, plate, Status.PENDING, otherDate);
 
-        // 4. Service for OTHER messenger on target date (Should NOT be found)
         createAndPersistService(otherMessenger, dealership, plate, Status.ASSIGNED, targetDate);
 
         entityManager.flush();

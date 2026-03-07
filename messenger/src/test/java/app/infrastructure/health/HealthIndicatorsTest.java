@@ -36,36 +36,38 @@ class HealthIndicatorsTest {
     private GoogleMapsHealthIndicator googleMapsHealthIndicator;
 
     @Test
+    /**
+     * Verifica que Redis esté disponible.
+     */
     void redisHealthShouldBeUpWhenPingReturnsPong() {
-        // Arrange
         when(redisConnectionFactory.getConnection()).thenReturn(redisConnection);
         when(redisConnection.ping()).thenReturn("PONG");
 
-        // Act
         Health health = redisHealthIndicator.health();
 
-        // Assert
         assertEquals(Status.UP, health.getStatus());
         assertEquals("PONG", health.getDetails().get("response"));
     }
 
     @Test
+    /**
+     * Verifica que Redis no esté disponible.
+     */
     void redisHealthShouldBeDownOnException() {
-        // Arrange
         when(redisConnectionFactory.getConnection()).thenThrow(new RuntimeException("Redis down"));
 
-        // Act
         Health health = redisHealthIndicator.health();
 
-        // Assert
         assertEquals(Status.DOWN, health.getStatus());
         assertTrue(health.getDetails().get("error").toString().contains("Redis down"));
     }
 
     @Test
+    /**
+     * Verifica que Google Maps esté disponible.
+     */
     void googleMapsHealthShouldBeUpWhenApiResponds() throws Exception {
         try (MockedStatic<GeocodingApi> mockedGeocodingApi = mockStatic(GeocodingApi.class)) {
-            // Arrange
             GeocodingResult[] results = new GeocodingResult[] { new GeocodingResult() };
             com.google.maps.GeocodingApiRequest pendingRequest = mock(com.google.maps.GeocodingApiRequest.class);
 
@@ -73,10 +75,8 @@ class HealthIndicatorsTest {
                     .thenReturn(pendingRequest);
             when(pendingRequest.await()).thenReturn(results);
 
-            // Act
             Health health = googleMapsHealthIndicator.health();
 
-            // Assert
             assertEquals(Status.UP, health.getStatus());
             assertEquals("Connected", health.getDetails().get("status"));
         }

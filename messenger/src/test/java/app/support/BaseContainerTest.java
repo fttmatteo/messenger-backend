@@ -15,6 +15,7 @@ import com.redis.testcontainers.RedisContainer;
  * Esta clase NO tiene anotaciones de Spring para permitir que sea extendida
  * tanto por @SpringBootTest como por @DataJpaTest sin conflictos de bootstrap.
  */
+@SuppressWarnings("resource")
 public abstract class BaseContainerTest {
 
     protected static final MySQLContainer<?> mysql;
