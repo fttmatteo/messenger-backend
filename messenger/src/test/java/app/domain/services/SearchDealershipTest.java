@@ -87,6 +87,9 @@ class SearchDealershipTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si Nombre no existe")
+    /**
+     * Verifica que se lance excepción ResourceNotFoundException si el nombre no existe.
+     */
     void shouldThrowExceptionIfNameNotFound() {
         when(dealershipPort.findByName("Central")).thenReturn(null);
 

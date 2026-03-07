@@ -22,6 +22,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("DealershipAdapter Unit Tests")
+/**
+ * Clase de pruebas unitarias para el adaptador de concesionarios.
+ */
 class DealershipAdapterTest {
 
     @Mock

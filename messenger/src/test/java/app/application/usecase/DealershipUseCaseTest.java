@@ -21,6 +21,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("DealershipUseCase Unit Tests")
+/**
+ * Clase de pruebas unitarias para el caso de uso de concesionarios.
+ */
 class DealershipUseCaseTest {
 
     @Mock

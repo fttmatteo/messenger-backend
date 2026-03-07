@@ -19,6 +19,9 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ValidateDeliveryLocationUseCase Unit Tests")
+/**
+ * Clase de pruebas unitarias para el caso de uso de validación de ubicación de entrega.
+ */
 class ValidateDeliveryLocationUseCaseTest {
 
     @Mock

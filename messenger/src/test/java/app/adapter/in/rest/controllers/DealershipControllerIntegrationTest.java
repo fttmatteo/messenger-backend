@@ -25,6 +25,9 @@ import app.support.AbstractIntegrationTest;
 
 @Transactional
 @DisplayName("DealershipController Integration Tests")
+/**
+ * Clase de pruebas integración para el controlador de concesionarios.
+ */
 class DealershipControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired

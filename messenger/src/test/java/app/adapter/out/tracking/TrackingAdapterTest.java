@@ -27,6 +27,9 @@ import org.springframework.data.redis.core.ValueOperations;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("TrackingAdapter Unit Tests")
+/**
+ * Clase de pruebas unitarias para el adaptador de seguimiento.
+ */
 class TrackingAdapterTest {
 
     @Mock

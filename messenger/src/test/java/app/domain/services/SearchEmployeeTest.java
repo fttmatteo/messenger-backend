@@ -59,6 +59,9 @@ class SearchEmployeeTest {
 
         @Test
         @DisplayName("Debe retornar lista vacía si no hay empleados")
+        /**
+         * Verifica que se retorne lista vacía cuando no hay empleados.
+         */
         void shouldReturnEmptyListIfNoEmployees() {
             when(employeePort.findAll()).thenReturn(List.of());
 
@@ -88,6 +91,9 @@ class SearchEmployeeTest {
 
         @Test
         @DisplayName("Debe lanzar excepción para ID no existente")
+        /**
+         * Verifica que se lance excepción cuando el ID no existe.
+         */
         void shouldThrowExceptionForNonExistingId() {
             when(employeePort.findById(999L)).thenReturn(null);
 
@@ -118,6 +124,9 @@ class SearchEmployeeTest {
 
         @Test
         @DisplayName("Debe lanzar excepción para documento no existente")
+        /**
+         * Verifica que se lance excepción cuando el documento no existe.
+         */
         void shouldThrowExceptionForNonExistingDocument() {
             when(employeePort.findByDocument(999999999L)).thenReturn(null);
 

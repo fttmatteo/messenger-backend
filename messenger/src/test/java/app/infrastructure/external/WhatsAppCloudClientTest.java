@@ -29,13 +29,14 @@ class WhatsAppCloudClientTest {
 
         whatsAppCloudClient = new WhatsAppCloudClient(config);
 
-        // WhatsAppCloudClient creates its own RestTemplate, so we extract it or inject
-        // it
         RestTemplate restTemplate = (RestTemplate) ReflectionTestUtils.getField(whatsAppCloudClient, "restTemplate");
         mockServer = MockRestServiceServer.createServer(restTemplate);
     }
 
     @Test
+    /**
+     * Verifica que el mensaje se envíe correctamente.
+     */
     void shouldSendTextMessageSuccessfully() {
         mockServer.expect(requestTo("https://graph.facebook.com/v21.0/test-phone-id/messages"))
                 .andExpect(method(org.springframework.http.HttpMethod.POST))
@@ -56,6 +57,9 @@ class WhatsAppCloudClientTest {
     }
 
     @Test
+    /**
+     * Verifica que la ubicación se envíe correctamente.
+     */
     void shouldSendLocationSuccessfully() {
         mockServer.expect(requestTo("https://graph.facebook.com/v21.0/test-phone-id/messages"))
                 .andExpect(jsonPath("$.type").value("location"))
@@ -69,6 +73,9 @@ class WhatsAppCloudClientTest {
     }
 
     @Test
+    /**
+     * Verifica que los botones de respuesta se envíen correctamente.
+     */
     void shouldSendReplyButtonsSuccessfully() {
         mockServer.expect(requestTo("https://graph.facebook.com/v21.0/test-phone-id/messages"))
                 .andExpect(jsonPath("$.type").value("interactive"))
@@ -84,6 +91,9 @@ class WhatsAppCloudClientTest {
     }
 
     @Test
+    /**
+     * Verifica que retorne false en caso de error en la API.
+     */
     void shouldReturnFalseOnApiError() {
         mockServer.expect(requestTo("https://graph.facebook.com/v21.0/test-phone-id/messages"))
                 .andRespond(withBadRequest());

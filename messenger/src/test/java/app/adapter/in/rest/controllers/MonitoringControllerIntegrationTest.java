@@ -28,6 +28,9 @@ import app.support.AbstractIntegrationTest;
 
 @Transactional
 @DisplayName("MonitoringController Integration Tests")
+/**
+ * Clase de pruebas integración para el controlador de monitoreo.
+ */
 class MonitoringControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired

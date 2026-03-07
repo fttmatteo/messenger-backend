@@ -38,6 +38,9 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
+    /**
+     * Verifica que el bot procese el mensaje y espere el PIN.
+     */
     void testProcessMessage_AwaitingPin_Success() {
         String from = "123456789";
         String pin = "1234";
@@ -60,6 +63,9 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
+    /**
+     * Verifica que el bot procese el mensaje y espere el PIN.
+     */
     void testProcessMessage_AwaitingPin_Failure_NotBlocked() {
         String from = "123456789";
         String wrongPin = "0000";
@@ -77,6 +83,9 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
+    /**
+     * Verifica que el bot procese el mensaje y espere el PIN.
+     */
     void testProcessMessage_AwaitingPin_Failure_FinalAttemptBlocks() {
         String from = "123456789";
         String wrongPin = "0000";
@@ -93,6 +102,9 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
+    /**
+     * Verifica que el bot procese el mensaje y espere el PIN.
+     */
     void testProcessMessage_AlreadyBlocked() {
         String from = "123456789";
 

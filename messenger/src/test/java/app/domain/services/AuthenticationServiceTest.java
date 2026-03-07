@@ -126,6 +126,9 @@ class AuthenticationServiceTest {
 
         @Test
         @DisplayName("Debe lanzar excepción si contraseña incorrecta")
+        /**
+         * Verifica que se lance excepción si la contraseña es incorrecta.
+         */
         void shouldThrowExceptionIfPasswordIncorrect() {
             when(employeePort.findByDocument(123456789L)).thenReturn(sampleEmployee);
             when(passwordEncoder.matches("wrongPassword", sampleEmployee.getPassword())).thenReturn(false);
@@ -176,6 +179,9 @@ class AuthenticationServiceTest {
 
         @Test
         @DisplayName("Debe manejar documento no encontrado")
+        /**
+         * Verifica que se maneje la excepción si el documento no es encontrado.
+         */
         void shouldHandleDocumentNotFound() {
             when(employeePort.findByDocument(111111111L)).thenReturn(null);
 

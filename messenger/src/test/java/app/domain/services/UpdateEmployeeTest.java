@@ -21,6 +21,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UpdateEmployee Unit Tests")
+/**
+ * Clase de pruebas unitarias para UpdateEmployee.
+ */
 class UpdateEmployeeTest {
 
     @Mock

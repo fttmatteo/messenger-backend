@@ -21,6 +21,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CalculateOptimalRouteUseCase Unit Tests")
+/**
+ * Clase de pruebas unitarias para el caso de uso de cálculo de ruta óptima.
+ */
 class CalculateOptimalRouteUseCaseTest {
 
     @Mock

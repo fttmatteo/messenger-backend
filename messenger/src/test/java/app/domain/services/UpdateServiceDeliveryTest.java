@@ -28,6 +28,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UpdateServiceDelivery Unit Tests")
+/**
+ * Clase de pruebas unitarias para UpdateServiceDelivery.
+ */
 class UpdateServiceDeliveryTest {
 
     @Mock
@@ -73,6 +76,9 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe actualizar estado a PENDING con evidencias completas")
+    /**
+     * Verifica que el estado se actualice correctamente a PENDING cuando las evidencias están completas.
+     */
     void shouldUpdateStatusToPendingWhenEvidenceComplete() throws Exception {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(1L)).thenReturn(messenger);
@@ -90,6 +96,9 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si servicio no existe o está en papelera")
+    /**
+     * Verifica que se lance excepción cuando el servicio no existe o está en la papelera.
+     */
     void shouldThrowExceptionIfServiceNotFound() {
         when(serviceDeliveryPort.findByIdActive(anyLong())).thenReturn(null);
 
@@ -101,6 +110,9 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si falta firma para estado PENDING")
+    /**
+     * Verifica que se lance excepción cuando falta la firma para el estado PENDING.
+     */
     void shouldThrowExceptionIfSignatureMissingForPending() {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(1L)).thenReturn(messenger);
@@ -113,6 +125,9 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si falta foto para estado RETURNED")
+    /**
+     * Verifica que se lance excepción cuando falta la foto para el estado RETURNED.
+     */
     void shouldThrowExceptionIfPhotoMissingForReturned() {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(1L)).thenReturn(messenger);
@@ -125,6 +140,9 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe permitir ADMIN cambiar a CANCELED desde cualquier estado")
+    /**
+     * Verifica que el ADMIN pueda cambiar el estado a CANCELED desde cualquier estado.
+     */
     void shouldAllowCanceledForAdminFromAnyState() throws Exception {
         service.setCurrentStatus(Status.ASSIGNED);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -138,6 +156,9 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe impedir MESSENGER cambiar a CANCELED")
+    /**
+     * Verifica que el MESSENGER no pueda cambiar el estado a CANCELED.
+     */
     void shouldForbidCanceledForMessenger() {
         service.setCurrentStatus(Status.ASSIGNED);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -153,6 +174,9 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe permitir MESSENGER actualizar desde cualquier estado no final")
+    /**
+     * Verifica que el MESSENGER pueda actualizar el estado desde cualquier estado no final.
+     */
     void shouldAllowMessengerToUpdateFromAnyNonFinalState() throws Exception {
         service.setCurrentStatus(Status.PENDING);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -166,6 +190,9 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe permitir ADMIN cambiar a RESOLVED desde cualquier estado")
+    /**
+     * Verifica que el ADMIN pueda cambiar el estado a RESOLVED desde cualquier estado.
+     */
     void shouldAllowResolvedForAdminFromAnyState() throws Exception {
         service.setCurrentStatus(Status.PENDING);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -179,6 +206,9 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe impedir ADMIN usar estados de mensajero (PENDING, DELIVERED, RETURNED)")
+    /**
+     * Verifica que el ADMIN no pueda usar los estados de mensajero (PENDING, DELIVERED, RETURNED).
+     */
     void shouldForbidAdminFromUsingMessengerStates() {
         service.setCurrentStatus(Status.ASSIGNED);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -194,6 +224,9 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe validar que no se actualice al mismo estado")
+    /**
+     * Verifica que no se pueda actualizar al mismo estado.
+     */
     void shouldThrowExceptionIfSameStatus() {
         service.setCurrentStatus(Status.ASSIGNED);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -207,6 +240,9 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe permitir cambiar estado DELIVERED sin restricción de tiempo")
+    /**
+     * Verifica que el estado DELIVERED se pueda actualizar sin restricción de tiempo.
+     */
     void shouldAllowDeliveredUpdateWithoutTimeRestriction() throws Exception {
         service.setCurrentStatus(Status.DELIVERED);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -220,6 +256,9 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe reasignar mensajero cuando servicio está en CANCELED")
+    /**
+     * Verifica que el mensajero se pueda reasignar cuando el servicio está en CANCELED.
+     */
     void shouldReassignMessengerFromCanceled() throws Exception {
         service.setCurrentStatus(Status.CANCELED);
 
@@ -241,6 +280,9 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe impedir reasignación si no está en CANCELED")
+    /**
+     * Verifica que el mensajero no se pueda reasignar si el servicio no está en CANCELED.
+     */
     void shouldForbidReassignIfNotCanceled() {
         service.setCurrentStatus(Status.PENDING);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -254,6 +296,9 @@ class UpdateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe impedir reasignación si no es ADMIN")
+    /**
+     * Verifica que el mensajero no se pueda reasignar si no es ADMIN.
+     */
     void shouldForbidReassignIfNotAdmin() {
         service.setCurrentStatus(Status.CANCELED);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);

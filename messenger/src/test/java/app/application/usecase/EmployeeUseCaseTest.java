@@ -22,6 +22,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("EmployeeUseCase Unit Tests")
+/**
+ * Clase de pruebas unitarias para el caso de uso de empleados.
+ */
 class EmployeeUseCaseTest {
 
     @Mock
@@ -121,6 +124,9 @@ class EmployeeUseCaseTest {
 
         @Test
         @DisplayName("Debe buscar empleado por documento")
+        /**
+         * Verifica que se pueda buscar un empleado por documento.
+         */
         void shouldFindEmployeeByDocument() throws Exception {
             when(searchEmployee.findByDocument(123456789L)).thenReturn(sampleEmployee);
 
@@ -150,6 +156,9 @@ class EmployeeUseCaseTest {
 
         @Test
         @DisplayName("Debe propagar excepción si empleado no existe")
+        /**
+         * Verifica que se propague la excepción si el empleado no existe.
+         */
         void shouldPropagateExceptionIfNotFound() throws Exception {
             doThrow(new ResourceNotFoundException("Empleado no encontrado"))
                     .when(updateEmployee).update(anyLong(), any());
@@ -177,6 +186,9 @@ class EmployeeUseCaseTest {
 
         @Test
         @DisplayName("Debe lanzar excepción si tiene servicios activos")
+        /**
+         * Verifica que se lance la excepción si el empleado tiene servicios activos.
+         */
         void shouldThrowExceptionIfHasActiveServices() throws Exception {
             doThrow(new BusinessException("Empleado tiene servicios asignados"))
                     .when(deleteEmployee).deleteById(1L);
@@ -192,6 +204,9 @@ class EmployeeUseCaseTest {
 
         @Test
         @DisplayName("Debe aceptar rol MESSENGER")
+        /**
+         * Verifica que se acepte el rol MESSENGER.
+         */
         void shouldAcceptMessengerRole() throws Exception {
             sampleEmployee.setRole(Role.MESSENGER);
             when(createEmployee.create(any(Employee.class))).thenReturn(sampleEmployee);
@@ -203,6 +218,9 @@ class EmployeeUseCaseTest {
 
         @Test
         @DisplayName("Debe aceptar rol ADMIN")
+        /**
+         * Verifica que se acepte el rol ADMIN.
+         */
         void shouldAcceptAdminRole() throws Exception {
             sampleEmployee.setRole(Role.ADMIN);
             when(createEmployee.create(any(Employee.class))).thenReturn(sampleEmployee);

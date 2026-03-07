@@ -27,6 +27,9 @@ class StatusHistoryTest {
 
     @Test
     @DisplayName("Debe retornar null cuando falla Lat o Lng")
+    /**
+     * Verifica que se retorne null cuando faltan coordenadas.
+     */
     void shouldReturnNullWhenCoordinatesMissing() {
         StatusHistory history = new StatusHistory();
 
@@ -38,6 +41,9 @@ class StatusHistoryTest {
 
     @Test
     @DisplayName("Debe establecer Lat/Lng desde Location")
+    /**
+     * Verifica que se establezcan las coordenadas cuando se proporciona un objeto Location.
+     */
     void shouldSetFromLocation() {
         StatusHistory history = new StatusHistory();
         Location loc = new Location(1.0, 2.0);
@@ -50,6 +56,9 @@ class StatusHistoryTest {
 
     @Test
     @DisplayName("No debe establecer Lat/Lng si Location es null")
+    /**
+     * Verifica que no se establezcan las coordenadas cuando se proporciona un objeto Location nulo.
+     */
     void shouldNotSetIfLocationNull() {
         StatusHistory history = new StatusHistory();
         history.setDeliveryLatitude(5.0);

@@ -11,6 +11,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("JwtAdapter Unit Tests")
+/**
+ * Clase de pruebas unitarias para el adaptador de autenticación JWT.
+ */
 class JwtAdapterTest {
 
     private JwtAdapter jwtAdapter;
@@ -53,6 +56,9 @@ class JwtAdapterTest {
 
     @Test
     @DisplayName("Debe rechazar un token inválido")
+    /**
+     * Verifica que un token inválido sea considerado inválido.
+     */
     void shouldRejectInvalidToken() {
         boolean isValid = jwtAdapter.validateToken("invalid.token.here");
 
@@ -76,6 +82,9 @@ class JwtAdapterTest {
 
     @Test
     @DisplayName("Debe extraer el rol del token")
+    /**
+     * Verifica la extracción del claim de rol desde el token.
+     */
     void shouldExtractRoleFromToken() {
         AuthCredentials credentials = new AuthCredentials();
         credentials.setDocument(123456789L);

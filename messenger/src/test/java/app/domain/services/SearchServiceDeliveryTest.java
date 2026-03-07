@@ -42,6 +42,9 @@ class SearchServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si servicio no existe o está en papelera")
+    /**
+     * Verifica que se lance excepción cuando el servicio no existe o está en la papelera.
+     */
     void shouldThrowExceptionIfServiceNotFoundOrDeleted() {
         when(serviceDeliveryPort.findByIdActive(99L)).thenReturn(null);
 
@@ -53,6 +56,9 @@ class SearchServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe buscar servicios por placa")
+    /**
+     * Verifica la búsqueda de servicios por número de placa.
+     */
     void shouldFindByPlateNumber() {
         when(serviceDeliveryPort.findByPlateNumber("ABC-123")).thenReturn(Arrays.asList(new ServiceDelivery()));
 
@@ -81,6 +87,9 @@ class SearchServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe retornar lista vacía si no hay servicios en papelera")
+    /**
+     * Verifica que se retorne lista vacía cuando no hay servicios en la papelera.
+     */
     void shouldReturnEmptyListIfNoDeletedServices() {
         when(serviceDeliveryPort.findDeleted()).thenReturn(Collections.emptyList());
 

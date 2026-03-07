@@ -139,6 +139,9 @@ class CreateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si concesionario no existe")
+    /**
+     * Verifica validación de existencia del concesionario.
+     */
     void shouldThrowExceptionIfDealershipNotFound() {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(999L)).thenReturn(null);
@@ -152,6 +155,9 @@ class CreateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe normalizar la placa a mayúsculas")
+    /**
+     * Verifica que la placa se normalice a mayúsculas antes de guardar.
+     */
     void shouldNormalizePlateToUpperCase() throws Exception {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
@@ -189,6 +195,9 @@ class CreateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe guardar historial de rastreo inicial si se proporciona ubicación")
+    /**
+     * Verifica que se guarde el historial de rastreo inicial si se proporciona ubicación.
+     */
     void shouldSaveTrackingHistoryWhenLocationIsProvided() throws Exception {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);

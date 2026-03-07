@@ -12,6 +12,9 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("FileValidationService Tests")
+/**
+ * Clase de pruebas unitarias para FileValidationService.
+ */
 class FileValidationServiceTest {
 
         private final FileValidationService fileValidationService = new FileValidationService();
@@ -32,6 +35,9 @@ class FileValidationServiceTest {
 
         @Test
         @DisplayName("Validar imagen PNG válida debe pasar")
+        /**
+         * Verifica que una imagen PNG válida sea aceptada.
+         */
         void testValidateValidPngImage() throws IOException {
                 byte[] imageBytes = createValidPngImage(800, 600);
                 MultipartFile file = new MockMultipartFile(
@@ -45,6 +51,9 @@ class FileValidationServiceTest {
 
         @Test
         @DisplayName("Validar imagen JPEG válida debe pasar")
+        /**
+         * Verifica que una imagen JPEG válida sea aceptada.
+         */
         void testValidateValidJpegImage() throws IOException {
                 byte[] imageBytes = createValidJpegImage(1024, 768);
                 MultipartFile file = new MockMultipartFile(
@@ -58,6 +67,9 @@ class FileValidationServiceTest {
 
         @Test
         @DisplayName("Archivo vacío debe fallar")
+        /**
+         * Verifica que un archivo vacío falle la validación.
+         */
         void testEmptyFileShouldFail() {
                 MultipartFile file = new MockMultipartFile(
                                 "image",
@@ -73,6 +85,9 @@ class FileValidationServiceTest {
 
         @Test
         @DisplayName("Archivo nulo debe fallar")
+        /**
+         * Verifica que un archivo nulo falle la validación.
+         */
         void testNullFileShouldFail() {
                 SecurityException exception = assertThrows(
                                 SecurityException.class,
@@ -82,6 +97,9 @@ class FileValidationServiceTest {
 
         @Test
         @DisplayName("Archivo de texto debe fallar")
+        /**
+         * Verifica que un archivo de texto falle la validación.
+         */
         void testTextFileTypeShouldFail() {
                 MultipartFile file = new MockMultipartFile(
                                 "file",
@@ -97,6 +115,9 @@ class FileValidationServiceTest {
 
         @Test
         @DisplayName("Archivo PDF debe fallar")
+        /**
+         * Verifica que un archivo PDF falle la validación.
+         */
         void testPdfFileShouldFail() {
                 byte[] pdfMagicBytes = new byte[] { 0x25, 0x50, 0x44, 0x46 };
                 MultipartFile file = new MockMultipartFile(
@@ -113,6 +134,9 @@ class FileValidationServiceTest {
 
         @Test
         @DisplayName("Archivo mayor al límite debe fallar")
+        /**
+         * Verifica que un archivo mayor al límite falle la validación.
+         */
         void testFileTooLargeShouldFail() throws IOException {
                 byte[] largeImage = createValidPngImage(100, 100);
                 byte[] oversizedImage = new byte[(int) (11 * 1024 * 1024)];
@@ -132,6 +156,9 @@ class FileValidationServiceTest {
 
         @Test
         @DisplayName("Imagen demasiado pequeña debe fallar")
+        /**
+         * Verifica que una imagen demasiado pequeña falle la validación.
+         */
         void testImageTooSmallShouldFail() throws IOException {
                 byte[] tinyImage = createValidPngImage(5, 5);
                 MultipartFile file = new MockMultipartFile(
@@ -148,6 +175,9 @@ class FileValidationServiceTest {
 
         @Test
         @DisplayName("Imagen más grande que el límite debe fallar")
+        /**
+         * Verifica que una imagen más grande que el límite falle la validación.
+         */
         void testImageExceedsDimensionLimitShouldFail() throws IOException {
                 byte[] largeImage = createValidPngImage(5000, 5000);
                 MultipartFile file = new MockMultipartFile(
@@ -164,6 +194,9 @@ class FileValidationServiceTest {
 
         @Test
         @DisplayName("Imagen con aspecto muy extremo debe fallar")
+        /**
+         * Verifica que una imagen con aspecto muy extremo falle la validación.
+         */
         void testImageExtremAspectRatioShouldFail() throws IOException {
                 byte[] extremeImage = createValidPngImage(4000, 10);
                 MultipartFile file = new MockMultipartFile(
@@ -180,6 +213,9 @@ class FileValidationServiceTest {
 
         @Test
         @DisplayName("Firma válida debe pasar")
+        /**
+         * Verifica que una firma válida sea aceptada.
+         */
         void testValidSignatureShouldPass() throws IOException {
                 byte[] signatureBytes = createValidPngImage(200, 100);
                 MultipartFile file = new MockMultipartFile(
@@ -193,6 +229,9 @@ class FileValidationServiceTest {
 
         @Test
         @DisplayName("Firma demasiado grande debe fallar")
+        /**
+         * Verifica que una firma demasiado grande falle la validación.
+         */
         void testSignatureTooLargeShouldFail() {
                 byte[] oversizedSignature = new byte[(int) (6 * 1024 * 1024)];
                 MultipartFile file = new MockMultipartFile(
@@ -209,6 +248,9 @@ class FileValidationServiceTest {
 
         @Test
         @DisplayName("Foto válida debe pasar")
+        /**
+         * Verifica que una foto válida sea aceptada.
+         */
         void testValidPhotoShouldPass() throws IOException {
                 byte[] photoBytes = createValidJpegImage(1920, 1080);
                 MultipartFile file = new MockMultipartFile(
@@ -222,6 +264,9 @@ class FileValidationServiceTest {
 
         @Test
         @DisplayName("Foto demasiado grande debe fallar")
+        /**
+         * Verifica que una foto demasiado grande falle la validación.
+         */
         void testPhotoTooLargeShouldFail() {
                 byte[] oversizedPhoto = new byte[(int) (21 * 1024 * 1024)];
                 MultipartFile file = new MockMultipartFile(
@@ -238,6 +283,9 @@ class FileValidationServiceTest {
 
         @Test
         @DisplayName("Detectar MIME type por magic bytes (PNG)")
+        /**
+         * Verifica que el MIME type sea detectado correctamente por magic bytes.
+         */
         void testDetectPngByMagicBytes() throws IOException {
                 byte[] validPng = createValidPngImage(100, 100);
 
@@ -252,6 +300,9 @@ class FileValidationServiceTest {
 
         @Test
         @DisplayName("Verificar límites de validación están correctamente definidos")
+        /**
+         * Verifica que los límites de validación estén correctamente definidos.
+         */
         void testValidationLimitsAreDefined() {
                 assertEquals(10, FileValidationService.ValidationLimits.MAX_IMAGE_SIZE_MB);
                 assertEquals(5, FileValidationService.ValidationLimits.MAX_SIGNATURE_SIZE_MB);

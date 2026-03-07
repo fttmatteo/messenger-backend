@@ -29,6 +29,9 @@ import app.support.AbstractIntegrationTest;
 
 @Transactional
 @DisplayName("TrackingController Integration Tests")
+/**
+ * Clase de pruebas integración para el controlador de seguimiento.
+ */
 class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Autowired

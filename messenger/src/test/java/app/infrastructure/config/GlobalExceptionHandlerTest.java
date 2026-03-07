@@ -60,6 +60,9 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    /**
+     * Verifica que UnauthorizedException retorne 401 Unauthorized.
+     */
     void handleUnauthorizedException_ShouldReturn401() {
         UnauthorizedException exception = new UnauthorizedException("Credenciales inválidas");
 
@@ -73,6 +76,9 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    /**
+     * Verifica que ResourceNotFoundException retorne 404 Not Found.
+     */
     void handleResourceNotFoundException_ShouldReturn404() {
         ResourceNotFoundException exception = new ResourceNotFoundException("Empleado no encontrado");
 
@@ -86,6 +92,9 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    /**
+     * Verifica que GeolocationException retorne 400 Bad Request.
+     */
     void handleGeolocationException_ShouldReturn400() {
         GeolocationException exception = new GeolocationException("Coordenadas inválidas");
 
@@ -97,6 +106,9 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    /**
+     * Verifica que ExternalServiceException retorne 503 Service Unavailable.
+     */
     void handleExternalServiceException_ShouldReturn503() {
         ExternalServiceException exception = new ExternalServiceException("Servicio OCR no disponible");
 
@@ -109,6 +121,9 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    /**
+     * Verifica que AccessDeniedException retorne 403 Forbidden.
+     */
     void handleAccessDeniedException_ShouldReturn403() {
         AccessDeniedException exception = new AccessDeniedException("Acceso denegado");
 
@@ -121,6 +136,9 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    /**
+     * Verifica que Exception retorne 500 Internal Server Error.
+     */
     void handleGlobalException_ShouldReturn500() {
         Exception exception = new Exception("Error inesperado");
 
@@ -159,6 +177,9 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    /**
+     * Verifica que todas las respuestas tengan timestamp.
+     */
     void allResponses_ShouldHaveTimestamp() {
         InputsException exception = new InputsException("Test");
 
@@ -169,6 +190,9 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    /**
+     * Verifica que todas las respuestas tengan path.
+     */
     void allResponses_ShouldHavePath() {
         InputsException exception = new InputsException("Test");
 

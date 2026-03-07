@@ -11,6 +11,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("PlateRecognition Unit Tests")
+/**
+ * Clase de pruebas unitarias para PlateRecognition.
+ */
 class PlateRecognitionTest {
 
     private PlateRecognition plateRecognition;
@@ -66,6 +69,9 @@ class PlateRecognitionTest {
         @ParameterizedTest
         @ValueSource(strings = { "123ABC", "123 ABC", "789xyz", "456DEF" })
         @DisplayName("Debe reconocer placas de motocarro válidas")
+        /**
+         * Verifica reconocimiento de patrones de placas de motocarro.
+         */
         void shouldRecognizeValidMotocarPlates(String plate) {
             PlateType result = plateRecognition.determinePlateType(plate);
             assertEquals(PlateType.MOTORCAR, result);
@@ -78,6 +84,9 @@ class PlateRecognitionTest {
 
         @Test
         @DisplayName("Debe lanzar excepción para placa nula")
+        /**
+         * Verifica que una placa nula lance una excepción.
+         */
         void shouldThrowExceptionForNullPlate() {
             BusinessException exception = assertThrows(
                     BusinessException.class,
@@ -87,6 +96,9 @@ class PlateRecognitionTest {
 
         @Test
         @DisplayName("Debe lanzar excepción para placa vacía")
+        /**
+         * Verifica que una placa vacía lance una excepción.
+         */
         void shouldThrowExceptionForEmptyPlate() {
             BusinessException exception = assertThrows(
                     BusinessException.class,
@@ -96,6 +108,9 @@ class PlateRecognitionTest {
 
         @Test
         @DisplayName("Debe lanzar excepción para placa solo espacios")
+        /**
+         * Verifica que una placa solo con espacios lance una excepción.
+         */
         void shouldThrowExceptionForWhitespacePlate() {
             BusinessException exception = assertThrows(
                     BusinessException.class,
@@ -106,6 +121,9 @@ class PlateRecognitionTest {
         @ParameterizedTest
         @ValueSource(strings = { "AB123", "ABCD123", "AB1234", "12AB34", "ABCDEF", "123456" })
         @DisplayName("Debe lanzar excepción para formatos inválidos")
+        /**
+         * Verifica que formatos de placa inválidos lancen una excepción.
+         */
         void shouldThrowExceptionForInvalidFormats(String plate) {
             BusinessException exception = assertThrows(
                     BusinessException.class,
@@ -130,6 +148,9 @@ class PlateRecognitionTest {
 
         @Test
         @DisplayName("Debe formatear placa de moto correctamente")
+        /**
+         * Verifica el formateo estándar para almacenamiento de placas de motocicleta.
+         */
         void shouldFormatMotorcyclePlate() {
             String result = plateRecognition.formatPlateForStorage("ABC12D", PlateType.MOTORCYCLE);
             assertEquals("ABC 12D", result);
@@ -137,6 +158,9 @@ class PlateRecognitionTest {
 
         @Test
         @DisplayName("Debe formatear placa de motocarro correctamente")
+        /**
+         * Verifica el formateo estándar para almacenamiento de placas de motocarro.
+         */
         void shouldFormatMotocarPlate() {
             String result = plateRecognition.formatPlateForStorage("123ABC", PlateType.MOTORCAR);
             assertEquals("123 ABC", result);
@@ -144,6 +168,9 @@ class PlateRecognitionTest {
 
         @Test
         @DisplayName("Debe normalizar a mayúsculas al formatear")
+        /**
+         * Verifica que las placas sean normalizadas a mayúsculas al formatear.
+         */
         void shouldNormalizeToUppercase() {
             String result = plateRecognition.formatPlateForStorage("abc123", PlateType.CAR);
             assertEquals("ABC 123", result);
@@ -151,6 +178,9 @@ class PlateRecognitionTest {
 
         @Test
         @DisplayName("Debe remover espacios extra al formatear")
+        /**
+         * Verifica que los espacios extra sean removidos al formatear.
+         */
         void shouldRemoveExtraSpaces() {
             String result = plateRecognition.formatPlateForStorage("ABC  123", PlateType.CAR);
             assertEquals("ABC 123", result);
