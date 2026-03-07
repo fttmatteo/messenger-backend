@@ -13,11 +13,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -31,11 +29,11 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-@SpringBootTest
-@ActiveProfiles("test")
+import app.support.AbstractIntegrationTest;
+
 @Transactional
 @DisplayName("Full Business Flow E2E Integration Test")
-class FullBusinessFlowIntegrationTest {
+class FullBusinessFlowIntegrationTest extends AbstractIntegrationTest {
 
         @Autowired
         private WebApplicationContext context;
@@ -67,13 +65,6 @@ class FullBusinessFlowIntegrationTest {
 
         @Test
         @DisplayName("Complete happy path for a service delivery cycle")
-        /**
-         * Prueba de integración E2E que simula el flujo completo de negocio:
-         * 1. Creación de datos maestros (Admin, Mensajero, Concesionario).
-         * 2. Creación de un servicio.
-         * 3. Actualización de estado por parte del mensajero.
-         * 4. Verificación final de historial.
-         */
         void shouldCompleteFullBusinessCycle() throws Exception {
                 EmployeeEntity adminEntity = new EmployeeEntity();
                 adminEntity.setDocument(999999L);
@@ -103,7 +94,7 @@ class FullBusinessFlowIntegrationTest {
                                 .asLong();
 
                 DealershipRequest dealershipRequest = new DealershipRequest();
-                dealershipRequest.setName("Central Motors");
+                dealershipRequest.setName("Central Motors " + System.currentTimeMillis());
                 dealershipRequest.setAddress("Main St 456");
                 dealershipRequest.setPhone("3001234567");
                 dealershipRequest.setZone("Centro");

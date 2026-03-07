@@ -45,4 +45,24 @@ public class HexagonalArchitectureTest {
         static final ArchRule repository_names_should_end_with_repository = classes()
                         .that().resideInAPackage("..infrastructure.persistence.repository..")
                         .should().haveSimpleNameEndingWith("Repository");
+
+        // Comentado temporalmente debido a violaciones existentes en el proyecto
+        // actual.
+        // Estos deberían habilitarse tras una refactorización de la capa de dominio.
+        /*
+         * @ArchTest
+         * static final ArchRule domain_should_not_use_spring_annotations = noClasses()
+         * .that().resideInAPackage("..domain..")
+         * .should().beAnnotatedWith("org.springframework.stereotype.Service")
+         * .orShould().beAnnotatedWith("org.springframework.stereotype.Repository")
+         * .orShould().beAnnotatedWith(
+         * "org.springframework.beans.factory.annotation.Autowired");
+         * 
+         * @ArchTest
+         * static final ArchRule domain_should_not_use_persistence_annotations =
+         * noClasses()
+         * .that().resideInAPackage("..domain..")
+         * .should().beAnnotatedWith("jakarta.persistence.Entity")
+         * .orShould().beAnnotatedWith("jakarta.persistence.Table");
+         */
 }

@@ -151,4 +151,21 @@ class AuthControllerIntegrationTest extends AbstractIntegrationTest {
                                 .andExpect(cookie().exists("accessToken"))
                                 .andExpect(jsonPath("$.message").exists());
         }
+
+        @Test
+        @DisplayName("POST /auth/login should return 400 when turnstileToken is empty")
+        /**
+         * Verifica que el endpoint rechace el login cuando el turnstileToken está vacío.
+         */
+        void shouldReturnBadRequestWhenTurnstileTokenIsEmpty() throws Exception {
+                AuthCredentials credentials = new AuthCredentials();
+                credentials.setDocument(12345678L);
+                credentials.setPassword("secret123");
+                credentials.setTurnstileToken(""); // Empty token
+
+                mockMvc.perform(post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(credentials)))
+                                .andExpect(status().isBadRequest());
+        }
 }

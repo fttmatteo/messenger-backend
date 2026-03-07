@@ -1,12 +1,9 @@
 package app.messenger;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import app.support.AbstractIntegrationTest;
 
-@SpringBootTest
-@ActiveProfiles("test")
-class MessengerApplicationTests {
+class MessengerApplicationTests extends AbstractIntegrationTest {
 
 	@Test
 	/**
