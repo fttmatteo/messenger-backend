@@ -38,6 +38,7 @@
 - [Testing](#-testing)
 - [Optimización de Rendimiento](#-optimización-de-rendimiento)
 - [Colección Postman](#-colección-postman)
+- [Integración Android](#-integración-android)
 
 ---
 
@@ -137,6 +138,7 @@ graph LR
 | **Speech-to-Text** | Google Cloud Speech-to-Text |
 | **Almacenamiento** | Google Cloud Storage |
 | **Mapas** | Google Maps Platform |
+| **Cliente Móvil** | Capacitor (Generación de App Android) |
 | **WhatsApp** | WhatsApp Cloud API (Meta) |
 | **Tiempo Real** | WebSocket + Redis |
 | **Build** | Maven 3.9+ |
@@ -1059,6 +1061,43 @@ El proyecto implementa una estrategia de pruebas robusta en todas las capas de l
 4. Los tokens (`token` y `refreshToken`) se guardan automáticamente
 5. Todos los demás endpoints usan el token automáticamente
 6. Cuando el access token expire, ejecutar **"Refresh Token"**
+</details>
+
+## 📱 Integración Android
+<details>
+
+El sistema incluye una aplicación nativa para Android construida con **Capacitor**, proporcionando una experiencia móvil fluida para los mensajeros.
+
+### Detalles Técnicos
+- **App ID**: `com.plak.messenger`
+- **Framework**: Ionic + Capacitor
+- **Plugins**: 
+  - `CapacitorHttp`: Peticiones de red nativas optimizadas.
+  - `PushNotifications`: Alertas en tiempo real para actualizaciones de servicios.
+  - `StatusBar`: Personalización de la interfaz para una experiencia edge-to-edge.
+
+### Características y Permisos
+La aplicación requiere los siguientes permisos para su correcto funcionamiento:
+- 📍 **Ubicación**: `ACCESS_FINE_LOCATION` y `ACCESS_BACKGROUND_LOCATION` para el seguimiento en tiempo real incluso cuando la app está minimizada.
+- 📸 **Cámara**: `CAMERA` para el reconocimiento de placas (OCR) y evidencias de entrega.
+- 🔔 **Notificaciones**: `POST_NOTIFICATIONS` para actualizaciones de servicios.
+- 🏃 **Servicio de Primer Plano**: Garantiza la persistencia del tracking durante las entregas.
+
+### Configuración de Desarrollo (Emulador)
+Para conectar el emulador de Android a tu entorno local de desarrollo:
+1. Asegúrate de que el backend esté corriendo en `localhost:8080`.
+2. El proyecto de Android está pre-configurado para usar `10.0.2.2` para acceder al `localhost` de la máquina host.
+3. El tráfico de texto claro (HTTP) está permitido para `10.0.2.2` en `network_security_config.xml`.
+
+### Comandos Útiles
+Desde el directorio `messenger-frontend`:
+```bash
+# Sincronizar activos web con el proyecto Android
+npx cap sync android
+
+# Abrir el proyecto en Android Studio
+npx cap open android
+```
 </details>
 
 ---

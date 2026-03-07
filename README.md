@@ -37,6 +37,7 @@
 - [Testing](#-testing)
 - [Performance Optimization](#-performance-optimization)
 - [Postman Collection](#-postman-collection)
+- [Android Integration](#-android-integration)
 
 ---
 
@@ -136,6 +137,7 @@ graph LR
 | **Speech-to-Text** | Google Cloud Speech-to-Text |
 | **Storage** | Google Cloud Storage |
 | **Maps** | Google Maps Platform |
+| **Mobile Client** | Capacitor (Android App Generation) |
 | **WhatsApp** | WhatsApp Cloud API (Meta) |
 | **Real-Time** | WebSocket + Redis |
 | **Build** | Maven 3.9+ |
@@ -1058,6 +1060,43 @@ The project implements a robust testing strategy across all layers of the hexago
 4. Tokens (`token` and `refreshToken`) are saved automatically
 5. All other endpoints use the token automatically
 6. When access token expires, run **"Refresh Token"**
+</details>
+
+## 📱 Android Integration
+<details>
+
+The system includes a native Android application built with **Capacitor**, providing a seamless mobile experience for messengers.
+
+### Technical Details
+- **App ID**: `com.plak.messenger`
+- **Framework**: Ionic + Capacitor
+- **Plugins**: 
+  - `CapacitorHttp`: Optimized native network requests.
+  - `PushNotifications`: Real-time alerts for updates.
+  - `StatusBar`: Custom UI overlays for edge-to-edge experience.
+
+### Key Features & Permissions
+The app requests the following permissions to function correctly:
+- 📍 **Location**: `ACCESS_FINE_LOCATION` & `ACCESS_BACKGROUND_LOCATION` for real-time tracking even when the app is minimized.
+- 📸 **Camera**: `CAMERA` for OCR license plate recognition and delivery evidence.
+- 🔔 **Notifications**: `POST_NOTIFICATIONS` for delivery updates.
+- 🏃 **Foreground Service**: Ensures tracking persistence during deliveries.
+
+### Development Setup (Emulator)
+To connect the Android Emulator to your local backend development environment:
+1. Ensure the backend is running on `localhost:8080`.
+2. The Android project is pre-configured to use `10.0.2.2` to access the host machine's `localhost`.
+3. Cleartext traffic is permitted for `10.0.2.2` in `network_security_config.xml`.
+
+### Commands
+From the `messenger-frontend` directory:
+```bash
+# Sync web assets to Android project
+npx cap sync android
+
+# Open in Android Studio
+npx cap open android
+```
 </details>
 
 ---

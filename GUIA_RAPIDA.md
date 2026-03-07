@@ -29,8 +29,6 @@ Una vez que veas que los logs se detienen y el backend dice "Started MessengerAp
 -   **Colección Postman**: El archivo `Messenger_API.postman_collection.json` está incluido en la carpeta raíz del backend para pruebas directas.
 -   **Salud del Sistema**: [http://localhost:8080/actuator/health](http://localhost:8080/actuator/health)
 
----
-
 ## 🔑 Credenciales de Prueba
 
 Utiliza estas credenciales para entrar al sistema en perfil **local**:
@@ -59,3 +57,18 @@ El sistema cuenta con una suite de pruebas robusta (370+ tests) que utiliza **Te
 > [!TIP]
 > **Mutation Testing**: Puedes medir la efectividad de los tests con:
 > `./mvnw org.pitest:pitest-maven:mutationCoverage`
+
+## 📱 Desarrollo en Android
+
+El proyecto utiliza **Capacitor** para ejecutarse como aplicación nativa.
+
+### Sincronización y Ejecución
+Para preparar el entorno de Android tras realizar cambios en el frontend:
+
+1. Navega a la carpeta del frontend: `cd messenger-frontend`
+2. **Sincronizar**: `npx cap sync android`
+3. **Abrir en Android Studio**: `npx cap open android`
+
+### Conexión con el Backend Local
+- El emulador de Android usa la IP `10.0.2.2` para referirse al `localhost` de tu computadora.
+- El proyecto ya está pre-configurado para conectar al backend en esa dirección.
