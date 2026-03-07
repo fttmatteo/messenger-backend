@@ -4,10 +4,7 @@ import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.redisson.hibernate.RedissonRegionFactory;
-import org.redisson.config.ConstantDelay;
 import org.hibernate.boot.spi.SessionFactoryOptions;
-
-import java.time.Duration;
 import java.lang.reflect.Field;
 import java.util.Map;
 
@@ -43,7 +40,7 @@ public class SpringRedissonRegionFactory extends RedissonRegionFactory {
                 .setConnectTimeout(10000)
                 .setTimeout(5000)
                 .setRetryAttempts(3)
-                .setRetryDelay(new ConstantDelay(Duration.ofMillis(1500)))
+                .setRetryInterval(1500)
                 .setClientName("hibernate-l2-cache");
 
         RedissonClient redissonClient = Redisson.create(config);

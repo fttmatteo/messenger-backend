@@ -37,11 +37,13 @@
 - [CI/CD](#-cicd)
 - [Testing](#-testing)
 - [Optimización de Rendimiento](#-optimización-de-rendimiento)
- - [Colección Postman](#-colección-postman)
+- [Colección Postman](#-colección-postman)
+- [Integración Android](#-integración-android)
 
 ---
 
 ## 🏗 Arquitectura
+<details>
 
 El proyecto implementa **Arquitectura Hexagonal (Ports & Adapters)** para mantener el dominio aislado de las dependencias externas.
 
@@ -116,10 +118,12 @@ graph LR
     classDef actor fill:#21262d,stroke:#8b949e,color:#c9d1d9
     class USER,MAPS,GCS,WAPP,OCR_EXT,DB,REDIS actor
 ```
+</details>
 
 ---
 
 ## 💻 Stack Tecnológico
+<details>
 
 | Componente | Tecnología |
 |------------|------------|
@@ -134,6 +138,7 @@ graph LR
 | **Speech-to-Text** | Google Cloud Speech-to-Text |
 | **Almacenamiento** | Google Cloud Storage |
 | **Mapas** | Google Maps Platform |
+| **Cliente Móvil** | Capacitor (Generación de App Android) |
 | **WhatsApp** | WhatsApp Cloud API (Meta) |
 | **Tiempo Real** | WebSocket + Redis |
 | **Build** | Maven 3.9+ |
@@ -142,10 +147,12 @@ graph LR
 | **CI/CD** | GitHub Actions |
 | **Tests de Arquitectura** | ArchUnit |
 | **Rendimiento** | Spring Cache + Redis, Hibernate L2 Cache, Lazy Loading, Índices de Base de Datos |
+</details>
 
 ---
 
 ## 📁 Estructura del Proyecto
+<details>
 
 ```
 messenger/
@@ -192,16 +199,18 @@ messenger/
     ├── application-prod.properties      # Producción
     └── db/migration/                    # Migraciones Flyway
 ```
+</details>
 
 ---
 
 ## 🌍 Perfiles de Ambiente
+<details>
 
 | Perfil | Propósito | Base de Datos | APIs Externas | JWT Exp. |
 |--------|-----------|---------------|---------------|----------|
 | `local` | Desarrollo local sin dependencias | MySQL Local | Mock/Deshabilitado | 8 horas |
 | `dev` | Desarrollo con servicios reales | MySQL | Habilitado | 8 horas |
-| `test` | Testing automatizado (CI/CD) | MySQL (Docker) | Mock | 1 hora |
+| `test` | Testing automatizado (CI/CD) | Testcontainers (MySQL/Redis) | Mock | 1 hora |
 | `prod` | Producción (Cloud Run) | Cloud SQL (MySQL 8) | Habilitado | 30 min |
 
 ### 🚀 Inicio Rápido (Docker Zero-Config)
@@ -217,7 +226,7 @@ Para una demostración rápida sin configurar dependencias, usa Docker Compose. 
 
 ---
 
-## 🌍 Perfiles de Ambiente
+### 🌍 Perfiles
 
 <details>
 <summary><b>🏠 Local</b> - Sin dependencias externas</summary>
@@ -246,11 +255,10 @@ Para una demostración rápida sin configurar dependencias, usa Docker Compose. 
 <details>
 <summary><b>🧪 Test</b> - Testing automatizado</summary>
 
-- MySQL & Redis en contenedores (Docker Compose)
-- Servicios externos mockeados
-- Aislamiento total por puerto (3307/6380)
-- Compatible con GitHub Actions
-- Migraciones Flyway reales
+- **Integración con Testcontainers**: Ciclo de vida automatizado para MySQL 8.0 y Redis 7.2.
+- **Patrón Singleton Jerárquico**: `BaseContainerTest` asegura que la infraestructura se inicie una sola vez por JVM.
+- **Aislamiento de Datos**: Cada ejecución ocurre en un entorno limpio y aislado.
+- **Paridad con Flyway**: Los tests corren contra el mismo esquema de migraciones que producción.
 
 </details>
 
@@ -280,10 +288,12 @@ export SPRING_PROFILES_ACTIVE=dev
 # Docker
 docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ```
+</details>
 
 ---
 
 ## 🔌 API Endpoints
+<details>
 
 ### Autenticación (`/auth`)
 
@@ -415,10 +425,12 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | `GET` | `/monitoring/messenger/{id}/activity` | Línea de tiempo y estadísticas diarias de un mensajero |
+</details>
 
 ---
 
 ## 🗄 Esquema de Base de Datos
+<details>
 
 ```mermaid
 erDiagram
@@ -549,10 +561,12 @@ erDiagram
 | **PhotoType** | `PLATE_DETECTION`, `EVIDENCE` |
 | **TrackingStatus** | `ACTIVE`, `INACTIVE`, `OFFLINE` |
 | **TrackingSource** | `GPS`, `NETWORK`, `MANUAL` |
+</details>
 
 ---
 
 ## 📡 Tracking en Tiempo Real
+<details>
 
 Sistema de tracking GPS usando **Redis** + **WebSocket** para monitoreo de mensajeros.
 
@@ -646,11 +660,12 @@ flowchart LR
 | Archivo Automático | Job programado (3 AM diario) | Archiva servicios después de 60 días |
 
 **Sistema de Archivo**: Los servicios se archivan permanentemente en tablas dedicadas (`deleted_services`, `deleted_status_history`, `deleted_photos`, `deleted_tracking_history`, `deleted_signatures`) en lugar de ser eliminados. Todos los datos históricos se preservan para auditoría y análisis.
-
+</details>
 
 ---
 
 ## 🔐 Seguridad
+<details>
 
 ### Autenticación JWT con Refresh Tokens
 
@@ -729,10 +744,12 @@ flowchart LR
 - Cookies: `Secure`, `HttpOnly`, `SameSite=Strict`
 - CORS configurado por origen
 - Sin exposición de stack traces
+</details>
 
 ---
 
 ## 📊 Observabilidad
+<details>
 
 ### Endpoints de Monitoreo (Actuator)
 
@@ -758,10 +775,12 @@ flowchart LR
 
 > [!TIP]
 > Swagger UI es accesible públicamente en el perfil `dev`. En producción, considera restringir el acceso mediante configuración de seguridad.
+</details>
 
 ---
 
 ## 📝 Auditoría
+<details>
 
 ### Sistema de Auditoría Basado en AOP
 
@@ -784,14 +803,17 @@ La aplicación incluye un **sistema de logging de auditoría centralizado** usan
 | **EmployeeUseCase** | `CREATE_EMPLOYEE` | Crear nuevo empleado |
 | | `UPDATE_EMPLOYEE` | Actualizar información de empleado |
 | | `DELETE_EMPLOYEE` | Eliminar empleado |
+</details>
 
 ---
 
 ## 🏗 Verificación de Arquitectura
+<details>
 
 El proyecto incluye pruebas de **ArchUnit** para forzar la integridad estructural y asegurar que los principios de la **Arquitectura Hexagonal** nunca sean violados.
 
 ### Reglas Automatizadas
+
 - **Aislamiento de Capas**: Las capas de Dominio y Aplicación nunca deben depender de la Infraestructura.
 - **Flujo de Dependencias**: Los adaptadores de entrada solo deben hablar con los Casos de Uso, y los Casos de Uso solo deben interactuar con servicios de Dominio o Puertos.
 - **Integridad de Paquetes**: Controladores, entidades y repositorios deben residir en sus respectivos paquetes de adaptador/infraestructura.
@@ -820,10 +842,12 @@ AUDIT | timestamp | documento_usuario | accion | metodo | parametros | estado | 
 - **Nivel:** `WARN` (siempre visible en todos los ambientes)
 - **Salida:** Consola (Cloud Run captura stdout)
 - **Salida a Archivo:** Opcional, habilitar `AUDIT_FILE` appender en `logback-spring.xml`
+</details>
 
 ---
  
 ## ⚡ Optimización de Rendimiento
+<details>
 
 El sistema incluye múltiples capas de optimización para garantizar un alto rendimiento y baja latencia.
 
@@ -851,12 +875,12 @@ El sistema incluye múltiples capas de optimización para garantizar un alto ren
 - **Optimizado para Cloud SQL**: Parámetros ajustados para entornos de recursos limitados (db-f1-micro).
 - **Detección de Fugas**: Umbral activo para identificar y prevenir fugas de conexiones.
 - **Caché de Statements**: Habilitado para mejorar el rendimiento de ejecución de consultas.
+</details>
 
 ---
 
 ## ⚙️ Configuración e Instalación
-
-> 🚀 **¿Desplegar en Producción?** Consulta la guía completa de [**Despliegue en Cloud Run**](./DEPLOY_CLOUDRUN.md) con instrucciones paso a paso para desplegar en Google Cloud.
+<details>
 
 ### Prerrequisitos
 
@@ -867,10 +891,7 @@ El sistema incluye múltiples capas de optimización para garantizar un alto ren
 | Redis | 6.0+ |
 | Maven | 3.9+ |
 
-### Variables de Entorno
-
-<details>
-<summary><b>🔐 Variables Requeridas</b></summary>
+### 🔐 Variables de Entorno Requeridas
 
 | Variable | Descripción | Default/Ejemplo |
 |----------|-------------|-----------------|
@@ -888,13 +909,12 @@ El sistema incluye múltiples capas de optimización para garantizar un alto ren
 | `WHATSAPP_VERIFY_TOKEN`| Token de Verificación Webhook | `mi_token_secreto` |
 | `WHATSAPP_APP_SECRET`  | App Secret de Meta | `abc123...` |
 
-</details>
-
 ### Inicio Rápido (Docker) - Recomendado
 
 Ejecuta el stack completo localmente con un solo comando.
 
 #### Requisitos Previos
+
 - Docker y Docker Compose
 - Git
 
@@ -938,10 +958,12 @@ redis-server
 ```
 
 La API estará disponible en `http://localhost:8080`
+</details>
 
 ---
 
 ## 🔄 CI/CD
+<details>
 
 Pipeline automatizado con **GitHub Actions**:
 
@@ -971,19 +993,45 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 
 > [!NOTE]
 > El pipeline utiliza un entorno efímero con **Docker** (MySQL + Redis) para los tests de integración, garantizando máxima paridad con producción. No se requieren secrets de BD externa.
+</details>
 
 ---
 
 ## 🧪 Testing
+<details>
 
-- **Unit Tests**: Cobertura amplia para adaptadores y modelos
-- **Integration Tests**: Servicios de dominio y persistencia con MySQL/Redis reales vía Docker
-- **Test Profile**: Ambiente idéntico a producción mediante contenedores locales
-- **CI/CD**: Integración continua en GitHub Actions con servicios Docker efímeros
+El proyecto implementa una estrategia de pruebas robusta en todas las capas de la arquitectura hexagonal.
+
+| Nivel | Estrategia | Tecnología |
+|-------|------------|------------|
+| **Unitario** | Verificación lógica aislada | JUnit 5 + Mockito |
+| **Integración** | Validación de infra y servicios | Spring Boot Test + **Testcontainers** |
+| **Persistencia** | Validación de mapeos y queries | `@DataJpaTest` + MySQL Real |
+| **Arquitectura** | Cumplimiento de reglas hexagonales | **ArchUnit** |
+| **Mutación** | Medición de efectividad de tests | **Pitest** |
+
+### 🛠️ Características Clave
+
+- **Testcontainers (MySQL & Redis)**: No requiere configuración manual de Docker. Los tests descargan y gestionan los contenedores necesarios automáticamente.
+- **Patrón Singleton Jerárquico**: Uso de `BaseContainerTest` para compartir la infraestructura entre múltiples contextos de prueba, reduciendo drásticamente el tiempo de inicio.
+- **Pruebas de Mutación**: Métricas que van más allá de la cobertura de líneas, inyectando fallos para verificar que los asertos de los tests realmente detecten errores.
+- **Paridad con Flyway**: Los tests de integración corren exactamente sobre las mismas migraciones que se usan en producción.
+
+### 🚀 Ejecución de Pruebas
+
+```bash
+# Tests estándar (Unitarios + Integración)
+./mvnw test
+
+# Pruebas de Mutación (Pitest)
+./mvnw org.pitest:pitest-maven:mutationCoverage
+```
+</details>
 
 ---
 
 ## 📬 Colección Postman
+<details>
 
 📄 **[Messenger_API.postman_collection.json](./Messenger_API.postman_collection.json)**
 
@@ -1013,6 +1061,44 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 4. Los tokens (`token` y `refreshToken`) se guardan automáticamente
 5. Todos los demás endpoints usan el token automáticamente
 6. Cuando el access token expire, ejecutar **"Refresh Token"**
+</details>
+
+## 📱 Integración Android
+<details>
+
+El sistema incluye una aplicación nativa para Android construida con **Capacitor**, proporcionando una experiencia móvil fluida para los mensajeros.
+
+### Detalles Técnicos
+- **App ID**: `com.plak.messenger`
+- **Framework**: Ionic + Capacitor
+- **Plugins**: 
+  - `CapacitorHttp`: Peticiones de red nativas optimizadas.
+  - `PushNotifications`: Alertas en tiempo real para actualizaciones de servicios.
+  - `StatusBar`: Personalización de la interfaz para una experiencia edge-to-edge.
+
+### Características y Permisos
+La aplicación requiere los siguientes permisos para su correcto funcionamiento:
+- 📍 **Ubicación**: `ACCESS_FINE_LOCATION` y `ACCESS_BACKGROUND_LOCATION` para el seguimiento en tiempo real incluso cuando la app está minimizada.
+- 📸 **Cámara**: `CAMERA` para el reconocimiento de placas (OCR) y evidencias de entrega.
+- 🔔 **Notificaciones**: `POST_NOTIFICATIONS` para actualizaciones de servicios.
+- 🏃 **Servicio de Primer Plano**: Garantiza la persistencia del tracking durante las entregas.
+
+### Configuración de Desarrollo (Emulador)
+Para conectar el emulador de Android a tu entorno local de desarrollo:
+1. Asegúrate de que el backend esté corriendo en `localhost:8080`.
+2. El proyecto de Android está pre-configurado para usar `10.0.2.2` para acceder al `localhost` de la máquina host.
+3. El tráfico de texto claro (HTTP) está permitido para `10.0.2.2` en `network_security_config.xml`.
+
+### Comandos Útiles
+Desde el directorio `messenger-frontend`:
+```bash
+# Sincronizar activos web con el proyecto Android
+npx cap sync android
+
+# Abrir el proyecto en Android Studio
+npx cap open android
+```
+</details>
 
 ---
 
@@ -1022,27 +1108,19 @@ GOOGLE_APPLICATION_CREDENTIALS_JSON
 - [Documentación de Spring Boot](https://spring.io/projects/spring-boot)
 - [Google Cloud Run](https://cloud.google.com/run/docs)
 
-### 📚 Documentación
+**Documentación:**
 - [🔐 **Secretos de GitHub**](./.github/SECRETS.md)
 - [🛡️ **Política de Seguridad**](./.github/SECURITY.md)
 
 **Proyecto Específico:**
 - Repositorio: `messenger-backend`
-- Autor: Matteo
-- Email: contacto@plak.digital
+- Autor: [Mateo Valencia Ardila](https://github.com/fttmatteo)
+- Email: [contacto@plak.digital](mailto:contacto@plak.digital)
 
 ---
 
 ## 📄 Licencia
 
-Ver archivo [LICENSE](./LICENSE) para detalles.
-
----
-
-<div align="center">
-
-**Made with ❤️ using Spring Boot 3.5**
-
-</div>
+Ver archivo [LICENSE](./LICENSE).
 
 > **Copyright (C) 2026 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**

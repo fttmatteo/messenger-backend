@@ -31,8 +31,11 @@ class WhatsAppTimeoutSchedulerTest {
     }
 
     @Test
+    /**
+     * Verifica que el planificador envíe mensajes y actualice las sesiones
+     * correctamente.
+     */
     void testCheckInactivityTimeouts_SendsMessagesAndUpdatesSessions() {
-        // Arrange
         WhatsAppSession session1 = new WhatsAppSession();
         session1.setPhoneNumber("123456789");
         session1.setTimeoutNotified(false);
@@ -44,10 +47,8 @@ class WhatsAppTimeoutSchedulerTest {
         when(sessionPort.findInactiveSessions(any(LocalDateTime.class)))
                 .thenReturn(List.of(session1, session2));
 
-        // Act
         scheduler.checkInactivityTimeouts();
 
-        // Assert
         verify(messagePort, times(2)).sendTextMessage(anyString(), contains("inactividad"));
         verify(messagePort).sendTextMessage(eq("123456789"), anyString());
         verify(messagePort).sendTextMessage(eq("987654321"), anyString());
@@ -61,20 +62,25 @@ class WhatsAppTimeoutSchedulerTest {
     }
 
     @Test
+    /**
+     * Verifica que el planificador no realice ninguna acción cuando no hay
+     * sesiones inactivas.
+     */
     void testCheckInactivityTimeouts_NoSessions_DoesNothing() {
-        // Arrange
+
         when(sessionPort.findInactiveSessions(any(LocalDateTime.class)))
                 .thenReturn(List.of());
 
-        // Act
         scheduler.checkInactivityTimeouts();
 
-        // Assert
         verify(messagePort, never()).sendTextMessage(anyString(), anyString());
         verify(sessionPort, never()).updateSession(any());
     }
 
     @Test
+    /**
+     * Verifica que el planificador elimine correctamente las sesiones expiradas.
+     */
     void testCleanupExpiredSessions_DeletesSessions() {
         when(sessionRepository.deleteExpiredSessions(any(LocalDateTime.class)))
                 .thenReturn(5);
@@ -85,6 +91,10 @@ class WhatsAppTimeoutSchedulerTest {
     }
 
     @Test
+    /**
+     * Verifica que el planificador no realice ninguna acción cuando no hay
+     * sesiones expiradas para eliminar.
+     */
     void testCleanupExpiredSessions_NothingToDelete() {
         when(sessionRepository.deleteExpiredSessions(any(LocalDateTime.class)))
                 .thenReturn(0);

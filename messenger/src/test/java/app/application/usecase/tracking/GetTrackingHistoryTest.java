@@ -16,6 +16,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("GetTrackingHistoryUseCase Unit Tests")
+/**
+ * Clase de pruebas unitarias para el caso de uso de recuperación de historial de seguimiento.
+ */
 class GetTrackingHistoryUseCaseTest {
 
     @Mock

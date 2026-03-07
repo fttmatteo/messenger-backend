@@ -17,6 +17,7 @@ Para mantener la integridad del código y cumplir con los estándares del proyec
 3. **Pull Requests (PR):** Para integrar código a `main`, se debe abrir un PR.
 4. **Revisión Obligatoria:** Todos los PR requieren la aprobación de **@fttmatteo** (Code Owner) para ser fusionados.
 5. **Conversaciones Resueltas:** No se podrá hacer merge si existen comentarios o dudas pendientes en el PR.
+6. **Tests Verificados:** Todo PR debe pasar la suite completa de tests (`./mvnw test`). El sistema usa **Testcontainers**, por lo que solo necesitas tener Docker activo.
 
 ## 🚀 Pasos para colaborar
 1. Clona el repositorio.

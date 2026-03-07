@@ -11,7 +11,6 @@ import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
@@ -23,10 +22,14 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.*;
 
+import app.support.AbstractIntegrationTest;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
 @DisplayName("Tracking WebSocket Integration Tests")
-class TrackingWebSocketTest {
+/**
+ * Clase de pruebas integración para el WebSocket de seguimiento.
+ */
+class TrackingWebSocketTest extends AbstractIntegrationTest {
 
     @LocalServerPort
     private int port;
@@ -51,6 +54,10 @@ class TrackingWebSocketTest {
 
     @Test
     @DisplayName("Should successfully connect to WebSocket and subscribe to tracking topic")
+    /**
+     * Verifica que el WebSocket se conecte correctamente y se suscriba al topic de
+     * seguimiento.
+     */
     void shouldConnectAndSubscribeSuccessfully() throws Exception {
         app.domain.model.auth.AuthCredentials credentials = new app.domain.model.auth.AuthCredentials();
         credentials.setDocument(12345678L);
@@ -80,6 +87,9 @@ class TrackingWebSocketTest {
 
     @Test
     @DisplayName("Should successfully connect to WebSocket using a cookie")
+    /**
+     * Verifica que el WebSocket se conecte correctamente usando una cookie.
+     */
     void shouldConnectWithCookieSuccessfully() throws Exception {
         app.domain.model.auth.AuthCredentials credentials = new app.domain.model.auth.AuthCredentials();
         credentials.setDocument(87654321L);
@@ -103,6 +113,10 @@ class TrackingWebSocketTest {
 
     @Test
     @DisplayName("Should successfully connect with WS token obtained from endpoint")
+    /**
+     * Verifica que el WebSocket se conecte correctamente usando un token WS
+     * obtenido desde el endpoint.
+     */
     void shouldConnectWithWsTokenFromEndpointSuccessfully() throws Exception {
         app.domain.model.auth.AuthCredentials credentials = new app.domain.model.auth.AuthCredentials();
         credentials.setDocument(55554444L);
@@ -137,6 +151,10 @@ class TrackingWebSocketTest {
 
     @Test
     @DisplayName("Should successfully connect with WS token in query parameter")
+    /**
+     * Verifica que el WebSocket se conecte correctamente usando un token WS en el
+     * parámetro de consulta.
+     */
     void shouldConnectWithWsTokenInQueryParamSuccessfully() throws Exception {
         app.domain.model.auth.AuthCredentials credentials = new app.domain.model.auth.AuthCredentials();
         credentials.setDocument(11223344L);

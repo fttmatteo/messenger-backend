@@ -18,6 +18,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("GeocodeDealershipUseCase Unit Tests")
+/**
+ * Clase de pruebas unitarias para el caso de uso de geocodificación de concesionarios.
+ */
 class GeocodeDealershipUseCaseTest {
 
     @Mock

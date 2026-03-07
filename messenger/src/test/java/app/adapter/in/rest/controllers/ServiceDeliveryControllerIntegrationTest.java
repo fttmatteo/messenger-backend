@@ -36,12 +36,6 @@ class ServiceDeliveryControllerIntegrationTest extends AbstractIntegrationTest {
     @Autowired
     private EntityManager entityManager;
 
-    /*
-     * static {
-     * TimeZone.setDefault(TimeZone.getTimeZone("America/Bogota"));
-     * 
-     */
-
     @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders

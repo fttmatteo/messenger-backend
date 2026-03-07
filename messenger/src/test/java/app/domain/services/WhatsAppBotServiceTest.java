@@ -38,6 +38,9 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
+    /**
+     * Verifica que el bot procese el mensaje y espere el PIN.
+     */
     void testProcessMessage_AwaitingPin_Success() {
         String from = "123456789";
         String pin = "1234";
@@ -50,11 +53,9 @@ class WhatsAppBotServiceTest {
         when(sessionPort.findDealershipByPin(pin)).thenReturn(Optional.of(dealership));
         when(sessionPort.createSession(anyString(), any(), anyInt())).thenReturn(new WhatsAppSession());
 
-        // First message: Greeting
         botService.processMessage(from, "Hola");
         verify(messagePort).sendTextMessage(eq(from), contains("Ingresa el PIN"));
 
-        // Second message: PIN
         botService.processMessage(from, pin);
 
         verify(rateLimitPort).clearFailedAttempts(from);
@@ -62,6 +63,9 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
+    /**
+     * Verifica que el bot procese el mensaje y espere el PIN.
+     */
     void testProcessMessage_AwaitingPin_Failure_NotBlocked() {
         String from = "123456789";
         String wrongPin = "0000";
@@ -69,12 +73,9 @@ class WhatsAppBotServiceTest {
         when(sessionPort.findActiveSession(from)).thenReturn(Optional.empty());
         when(rateLimitPort.isBlocked(from)).thenReturn(false);
         when(sessionPort.findDealershipByPin(wrongPin)).thenReturn(Optional.empty());
-        when(rateLimitPort.recordFailedAttempt(from)).thenReturn(2); // 1 attempt done, 2 remaining
+        when(rateLimitPort.recordFailedAttempt(from)).thenReturn(2);
 
-        // First message: Greeting
         botService.processMessage(from, "Hola");
-
-        // Second message: Wrong PIN
         botService.processMessage(from, wrongPin);
 
         verify(rateLimitPort).recordFailedAttempt(from);
@@ -82,6 +83,9 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
+    /**
+     * Verifica que el bot procese el mensaje y espere el PIN.
+     */
     void testProcessMessage_AwaitingPin_Failure_FinalAttemptBlocks() {
         String from = "123456789";
         String wrongPin = "0000";
@@ -89,18 +93,18 @@ class WhatsAppBotServiceTest {
         when(sessionPort.findActiveSession(from)).thenReturn(Optional.empty());
         when(rateLimitPort.isBlocked(from)).thenReturn(false);
         when(sessionPort.findDealershipByPin(wrongPin)).thenReturn(Optional.empty());
-        when(rateLimitPort.recordFailedAttempt(from)).thenReturn(0); // 0 remaining
+        when(rateLimitPort.recordFailedAttempt(from)).thenReturn(0);
 
-        // First message: Greeting
         botService.processMessage(from, "Hola");
-
-        // Second message: Final wrong PIN
         botService.processMessage(from, wrongPin);
 
         verify(messagePort).sendTextMessage(eq(from), contains("máximo de intentos"));
     }
 
     @Test
+    /**
+     * Verifica que el bot procese el mensaje y espere el PIN.
+     */
     void testProcessMessage_AlreadyBlocked() {
         String from = "123456789";
 

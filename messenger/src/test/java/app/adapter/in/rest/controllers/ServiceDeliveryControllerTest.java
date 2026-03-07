@@ -30,6 +30,9 @@ import org.springframework.mock.web.MockMultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ServiceDeliveryController Unit Tests")
+/**
+ * Clase de pruebas unitarias para el controlador de entregas de servicios.
+ */
 class ServiceDeliveryControllerTest {
 
     private MockMvc mockMvc;
@@ -90,6 +93,9 @@ class ServiceDeliveryControllerTest {
 
         @Test
         @DisplayName("Debe retornar 200 al eliminar lógicamente")
+        /**
+         * Verifica que el endpoint de eliminación lógica retorne 200.
+         */
         void shouldSoftDelete() throws Exception {
             Employee admin = new Employee();
             admin.setIdEmployee(1L);
@@ -111,6 +117,9 @@ class ServiceDeliveryControllerTest {
 
         @Test
         @DisplayName("Debe restaurar servicio desde papelera")
+        /**
+         * Verifica que el endpoint de restauración retorne 200.
+         */
         void shouldRestoreFromTrash() throws Exception {
             Employee admin = new Employee();
             admin.setIdEmployee(1L);
@@ -133,6 +142,9 @@ class ServiceDeliveryControllerTest {
 
         @Test
         @DisplayName("Debe extraer placa exitosamente")
+        /**
+         * Verifica que el endpoint de extracción de placa retorne 200.
+         */
         void shouldExtractPlate() throws Exception {
             MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "test".getBytes());
 
@@ -151,6 +163,9 @@ class ServiceDeliveryControllerTest {
 
         @Test
         @DisplayName("Debe retornar fallo si OCR no detecta nada")
+        /**
+         * Verifica que el endpoint de extracción de placa retorne 200.
+         */
         void shouldReturnFailureIfOcrFails() throws Exception {
             MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "test".getBytes());
 

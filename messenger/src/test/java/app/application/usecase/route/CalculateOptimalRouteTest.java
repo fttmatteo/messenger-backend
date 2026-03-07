@@ -21,6 +21,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CalculateOptimalRouteUseCase Unit Tests")
+/**
+ * Clase de pruebas unitarias para el caso de uso de cálculo de ruta óptima.
+ */
 class CalculateOptimalRouteUseCaseTest {
 
     @Mock
@@ -89,6 +92,9 @@ class CalculateOptimalRouteUseCaseTest {
 
     @Test
     @DisplayName("Debe calcular distancia")
+    /**
+     * Verifica el cálculo de distancia entre dos puntos.
+     */
     void shouldCalculateDistance() {
         Location origin = new Location(0.0, 0.0);
         Location dest = new Location(1.0, 1.0);

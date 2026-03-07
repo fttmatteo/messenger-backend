@@ -19,6 +19,9 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ValidateDeliveryLocationUseCase Unit Tests")
+/**
+ * Clase de pruebas unitarias para el caso de uso de validación de ubicación de entrega.
+ */
 class ValidateDeliveryLocationUseCaseTest {
 
     @Mock
@@ -86,6 +89,9 @@ class ValidateDeliveryLocationUseCaseTest {
 
     @Test
     @DisplayName("isWithinRange debe retornar false si está fuera de rango")
+    /**
+     * Verifica que isWithinRange retorne false si la entrega está fuera de rango.
+     */
     void isWithinRangeShouldReturnFalseIfFar() {
         Dealership d = new Dealership();
         d.setIsGeolocated(true);
@@ -100,6 +106,9 @@ class ValidateDeliveryLocationUseCaseTest {
 
     @Test
     @DisplayName("isWithinRange debe retornar true si es válido")
+    /**
+     * Verifica que isWithinRange retorne true si la entrega está dentro del rango.
+     */
     void isWithinRangeShouldReturnTrueIfValid() {
         Dealership d = new Dealership();
         d.setIsGeolocated(true);

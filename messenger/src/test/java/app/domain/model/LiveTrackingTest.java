@@ -60,6 +60,9 @@ class LiveTrackingTest {
 
     @Test
     @DisplayName("Should return 'Desconocido' for null heading")
+    /**
+     * Verifica que se devuelva 'Desconocido' cuando el heading es nulo.
+     */
     void shouldReturnUnknownForNullHeading() {
         LiveTracking tracking = new LiveTracking();
         tracking.setHeading(null);

@@ -23,6 +23,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("PlateAdapter Unit Tests")
+/**
+ * Clase de pruebas unitarias para el adaptador de placas.
+ */
 class PlateAdapterTest {
 
     @Mock

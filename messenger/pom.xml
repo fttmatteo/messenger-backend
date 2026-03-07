@@ -7,14 +7,14 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.5.11</version> 
 		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
+	</parent> 
 	<groupId>app</groupId> 
 	<artifactId>messenger</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>PLAK</name>
 	<description>Sistema de gestión PLAK</description>
-	<url/>
+	<url/> 
 	<licenses>
 		<license/>
 	</licenses> 
@@ -56,6 +56,13 @@
 				<artifactId>error_prone_annotations</artifactId>
 				<version>2.47.0</version>
 			</dependency>
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>testcontainers-bom</artifactId>
+				<version>1.20.4</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency> 
 		</dependencies>
 	</dependencyManagement>
 
@@ -219,7 +226,7 @@
 		<dependency>
 			<groupId>org.redisson</groupId>
 			<artifactId>redisson-hibernate-6</artifactId>
-			<version>4.2.0</version>
+			<version>3.27.0</version>
 		</dependency>
 
 		<!-- Actuator (Health/Metrics) -->
@@ -291,6 +298,29 @@
 			<version>6.3.0</version>
 		</dependency>
 
+		<!-- Testcontainers -->
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>mysql</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.redis</groupId>
+			<artifactId>testcontainers-redis</artifactId>
+			<version>2.2.3</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -305,16 +335,12 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<argLine>
+						@{argLine}
 						-XX:+EnableDynamicAgentLoading
 						-Djdk.instrument.traceUsage
 						-Dnet.bytebuddy.experimental=true
 						-Duser.timezone=America/Bogota
-						-Ddocker.api.version=1.44
 					</argLine>
-					<environmentVariables>
-						<TESTCONTAINERS_RYUK_DISABLED>true</TESTCONTAINERS_RYUK_DISABLED>
-						<TESTCONTAINERS_HOST_OVERRIDE>localhost</TESTCONTAINERS_HOST_OVERRIDE>
-					</environmentVariables>
 				</configuration>
 			</plugin>
 			<!-- 
@@ -379,6 +405,36 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+
+			<!-- Pitest (Mutation Testing) -->
+			<plugin>
+				<groupId>org.pitest</groupId>
+				<artifactId>pitest-maven</artifactId>
+				<version>1.17.4</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.pitest</groupId>
+						<artifactId>pitest-junit5-plugin</artifactId>
+						<version>1.2.1</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<targetClasses>
+						<param>app.domain.*</param>
+						<param>app.application.*</param>
+					</targetClasses>
+					<targetTests>
+						<param>app.domain.*</param>
+						<param>app.application.*</param>
+					</targetTests>
+					<mutators>
+						<mutator>DEFAULTS</mutator>
+					</mutators>
+					<outputFormats>
+						<outputFormat>HTML</outputFormat>
+					</outputFormats>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

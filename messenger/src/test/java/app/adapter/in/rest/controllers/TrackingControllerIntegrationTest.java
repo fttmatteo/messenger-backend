@@ -29,6 +29,9 @@ import app.support.AbstractIntegrationTest;
 
 @Transactional
 @DisplayName("TrackingController Integration Tests")
+/**
+ * Clase de pruebas integración para el controlador de seguimiento.
+ */
 class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Autowired
@@ -55,6 +58,9 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
         @Test
         @WithMockUser(roles = "MESSENGER")
         @DisplayName("POST /tracking/update should return 200 and save location")
+        /**
+         * Verifica que el endpoint de actualización de ubicación retorne 200.
+         */
         void shouldUpdateLocationSuccessfully() throws Exception {
                 EmployeeEntity messenger = new EmployeeEntity();
                 messenger.setDocument(77766655L);
@@ -88,6 +94,9 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
         @Test
         @WithMockUser(roles = "ADMIN")
         @DisplayName("GET /tracking/messenger/{id} should return location for admin")
+        /**
+         * Verifica que el endpoint de ubicación retorne 200.
+         */
         void shouldGetLastLocationForAdmin() throws Exception {
                 EmployeeEntity messenger = new EmployeeEntity();
                 messenger.setDocument(55544433L);
@@ -127,6 +136,9 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
         @Test
         @WithMockUser(roles = "MESSENGER")
         @DisplayName("GET /tracking/messenger/{id} should return 403 for non-admin")
+        /**
+         * Verifica que el endpoint de ubicación retorne 403.
+         */
         void shouldReturnForbiddenForNonAdmin() throws Exception {
                 mockMvc.perform(get("/tracking/messenger/1"))
                                 .andExpect(status().isForbidden());
@@ -135,6 +147,9 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
         @Test
         @WithMockUser
         @DisplayName("GET /tracking/history/{id} should return historical data")
+        /**
+         * Verifica que el endpoint de historial retorne 200.
+         */
         void shouldGetTrackingHistory() throws Exception {
                 String today = LocalDate.now().toString();
 

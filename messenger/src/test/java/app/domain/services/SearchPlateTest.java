@@ -14,6 +14,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SearchPlate Unit Tests")
+/**
+ * Clase de pruebas unitarias para SearchPlate.
+ */
 class SearchPlateTest {
 
     @Mock

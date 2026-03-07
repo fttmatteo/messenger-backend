@@ -78,6 +78,9 @@ class CreateEmployeeTest {
 
         @Test
         @DisplayName("Debe permitir crear empleado sin contraseña")
+        /**
+         * Verifica que se permita crear un empleado sin contraseña.
+         */
         void shouldCreateEmployeeWithoutPassword() throws Exception {
             newEmployee.setPassword(null);
             when(employeePort.findByDocument(anyLong())).thenReturn(null);

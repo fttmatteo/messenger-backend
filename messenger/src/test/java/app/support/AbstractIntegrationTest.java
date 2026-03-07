@@ -1,11 +1,13 @@
 package app.support;
 
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+/**
+ * Clase base para tests de integración de contexto completo (@SpringBootTest).
+ * Hereda la infraestructura de contenedores de BaseContainerTest.
+ */
+@SpringBootTest
 @ActiveProfiles("test")
-@Import(TestCacheConfig.class)
-public abstract class AbstractIntegrationTest {
+public abstract class AbstractIntegrationTest extends BaseContainerTest {
 }

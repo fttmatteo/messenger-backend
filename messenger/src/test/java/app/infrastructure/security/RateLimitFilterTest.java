@@ -51,6 +51,9 @@ class RateLimitFilterTest {
     }
 
     @Test
+    /**
+     * Verifica que el filtro permita solicitudes cuando hay tokens disponibles.
+     */
     void shouldAllowRequestWhenTokensAvailable() throws Exception {
         when(request.getRequestURI()).thenReturn("/api/test");
         when(request.getRemoteAddr()).thenReturn("127.0.0.1");
@@ -62,6 +65,9 @@ class RateLimitFilterTest {
     }
 
     @Test
+    /**
+     * Verifica que el filtro bloquee solicitudes cuando los tokens están agotados.
+     */
     void shouldBlockRequestWhenTokensExhausted() throws Exception {
         when(request.getRequestURI()).thenReturn("/auth/login");
         when(request.getRemoteAddr()).thenReturn("127.0.0.1");
