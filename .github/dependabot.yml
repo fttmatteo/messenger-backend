@@ -19,6 +19,13 @@ updates:
       - "dependencies"
       - "github-actions"
     open-pull-requests-limit: 5
+    groups:
+      todas-las-dependencias:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -42,21 +49,9 @@ updates:
         update-types: ["version-update:semver-major"]
     # Agrupar actualizaciones menores y de parche
     groups:
-      # Agrupar actualizaciones del framework Spring
-      spring:
+      todas-las-dependencias:
         patterns:
-          - "org.springframework*"
+          - "*"
         update-types:
           - "minor"
           - "patch"
-      # Agrupar librerías de testing (JUnit, Mockito, etc.)
-      testing:
-        patterns:
-          - "org.junit*"
-          - "org.mockito*"
-          - "org.assertj*"
-      # Agrupar actualizaciones críticas de seguridad
-      security:
-        patterns:
-          - "io.jsonwebtoken*"
-          - "org.springframework.security*"
