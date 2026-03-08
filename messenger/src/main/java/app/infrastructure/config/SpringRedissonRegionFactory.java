@@ -40,7 +40,6 @@ public class SpringRedissonRegionFactory extends RedissonRegionFactory {
                 .setConnectTimeout(10000)
                 .setTimeout(5000)
                 .setRetryAttempts(3)
-                .setRetryInterval(1500)
                 .setClientName("hibernate-l2-cache");
 
         RedissonClient redissonClient = Redisson.create(config);
