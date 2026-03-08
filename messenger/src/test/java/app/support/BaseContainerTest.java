@@ -20,26 +20,41 @@ public abstract class BaseContainerTest {
 
     protected static final MySQLContainer<?> mysql;
     protected static final RedisContainer redis;
+    private static final boolean isCiEnviroment = "true".equals(System.getenv("CI"));
 
     static {
-        mysql = new MySQLContainer<>(DockerImageName.parse("mysql:8.0"))
-                .withDatabaseName("messenger_db_test")
-                .withUsername("root")
-                .withPassword("test")
-                .withReuse(true);
+        if (!isCiEnviroment) {
+            mysql = new MySQLContainer<>(DockerImageName.parse("mysql:8.0"))
+                    .withDatabaseName("messenger_db_test")
+                    .withUsername("root")
+                    .withPassword("test")
+                    .withReuse(true);
 
-        redis = new RedisContainer(DockerImageName.parse("redis:7.2-alpine"))
-                .withReuse(true);
+            redis = new RedisContainer(DockerImageName.parse("redis:7.2-alpine"))
+                    .withReuse(true);
 
-        Startables.deepStart(mysql, redis).join();
+            Startables.deepStart(mysql, redis).join();
+        } else {
+            mysql = null;
+            redis = null;
+        }
     }
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", mysql::getJdbcUrl);
-        registry.add("spring.datasource.username", mysql::getUsername);
-        registry.add("spring.datasource.password", mysql::getPassword);
-        registry.add("spring.data.redis.host", redis::getHost);
-        registry.add("spring.data.redis.port", () -> redis.getFirstMappedPort().toString());
+        if (!isCiEnviroment) {
+            registry.add("spring.datasource.url", mysql::getJdbcUrl);
+            registry.add("spring.datasource.username", mysql::getUsername);
+            registry.add("spring.datasource.password", mysql::getPassword);
+            registry.add("spring.data.redis.host", redis::getHost);
+            registry.add("spring.data.redis.port", () -> redis.getFirstMappedPort().toString());
+        } else {
+            registry.add("spring.sql.init.mode", () -> "never");
+            registry.add("spring.datasource.url",
+                    () -> "jdbc:mysql://localhost:3307/messenger_db_test?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true");
+            registry.add("spring.datasource.username", () -> "root");
+            registry.add("spring.datasource.password", () -> "test");
+            registry.add("spring.datasource.driver-class-name", () -> "com.mysql.cj.jdbc.Driver");
+        }
     }
 }
