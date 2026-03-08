@@ -48,6 +48,13 @@ public abstract class BaseContainerTest {
             registry.add("spring.datasource.password", mysql::getPassword);
             registry.add("spring.data.redis.host", redis::getHost);
             registry.add("spring.data.redis.port", () -> redis.getFirstMappedPort().toString());
+        } else {
+            registry.add("spring.sql.init.mode", () -> "never");
+            registry.add("spring.datasource.url",
+                    () -> "jdbc:mysql://localhost:3307/messenger_db_test?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true");
+            registry.add("spring.datasource.username", () -> "root");
+            registry.add("spring.datasource.password", () -> "test");
+            registry.add("spring.datasource.driver-class-name", () -> "com.mysql.cj.jdbc.Driver");
         }
     }
 }
