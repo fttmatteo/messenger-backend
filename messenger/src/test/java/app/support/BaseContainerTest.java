@@ -12,6 +12,9 @@ import com.redis.testcontainers.RedisContainer;
  * Implementa el patrón Singleton para asegurar que los contenedores se inicien
  * una sola vez por JVM, mejorando drásticamente la estabilidad y velocidad.
  * 
+ * Funciona igual en entorno local y CI (GitHub Actions) eliminando la necesidad
+ * de docker-compose para tests. Testcontainers gestiona todo automáticamente.
+ * 
  * Esta clase NO tiene anotaciones de Spring para permitir que sea extendida
  * tanto por @SpringBootTest como por @DataJpaTest sin conflictos de bootstrap.
  */
@@ -20,41 +23,27 @@ public abstract class BaseContainerTest {
 
     protected static final MySQLContainer<?> mysql;
     protected static final RedisContainer redis;
-    private static final boolean isCiEnviroment = "true".equals(System.getenv("CI"));
 
     static {
-        if (!isCiEnviroment) {
-            mysql = new MySQLContainer<>(DockerImageName.parse("mysql:8.0"))
-                    .withDatabaseName("messenger_db_test")
-                    .withUsername("root")
-                    .withPassword("test")
-                    .withReuse(true);
+        mysql = new MySQLContainer<>(DockerImageName.parse("mysql:8.0"))
+                .withDatabaseName("messenger_db_test")
+                .withUsername("root")
+                .withPassword("test")
+                .withReuse(true);
 
-            redis = new RedisContainer(DockerImageName.parse("redis:7.2-alpine"))
-                    .withReuse(true);
+        redis = new RedisContainer(DockerImageName.parse("redis:7.2-alpine"))
+                .withReuse(true);
 
-            Startables.deepStart(mysql, redis).join();
-        } else {
-            mysql = null;
-            redis = null;
-        }
+        Startables.deepStart(mysql, redis).join();
     }
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
-        if (!isCiEnviroment) {
-            registry.add("spring.datasource.url", mysql::getJdbcUrl);
-            registry.add("spring.datasource.username", mysql::getUsername);
-            registry.add("spring.datasource.password", mysql::getPassword);
-            registry.add("spring.data.redis.host", redis::getHost);
-            registry.add("spring.data.redis.port", () -> redis.getFirstMappedPort().toString());
-        } else {
-            registry.add("spring.sql.init.mode", () -> "never");
-            registry.add("spring.datasource.url",
-                    () -> "jdbc:mysql://localhost:3307/messenger_db_test?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true");
-            registry.add("spring.datasource.username", () -> "root");
-            registry.add("spring.datasource.password", () -> "test");
-            registry.add("spring.datasource.driver-class-name", () -> "com.mysql.cj.jdbc.Driver");
-        }
+        registry.add("spring.datasource.url", mysql::getJdbcUrl);
+        registry.add("spring.datasource.username", mysql::getUsername);
+        registry.add("spring.datasource.password", mysql::getPassword);
+        registry.add("spring.datasource.driver-class-name", () -> "com.mysql.cj.jdbc.Driver");
+        registry.add("spring.data.redis.host", redis::getHost);
+        registry.add("spring.data.redis.port", () -> redis.getFirstMappedPort().toString());
     }
 }
