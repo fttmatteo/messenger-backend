@@ -218,8 +218,23 @@ messenger/
 Para una demostración rápida sin configurar dependencias, usa Docker Compose. Esto levantará el frontend, backend, base de datos y redis automáticamente.
 
 1. Navega a la raíz del backend: `cd messenger-backend`
-2. Ejecuta: `docker-compose up --build`
+2. Ejecuta: `docker-compose -f docker-compose.local.yml up --build`
 3. Accede a: `http://localhost`
+
+### 🔥 Desarrollo con Hot Reloading
+
+Para desarrollo activo con recarga automática de código (sin necesidad de reiniciar los contenedores al hacer cambios):
+
+```bash
+docker-compose -f docker-compose.dev.yml up --build
+```
+
+| Servicio | URL | Descripción |
+|----------|-----|-------------|
+| Frontend (Vite HMR) | `http://localhost:5173` | Se recarga automáticamente al guardar |
+| Backend API | `http://localhost:8080` | Se reinicia automáticamente al recompilar |
+| PHPMyAdmin | `http://localhost:8081` | Gestión de base de datos |
+| Debug Remoto | Puerto `5005` | Conectar debugger de IntelliJ/VS Code |
 
 > [!TIP]
 > Consulta la **[Guía de Inicio Rápido](./GUIA_RAPIDA.md)** para más detalles sobre credenciales de prueba y acceso a phpMyAdmin.
@@ -936,7 +951,7 @@ Ejecuta el stack completo localmente con un solo comando.
 3. **Ejecutar con Docker**
    ```bash
    cd ..
-   docker-compose up --build
+   docker-compose -f docker-compose.local.yml up --build
    ```
 
 La API estará disponible en `http://localhost:8080`.
@@ -1009,10 +1024,12 @@ El proyecto implementa una estrategia de pruebas robusta en todas las capas de l
 | **Persistencia** | Validación de mapeos y queries | `@DataJpaTest` + MySQL Real |
 | **Arquitectura** | Cumplimiento de reglas hexagonales | **ArchUnit** |
 | **Mutación** | Medición de efectividad de tests | **Pitest** |
+| **E2E (Client)** | Validación de flujos completos de negocio | **Playwright** (en `messenger-frontend`) |
 
 ### 🛠️ Características Clave
 
 - **Testcontainers (MySQL & Redis)**: No requiere configuración manual de Docker. Los tests descargan y gestionan los contenedores necesarios automáticamente.
+- **Estrategia Integral (Full-Stack)**: El proyecto se complementa con una suite E2E en el frontend que valida la integración real con los endpoints del backend, incluyendo bypass de seguridad (Turnstile) y simulación de sensores (GPS/Cámara).
 - **Patrón Singleton Jerárquico**: Uso de `BaseContainerTest` para compartir la infraestructura entre múltiples contextos de prueba, reduciendo drásticamente el tiempo de inicio.
 - **Pruebas de Mutación**: Métricas que van más allá de la cobertura de líneas, inyectando fallos para verificar que los asertos de los tests realmente detecten errores.
 - **Paridad con Flyway**: Los tests de integración corren exactamente sobre las mismas migraciones que se usan en producción.

@@ -217,8 +217,23 @@ messenger/
 For a quick demonstration without manual setup, use Docker Compose. This will spin up the frontend, backend, database, and redis automatically.
 
 1. Navigate to backend root: `cd messenger-backend`
-2. Run: `docker-compose up --build`
+2. Run: `docker-compose -f docker-compose.local.yml up --build`
 3. Access: `http://localhost`
+
+### 🔥 Development with Hot Reloading
+
+For active development with automatic code reloading (no need to restart containers when making changes):
+
+```bash
+docker-compose -f docker-compose.dev.yml up --build
+```
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| Frontend (Vite HMR) | `http://localhost:5173` | Auto-reloads on file save |
+| Backend API | `http://localhost:8080` | Auto-restarts on recompile |
+| PHPMyAdmin | `http://localhost:8081` | Database management |
+| Remote Debug | Port `5005` | Attach IntelliJ/VS Code debugger |
 
 > [!TIP]
 > Check the **[Quick Start Guide](./GUIA_RAPIDA.md)** (Spanish) for more details on test credentials and phpMyAdmin access.
@@ -935,7 +950,7 @@ Run the full stack locally with one command.
 3. **Run with Docker**
    ```bash
    cd ..
-   docker-compose up --build
+   docker-compose -f docker-compose.local.yml up --build
    ```
 
 The API will be available at `http://localhost:8080`.
@@ -1006,15 +1021,17 @@ The project implements a robust testing strategy across all layers of the hexago
 | **Unit** | Isolated logic verification | JUnit 5 + Mockito |
 | **Integration** | Infrastructure & Service validation | Spring Boot Test + **Testcontainers** |
 | **Persistence** | Data mapping & Query validation | `@DataJpaTest` + Real MySQL |
-| **Architecture** | Hexagonal rules enforcement | **ArchUnit** |
+| **Architecture** | Hexagonal rules compliance | **ArchUnit** |
 | **Mutation** | Test effectiveness measurement | **Pitest** |
+| **E2E (Client)** | Full business flow validation | **Playwright** (in `messenger-frontend`) |
 
 ### 🛠️ Key Features
 
-- **Testcontainers (MySQL & Redis)**: No manual Docker setup needed. Tests automatically pull and manage required containers.
-- **Hierarchical Singleton Pattern**: Using `BaseContainerTest` to share infrastructure across multiple test contexts, drastically reducing startup time and resource usage.
-- **Mutation Testing**: Metrics that go beyond simple line coverage by injecting faults to verify test assertions.
-- **Flyway Parity**: Integration tests run against the exact same migrations used in production.
+- **Testcontainers (MySQL & Redis)**: No manual Docker setup required. Tests download and manage containers automatically.
+- **Integral Strategy (Full-Stack)**: The project is complemented by a frontend E2E suite that validates real integration with backend endpoints, including security bypass (Turnstile) and sensor simulation (GPS/Camera).
+- **Hierarchical Singleton Pattern**: `BaseContainerTest` shares infrastructure across test contexts, drastically reducing startup time.
+- **Mutation Testing**: Metrics beyond line coverage, injecting faults to ensure assertions actually detect errors.
+- **Flyway Parity**: Integration tests run on the exact same migrations used in production.
 
 ### 🚀 Running Tests
 

@@ -12,11 +12,11 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
- * Inicializador de datos para el perfil 'local'.
+ * Inicializador de datos para los perfiles 'local' y 'dev'.
  * Asegura que existan usuarios de prueba para una experiencia Zero-Config.
  */
 @Configuration
-@Profile("local")
+@Profile({ "local", "dev" })
 public class DataInitializer {
 
     private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
@@ -24,7 +24,7 @@ public class DataInitializer {
     @Bean
     public CommandLineRunner initData(EmployeeRepository employeeRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            logger.info("Iniciando carga de datos Zero-Config para perfil local...");
+            logger.info("Iniciando carga de datos para perfil local y dev...");
 
             // 1. Crear Administrador (123456 / admin123)
             if (employeeRepository.findByDocument(123456L) == null) {
@@ -35,7 +35,6 @@ public class DataInitializer {
                 admin.setRole(Role.ADMIN);
                 admin.setPhone("3000000001");
                 employeeRepository.save(admin);
-                logger.info("Usuario Administrador creado: 123456 / admin123");
             }
 
             // 2. Crear Mensajero (654321 / password123)
@@ -47,7 +46,6 @@ public class DataInitializer {
                 messenger.setRole(Role.MESSENGER);
                 messenger.setPhone("3000000002");
                 employeeRepository.save(messenger);
-                logger.info("Usuario Mensajero creado: 654321 / password123");
             }
 
             logger.info("Carga de datos Zero-Config completada.");

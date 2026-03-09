@@ -13,9 +13,24 @@ Esta guía permite levantar el backend de **Messenger** y todo su ecosistema (in
 2.  **Abrir una terminal**: Navega hasta la carpeta `messenger-backend`.
 3.  **Ejecutar Docker**:
 ```bash
-    docker-compose up --build
+    docker-compose -f docker-compose.local.yml up --build
 ```
 4.  **Esperar a que inicie**: La primera vez puede tardar unos minutos descargando las imágenes y compilando el código.
+
+### 🔥 Desarrollo con Hot Reloading
+
+Para desarrollo activo donde los cambios en el código se reflejan automáticamente (sin reiniciar contenedores):
+
+```bash
+    docker-compose -f docker-compose.dev.yml up --build
+```
+
+| Servicio | URL |
+|----------|-----|
+| Frontend (Vite HMR) | `http://localhost:5173` |
+| Backend API | `http://localhost:8080` |
+| PHPMyAdmin | `http://localhost:8081` |
+| Debug Remoto | Puerto `5005` |
 
 ## 🌐 Acceso a la Aplicación
 

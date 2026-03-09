@@ -46,7 +46,6 @@ public class RedissonConfig {
                 .setConnectTimeout(10000)
                 .setTimeout(5000)
                 .setRetryAttempts(3)
-                .setRetryInterval(1500)
                 .setClientName("hibernate-cache");
 
         return Redisson.create(config);
