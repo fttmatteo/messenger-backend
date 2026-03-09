@@ -1024,10 +1024,12 @@ El proyecto implementa una estrategia de pruebas robusta en todas las capas de l
 | **Persistencia** | Validación de mapeos y queries | `@DataJpaTest` + MySQL Real |
 | **Arquitectura** | Cumplimiento de reglas hexagonales | **ArchUnit** |
 | **Mutación** | Medición de efectividad de tests | **Pitest** |
+| **E2E (Client)** | Validación de flujos completos de negocio | **Playwright** (en `messenger-frontend`) |
 
 ### 🛠️ Características Clave
 
 - **Testcontainers (MySQL & Redis)**: No requiere configuración manual de Docker. Los tests descargan y gestionan los contenedores necesarios automáticamente.
+- **Estrategia Integral (Full-Stack)**: El proyecto se complementa con una suite E2E en el frontend que valida la integración real con los endpoints del backend, incluyendo bypass de seguridad (Turnstile) y simulación de sensores (GPS/Cámara).
 - **Patrón Singleton Jerárquico**: Uso de `BaseContainerTest` para compartir la infraestructura entre múltiples contextos de prueba, reduciendo drásticamente el tiempo de inicio.
 - **Pruebas de Mutación**: Métricas que van más allá de la cobertura de líneas, inyectando fallos para verificar que los asertos de los tests realmente detecten errores.
 - **Paridad con Flyway**: Los tests de integración corren exactamente sobre las mismas migraciones que se usan en producción.

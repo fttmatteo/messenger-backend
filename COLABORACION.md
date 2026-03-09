@@ -15,9 +15,10 @@ Para mantener la integridad del código y cumplir con los estándares del proyec
 2. **Flujo de Ramas:** Todo cambio debe realizarse en una rama nueva:
    - `git checkout -b feature/nombre-tarea`
 3. **Pull Requests (PR):** Para integrar código a `main`, se debe abrir un PR.
-4. **Revisión Obligatoria:** Todos los PR requieren la aprobación de **@fttmatteo** (Code Owner) para ser fusionados.
-5. **Conversaciones Resueltas:** No se podrá hacer merge si existen comentarios o dudas pendientes en el PR.
-6. **Tests Verificados:** Todo PR debe pasar la suite completa de tests (`./mvnw test`). El sistema usa **Testcontainers**, por lo que solo necesitas tener Docker activo.
+4. **Revisión Obligatoria:** Los PR requieren la aprobación de **@fttmatteo** (Code Owner) para ser integrados.
+5. **Pruebas Obligatorias:** Todo Pull Request debe pasar la suite de pruebas completa (`./mvnw test`) y ser validado contra la suite E2E del frontend si hay cambios en los controladores.
+6. **Conversaciones Resueltas:** Asegúrate de responder y resolver todos los comentarios del revisor antes del merge.
+7. **Tests Verificados:** Todo PR debe pasar la suite completa de tests (`./mvnw test`). El sistema usa **Testcontainers**, por lo que solo necesitas tener Docker activo.
 
 ## 🚀 Pasos para colaborar
 1. Clona el repositorio.

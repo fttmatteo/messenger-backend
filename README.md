@@ -1021,15 +1021,17 @@ The project implements a robust testing strategy across all layers of the hexago
 | **Unit** | Isolated logic verification | JUnit 5 + Mockito |
 | **Integration** | Infrastructure & Service validation | Spring Boot Test + **Testcontainers** |
 | **Persistence** | Data mapping & Query validation | `@DataJpaTest` + Real MySQL |
-| **Architecture** | Hexagonal rules enforcement | **ArchUnit** |
+| **Architecture** | Hexagonal rules compliance | **ArchUnit** |
 | **Mutation** | Test effectiveness measurement | **Pitest** |
+| **E2E (Client)** | Full business flow validation | **Playwright** (in `messenger-frontend`) |
 
 ### 🛠️ Key Features
 
-- **Testcontainers (MySQL & Redis)**: No manual Docker setup needed. Tests automatically pull and manage required containers.
-- **Hierarchical Singleton Pattern**: Using `BaseContainerTest` to share infrastructure across multiple test contexts, drastically reducing startup time and resource usage.
-- **Mutation Testing**: Metrics that go beyond simple line coverage by injecting faults to verify test assertions.
-- **Flyway Parity**: Integration tests run against the exact same migrations used in production.
+- **Testcontainers (MySQL & Redis)**: No manual Docker setup required. Tests download and manage containers automatically.
+- **Integral Strategy (Full-Stack)**: The project is complemented by a frontend E2E suite that validates real integration with backend endpoints, including security bypass (Turnstile) and sensor simulation (GPS/Camera).
+- **Hierarchical Singleton Pattern**: `BaseContainerTest` shares infrastructure across test contexts, drastically reducing startup time.
+- **Mutation Testing**: Metrics beyond line coverage, injecting faults to ensure assertions actually detect errors.
+- **Flyway Parity**: Integration tests run on the exact same migrations used in production.
 
 ### 🚀 Running Tests
 
