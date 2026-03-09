@@ -37,13 +37,14 @@ services:
     image: maven:3.9.6-eclipse-temurin-17-alpine
     container_name: messenger-backend-dev
     working_dir: /app
-    command: mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Duser.timezone=America/Bogota"
+    command: mvn -q spring-boot:run -Dspring-boot.run.jvmArguments="-Duser.timezone=America/Bogota"
     ports:
       - "8080:8080"
       - "5005:5005" # Puerto de debug remoto (opcional)
     volumes:
       - ./messenger:/app
       - maven_repo:/root/.m2
+      - "C:/Users/valen/Documents/Nueva carpeta/messenger-backend.json:/app/credentials/service-account.json:ro"
     environment:
       - SPRING_PROFILES_ACTIVE=dev
       - DB_HOST=messenger-db
@@ -65,11 +66,8 @@ services:
       - WHATSAPP_VERIFY_TOKEN=${WHATSAPP_VERIFY_TOKEN:-}
       - WHATSAPP_APP_SECRET=${WHATSAPP_APP_SECRET:-}
       - WHATSAPP_SESSION_EXPIRATION_HOURS=${WHATSAPP_SESSION_EXPIRATION_HOURS:-12}
-      # Sobrescribir servicios que requieren credenciales de Google Cloud
-      # Usa almacenamiento local y OCR mock dentro de Docker
-      - APP_STORAGE_TYPE=local
-      - APP_STORAGE_PATH=./uploads
-      - APP_OCR_MODE=mock
+      # Credenciales de Google Cloud (montadas como volumen)
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials/service-account.json
       # Habilitar debug remoto (conectar desde IntelliJ/VS Code al puerto 5005)
       - MAVEN_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
     depends_on:
