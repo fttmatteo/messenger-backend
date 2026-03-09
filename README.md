@@ -217,8 +217,23 @@ messenger/
 For a quick demonstration without manual setup, use Docker Compose. This will spin up the frontend, backend, database, and redis automatically.
 
 1. Navigate to backend root: `cd messenger-backend`
-2. Run: `docker-compose up --build`
+2. Run: `docker-compose -f docker-compose.local.yml up --build`
 3. Access: `http://localhost`
+
+### 🔥 Development with Hot Reloading
+
+For active development with automatic code reloading (no need to restart containers when making changes):
+
+```bash
+docker-compose -f docker-compose.dev.yml up --build
+```
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| Frontend (Vite HMR) | `http://localhost:5173` | Auto-reloads on file save |
+| Backend API | `http://localhost:8080` | Auto-restarts on recompile |
+| PHPMyAdmin | `http://localhost:8081` | Database management |
+| Remote Debug | Port `5005` | Attach IntelliJ/VS Code debugger |
 
 > [!TIP]
 > Check the **[Quick Start Guide](./GUIA_RAPIDA.md)** (Spanish) for more details on test credentials and phpMyAdmin access.
@@ -935,7 +950,7 @@ Run the full stack locally with one command.
 3. **Run with Docker**
    ```bash
    cd ..
-   docker-compose up --build
+   docker-compose -f docker-compose.local.yml up --build
    ```
 
 The API will be available at `http://localhost:8080`.

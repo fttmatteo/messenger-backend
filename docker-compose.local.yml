@@ -1,10 +1,10 @@
-# ORQUESTACIÓN DE SERVICIOS (Docker Compose)
-# Define la infraestructura local necesaria para correr la aplicación completa.
+# ORQUESTACIÓN DE SERVICIOS - LOCAL (Docker Compose)
+# Perfil: local - Todo empaquetado, sin hot reload.
 #
 # Comandos útiles:
-# - Iniciar: docker-compose up --build
-# - Detener: docker-compose down
-# - Ver logs: docker-compose logs -f
+# - Iniciar: docker-compose -f docker-compose.local.yml up --build
+# - Detener: docker-compose -f docker-compose.local.yml down
+# - Ver logs: docker-compose -f docker-compose.local.yml logs -f
 
 services:
   # FRONTEND: Interfaz Web React/Vite

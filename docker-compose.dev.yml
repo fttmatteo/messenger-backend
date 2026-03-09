@@ -1,0 +1,145 @@
+# ORQUESTACIÓN DE SERVICIOS - DESARROLLO (Hot Reloading)
+# Perfil: dev - Cambios en código se reflejan automáticamente.
+#
+# Comandos útiles:
+# - Iniciar: docker-compose -f docker-compose.dev.yml up --build
+# - Detener: docker-compose -f docker-compose.dev.yml down
+# - Ver logs: docker-compose -f docker-compose.dev.yml logs -f
+# - Solo infra: docker-compose -f docker-compose.dev.yml up messenger-db messenger-redis phpmyadmin
+
+services:
+  # FRONTEND: Vite Dev Server con Hot Module Replacement (HMR)
+  # Acceder en: http://localhost:5173
+  messenger-frontend:
+    image: node:20-alpine
+    container_name: messenger-frontend-dev
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5173:5173"
+    volumes:
+      - ../messenger-frontend:/app
+      - frontend_node_modules:/app/node_modules
+      - /app/android
+    environment:
+      - VITE_API_URL=http://localhost:8080
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    depends_on:
+      - messenger-backend
+    networks:
+      - messenger-network
+    restart: unless-stopped
+
+  # APP: Backend Spring Boot con Spring DevTools (Auto-restart)
+  # Acceder en: http://localhost:8080
+  messenger-backend:
+    image: maven:3.9.6-eclipse-temurin-17-alpine
+    container_name: messenger-backend-dev
+    working_dir: /app
+    command: mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Duser.timezone=America/Bogota"
+    ports:
+      - "8080:8080"
+      - "5005:5005" # Puerto de debug remoto (opcional)
+    volumes:
+      - ./messenger:/app
+      - maven_repo:/root/.m2
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_HOST=messenger-db
+      - DB_PORT=3306
+      - DB_NAME=messenger_dev
+      - DB_USERNAME=root
+      - DB_PASSWORD=secret123
+      - REDIS_HOST=messenger-redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=
+      - JWT_SECRET=esta-es-una-clave-secreta-de-prueba-para-desarrollo-local-min-32-chars
+      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY:-}
+      - GCS_BUCKET_NAME=${GCS_BUCKET_NAME:-}
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID:-}
+      - PLATE_RECOGNIZER_TOKEN=${PLATE_RECOGNIZER_TOKEN:-}
+      - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY:-}
+      - WHATSAPP_PHONE_NUMBER_ID=${WHATSAPP_PHONE_NUMBER_ID:-}
+      - WHATSAPP_ACCESS_TOKEN=${WHATSAPP_ACCESS_TOKEN:-}
+      - WHATSAPP_VERIFY_TOKEN=${WHATSAPP_VERIFY_TOKEN:-}
+      - WHATSAPP_APP_SECRET=${WHATSAPP_APP_SECRET:-}
+      - WHATSAPP_SESSION_EXPIRATION_HOURS=${WHATSAPP_SESSION_EXPIRATION_HOURS:-12}
+      # Sobrescribir servicios que requieren credenciales de Google Cloud
+      # Usa almacenamiento local y OCR mock dentro de Docker
+      - APP_STORAGE_TYPE=local
+      - APP_STORAGE_PATH=./uploads
+      - APP_OCR_MODE=mock
+      # Habilitar debug remoto (conectar desde IntelliJ/VS Code al puerto 5005)
+      - MAVEN_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+    depends_on:
+      messenger-db:
+        condition: service_healthy
+      messenger-redis:
+        condition: service_healthy
+    networks:
+      - messenger-network
+    restart: unless-stopped
+
+  # DATABASE: MySQL 8.0
+  messenger-db:
+    image: mysql:8.0
+    container_name: messenger-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret123
+      - MYSQL_DATABASE=messenger_dev
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data_dev:/var/lib/mysql
+    networks:
+      - messenger-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+    restart: unless-stopped
+
+  # PHPMYADMIN: Interfaz web para MySQL
+  # Acceder en: http://localhost:8081
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: messenger-phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: messenger-db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: secret123
+    depends_on:
+      - messenger-db
+    networks:
+      - messenger-network
+    restart: unless-stopped
+
+  # CACHE: Redis
+  messenger-redis:
+    image: redis:7-alpine
+    container_name: messenger-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - messenger-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+# VOLÚMENES
+volumes:
+  mysql_data_dev:
+  maven_repo: # Caché de dependencias Maven (evita descargar todo cada vez)
+  frontend_node_modules:
+    # node_modules aislados del host (evita conflictos Windows/Linux)
+
+    # REDES
+networks:
+  messenger-network:
+    driver: bridge
