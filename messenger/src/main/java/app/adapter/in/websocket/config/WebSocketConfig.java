@@ -20,6 +20,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private String allowedOrigins;
     @Autowired
     private WebSocketAuthChannelInterceptor authChannelInterceptor;
+    @Autowired
+    private CookieHandshakeInterceptor cookieHandshakeInterceptor;
 
     /**
      * Habilita un broker de mensajes en memoria simple.
@@ -53,10 +55,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
         registry.addEndpoint("/ws/tracking")
                 .setAllowedOriginPatterns(origins)
-                .addInterceptors(new CookieHandshakeInterceptor())
+                .addInterceptors(cookieHandshakeInterceptor)
                 .withSockJS();
         registry.addEndpoint("/ws/tracking")
                 .setAllowedOriginPatterns(origins)
-                .addInterceptors(new CookieHandshakeInterceptor());
+                .addInterceptors(cookieHandshakeInterceptor);
     }
 }

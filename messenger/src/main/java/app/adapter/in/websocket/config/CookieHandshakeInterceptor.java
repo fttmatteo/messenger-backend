@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * Interceptor para copiar cookies del handshake HTTP a los atributos de la
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
  * Esto permite que los ChannelInterceptors accedan a los tokens almacenados en
  * cookies HttpOnly.
  */
+@Component
 public class CookieHandshakeInterceptor implements HandshakeInterceptor {
 
     private static final Logger logger = LoggerFactory.getLogger(CookieHandshakeInterceptor.class);

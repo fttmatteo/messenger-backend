@@ -2,7 +2,7 @@
 
 <div align="center">
 
-# 🚀 Messenger Backend API
+# Messenger Backend API
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.10-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
@@ -19,7 +19,7 @@
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Architecture](#-architecture)
 - [Tech Stack](#-tech-stack)
@@ -41,15 +41,13 @@
 
 ---
 
-## 🏗 Architecture
-<details>
-
+## Architecture
 The project implements **Hexagonal Architecture (Ports & Adapters)** to keep the domain isolated from external dependencies.
 
 ```mermaid
 graph LR
     %% External Actors
-    USER((👤 User/App))
+    USER((User/App))
     MAPS{{G-Maps}}
     GCS{{GCS}}
     WAPP{{WhatsApp}}
@@ -59,29 +57,29 @@ graph LR
 
     subgraph IN [Input Adapters]
         direction TB
-        REST[🌐 REST API]
-        SOC[🔌 WebSockets]
+        REST[REST API]
+        SOC[WebSockets]
     end
 
     subgraph CORE [Application Core]
         direction TB
         subgraph APP [Application Layer]
-            UC[⚙️ Use Cases]
+            UC[Use Cases]
         end
         subgraph DOMAIN [Domain Layer]
-            SVC[🛠️ Domain Services]
-            PORTS[🎯 Ports]
-            MODEL[💎 Domain Models]
+            SVC[Domain Services]
+            PORTS[Ports]
+            MODEL[Domain Models]
         end
     end
 
     subgraph OUT [Output Adapters]
         direction TB
-        PERS[💾 Persistence]
-        CLD[☁️ Cloud Services]
-        WABA[📱 WhatsApp]
-        VIS[👁️ Vision/OCR]
-        SEC[🔐 Security]
+        PERS[Persistence]
+        CLD[Cloud Services]
+        WABA[WhatsApp]
+        VIS[Vision/OCR]
+        SEC[Security]
     end
 
     %% Inbound Flow
@@ -117,13 +115,10 @@ graph LR
     classDef actor fill:#21262d,stroke:#8b949e,color:#c9d1d9
     class USER,MAPS,GCS,WAPP,OCR_EXT,DB,REDIS actor
 ```
-</details>
 
 ---
 
-## 💻 Tech Stack
-<details>
-
+## Tech Stack
 | Component | Technology |
 |-----------|------------|
 | **Framework** | Spring Boot 3.5.10 |
@@ -146,13 +141,10 @@ graph LR
 | **CI/CD** | GitHub Actions |
 | **Architecture Testing** | ArchUnit |
 | **Performance** | Spring Cache + Redis, Hibernate L2 Cache, Lazy Loading, Database Indices |
-</details>
 
 ---
 
-## 📁 Project Structure
-<details>
-
+## Project Structure
 ```
 messenger/
 ├── src/main/java/app/
@@ -198,13 +190,10 @@ messenger/
     ├── application-prod.properties      # Production
     └── db/migration/                    # Flyway Migrations
 ```
-</details>
 
 ---
 
-## 🌍 Environment Profiles
-<details>
-
+## Environment Profiles
 | Profile | Purpose | Database | External APIs | JWT Exp. |
 |---------|---------|----------|---------------|----------|
 | `local` | Local development without dependencies | MySQL Local | Mock/Disabled | 8 hours |
@@ -212,16 +201,18 @@ messenger/
 | `test` | Automated testing (CI/CD) | Testcontainers (MySQL/Redis) | Mock | 1 hour |
 | `prod` | Production (Cloud Run) | Cloud SQL (MySQL 8) | Enabled | 30 min |
 
-### 🚀 Quick Start (Docker Zero-Config)
+---
 
+### Quick Start (Docker Zero-Config)
 For a quick demonstration without manual setup, use Docker Compose. This will spin up the frontend, backend, database, and redis automatically.
 
 1. Navigate to backend root: `cd messenger-backend`
 2. Run: `docker-compose -f docker-compose.local.yml up --build`
 3. Access: `http://localhost`
 
-### 🔥 Development with Hot Reloading
+---
 
+### Development with Hot Reloading
 For active development with automatic code reloading (no need to restart containers when making changes):
 
 ```bash
@@ -240,10 +231,10 @@ docker-compose -f docker-compose.dev.yml up --build
 
 ---
 
-### 🌍 Profiles
+### Profiles
 
 <details>
-<summary><b>🏠 Local</b> - No external dependencies</summary>
+<summary><b>Local</b> - No external dependencies</summary>
 
 - MySQL Local database (Dockerized)
 - **Zero-Config**: Pre-configured with test keys and Mocks
@@ -256,7 +247,7 @@ docker-compose -f docker-compose.dev.yml up --build
 </details>
 
 <details>
-<summary><b>🔧 Dev</b> - Development with APIs</summary>
+<summary><b>Dev</b> - Development with APIs</summary>
 
 - MySQL development database
 - Google Cloud APIs enabled
@@ -267,7 +258,7 @@ docker-compose -f docker-compose.dev.yml up --build
 </details>
 
 <details>
-<summary><b>🧪 Test</b> - Automated testing</summary>
+<summary><b>Test</b> - Automated testing</summary>
 
 - **Testcontainers integration**: Automated lifecycle for MySQL 8.0 and Redis 7.2.
 - **Hierarchical Singleton Pattern**: BaseContainerTest ensures infrastructure starts once per JVM.
@@ -277,7 +268,7 @@ docker-compose -f docker-compose.dev.yml up --build
 </details>
 
 <details>
-<summary><b>🚀 Prod</b> - Production (Cloud Run Optimized)</summary>
+<summary><b>Prod</b> - Production (Cloud Run Optimized)</summary>
 
 - MySQL with mandatory SSL
 - Optimized connection pool (HikariCP)
@@ -289,6 +280,8 @@ docker-compose -f docker-compose.dev.yml up --build
 - Cloud Run Proxy support (Forwarded Headers)
 
 </details>
+
+---
 
 ### Activation
 
@@ -302,15 +295,12 @@ export SPRING_PROFILES_ACTIVE=dev
 # Docker
 docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ```
-</details>
 
 ---
 
-## 🔌 API Endpoints
-<details>
+## API Endpoints
 
 ### Authentication (`/auth`)
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/auth/login` | Login and receive access + refresh tokens (Requires `turnstileToken`) |
@@ -321,7 +311,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ---
 
 ### Employees (`/employees`) - ADMIN only
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/employees/createEmployee` | Create new employee |
@@ -333,7 +322,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ---
 
 ### Dealerships (`/dealerships`)
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/dealerships/createDealership` | Create dealership (ADMIN) |
@@ -347,7 +335,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ---
 
 ### Service Deliveries (`/services`)
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/services/extractPlate` | Extract plate from image using OCR (preview before creating) |
@@ -366,13 +353,11 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ---
 
 ### Transcription (`/api/transcribe`)
-
 | `POST` | `/api/transcribe` | Transcribe audio file to text using Google Cloud STT |
 
 ---
 
 ### WhatsApp (`/api/whatsapp`)
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET`  | `/api/whatsapp/webhook` | Webhook verification (required by Meta) |
@@ -384,7 +369,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 > 2. Bot requests a 4-digit PIN (requested every 12 hours).
 > 3. After authentication, the user can query plate status or list pending deliveries.
 
-
 > [!CAUTION]
 > **File Constraints**:
 > - **Images**: Max 10MB (JPEG/PNG)
@@ -394,7 +378,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ---
 
 ### System Settings (`/settings`) - ADMIN only
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/settings/status-colors` | Get status color configuration |
@@ -403,7 +386,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ---
 
 ### Locations & Routes (`/locations`)
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/locations/geocode` | Address to coordinates |
@@ -414,7 +396,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ---
 
 ### Files (`/files`)
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/files/{filename}` | Download protected file (photos/signatures/GIFs) |
@@ -422,7 +403,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ---
 
 ### Real-Time Tracking (`/tracking` & WebSocket)
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `WS` | `/ws/tracking/update` | Update location via WebSocket (with Heartbeat) |
@@ -435,17 +415,13 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ---
 
 ### Monitoring (`/monitoring`) - ADMIN only
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/monitoring/messenger/{id}/activity` | Get daily activity timeline + stats for a messenger |
-</details>
 
 ---
 
-## 🗄 Database Schema
-<details>
-
+## Database Schema
 ```mermaid
 erDiagram
     employees {
@@ -565,8 +541,9 @@ erDiagram
     dealerships ||--o{ wa_sessions : "authorized"
 ```
 
-### Enums
+---
 
+### Enums
 | Enum | Values |
 |------|--------|
 | **Role** | `ADMIN`, `MESSENGER` |
@@ -575,28 +552,25 @@ erDiagram
 | **PhotoType** | `PLATE_DETECTION`, `EVIDENCE` |
 | **TrackingStatus** | `ACTIVE`, `INACTIVE`, `OFFLINE` |
 | **TrackingSource** | `GPS`, `NETWORK`, `MANUAL` |
-</details>
 
 ---
 
-## 📡 Real-Time Tracking
-<details>
-
+## Real-Time Tracking
 GPS tracking system using **Redis** + **WebSocket** for messenger monitoring.
 
 ### Features
-
 | Feature | Description |
 |---------|-------------|
-| 🔴 **Live location** | Updates every 45 seconds (5s rate limit) |
-| 📍 **Delivery validation** | DISABLED - Maximum 200m radius from destination |
-| 🎯 **Technical accuracy** | < 100m GPS error filtered for history |
-| 📊 **Complete history** | Permanent retention (Historical Archive) |
-| ⚡ **Low latency** | Redis for location caching |
-| 🌐 **WebSocket** | Real-time data updates (Server Push) |
+| **Live location** | Updates every 45 seconds (5s rate limit) |
+| **Delivery validation** | DISABLED - Maximum 200m radius from destination |
+| **Technical accuracy** | < 100m GPS error filtered for history |
+| **Complete history** | Permanent retention (Historical Archive) |
+| **Low latency** | Redis for location caching |
+| **WebSocket** | Real-time data updates (Server Push) |
+
+---
 
 ### WebSocket API
-
 Connection URL: `ws://localhost:8080/ws/tracking`
 
 | Type | Destination | Description |
@@ -606,8 +580,9 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 | `SUB` | `/topic/tracking/{id}` | Receive updates for specific messenger |
 | `SUB` | `/topic/tracking/all` | Receive updates for all messengers (Admin) |
 
-### Google Maps Integration
+---
 
+### Google Maps Integration
 - **Geocoding**: Address ↔ Coordinates
 - **Directions API**: DISABLED - Optimized routes
 - **Distance Matrix**: Time estimation
@@ -616,7 +591,6 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 ---
 
 ### Business Rules
-
 > [!IMPORTANT]
 > **Role-Based Status Transitions**
 > - **MESSENGER** can only use: `PENDING`, `DELIVERED`, `RETURNED`.
@@ -636,8 +610,9 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 > Deleted services are moved to a **trash bin** and permanently deleted after **60 days**.
 > Admins can restore services from the trash before permanent deletion.
 
-### State Rules
+---
 
+### State Rules
 | State | Messenger | Admin | Delete |
 |-------|-----------|-------|--------|
 | `ASSIGNED` | → `PENDING`, `DELIVERED`, `RETURNED` | → `CANCELED`, `RESOLVED` | ✅ Trash |
@@ -647,15 +622,17 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 | `CANCELED` | - | Admin can **reassign** → `ASSIGNED` | ✅ Trash |
 | `RESOLVED` | - | - | ✅ Trash |
 
-### Permissions Summary
+---
 
+### Permissions Summary
 | Role | Available States | Special Actions | Notes |
 |------|------------------|-----------------|-------|
 | **MESSENGER** | `PENDING`, `DELIVERED`, `RETURNED` | - | Can change services to any allowed state at any time |
 | **ADMIN** | `CANCELED`, `RESOLVED` | **Reassign messenger** (from `CANCELED` only) | Can change services to admin states from any current state |
 
-### Reassignment Flow
+---
 
+### Reassignment Flow
 ```mermaid
 flowchart LR
     A[Service in CANCELED] --> B{Admin reassigns}
@@ -663,9 +640,9 @@ flowchart LR
     C --> D[Status → ASSIGNED]
 ```
 
+---
 
 ### Trash Management (Soft Delete & Archive)
-
 | Action | Endpoint | Description |
 |--------|----------|-------------|
 | Delete → Trash | `DELETE /services/{id}` | Moves to trash (soft delete) |
@@ -675,15 +652,12 @@ flowchart LR
 | Auto-Archive | Scheduled job (3 AM daily) | Archives services after 60 days |
 
 **Archive System**: Services are permanently archived to dedicated tables (`deleted_services`, `deleted_status_history`, `deleted_photos`, `deleted_tracking_history`, `deleted_signatures`) instead of being deleted. All historical data is preserved for auditing and analytics.
-</details>
 
 ---
 
-## 🔐 Security
-<details>
+## Security
 
 ### JWT Authentication with Refresh Tokens
-
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
 │   Client    │────▶│   /login    │────▶│   Server    │
@@ -723,16 +697,18 @@ flowchart LR
 | **Access Token** | 30 minutes | 8 hours | 8 hours | Header `Authorization: Bearer <token>` |
 | **Refresh Token** | 12 hours | 8 days | 8 days | Endpoint `/auth/refresh` to renew |
 
-### Security Features
+---
 
-- 🔄 **Token Rotation**: Each refresh generates a new token pair
-- 🔒 **Stateless**: No tokens stored server-side (Redis only for data caching)
-- ⏱️ **Auto Expiration**: Tokens expire automatically
-- 🛡️ **HMAC-SHA256**: Robust digital signature algorithm
-- 🕵️ **File Validation**: Magic bytes check for GIF/Images to prevent content spoofing
+### Security Features
+- **Token Rotation**: Each refresh generates a new token pair
+- **Stateless**: No tokens stored server-side (Redis only for data caching)
+- **Auto Expiration**: Tokens expire automatically
+- **HMAC-SHA256**: Robust digital signature algorithm
+- **File Validation**: Magic bytes check for GIF/Images to prevent content spoofing
+
+---
 
 ### Distributed Rate Limiting
-
 - **Cloudflare Turnstile**: Mandatory bot protection for all login attempts to prevent automated attacks.
 - **Redis-Backed Throttling**:
   - Global enforcement across multiple instances (Cloud Run compatible).
@@ -748,40 +724,41 @@ flowchart LR
   - **Brute-force protection**: Bot access is blocked for 15 minutes after 3 failed PIN attempts, with progressive delays between attempts.
 - Response headers: `X-Rate-Limit-Remaining`, `X-Rate-Limit-Retry-After-Seconds`
 
-### Roles & Permissions
+---
 
+### Roles & Permissions
 - **ADMIN**: Full access to all endpoints
 - **MESSENGER**: Only manages own services and location
 
-### Security Headers (Production)
+---
 
+### Security Headers (Production)
 - HSTS (HTTP Strict Transport Security)
 - Cookies: `Secure`, `HttpOnly`, `SameSite=Strict`
 - CORS configured by origin
 - No stack trace exposure
-</details>
 
 ---
 
-## 📊 Observability
-<details>
+## Observability
 
 ### Monitoring Endpoints (Actuator)
-
 | Endpoint | Description | Profile | Access |
 |----------|-------------|---------|--------|
 | `/actuator/health` | Health status (DB, Redis, Disk) | All | Public |
 | `/actuator/metrics` | JVM and HTTP metrics | `dev`, `local` | Private (JWT) |
 | `/actuator/info` | Build information | All | Private (JWT) |
 
-### Cloud Run Optimization
+---
 
+### Cloud Run Optimization
 - **JSON Logging (Prod):** Structured output compatible with Google Cloud Logging
 - **Graceful Shutdown:** Waits 30s to finish active connections
 - **SSL Offloading:** Trusts proxy headers (`X-Forwarded-Proto`) from Cloud Run
 
-### API Documentation
+---
 
+### API Documentation
 | Endpoint | Description |
 |----------|-------------|
 | `/swagger-ui/index.html` | Interactive Swagger UI |
@@ -790,19 +767,17 @@ flowchart LR
 
 > [!TIP]
 > Swagger UI is publicly accessible in `dev` profile. In production, consider restricting access via security configuration.
-</details>
 
 ---
 
-## 📝 Auditing
-<details>
+## Auditing
 
 ### AOP-Based Audit System
-
 The application includes a centralized **audit logging system** using Aspect-Oriented Programming (AOP). Critical actions are automatically logged with user context, timing, and results.
 
-### Audited Actions
+---
 
+### Audited Actions
 | Component | Action | Description |
 |-----------|--------|-------------|
 | **AuthController** | `LOGIN` | User login attempts |
@@ -818,17 +793,13 @@ The application includes a centralized **audit logging system** using Aspect-Ori
 | **EmployeeUseCase** | `CREATE_EMPLOYEE` | Create new employee |
 | | `UPDATE_EMPLOYEE` | Update employee information |
 | | `DELETE_EMPLOYEE` | Delete employee |
-</details>
 
 ---
 
-## 🏗 Architecture Verification
-<details>
-
+## Architecture Verification
 The project includes **ArchUnit** tests to enforce structural integrity and ensure that the **Hexagonal Architecture** principles are never violated.
 
 ### Automated Rules
-
 - **Layer Isolation**: Domain and Application layers must never depend on Infrastructure.
 - **Dependency Flow**: Input adapters must only talk to Use Cases, and Use Cases must only interact with Domain services or Ports.
 - **Package Integrity**: Controllers, entities, and repositories must reside in their respective adapter/infrastructure packages.
@@ -841,7 +812,6 @@ mvn test -Dtest=HexagonalArchitectureTest
 ---
 
 ### Log Format
-
 ```
 AUDIT | timestamp | user_document | action | method | params | status | duration | error
 ```
@@ -851,53 +821,50 @@ AUDIT | timestamp | user_document | action | method | params | status | duration
 2025-12-21 00:42:00.123 [AUDIT] AUDIT | 2025-12-21 00:42:00 | 123456 | UPDATE_STATUS | ServiceDeliveryUseCase.updateStatus | [1, DELIVERED, "Delivered", ...] | SUCCESS | 125ms |
 ```
 
-### Configuration
+---
 
+### Configuration
 - **Logger Name:** `AUDIT`
 - **Level:** `WARN` (always visible in all environments)
 - **Output:** Console (Cloud Run captures stdout)
 - **File Output:** Optional, enable `AUDIT_FILE` appender in `logback-spring.xml`
-</details>
 
 ---
  
-## ⚡ Performance Optimization
-<details>
-
+## Performance Optimization
 The system includes multiple optimization layers to ensure high performance and low latency.
  
-### 🚀 Caching Strategy (Redis)
- 
+### Caching Strategy (Redis)
 - **Spring Cache Abstraction**: Application-level caching using `@Cacheable` and `@CacheEvict`.
   - `Dealerships`: TTL 30 minutes.
   - `Employees`: TTL 15 minutes.
 - **Hibernate Second-Level Cache (L2)**: Entity-level caching via Redisson to reduce database load.
   - Enabled for `DealershipEntity`, `EmployeeEntity`, and `PlateEntity`.
 - **Custom Serialization**: Optimized `ObjectMapper` with `JavaTimeModule` support for `LocalDateTime`.
- 
-### 📉 Data Fetching Optimization
- 
-- **Lazy Loading**: Most relationships in `ServiceDeliveryEntity` are configured as `FetchType.LAZY` to avoid loading unnecessary data.
-- **Entity Graphs**: Explicit `@EntityGraph` definitions in repositories to solve the N+1 problem by fetching only required associations in a single query.
-
-### 🖼️ Image Optimization
-
-- **Automatic Resizing**: Images are automatically resized to a maximum of 1280px preserving aspect ratio.
-- **Smart Compression**: Quality reduction to 75% for JPEG files using the `Thumbnailator` library.
-
-### 🔌 Connection Pool Tuning (HikariCP)
-
-- **Optimized for Cloud SQL**: Fine-tuned parameters for low-resource environments (db-f1-micro).
-- **Leak Detection**: Active threshold to identify and prevent connection leaks.
-</details>
 
 ---
 
-## ⚙️ Setup & Installation
-<details>
+### Data Fetching Optimization
+- **Lazy Loading**: Most relationships in `ServiceDeliveryEntity` are configured as `FetchType.LAZY` to avoid loading unnecessary data.
+- **Entity Graphs**: Explicit `@EntityGraph` definitions in repositories to solve the N+1 problem by fetching only required associations in a single query.
+
+---
+
+### Image Optimization
+- **Automatic Resizing**: Images are automatically resized to a maximum of 1280px preserving aspect ratio.
+- **Smart Compression**: Quality reduction to 75% for JPEG files using the `Thumbnailator` library.
+
+---
+
+### Connection Pool Tuning (HikariCP)
+- **Optimized for Cloud SQL**: Fine-tuned parameters for low-resource environments (db-f1-micro).
+- **Leak Detection**: Active threshold to identify and prevent connection leaks.
+
+---
+
+## Setup & Installation
 
 ### Prerequisites
-
 | Requirement | Version |
 |-------------|---------|
 | Java | 17+ |
@@ -905,8 +872,9 @@ The system includes multiple optimization layers to ensure high performance and 
 | Redis | 6.0+ |
 | Maven | 3.9+ |
 
-### 🔐 Environment Variables Required
+---
 
+### Environment Variables Required
 | Variable | Description | Default/Example |
 |----------|-------------|-----------------|
 | `DB_NAME` | MySQL Database Name | `messenger_db` |
@@ -923,17 +891,16 @@ The system includes multiple optimization layers to ensure high performance and 
 | `WHATSAPP_VERIFY_TOKEN`| Custom Webhook Token | `my_secret_token` |
 | `WHATSAPP_APP_SECRET`  | Meta App Secret | `abc123...` |
 
-### Quick Start (Docker) - Recommended
+---
 
+### Quick Start (Docker) - Recommended
 Run the full stack locally with one command.
 
 #### Prerequisites
-
 - Docker & Docker Compose
 - Git
 
 #### Steps
-
 1. **Clone the repository**
    ```bash
    git clone https://github.com/StartApp-FTT/messenger-backend.git
@@ -955,8 +922,9 @@ Run the full stack locally with one command.
 
 The API will be available at `http://localhost:8080`.
 
-### Manual Quick Start
+---
 
+### Manual Quick Start
 ```bash
 # 1. Clone
 git clone <repository-url>
@@ -972,13 +940,10 @@ redis-server
 ```
 
 API available at `http://localhost:8080`
-</details>
 
 ---
 
-## 🔄 CI/CD
-<details>
-
+## CI/CD
 Automated pipeline with **GitHub Actions**:
 
 ```yaml
@@ -990,30 +955,29 @@ on:
     branches: [ "main", "develop" ]
 ```
 
-### Features
+---
 
+### Features
 | Feature | Description |
 |---------|-------------|
-| ✅ Automated build | Java 17 + Maven |
-| ✅ Dependency caching | Faster builds |
-| ✅ Secure secrets | Credential injection |
-| ✅ Testing | Profile test with Docker (MySQL/Redis) |
+| Automated build | Java 17 + Maven |
+| Dependency caching | Faster builds |
+| Secure secrets | Credential injection |
+| Testing | Profile test with Docker (MySQL/Redis) |
+
+---
 
 ### Required GitHub Secrets
-
 ```
 GOOGLE_APPLICATION_CREDENTIALS_JSON
 ```
 
 > [!NOTE]
 > The CI pipeline uses an ephemeral **Docker** environment (MySQL + Redis) for integration tests, ensuring maximum parity with production. No external DB secrets are required.
-</details>
 
 ---
 
-## 🧪 Testing
-<details>
-
+## Testing
 The project implements a robust testing strategy across all layers of the hexagonal architecture.
 
 | Level | Strategy | Technology |
@@ -1025,16 +989,18 @@ The project implements a robust testing strategy across all layers of the hexago
 | **Mutation** | Test effectiveness measurement | **Pitest** |
 | **E2E (Client)** | Full business flow validation | **Playwright** (in `messenger-frontend`) |
 
-### 🛠️ Key Features
+---
 
+### Key Features
 - **Testcontainers (MySQL & Redis)**: No manual Docker setup required. Tests download and manage containers automatically.
 - **Integral Strategy (Full-Stack)**: The project is complemented by a frontend E2E suite that validates real integration with backend endpoints, including security bypass (Turnstile) and sensor simulation (GPS/Camera).
 - **Hierarchical Singleton Pattern**: `BaseContainerTest` shares infrastructure across test contexts, drastically reducing startup time.
 - **Mutation Testing**: Metrics beyond line coverage, injecting faults to ensure assertions actually detect errors.
 - **Flyway Parity**: Integration tests run on the exact same migrations used in production.
 
-### 🚀 Running Tests
+---
 
+### Running Tests
 ```bash
 # Standard tests (Unit + Integration)
 ./mvnw test
@@ -1042,46 +1008,42 @@ The project implements a robust testing strategy across all layers of the hexago
 # Mutation Testing (Pitest)
 ./mvnw org.pitest:pitest-maven:mutationCoverage
 ```
-</details>
 
 ---
 
-## 📬 Postman Collection
-<details>
-
-📄 **[Messenger_API.postman_collection.json](./Messenger_API.postman_collection.json)**
+## Postman Collection
+**[Messenger_API.postman_collection.json](./Messenger_API.postman_collection.json)**
 
 ### Features
+- **JWT and Refresh Token** saved automatically
+- **Environment variables** preconfigured (`baseUrl`, `token`, `refreshToken`)
+- **Automated tests** that save tokens to collection variables
+- **Payload examples** for all endpoints
+- **10 controllers** fully documented:
+  - Authentication (Login + Refresh)
+  - Employees
+  - Dealerships
+  - Locations
+  - Tracking
+  - Service Deliveries
+  - Files
+  - Monitoring
+  - System Settings
+  - Transcription
 
-- ✅ **JWT and Refresh Token** saved automatically
-- ✅ **Environment variables** preconfigured (`baseUrl`, `token`, `refreshToken`)
-- ✅ **Automated tests** that save tokens to collection variables
-- ✅ **Payload examples** for all endpoints
-- ✅ **10 controllers** fully documented:
-  - 🔐 Authentication (Login + Refresh)
-  - 👥 Employees
-  - 🏢 Dealerships
-  - 📍 Locations
-  - 📡 Tracking
-  - 📦 Service Deliveries
-  - 📁 Files
-  - 📊 Monitoring
-  - ⚙️ System Settings
-  - 🎙️ Transcription
+---
 
 ### Usage
-
 1. Import collection in Postman
 2. Configure `baseUrl` variable (default: `http://localhost:8080`)
 3. Run **"Login"** first
 4. Tokens (`token` and `refreshToken`) are saved automatically
 5. All other endpoints use the token automatically
 6. When access token expires, run **"Refresh Token"**
-</details>
 
-## 📱 Android Integration
-<details>
+---
 
+## Android Integration
 The system includes a native Android application built with **Capacitor**, providing a seamless mobile experience for messengers.
 
 ### Technical Details
@@ -1092,18 +1054,24 @@ The system includes a native Android application built with **Capacitor**, provi
   - `PushNotifications`: Real-time alerts for updates.
   - `StatusBar`: Custom UI overlays for edge-to-edge experience.
 
+---
+
 ### Key Features & Permissions
 The app requests the following permissions to function correctly:
-- 📍 **Location**: `ACCESS_FINE_LOCATION` & `ACCESS_BACKGROUND_LOCATION` for real-time tracking even when the app is minimized.
-- 📸 **Camera**: `CAMERA` for OCR license plate recognition and delivery evidence.
-- 🔔 **Notifications**: `POST_NOTIFICATIONS` for delivery updates.
-- 🏃 **Foreground Service**: Ensures tracking persistence during deliveries.
+- **Location**: `ACCESS_FINE_LOCATION` & `ACCESS_BACKGROUND_LOCATION` for real-time tracking even when the app is minimized.
+- **Camera**: `CAMERA` for OCR license plate recognition and delivery evidence.
+- **Notifications**: `POST_NOTIFICATIONS` for delivery updates.
+- **Foreground Service**: Ensures tracking persistence during deliveries.
+
+---
 
 ### Development Setup (Emulator)
 To connect the Android Emulator to your local backend development environment:
 1. Ensure the backend is running on `localhost:8080`.
 2. The Android project is pre-configured to use `10.0.2.2` to access the host machine's `localhost`.
 3. Cleartext traffic is permitted for `10.0.2.2` in `network_security_config.xml`.
+
+---
 
 ### Commands
 From the `messenger-frontend` directory:
@@ -1114,19 +1082,17 @@ npx cap sync android
 # Open in Android Studio
 npx cap open android
 ```
-</details>
 
 ---
 
-## 📧 Support & Contact
-
+## Support & Contact
 **Official Documentation:**
 - [Spring Boot Documentation](https://spring.io/projects/spring-boot)
 - [Google Cloud Run](https://cloud.google.com/run/docs)
 
 **Documentation:**
-- [🔐 **GitHub Secrets Guide**](./.github/SECRETS.md)
-- [🛡️ **Security Policy**](./.github/SECURITY.md)
+- [**GitHub Secrets Guide**](./.github/SECRETS.md)
+- [**Security Policy**](./.github/SECURITY.md)
 
 **Project Specific:**
 - Repository: `messenger-backend`
@@ -1135,8 +1101,7 @@ npx cap open android
 
 ---
 
-## 📄 License
-
+## License
 See [LICENSE](./LICENSE).
 
 > **Copyright (C) 2026 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**

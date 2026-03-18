@@ -1,13 +1,13 @@
-# 🚀 Guía de Inicio Rápido
+# Guía de Inicio Rápido
 
 Esta guía permite levantar el backend de **Messenger** y todo su ecosistema (incluyendo base de datos y herramientas) utilizando Docker de forma profesional.
 
-## 📋 Requisitos Previos
+## Requisitos Previos
 
 - Tener instalado **Docker Desktop** ([Descargar aquí](https://www.docker.com/products/docker-desktop/)).
 - Asegurarse de que Docker esté iniciado.
 
-## 🛠 Instalación y Ejecución
+## Instalación y Ejecución
 
 1.  **Descargar el proyecto**: Asegúrate de tener las carpetas `messenger-backend` y `messenger-frontend` en el mismo directorio raíz.
 2.  **Abrir una terminal**: Navega hasta la carpeta `messenger-backend`.
@@ -17,7 +17,7 @@ Esta guía permite levantar el backend de **Messenger** y todo su ecosistema (in
 ```
 4.  **Esperar a que inicie**: La primera vez puede tardar unos minutos descargando las imágenes y compilando el código.
 
-### 🔥 Desarrollo con Hot Reloading
+### Desarrollo con Hot Reloading
 
 Para desarrollo activo donde los cambios en el código se reflejan automáticamente (sin reiniciar contenedores):
 
@@ -32,7 +32,7 @@ Para desarrollo activo donde los cambios en el código se reflejan automáticame
 | PHPMyAdmin | `http://localhost:8081` |
 | Debug Remoto | Puerto `5005` |
 
-## 🌐 Acceso a la Aplicación
+## Acceso a la Aplicación
 
 Una vez que veas que los logs se detienen y el backend dice "Started MessengerApplication", puedes acceder a:
 
@@ -44,7 +44,7 @@ Una vez que veas que los logs se detienen y el backend dice "Started MessengerAp
 -   **Colección Postman**: El archivo `Messenger_API.postman_collection.json` está incluido en la carpeta raíz del backend para pruebas directas.
 -   **Salud del Sistema**: [http://localhost:8080/actuator/health](http://localhost:8080/actuator/health)
 
-## 🔑 Credenciales de Prueba
+## Credenciales de Prueba
 
 Utiliza estas credenciales para entrar al sistema en perfil **local**:
 
@@ -61,7 +61,7 @@ Utiliza estas credenciales para entrar al sistema en perfil **local**:
 > - Las **Imágenes** se guardarán dentro del contenedor (carpeta `uploads`).
 > - No se requiere configuración de Google Cloud para esta demostración.
 
-## 🧪 Pruebas Automatizadas
+## Pruebas Automatizadas
 
 El sistema cuenta con una suite de pruebas robusta (370+ tests) que utiliza **Testcontainers**. No necesitas configurar bases de datos manualmente para los tests.
 
@@ -73,7 +73,7 @@ El sistema cuenta con una suite de pruebas robusta (370+ tests) que utiliza **Te
 > **Mutation Testing**: Puedes medir la efectividad de los tests con:
 > `./mvnw org.pitest:pitest-maven:mutationCoverage`
 
-## 📱 Desarrollo en Android
+## Desarrollo en Android
 
 El proyecto utiliza **Capacitor** para ejecutarse como aplicación nativa.
 

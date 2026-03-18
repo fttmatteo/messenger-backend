@@ -2,7 +2,7 @@
 
 <div align="center">
 
-# 🚀 Messenger Backend API
+# Messenger Backend API
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.10-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
@@ -20,7 +20,7 @@
 
 ---
 
-## 📋 Tabla de Contenidos
+## Tabla de Contenidos
 
 - [Arquitectura](#-arquitectura)
 - [Stack Tecnológico](#-stack-tecnológico)
@@ -42,15 +42,13 @@
 
 ---
 
-## 🏗 Arquitectura
-<details>
-
+## Arquitectura
 El proyecto implementa **Arquitectura Hexagonal (Ports & Adapters)** para mantener el dominio aislado de las dependencias externas.
 
 ```mermaid
 graph LR
     %% Actores Externos
-    USER((👤 Usuario/App))
+    USER((Usuario/App))
     MAPS{{G-Maps}}
     GCS{{GCS}}
     WAPP{{WhatsApp}}
@@ -60,29 +58,29 @@ graph LR
 
     subgraph IN [Adaptadores de Entrada]
         direction TB
-        REST[🌐 REST API]
-        SOC[🔌 WebSockets]
+        REST[REST API]
+        SOC[WebSockets]
     end
 
     subgraph CORE [Capa Core / Aplicación]
         direction TB
         subgraph APP [Capa de Aplicación]
-            UC[⚙️ Casos de Uso]
+            UC[Casos de Uso]
         end
         subgraph DOMAIN [Capa de Dominio]
-            SVC[🛠️ Servicios de Dominio]
-            PORTS[🎯 Puertos]
-            MODEL[💎 Modelos de Dominio]
+            SVC[Servicios de Dominio]
+            PORTS[Puertos]
+            MODEL[Modelos de Dominio]
         end
     end
 
     subgraph OUT [Adaptadores de Salida]
         direction TB
-        PERS[💾 Persistencia]
-        CLD[☁️ Servicios Cloud]
-        WABA[📱 WhatsApp]
-        VIS[👁️ Visión/OCR]
-        SEC[🔐 Seguridad]
+        PERS[Persistencia]
+        CLD[Servicios Cloud]
+        WABA[WhatsApp]
+        VIS[Visión/OCR]
+        SEC[Seguridad]
     end
 
     %% Flujo de Entrada
@@ -118,13 +116,10 @@ graph LR
     classDef actor fill:#21262d,stroke:#8b949e,color:#c9d1d9
     class USER,MAPS,GCS,WAPP,OCR_EXT,DB,REDIS actor
 ```
-</details>
 
 ---
 
-## 💻 Stack Tecnológico
-<details>
-
+## Stack Tecnológico
 | Componente | Tecnología |
 |------------|------------|
 | **Framework** | Spring Boot 3.5.10 |
@@ -147,13 +142,10 @@ graph LR
 | **CI/CD** | GitHub Actions |
 | **Tests de Arquitectura** | ArchUnit |
 | **Rendimiento** | Spring Cache + Redis, Hibernate L2 Cache, Lazy Loading, Índices de Base de Datos |
-</details>
 
 ---
 
-## 📁 Estructura del Proyecto
-<details>
-
+## Estructura del Proyecto
 ```
 messenger/
 ├── src/main/java/app/
@@ -199,13 +191,10 @@ messenger/
     ├── application-prod.properties      # Producción
     └── db/migration/                    # Migraciones Flyway
 ```
-</details>
 
 ---
 
-## 🌍 Perfiles de Ambiente
-<details>
-
+## Perfiles de Ambiente
 | Perfil | Propósito | Base de Datos | APIs Externas | JWT Exp. |
 |--------|-----------|---------------|---------------|----------|
 | `local` | Desarrollo local sin dependencias | MySQL Local | Mock/Deshabilitado | 8 horas |
@@ -213,16 +202,18 @@ messenger/
 | `test` | Testing automatizado (CI/CD) | Testcontainers (MySQL/Redis) | Mock | 1 hora |
 | `prod` | Producción (Cloud Run) | Cloud SQL (MySQL 8) | Habilitado | 30 min |
 
-### 🚀 Inicio Rápido (Docker Zero-Config)
+---
 
+### Inicio Rápido (Docker Zero-Config)
 Para una demostración rápida sin configurar dependencias, usa Docker Compose. Esto levantará el frontend, backend, base de datos y redis automáticamente.
 
 1. Navega a la raíz del backend: `cd messenger-backend`
 2. Ejecuta: `docker-compose -f docker-compose.local.yml up --build`
 3. Accede a: `http://localhost`
 
-### 🔥 Desarrollo con Hot Reloading
+---
 
+### Desarrollo con Hot Reloading
 Para desarrollo activo con recarga automática de código (sin necesidad de reiniciar los contenedores al hacer cambios):
 
 ```bash
@@ -241,10 +232,10 @@ docker-compose -f docker-compose.dev.yml up --build
 
 ---
 
-### 🌍 Perfiles
+### Perfiles
 
 <details>
-<summary><b>🏠 Local</b> - Sin dependencias externas</summary>
+<summary><b>Local</b> - Sin dependencias externas</summary>
 
 - Base de datos MySQL Local (Dockerizada)
 - **Zero-Config**: Perfil pre-configurado con llaves de prueba y Mocks
@@ -257,7 +248,7 @@ docker-compose -f docker-compose.dev.yml up --build
 </details>
 
 <details>
-<summary><b>🔧 Dev</b> - Desarrollo con APIs</summary>
+<summary><b>Dev</b> - Desarrollo con APIs</summary>
 
 - MySQL de desarrollo
 - Google Cloud APIs habilitadas
@@ -268,7 +259,7 @@ docker-compose -f docker-compose.dev.yml up --build
 </details>
 
 <details>
-<summary><b>🧪 Test</b> - Testing automatizado</summary>
+<summary><b>Test</b> - Testing automatizado</summary>
 
 - **Integración con Testcontainers**: Ciclo de vida automatizado para MySQL 8.0 y Redis 7.2.
 - **Patrón Singleton Jerárquico**: `BaseContainerTest` asegura que la infraestructura se inicie una sola vez por JVM.
@@ -278,7 +269,7 @@ docker-compose -f docker-compose.dev.yml up --build
 </details>
 
 <details>
-<summary><b>🚀 Prod</b> - Producción (Optimizado Cloud Run)</summary>
+<summary><b>Prod</b> - Producción (Optimizado Cloud Run)</summary>
 
 - MySQL con SSL obligatorio
 - Pool de conexiones optimizado (HikariCP)
@@ -291,8 +282,9 @@ docker-compose -f docker-compose.dev.yml up --build
 
 </details>
 
-### Activación
+---
 
+### Activación
 ```bash
 # Variable de entorno (recomendado)
 export SPRING_PROFILES_ACTIVE=dev
@@ -303,15 +295,12 @@ export SPRING_PROFILES_ACTIVE=dev
 # Docker
 docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ```
-</details>
 
 ---
 
-## 🔌 API Endpoints
-<details>
+## API Endpoints
 
 ### Autenticación (`/auth`)
-
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | `POST` | `/auth/login` | Iniciar sesión y obtener tokens de acceso + refresh (Requiere `turnstileToken`) |
@@ -322,7 +311,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ---
 
 ### Empleados (`/employees`) - Solo ADMIN
-
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | `POST` | `/employees/createEmployee` | Crear nuevo empleado |
@@ -334,7 +322,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ---
 
 ### Concesionarios (`/dealerships`)
-
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | `POST` | `/dealerships/createDealership` | Crear concesionario (ADMIN) |
@@ -348,7 +335,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ---
 
 ### Servicios de Entrega (`/services`)
-
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | `POST` | `/services/extractPlate` | Extraer placa de imagen usando OCR (preview antes de crear) |
@@ -367,13 +353,11 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ---
 
 ### Transcripción (`/api/transcribe`)
-
 | `POST` | `/api/transcribe` | Transcribir archivo de audio a texto usando Google Cloud STT |
 
 ---
 
 ### WhatsApp (`/api/whatsapp`)
-
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | `GET`  | `/api/whatsapp/webhook` | Verificación de webhook (requerido por Meta) |
@@ -385,7 +369,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 > 2. El bot solicita un PIN de acceso de 4 dígitos (se solicita cada 12 horas).
 > 3. Tras la autenticación, el usuario puede consultar estados de placas o listar entregas pendientes.
 
-
 > [!CAUTION]
 > **Restricciones de Archivos**:
 > - **Imágenes**: Máx 10MB (JPEG/PNG)
@@ -395,7 +378,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ---
 
 ### Configuraciones del Sistema (`/settings`) - Solo ADMIN
-
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | `GET` | `/settings/status-colors` | Obtener configuración de colores de estados |
@@ -404,7 +386,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ---
 
 ### Ubicaciones y Rutas (`/locations`)
-
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | `POST` | `/locations/geocode` | Dirección a coordenadas |
@@ -415,7 +396,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ---
 
 ### Archivos (`/files`)
-
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | `GET` | `/files/{filename}` | Descargar archivo protegido (fotos/firmas/GIFs) |
@@ -423,7 +403,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ---
 
 ### Tracking en Tiempo Real (`/tracking` & WebSocket)
-
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | `WS` | `/ws/tracking/update` | Actualizar ubicación vía WebSocket (con Heartbeat) |
@@ -436,17 +415,13 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 ---
 
 ### Monitoreo (`/monitoring`) - Solo ADMIN
-
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | `GET` | `/monitoring/messenger/{id}/activity` | Línea de tiempo y estadísticas diarias de un mensajero |
-</details>
 
 ---
 
-## 🗄 Esquema de Base de Datos
-<details>
-
+## Esquema de Base de Datos
 ```mermaid
 erDiagram
     employees {
@@ -566,8 +541,9 @@ erDiagram
     dealerships ||--o{ wa_sessions : "authorized"
 ```
 
-### Enums
+---
 
+### Enums
 | Enum | Valores |
 |------|---------|
 | **Role** | `ADMIN`, `MESSENGER` |
@@ -576,28 +552,25 @@ erDiagram
 | **PhotoType** | `PLATE_DETECTION`, `EVIDENCE` |
 | **TrackingStatus** | `ACTIVE`, `INACTIVE`, `OFFLINE` |
 | **TrackingSource** | `GPS`, `NETWORK`, `MANUAL` |
-</details>
 
 ---
 
-## 📡 Tracking en Tiempo Real
-<details>
-
+## Tracking en Tiempo Real
 Sistema de tracking GPS usando **Redis** + **WebSocket** para monitoreo de mensajeros.
 
 ### Características
-
 | Feature | Descripción |
 |---------|-------------|
-| 🔴 **Ubicación en vivo** | Actualización cada 45 seg (mín. 5s) |
-| 📍 **Validación de entrega** | INHABILITADO - Radio máximo de 200m del destino |
-| 🎯 **Precisión técnica** | Filtro de error GPS < 100m para historial |
-| 📊 **Historial completo** | Retención permanente (Archivado histórico) |
-| ⚡ **Baja latencia** | Redis para caché de ubicaciones |
-| 🌐 **WebSocket** | Actualizaciones de datos en tiempo real (Server Push) |
+| **Ubicación en vivo** | Actualización cada 45 seg (mín. 5s) |
+| **Validación de entrega** | INHABILITADO - Radio máximo de 200m del destino |
+| **Precisión técnica** | Filtro de error GPS < 100m para historial |
+| **Historial completo** | Retención permanente (Archivado histórico) |
+| **Baja latencia** | Redis para caché de ubicaciones |
+| **WebSocket** | Actualizaciones de datos en tiempo real (Server Push) |
+
+---
 
 ### API WebSocket
-
 URL de conexión: `ws://localhost:8080/ws/tracking`
 
 | Tipo | Destino | Descripción |
@@ -607,8 +580,9 @@ URL de conexión: `ws://localhost:8080/ws/tracking`
 | `SUB` | `/topic/tracking/{id}` | Recibir actualizaciones de un mensajero |
 | `SUB` | `/topic/tracking/all` | Recibir actualizaciones de todos (Admin) |
 
-### Integración Google Maps
+---
 
+### Integración Google Maps
 - **Geocoding**: Dirección ↔ Coordenadas
 - **Directions API**: INHABILITADO - Rutas optimizadas
 - **Distance Matrix**: Estimación de tiempos
@@ -617,7 +591,6 @@ URL de conexión: `ws://localhost:8080/ws/tracking`
 ---
 
 ### Reglas de Negocio
-
 > [!IMPORTANT]
 > **Transiciones de Estado por Rol**
 > - **MENSAJERO** solo puede trabajar con: `PENDING`, `DELIVERED`, `RETURNED`.
@@ -637,8 +610,9 @@ URL de conexión: `ws://localhost:8080/ws/tracking`
 > Los servicios eliminados se mueven a una **papelera** y se archivan permanentemente después de **60 días**.
 > Los administradores pueden restaurar servicios de la papelera antes de la eliminación permanente.
 
-### Reglas de Estados
+---
 
+### Reglas de Estados
 | Estado | Mensajero | Admin | Eliminar |
 |--------|-----------|-------|----------|
 | `ASSIGNED` | → `PENDING`, `DELIVERED`, `RETURNED` | → `CANCELED`, `RESOLVED` | ✅ Papelera |
@@ -648,15 +622,17 @@ URL de conexión: `ws://localhost:8080/ws/tracking`
 | `CANCELED` | - | Reasignar → `ASSIGNED` | ✅ Papelera |
 | `RESOLVED` | - | - | ✅ Papelera |
 
-### Resumen de Permisos
+---
 
+### Resumen de Permisos
 | Rol | Estados Disponibles | Acciones Especiales | Notas |
 |-----|---------------------|---------------------|-------|
 | **MENSAJERO** | `PENDING`, `DELIVERED`, `RETURNED` | - | Puede cambiar servicios a cualquier estado permitido en cualquier momento |
 | **ADMIN** | `CANCELED`, `RESOLVED` | **Reasignar mensajero** (desde `CANCELED` únicamente) | Puede cambiar servicios a estados administrativos desde cualquier estado actual |
 
-### Flujo de Reasignación
+---
 
+### Flujo de Reasignación
 ```mermaid
 flowchart LR
     A[Servicio en CANCELED] --> B{Admin reasigna}
@@ -664,8 +640,9 @@ flowchart LR
     C --> D[Estado → ASSIGNED]
 ```
 
-### Gestión de Papelera (Soft Delete y Archivo)
+---
 
+### Gestión de Papelera (Soft Delete y Archivo)
 | Acción | Endpoint | Descripción |
 |--------|----------|-------------|
 | Eliminar → Papelera | `DELETE /services/{id}` | Mueve a papelera (soft delete) |
@@ -675,15 +652,12 @@ flowchart LR
 | Archivo Automático | Job programado (3 AM diario) | Archiva servicios después de 60 días |
 
 **Sistema de Archivo**: Los servicios se archivan permanentemente en tablas dedicadas (`deleted_services`, `deleted_status_history`, `deleted_photos`, `deleted_tracking_history`, `deleted_signatures`) en lugar de ser eliminados. Todos los datos históricos se preservan para auditoría y análisis.
-</details>
 
 ---
 
-## 🔐 Seguridad
-<details>
+## Seguridad
 
 ### Autenticación JWT con Refresh Tokens
-
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
 │   Client    │────▶│   /login    │────▶│   Server    │
@@ -723,16 +697,18 @@ flowchart LR
 | **Access Token** | 30 minutos | 8 horas | 8 horas | Header `Authorization: Bearer <token>` |
 | **Refresh Token** | 12 horas | 8 días | 8 días | Endpoint `/auth/refresh` para renovar |
 
-### Características de Seguridad
+---
 
-- 🔄 **Token Rotation**: Cada refresh genera un nuevo par de tokens
-- 🔒 **Stateless**: No se almacenan tokens en el servidor (Redis solo para caché de datos)
-- ⏱️ **Expiración Automática**: Tokens expire automáticamente
-- 🛡️ **HMAC-SHA256**: Algoritmo robusto de firma digital
-- 🕵️ **Validación de Archivos**: Verificación de Magic Bytes para evitar suplantación de contenido
+### Características de Seguridad
+- **Token Rotation**: Cada refresh genera un nuevo par de tokens
+- **Stateless**: No se almacenan tokens en el servidor (Redis solo para caché de datos)
+- **Expiración Automática**: Tokens expire automáticamente
+- **HMAC-SHA256**: Algoritmo robusto de firma digital
+- **Validación de Archivos**: Verificación de Magic Bytes para evitar suplantación de contenido
+
+---
 
 ### Rate Limiting Distribuido
-
 - **Cloudflare Turnstile**: Protección obligatoria contra bots en todos los intentos de inicio de sesión para evitar ataques automatizados.
 - **Limitación en Redis**:
   - Protección global sincronizada entre múltiples instancias (Cloud Run).
@@ -748,40 +724,41 @@ flowchart LR
   - **Protección Fuerza Bruta**: El acceso al bot se bloquea por 15 minutos tras 3 intentos fallidos de PIN, con delays progresivos entre intentos.
 - Headers de respuesta: `X-Rate-Limit-Remaining`, `X-Rate-Limit-Retry-After-Seconds`
 
-### Roles y Permisos
+---
 
+### Roles y Permisos
 - **ADMIN**: Acceso completo a todos los endpoints
 - **MESSENGER**: Solo gestiona sus propios servicios y ubicación
 
-### Headers de Seguridad (Producción)
+---
 
+### Headers de Seguridad (Producción)
 - HSTS (HTTP Strict Transport Security)
 - Cookies: `Secure`, `HttpOnly`, `SameSite=Strict`
 - CORS configurado por origen
 - Sin exposición de stack traces
-</details>
 
 ---
 
-## 📊 Observabilidad
-<details>
+## Observabilidad
 
 ### Endpoints de Monitoreo (Actuator)
-
 | Endpoint | Descripción | Perfil | Acceso |
 |----------|-------------|--------|--------|
 | `/actuator/health` | Estado de salud (DB, Redis, Disco) | Todos | Público |
 | `/actuator/metrics` | Métricas de JVM y HTTP | `dev`, `local` | Privado (JWT) |
 | `/actuator/info` | Información de la build | Todos | Privado (JWT) |
 
-### Optimización para Cloud Run
+---
 
+### Optimización para Cloud Run
 - **Logging JSON (Prod):** Salida estructurada compatible con Google Cloud Logging
 - **Graceful Shutdown:** Espera 30s para terminar conexiones activas
 - **SSL Offloading:** Confía en headers de proxy (`X-Forwarded-Proto`) de Cloud Run
 
-### Documentación API
+---
 
+### Documentación API
 | Endpoint | Descripción |
 |----------|-------------|
 | `/swagger-ui/index.html` | Interfaz Swagger UI interactiva |
@@ -790,19 +767,17 @@ flowchart LR
 
 > [!TIP]
 > Swagger UI es accesible públicamente en el perfil `dev`. En producción, considera restringir el acceso mediante configuración de seguridad.
-</details>
 
 ---
 
-## 📝 Auditoría
-<details>
+## Auditoría
 
 ### Sistema de Auditoría Basado en AOP
-
 La aplicación incluye un **sistema de logging de auditoría centralizado** usando Programación Orientada a Aspectos (AOP). Las acciones críticas se registran automáticamente con contexto de usuario, tiempo y resultados.
 
-### Acciones Auditadas
+---
 
+### Acciones Auditadas
 | Componente | Acción | Descripción |
 |------------|--------|-------------|
 | **AuthController** | `LOGIN` | Intentos de inicio de sesión |
@@ -818,17 +793,13 @@ La aplicación incluye un **sistema de logging de auditoría centralizado** usan
 | **EmployeeUseCase** | `CREATE_EMPLOYEE` | Crear nuevo empleado |
 | | `UPDATE_EMPLOYEE` | Actualizar información de empleado |
 | | `DELETE_EMPLOYEE` | Eliminar empleado |
-</details>
 
 ---
 
-## 🏗 Verificación de Arquitectura
-<details>
-
+## Verificación de Arquitectura
 El proyecto incluye pruebas de **ArchUnit** para forzar la integridad estructural y asegurar que los principios de la **Arquitectura Hexagonal** nunca sean violados.
 
 ### Reglas Automatizadas
-
 - **Aislamiento de Capas**: Las capas de Dominio y Aplicación nunca deben depender de la Infraestructura.
 - **Flujo de Dependencias**: Los adaptadores de entrada solo deben hablar con los Casos de Uso, y los Casos de Uso solo deben interactuar con servicios de Dominio o Puertos.
 - **Integridad de Paquetes**: Controladores, entidades y repositorios deben residir en sus respectivos paquetes de adaptador/infraestructura.
@@ -841,7 +812,6 @@ mvn test -Dtest=HexagonalArchitectureTest
 ---
 
 ### Formato del Log
-
 ```
 AUDIT | timestamp | documento_usuario | accion | metodo | parametros | estado | duracion | error
 ```
@@ -851,23 +821,20 @@ AUDIT | timestamp | documento_usuario | accion | metodo | parametros | estado | 
 2025-12-21 00:42:00.123 [AUDIT] AUDIT | 2025-12-21 00:42:00 | 123456 | UPDATE_STATUS | ServiceDeliveryUseCase.updateStatus | [1, DELIVERED, "Entregado", ...] | SUCCESS | 125ms |
 ```
 
-### Configuración
+---
 
+### Configuración
 - **Nombre del Logger:** `AUDIT`
 - **Nivel:** `WARN` (siempre visible en todos los ambientes)
 - **Salida:** Consola (Cloud Run captura stdout)
 - **Salida a Archivo:** Opcional, habilitar `AUDIT_FILE` appender en `logback-spring.xml`
-</details>
 
 ---
  
-## ⚡ Optimización de Rendimiento
-<details>
-
+## Optimización de Rendimiento
 El sistema incluye múltiples capas de optimización para garantizar un alto rendimiento y baja latencia.
 
-### 🚀 Estrategia de Caché (Redis)
-
+### Estrategia de Caché (Redis)
 - **Abstracción de Spring Cache**: Caché a nivel de aplicación usando `@Cacheable` y `@CacheEvict`.
   - `Dealerships` (Concesionarios): TTL 30 minutos.
   - `Employees` (Empleados): TTL 15 minutos.
@@ -875,30 +842,30 @@ El sistema incluye múltiples capas de optimización para garantizar un alto ren
   - Habilitado para `DealershipEntity`, `EmployeeEntity`, y `PlateEntity`.
 - **Serialización Personalizada**: `ObjectMapper` optimizado con soporte para `JavaTimeModule` para manejar `LocalDateTime`.
 
-### 📉 Optimización de Carga de Datos
+---
 
+### Optimización de Carga de Datos
 - **Lazy Loading (Carga Perezosa)**: La mayoría de las relaciones en `ServiceDeliveryEntity` están configuradas como `FetchType.LAZY` para evitar cargar datos innecesarios.
 - **Entity Graphs**: Definiciones explícitas de `@EntityGraph` en los repositorios para resolver el problema N+1, cargando solo las asociaciones requeridas en una única consulta.
 
-### 🖼️ Optimización de Imágenes
+---
 
+### Optimización de Imágenes
 - **Redimensionamiento Automático**: Las imágenes se redimensionan automáticamente a un máximo de 1280px (ancho o alto) preservando la relación de aspecto.
 - **Compresión Inteligente**: Reducción de calidad al 75% para archivos JPEG usando la librería `Thumbnailator`, reduciendo significativamente el uso de almacenamiento y ancho de banda sin pérdida de detalle perceptible.
 
-### 🔌 Tuning del Pool de Conexiones (HikariCP)
+---
 
+### Tuning del Pool de Conexiones (HikariCP)
 - **Optimizado para Cloud SQL**: Parámetros ajustados para entornos de recursos limitados (db-f1-micro).
 - **Detección de Fugas**: Umbral activo para identificar y prevenir fugas de conexiones.
 - **Caché de Statements**: Habilitado para mejorar el rendimiento de ejecución de consultas.
-</details>
 
 ---
 
-## ⚙️ Configuración e Instalación
-<details>
+## Configuración e Instalación
 
 ### Prerrequisitos
-
 | Requisito | Versión |
 |-----------|---------|
 | Java | 17+ |
@@ -906,8 +873,9 @@ El sistema incluye múltiples capas de optimización para garantizar un alto ren
 | Redis | 6.0+ |
 | Maven | 3.9+ |
 
-### 🔐 Variables de Entorno Requeridas
+---
 
+### Variables de Entorno Requeridas
 | Variable | Descripción | Default/Ejemplo |
 |----------|-------------|-----------------|
 | `DB_NAME` | Nombre de la DB MySQL | `messenger_db` |
@@ -924,17 +892,16 @@ El sistema incluye múltiples capas de optimización para garantizar un alto ren
 | `WHATSAPP_VERIFY_TOKEN`| Token de Verificación Webhook | `mi_token_secreto` |
 | `WHATSAPP_APP_SECRET`  | App Secret de Meta | `abc123...` |
 
-### Inicio Rápido (Docker) - Recomendado
+---
 
+### Inicio Rápido (Docker) - Recomendado
 Ejecuta el stack completo localmente con un solo comando.
 
 #### Requisitos Previos
-
 - Docker y Docker Compose
 - Git
 
 #### Pasos
-
 1. **Clonar el repositorio**
    ```bash
    git clone https://github.com/StartApp-FTT/messenger-backend.git
@@ -956,8 +923,9 @@ Ejecuta el stack completo localmente con un solo comando.
 
 La API estará disponible en `http://localhost:8080`.
 
-### Instalación Manual
+---
 
+### Instalación Manual
 ```bash
 # 1. Clonar
 git clone <repository-url>
@@ -973,13 +941,10 @@ redis-server
 ```
 
 La API estará disponible en `http://localhost:8080`
-</details>
 
 ---
 
-## 🔄 CI/CD
-<details>
-
+## CI/CD
 Pipeline automatizado con **GitHub Actions**:
 
 ```yaml
@@ -991,30 +956,29 @@ on:
     branches: [ "main", "develop" ]
 ```
 
-### Características
+---
 
+### Características
 | Feature | Descripción |
 |---------|-------------|
-| ✅ Build automático | Java 17 + Maven |
-| ✅ Caché de dependencias | Builds más rápidos |
-| ✅ Secrets seguros | Inyección de credenciales |
-| ✅ Testing | Profile `test` con Docker (MySQL/Redis) |
+| Build automático | Java 17 + Maven |
+| Caché de dependencias | Builds más rápidos |
+| Secrets seguros | Inyección de credenciales |
+| Testing | Profile `test` con Docker (MySQL/Redis) |
+
+---
 
 ### Secrets de GitHub Requeridos
-
 ```
 GOOGLE_APPLICATION_CREDENTIALS_JSON
 ```
 
 > [!NOTE]
 > El pipeline utiliza un entorno efímero con **Docker** (MySQL + Redis) para los tests de integración, garantizando máxima paridad con producción. No se requieren secrets de BD externa.
-</details>
 
 ---
 
-## 🧪 Testing
-<details>
-
+## Testing
 El proyecto implementa una estrategia de pruebas robusta en todas las capas de la arquitectura hexagonal.
 
 | Nivel | Estrategia | Tecnología |
@@ -1026,16 +990,18 @@ El proyecto implementa una estrategia de pruebas robusta en todas las capas de l
 | **Mutación** | Medición de efectividad de tests | **Pitest** |
 | **E2E (Client)** | Validación de flujos completos de negocio | **Playwright** (en `messenger-frontend`) |
 
-### 🛠️ Características Clave
+---
 
+### Características Clave
 - **Testcontainers (MySQL & Redis)**: No requiere configuración manual de Docker. Los tests descargan y gestionan los contenedores necesarios automáticamente.
 - **Estrategia Integral (Full-Stack)**: El proyecto se complementa con una suite E2E en el frontend que valida la integración real con los endpoints del backend, incluyendo bypass de seguridad (Turnstile) y simulación de sensores (GPS/Cámara).
 - **Patrón Singleton Jerárquico**: Uso de `BaseContainerTest` para compartir la infraestructura entre múltiples contextos de prueba, reduciendo drásticamente el tiempo de inicio.
 - **Pruebas de Mutación**: Métricas que van más allá de la cobertura de líneas, inyectando fallos para verificar que los asertos de los tests realmente detecten errores.
 - **Paridad con Flyway**: Los tests de integración corren exactamente sobre las mismas migraciones que se usan en producción.
 
-### 🚀 Ejecución de Pruebas
+---
 
+### Ejecución de Pruebas
 ```bash
 # Tests estándar (Unitarios + Integración)
 ./mvnw test
@@ -1043,46 +1009,42 @@ El proyecto implementa una estrategia de pruebas robusta en todas las capas de l
 # Pruebas de Mutación (Pitest)
 ./mvnw org.pitest:pitest-maven:mutationCoverage
 ```
-</details>
 
 ---
 
-## 📬 Colección Postman
-<details>
-
-📄 **[Messenger_API.postman_collection.json](./Messenger_API.postman_collection.json)**
+## Colección Postman
+**[Messenger_API.postman_collection.json](./Messenger_API.postman_collection.json)**
 
 ### Características
+- **Token JWT y Refresh Token** guardados automáticamente
+- **Variables de entorno** preconfiguradas (`baseUrl`, `token`, `refreshToken`)
+- **Tests automáticos** que guardan tokens en variables de colección
+- **Ejemplos de payloads** para todos los endpoints
+- **10 controladores** completamente documentados:
+  - Authentication (Login + Refresh)
+  - Employees
+  - Dealerships
+  - Locations
+  - Tracking
+  - Service Deliveries
+  - Files
+  - Monitoring
+  - System Settings
+  - Transcription
 
-- ✅ **Token JWT y Refresh Token** guardados automáticamente
-- ✅ **Variables de entorno** preconfiguradas (`baseUrl`, `token`, `refreshToken`)
-- ✅ **Tests automáticos** que guardan tokens en variables de colección
-- ✅ **Ejemplos de payloads** para todos los endpoints
-- ✅ **10 controladores** completamente documentados:
-  - 🔐 Authentication (Login + Refresh)
-  - 👥 Employees
-  - 🏢 Dealerships
-  - 📍 Locations
-  - 📡 Tracking
-  - 📦 Service Deliveries
-  - 📁 Files
-  - 📊 Monitoring
-  - ⚙️ System Settings
-  - 🎙️ Transcription
+---
 
 ### Uso
-
 1. Importar colección en Postman
 2. Configurar variable `baseUrl` (default: `http://localhost:8080`)
 3. Ejecutar **"Login"** primero
 4. Los tokens (`token` y `refreshToken`) se guardan automáticamente
 5. Todos los demás endpoints usan el token automáticamente
 6. Cuando el access token expire, ejecutar **"Refresh Token"**
-</details>
 
-## 📱 Integración Android
-<details>
+---
 
+## Integración Android
 El sistema incluye una aplicación nativa para Android construida con **Capacitor**, proporcionando una experiencia móvil fluida para los mensajeros.
 
 ### Detalles Técnicos
@@ -1093,18 +1055,24 @@ El sistema incluye una aplicación nativa para Android construida con **Capacito
   - `PushNotifications`: Alertas en tiempo real para actualizaciones de servicios.
   - `StatusBar`: Personalización de la interfaz para una experiencia edge-to-edge.
 
+---
+
 ### Características y Permisos
 La aplicación requiere los siguientes permisos para su correcto funcionamiento:
-- 📍 **Ubicación**: `ACCESS_FINE_LOCATION` y `ACCESS_BACKGROUND_LOCATION` para el seguimiento en tiempo real incluso cuando la app está minimizada.
-- 📸 **Cámara**: `CAMERA` para el reconocimiento de placas (OCR) y evidencias de entrega.
-- 🔔 **Notificaciones**: `POST_NOTIFICATIONS` para actualizaciones de servicios.
-- 🏃 **Servicio de Primer Plano**: Garantiza la persistencia del tracking durante las entregas.
+- **Ubicación**: `ACCESS_FINE_LOCATION` y `ACCESS_BACKGROUND_LOCATION` para el seguimiento en tiempo real incluso cuando la app está minimizada.
+- **Cámara**: `CAMERA` para el reconocimiento de placas (OCR) y evidencias de entrega.
+- **Notificaciones**: `POST_NOTIFICATIONS` para actualizaciones de servicios.
+- **Servicio de Primer Plano**: Garantiza la persistencia del tracking durante las entregas.
+
+---
 
 ### Configuración de Desarrollo (Emulador)
 Para conectar el emulador de Android a tu entorno local de desarrollo:
 1. Asegúrate de que el backend esté corriendo en `localhost:8080`.
 2. El proyecto de Android está pre-configurado para usar `10.0.2.2` para acceder al `localhost` de la máquina host.
 3. El tráfico de texto claro (HTTP) está permitido para `10.0.2.2` en `network_security_config.xml`.
+
+---
 
 ### Comandos Útiles
 Desde el directorio `messenger-frontend`:
@@ -1115,19 +1083,17 @@ npx cap sync android
 # Abrir el proyecto en Android Studio
 npx cap open android
 ```
-</details>
 
 ---
 
-## 📧 Soporte y Contacto
-
+## Soporte y Contacto
 **Documentación Oficial:**
 - [Documentación de Spring Boot](https://spring.io/projects/spring-boot)
 - [Google Cloud Run](https://cloud.google.com/run/docs)
 
 **Documentación:**
-- [🔐 **Secretos de GitHub**](./.github/SECRETS.md)
-- [🛡️ **Política de Seguridad**](./.github/SECURITY.md)
+- [**Secretos de GitHub**](./.github/SECRETS.md)
+- [**Política de Seguridad**](./.github/SECURITY.md)
 
 **Proyecto Específico:**
 - Repositorio: `messenger-backend`
@@ -1136,8 +1102,7 @@ npx cap open android
 
 ---
 
-## 📄 Licencia
-
+## Licencia
 Ver archivo [LICENSE](./LICENSE).
 
 > **Copyright (C) 2026 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**
