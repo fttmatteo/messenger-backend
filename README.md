@@ -201,12 +201,16 @@ messenger/
 | `test` | Automated testing (CI/CD) | Testcontainers (MySQL/Redis) | Mock | 1 hour |
 | `prod` | Production (Cloud Run) | Cloud SQL (MySQL 8) | Enabled | 30 min |
 
+---
+
 ### Quick Start (Docker Zero-Config)
 For a quick demonstration without manual setup, use Docker Compose. This will spin up the frontend, backend, database, and redis automatically.
 
 1. Navigate to backend root: `cd messenger-backend`
 2. Run: `docker-compose -f docker-compose.local.yml up --build`
 3. Access: `http://localhost`
+
+---
 
 ### Development with Hot Reloading
 For active development with automatic code reloading (no need to restart containers when making changes):
@@ -276,6 +280,8 @@ docker-compose -f docker-compose.dev.yml up --build
 - Cloud Run Proxy support (Forwarded Headers)
 
 </details>
+
+---
 
 ### Activation
 
@@ -362,7 +368,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 > 1. User sends a message.
 > 2. Bot requests a 4-digit PIN (requested every 12 hours).
 > 3. After authentication, the user can query plate status or list pending deliveries.
-
 
 > [!CAUTION]
 > **File Constraints**:
@@ -536,6 +541,8 @@ erDiagram
     dealerships ||--o{ wa_sessions : "authorized"
 ```
 
+---
+
 ### Enums
 | Enum | Values |
 |------|--------|
@@ -561,6 +568,8 @@ GPS tracking system using **Redis** + **WebSocket** for messenger monitoring.
 | **Low latency** | Redis for location caching |
 | **WebSocket** | Real-time data updates (Server Push) |
 
+---
+
 ### WebSocket API
 Connection URL: `ws://localhost:8080/ws/tracking`
 
@@ -570,6 +579,8 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 | `SEND` | `/app/tracking/heartbeat` | Send keep-alive signal (no GPS) |
 | `SUB` | `/topic/tracking/{id}` | Receive updates for specific messenger |
 | `SUB` | `/topic/tracking/all` | Receive updates for all messengers (Admin) |
+
+---
 
 ### Google Maps Integration
 - **Geocoding**: Address ↔ Coordinates
@@ -599,6 +610,8 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 > Deleted services are moved to a **trash bin** and permanently deleted after **60 days**.
 > Admins can restore services from the trash before permanent deletion.
 
+---
+
 ### State Rules
 | State | Messenger | Admin | Delete |
 |-------|-----------|-------|--------|
@@ -609,11 +622,15 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 | `CANCELED` | - | Admin can **reassign** → `ASSIGNED` | ✅ Trash |
 | `RESOLVED` | - | - | ✅ Trash |
 
+---
+
 ### Permissions Summary
 | Role | Available States | Special Actions | Notes |
 |------|------------------|-----------------|-------|
 | **MESSENGER** | `PENDING`, `DELIVERED`, `RETURNED` | - | Can change services to any allowed state at any time |
 | **ADMIN** | `CANCELED`, `RESOLVED` | **Reassign messenger** (from `CANCELED` only) | Can change services to admin states from any current state |
+
+---
 
 ### Reassignment Flow
 ```mermaid
@@ -623,6 +640,7 @@ flowchart LR
     C --> D[Status → ASSIGNED]
 ```
 
+---
 
 ### Trash Management (Soft Delete & Archive)
 | Action | Endpoint | Description |
@@ -679,12 +697,16 @@ flowchart LR
 | **Access Token** | 30 minutes | 8 hours | 8 hours | Header `Authorization: Bearer <token>` |
 | **Refresh Token** | 12 hours | 8 days | 8 days | Endpoint `/auth/refresh` to renew |
 
+---
+
 ### Security Features
 - **Token Rotation**: Each refresh generates a new token pair
 - **Stateless**: No tokens stored server-side (Redis only for data caching)
 - **Auto Expiration**: Tokens expire automatically
 - **HMAC-SHA256**: Robust digital signature algorithm
 - **File Validation**: Magic bytes check for GIF/Images to prevent content spoofing
+
+---
 
 ### Distributed Rate Limiting
 - **Cloudflare Turnstile**: Mandatory bot protection for all login attempts to prevent automated attacks.
@@ -702,9 +724,13 @@ flowchart LR
   - **Brute-force protection**: Bot access is blocked for 15 minutes after 3 failed PIN attempts, with progressive delays between attempts.
 - Response headers: `X-Rate-Limit-Remaining`, `X-Rate-Limit-Retry-After-Seconds`
 
+---
+
 ### Roles & Permissions
 - **ADMIN**: Full access to all endpoints
 - **MESSENGER**: Only manages own services and location
+
+---
 
 ### Security Headers (Production)
 - HSTS (HTTP Strict Transport Security)
@@ -723,10 +749,14 @@ flowchart LR
 | `/actuator/metrics` | JVM and HTTP metrics | `dev`, `local` | Private (JWT) |
 | `/actuator/info` | Build information | All | Private (JWT) |
 
+---
+
 ### Cloud Run Optimization
 - **JSON Logging (Prod):** Structured output compatible with Google Cloud Logging
 - **Graceful Shutdown:** Waits 30s to finish active connections
 - **SSL Offloading:** Trusts proxy headers (`X-Forwarded-Proto`) from Cloud Run
+
+---
 
 ### API Documentation
 | Endpoint | Description |
@@ -744,6 +774,8 @@ flowchart LR
 
 ### AOP-Based Audit System
 The application includes a centralized **audit logging system** using Aspect-Oriented Programming (AOP). Critical actions are automatically logged with user context, timing, and results.
+
+---
 
 ### Audited Actions
 | Component | Action | Description |
@@ -789,6 +821,8 @@ AUDIT | timestamp | user_document | action | method | params | status | duration
 2025-12-21 00:42:00.123 [AUDIT] AUDIT | 2025-12-21 00:42:00 | 123456 | UPDATE_STATUS | ServiceDeliveryUseCase.updateStatus | [1, DELIVERED, "Delivered", ...] | SUCCESS | 125ms |
 ```
 
+---
+
 ### Configuration
 - **Logger Name:** `AUDIT`
 - **Level:** `WARN` (always visible in all environments)
@@ -807,14 +841,20 @@ The system includes multiple optimization layers to ensure high performance and 
 - **Hibernate Second-Level Cache (L2)**: Entity-level caching via Redisson to reduce database load.
   - Enabled for `DealershipEntity`, `EmployeeEntity`, and `PlateEntity`.
 - **Custom Serialization**: Optimized `ObjectMapper` with `JavaTimeModule` support for `LocalDateTime`.
- 
+
+---
+
 ### Data Fetching Optimization
 - **Lazy Loading**: Most relationships in `ServiceDeliveryEntity` are configured as `FetchType.LAZY` to avoid loading unnecessary data.
 - **Entity Graphs**: Explicit `@EntityGraph` definitions in repositories to solve the N+1 problem by fetching only required associations in a single query.
 
+---
+
 ### Image Optimization
 - **Automatic Resizing**: Images are automatically resized to a maximum of 1280px preserving aspect ratio.
 - **Smart Compression**: Quality reduction to 75% for JPEG files using the `Thumbnailator` library.
+
+---
 
 ### Connection Pool Tuning (HikariCP)
 - **Optimized for Cloud SQL**: Fine-tuned parameters for low-resource environments (db-f1-micro).
@@ -832,6 +872,8 @@ The system includes multiple optimization layers to ensure high performance and 
 | Redis | 6.0+ |
 | Maven | 3.9+ |
 
+---
+
 ### Environment Variables Required
 | Variable | Description | Default/Example |
 |----------|-------------|-----------------|
@@ -848,6 +890,8 @@ The system includes multiple optimization layers to ensure high performance and 
 | `WHATSAPP_ACCESS_TOKEN`| Meta Permanent Token | `EAAG...` |
 | `WHATSAPP_VERIFY_TOKEN`| Custom Webhook Token | `my_secret_token` |
 | `WHATSAPP_APP_SECRET`  | Meta App Secret | `abc123...` |
+
+---
 
 ### Quick Start (Docker) - Recommended
 Run the full stack locally with one command.
@@ -877,6 +921,8 @@ Run the full stack locally with one command.
    ```
 
 The API will be available at `http://localhost:8080`.
+
+---
 
 ### Manual Quick Start
 ```bash
@@ -909,6 +955,8 @@ on:
     branches: [ "main", "develop" ]
 ```
 
+---
+
 ### Features
 | Feature | Description |
 |---------|-------------|
@@ -916,6 +964,8 @@ on:
 | Dependency caching | Faster builds |
 | Secure secrets | Credential injection |
 | Testing | Profile test with Docker (MySQL/Redis) |
+
+---
 
 ### Required GitHub Secrets
 ```
@@ -939,12 +989,16 @@ The project implements a robust testing strategy across all layers of the hexago
 | **Mutation** | Test effectiveness measurement | **Pitest** |
 | **E2E (Client)** | Full business flow validation | **Playwright** (in `messenger-frontend`) |
 
+---
+
 ### Key Features
 - **Testcontainers (MySQL & Redis)**: No manual Docker setup required. Tests download and manage containers automatically.
 - **Integral Strategy (Full-Stack)**: The project is complemented by a frontend E2E suite that validates real integration with backend endpoints, including security bypass (Turnstile) and sensor simulation (GPS/Camera).
 - **Hierarchical Singleton Pattern**: `BaseContainerTest` shares infrastructure across test contexts, drastically reducing startup time.
 - **Mutation Testing**: Metrics beyond line coverage, injecting faults to ensure assertions actually detect errors.
 - **Flyway Parity**: Integration tests run on the exact same migrations used in production.
+
+---
 
 ### Running Tests
 ```bash
@@ -977,6 +1031,8 @@ The project implements a robust testing strategy across all layers of the hexago
   - System Settings
   - Transcription
 
+---
+
 ### Usage
 1. Import collection in Postman
 2. Configure `baseUrl` variable (default: `http://localhost:8080`)
@@ -984,6 +1040,8 @@ The project implements a robust testing strategy across all layers of the hexago
 4. Tokens (`token` and `refreshToken`) are saved automatically
 5. All other endpoints use the token automatically
 6. When access token expires, run **"Refresh Token"**
+
+---
 
 ## Android Integration
 The system includes a native Android application built with **Capacitor**, providing a seamless mobile experience for messengers.
@@ -996,6 +1054,8 @@ The system includes a native Android application built with **Capacitor**, provi
   - `PushNotifications`: Real-time alerts for updates.
   - `StatusBar`: Custom UI overlays for edge-to-edge experience.
 
+---
+
 ### Key Features & Permissions
 The app requests the following permissions to function correctly:
 - **Location**: `ACCESS_FINE_LOCATION` & `ACCESS_BACKGROUND_LOCATION` for real-time tracking even when the app is minimized.
@@ -1003,11 +1063,15 @@ The app requests the following permissions to function correctly:
 - **Notifications**: `POST_NOTIFICATIONS` for delivery updates.
 - **Foreground Service**: Ensures tracking persistence during deliveries.
 
+---
+
 ### Development Setup (Emulator)
 To connect the Android Emulator to your local backend development environment:
 1. Ensure the backend is running on `localhost:8080`.
 2. The Android project is pre-configured to use `10.0.2.2` to access the host machine's `localhost`.
 3. Cleartext traffic is permitted for `10.0.2.2` in `network_security_config.xml`.
+
+---
 
 ### Commands
 From the `messenger-frontend` directory:
