@@ -1,14 +1,14 @@
-# 🚀 Guía de Colaboración - Backend
+# Guía de Colaboración - Backend
 
 Esta guía establece los estándares y reglas para contribuir al backend del proyecto Messenger.
 
-## 🛠️ Stack Tecnológico
+## Stack Tecnológico
 * **Lenguaje:** Java 17+
 * **Framework:** Spring Boot
 * **Base de Datos:** MySQL & Redis
 * **Infraestructura:** Google Cloud Platform (GCP)
 
-## 🔐 Reglas de Contribución (Seguridad)
+## Reglas de Contribución (Seguridad)
 Para mantener la integridad del código y cumplir con los estándares del proyecto, el repositorio tiene activadas reglas de protección:
 
 1. **Prohibido Push a `main`:** Nadie puede subir código directamente a la rama principal.
@@ -20,7 +20,7 @@ Para mantener la integridad del código y cumplir con los estándares del proyec
 6. **Conversaciones Resueltas:** Asegúrate de responder y resolver todos los comentarios del revisor antes del merge.
 7. **Tests Verificados:** Todo PR debe pasar la suite completa de tests (`./mvnw test`). El sistema usa **Testcontainers**, por lo que solo necesitas tener Docker activo.
 
-## 🚀 Pasos para colaborar
+## Pasos para colaborar
 1. Clona el repositorio.
 2. Crea tu rama de trabajo.
 3. Asegúrate de que el archivo `.env` o credenciales de **MySQL/GCP** estén en el `.gitignore`.
