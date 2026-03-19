@@ -708,6 +708,14 @@ flowchart LR
 
 ---
 
+### Public Identification (UUID)
+To enhance security and facilitate offline synchronization, the system uses **UUID v4** for public identification of entities (Service Deliveries, Dealerships, Employees).
+- **Non-Enumerable**: Prevents ID enumeration attacks by using non-sequential identifiers.
+- **Offline-First Ready**: Allows the mobile client to generate temporary IDs or handle synchronization without primary key conflicts.
+- **Internal Performance**: Numeric IDs are maintained as internal primary keys for optimal database performance, but are never exposed through the public API.
+
+---
+
 ### Distributed Rate Limiting
 - **Cloudflare Turnstile**: Mandatory bot protection for all login attempts to prevent automated attacks.
 - **Redis-Backed Throttling**:

@@ -708,6 +708,14 @@ flowchart LR
 
 ---
 
+### Identificación Pública (UUID)
+Para mejorar la seguridad y facilitar la sincronización offline, el sistema utiliza **UUID v4** para la identificación pública de entidades (Servicios, Concesionarios, Empleados).
+- **No Enumerable**: Previene ataques de enumeración de IDs mediante identificadores no secuenciales.
+- **Preparado para Offline-First**: Permite al cliente móvil gestionar la sincronización y referencias sin conflictos de llaves primarias.
+- **Rendimiento Interno**: Se mantienen los IDs numéricos como llaves primarias internas para un rendimiento óptimo en la base de datos, pero nunca se exponen a través de la API pública.
+
+---
+
 ### Rate Limiting Distribuido
 - **Cloudflare Turnstile**: Protección obligatoria contra bots en todos los intentos de inicio de sesión para evitar ataques automatizados.
 - **Limitación en Redis**:
