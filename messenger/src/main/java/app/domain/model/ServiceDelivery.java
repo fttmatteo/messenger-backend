@@ -11,6 +11,7 @@ import java.util.List;
  */
 public class ServiceDelivery {
     private Long idServiceDelivery;
+    private String uuid;
     private Plate plate;
     private Dealership dealership;
     private Employee messenger;
@@ -34,6 +35,14 @@ public class ServiceDelivery {
 
     public void setIdServiceDelivery(Long idServiceDelivery) {
         this.idServiceDelivery = idServiceDelivery;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public Plate getPlate() {

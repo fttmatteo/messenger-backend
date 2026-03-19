@@ -57,35 +57,37 @@ public class DealershipController {
     }
 
     /**
-     * Busca un concesionario por su ID.
+     * Busca un concesionario por su UUID.
      */
-    @GetMapping("/findByDealershipId/{id}")
+    @GetMapping("/findByDealershipId/{uuid}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<DealershipResponse> findById(@PathVariable Long id) throws Exception {
-        Dealership dealership = dealershipUseCase.findById(id);
+    public ResponseEntity<DealershipResponse> findByUuid(@PathVariable String uuid) throws Exception {
+        Dealership dealership = dealershipUseCase.findByUuid(uuid);
         return ResponseEntity.ok(responseMapper.toResponse(dealership));
     }
 
     /**
      * Actualiza los datos de un concesionario (solo ADMIN).
      */
-    @PutMapping("/updateDealership/{id}")
+    @PutMapping("/updateDealership/{uuid}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<DealershipResponse> update(@PathVariable Long id,
+    public ResponseEntity<DealershipResponse> update(@PathVariable String uuid,
             @Valid @RequestBody DealershipRequest request)
             throws Exception {
         Dealership dealership = builder.build(request);
-        Dealership updated = dealershipUseCase.update(id, dealership);
+        Dealership existing = dealershipUseCase.findByUuid(uuid);
+        Dealership updated = dealershipUseCase.update(existing.getIdDealership(), dealership);
         return ResponseEntity.ok(responseMapper.toResponse(updated));
     }
 
     /**
-     * Elimina un concesionario por su ID (solo ADMIN).
+     * Elimina un concesionario por su UUID (solo ADMIN).
      */
-    @DeleteMapping("/deleteDealership/{id}")
+    @DeleteMapping("/deleteDealership/{uuid}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> delete(@PathVariable Long id) throws Exception {
-        dealershipUseCase.deleteById(id);
+    public ResponseEntity<Void> delete(@PathVariable String uuid) throws Exception {
+        Dealership existing = dealershipUseCase.findByUuid(uuid);
+        dealershipUseCase.deleteById(existing.getIdDealership());
         return ResponseEntity.noContent().build();
     }
 
@@ -93,11 +95,12 @@ public class DealershipController {
      * Geocodifica la dirección de un concesionario para obtener sus coordenadas
      * (solo ADMIN).
      */
-    @PostMapping("/geocodeDealership/{id}")
+    @PostMapping("/geocodeDealership/{uuid}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<DealershipResponse> geocodeDealership(@PathVariable Long id)
+    public ResponseEntity<DealershipResponse> geocodeDealership(@PathVariable String uuid)
             throws GeolocationException, Exception {
-        Dealership dealership = geocodeDealership.execute(id);
+        Dealership existing = dealershipUseCase.findByUuid(uuid);
+        Dealership dealership = geocodeDealership.execute(existing.getIdDealership());
         return ResponseEntity.ok(responseMapper.toResponse(dealership));
     }
 

@@ -43,4 +43,15 @@ public class SearchEmployee {
         }
         return employee;
     }
+
+    /**
+     * Busca un empleado por su UUID público.
+     */
+    public Employee findByUuid(String uuid) {
+        Employee employee = employeePort.findByUuid(uuid);
+        if (employee == null) {
+            throw new RuntimeException("El empleado con UUID " + uuid + " no existe.");
+        }
+        return employee;
+    }
 }

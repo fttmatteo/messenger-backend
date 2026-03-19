@@ -32,4 +32,9 @@ public interface EmployeePort {
      * Recupera todos los empleados registrados.
      */
     List<Employee> findAll();
+
+    /**
+     * Busca un empleado por su UUID público.
+     */
+    Employee findByUuid(String uuid);
 }

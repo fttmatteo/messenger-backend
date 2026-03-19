@@ -63,6 +63,13 @@ public class DealershipUseCase {
     }
 
     /**
+     * Busca un concesionario por su UUID público.
+     */
+    public Dealership findByUuid(String uuid) {
+        return searchDealership.findByUuid(uuid);
+    }
+
+    /**
      * Busca un concesionario por su nombre exacto.
      */
     public Dealership findByName(String name) throws Exception {

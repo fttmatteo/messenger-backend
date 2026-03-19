@@ -15,6 +15,7 @@ public class DealershipMapper {
             return null;
         DealershipEntity entity = new DealershipEntity();
         entity.setIdDealership(dealership.getIdDealership());
+        entity.setUuid(dealership.getUuid());
         entity.setName(dealership.getName());
         entity.setAddress(dealership.getAddress());
         entity.setPhone(dealership.getPhone());
@@ -31,6 +32,7 @@ public class DealershipMapper {
             return null;
         Dealership dealership = new Dealership();
         dealership.setIdDealership(entity.getIdDealership());
+        dealership.setUuid(entity.getUuid());
         dealership.setName(entity.getName());
         dealership.setAddress(entity.getAddress());
         dealership.setPhone(entity.getPhone());

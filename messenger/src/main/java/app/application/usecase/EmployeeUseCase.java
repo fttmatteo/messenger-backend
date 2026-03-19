@@ -56,11 +56,14 @@ public class EmployeeUseCase {
      */
     @Cacheable(value = "employees", key = "'id:' + #id")
     public Employee findById(Long id) {
-        Employee employee = searchEmployee.findById(id);
-        if (employee == null) {
-            throw new RuntimeException("Empleado no encontrado con ID: " + id);
-        }
-        return employee;
+        return searchEmployee.findById(id);
+    }
+
+    /**
+     * Busca un empleado por su UUID público.
+     */
+    public Employee findByUuid(String uuid) {
+        return searchEmployee.findByUuid(uuid);
     }
 
     /**

@@ -222,6 +222,14 @@ public class ServiceDeliveryUseCase {
     }
 
     /**
+     * Busca un servicio por su UUID público.
+     */
+    @Transactional(readOnly = true)
+    public ServiceDelivery findByUuid(String uuid) throws Exception {
+        return searchService.findByUuid(uuid);
+    }
+
+    /**
      * Recupera todos los servicios con paginación, ordenamiento y filtro de estado.
      */
     @Transactional(readOnly = true)

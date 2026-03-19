@@ -47,6 +47,7 @@ public class ServiceDeliveryResponseMapper {
 
         ServiceDeliveryResponse response = new ServiceDeliveryResponse();
         response.setIdServiceDelivery(service.getIdServiceDelivery());
+        response.setUuid(service.getUuid());
         response.setCurrentStatus(service.getCurrentStatus());
         response.setObservation(service.getObservation());
         response.setCreatedAt(service.getCreatedAt());
@@ -78,6 +79,7 @@ public class ServiceDeliveryResponseMapper {
 
         ServiceDeliveryResponse response = new ServiceDeliveryResponse();
         response.setIdServiceDelivery(service.getIdServiceDelivery());
+        response.setUuid(service.getUuid());
         response.setCurrentStatus(service.getCurrentStatus());
         response.setObservation(service.getObservation());
         response.setCreatedAt(service.getCreatedAt());

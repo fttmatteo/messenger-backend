@@ -122,7 +122,7 @@ class DealershipControllerIntegrationTest extends AbstractIntegrationTest {
         entityManager.persist(d);
         entityManager.flush();
 
-        mockMvc.perform(delete("/dealerships/deleteDealership/" + d.getIdDealership())
+        mockMvc.perform(delete("/dealerships/deleteDealership/" + d.getUuid())
                 .with(csrf()))
                 .andExpect(status().isNoContent());
 

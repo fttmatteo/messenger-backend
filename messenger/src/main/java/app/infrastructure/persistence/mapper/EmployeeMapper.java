@@ -15,6 +15,7 @@ public class EmployeeMapper {
             return null;
         EmployeeEntity entity = new EmployeeEntity();
         entity.setIdEmployee(employee.getIdEmployee());
+        entity.setUuid(employee.getUuid());
         entity.setDocument(employee.getDocument());
         entity.setFullName(employee.getFullName());
         entity.setPhone(employee.getPhone());
@@ -28,6 +29,7 @@ public class EmployeeMapper {
             return null;
         Employee employee = new Employee();
         employee.setIdEmployee(entity.getIdEmployee());
+        employee.setUuid(entity.getUuid());
         employee.setDocument(entity.getDocument());
         employee.setFullName(entity.getFullName());
         employee.setPhone(entity.getPhone());

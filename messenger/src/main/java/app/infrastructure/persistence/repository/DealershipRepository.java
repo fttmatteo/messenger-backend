@@ -24,4 +24,9 @@ public interface DealershipRepository extends JpaRepository<DealershipEntity, Lo
      * Busca un concesionario por su PIN de WhatsApp.
      */
     java.util.Optional<DealershipEntity> findByWhatsappPin(String whatsappPin);
+
+    /**
+     * Busca un concesionario por su UUID público.
+     */
+    java.util.Optional<DealershipEntity> findByUuid(String uuid);
 }

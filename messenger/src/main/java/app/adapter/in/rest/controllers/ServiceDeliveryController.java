@@ -154,10 +154,10 @@ public class ServiceDeliveryController {
      * Actualiza el estado de un servicio.
      * Permite adjuntar evidencia (firma, fotos) si es necesario.
      */
-    @PutMapping("/updateService/{id}")
+    @PutMapping("/updateService/{uuid}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ServiceDeliveryResponse> updateStatus(
-            @PathVariable Long id,
+            @PathVariable String uuid,
             @RequestParam("status") String status,
             @RequestParam(value = "observation", required = false) String observation,
             @RequestParam(value = "signature", required = false) MultipartFile signature,
@@ -215,7 +215,8 @@ public class ServiceDeliveryController {
             }
             tempFiles.addAll(photoFiles);
 
-            ServiceDelivery updated = serviceDeliveryUseCase.updateStatusWithFiles(id, data.getStatus(),
+            ServiceDelivery serviceForId = serviceDeliveryUseCase.findByUuid(uuid);
+            ServiceDelivery updated = serviceDeliveryUseCase.updateStatusWithFiles(serviceForId.getIdServiceDelivery(), data.getStatus(),
                     data.getObservation(),
                     signatureFile, signatureGifFile, photoFiles, data.getUserId(), data.getLatitude(),
                     data.getLongitude());
@@ -230,10 +231,10 @@ public class ServiceDeliveryController {
      * Reasigna un servicio a otro mensajero.
      * Solo disponible para ADMIN y solo cuando el servicio está en CANCELED.
      */
-    @PutMapping("/reassign/{id}")
+    @PutMapping("/reassign/{uuid}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ServiceDeliveryResponse> reassignMessenger(
-            @PathVariable Long id,
+            @PathVariable String uuid,
             @RequestBody Map<String, Long> request) throws Exception {
 
         Long newMessengerId = request.get("messengerId");
@@ -242,8 +243,9 @@ public class ServiceDeliveryController {
         }
 
         Employee currentUser = securityHelper.getCurrentUser();
+        ServiceDelivery serviceForId = serviceDeliveryUseCase.findByUuid(uuid);
         ServiceDelivery reassigned = serviceDeliveryUseCase.reassignMessenger(
-                id, newMessengerId, currentUser.getIdEmployee());
+                serviceForId.getIdServiceDelivery(), newMessengerId, currentUser.getIdEmployee());
 
         return ResponseEntity.ok(responseMapper.toResponse(reassigned));
     }
@@ -251,12 +253,12 @@ public class ServiceDeliveryController {
     /**
      * Busca un servicio por su ID.
      */
-    @GetMapping("/findByServiceId/{id}")
+    @GetMapping("/findByServiceId/{uuid}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ServiceDeliveryResponse> findById(@PathVariable Long id) throws Exception {
-        ServiceDelivery service = serviceDeliveryUseCase.findById(id);
+    public ResponseEntity<ServiceDeliveryResponse> findByUuid(@PathVariable String uuid) throws Exception {
+        ServiceDelivery service = serviceDeliveryUseCase.findByUuid(uuid);
         if (service == null) {
-            throw new ResourceNotFoundException("Servicio con ID " + id + " no encontrado");
+            throw new ResourceNotFoundException("Servicio con UUID " + uuid + " no encontrado");
         }
 
         Employee currentUser = securityHelper.getCurrentUser();
@@ -322,12 +324,13 @@ public class ServiceDeliveryController {
     /**
      * Mueve un servicio a la papelera (Soft Delete).
      */
-    @DeleteMapping("/deleteService/{id}")
+    @DeleteMapping("/deleteService/{uuid}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Map<String, String>> delete(@PathVariable Long id) throws Exception {
+    public ResponseEntity<Map<String, String>> delete(@PathVariable String uuid) throws Exception {
 
         Employee currentUser = securityHelper.getCurrentUser();
-        serviceDeliveryUseCase.deleteById(id, currentUser.getIdEmployee());
+        ServiceDelivery serviceForId = serviceDeliveryUseCase.findByUuid(uuid);
+        serviceDeliveryUseCase.deleteById(serviceForId.getIdServiceDelivery(), currentUser.getIdEmployee());
 
         return ResponseEntity.ok(Map.of(
                 "message",
@@ -352,12 +355,13 @@ public class ServiceDeliveryController {
     /**
      * Restaura un servicio desde la papelera (solo ADMIN).
      */
-    @PostMapping("/trash/restore/{id}")
+    @PostMapping("/trash/restore/{uuid}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ServiceDeliveryResponse> restore(@PathVariable Long id) throws Exception {
+    public ResponseEntity<ServiceDeliveryResponse> restore(@PathVariable String uuid) throws Exception {
 
         Employee currentUser = securityHelper.getCurrentUser();
-        ServiceDelivery restored = serviceDeliveryUseCase.restore(id, currentUser.getIdEmployee());
+        ServiceDelivery serviceForId = serviceDeliveryUseCase.findByUuid(uuid);
+        ServiceDelivery restored = serviceDeliveryUseCase.restore(serviceForId.getIdServiceDelivery(), currentUser.getIdEmployee());
 
         return ResponseEntity.ok(responseMapper.toResponse(restored));
     }
@@ -381,12 +385,13 @@ public class ServiceDeliveryController {
     /**
      * Elimina permanentemente un servicio individual de la papelera (solo ADMIN).
      */
-    @DeleteMapping("/trash/{id}")
+    @DeleteMapping("/trash/{uuid}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Map<String, String>> permanentDeleteFromTrash(@PathVariable Long id) throws Exception {
+    public ResponseEntity<Map<String, String>> permanentDeleteFromTrash(@PathVariable String uuid) throws Exception {
 
         Employee currentUser = securityHelper.getCurrentUser();
-        serviceDeliveryUseCase.permanentDeleteById(id, currentUser.getIdEmployee());
+        ServiceDelivery serviceForId = serviceDeliveryUseCase.findByUuid(uuid);
+        serviceDeliveryUseCase.permanentDeleteById(serviceForId.getIdServiceDelivery(), currentUser.getIdEmployee());
 
         return ResponseEntity.ok(Map.of("message", "Servicio eliminado permanentemente"));
     }

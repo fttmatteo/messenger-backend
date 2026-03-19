@@ -7,6 +7,8 @@ import app.domain.model.ServiceDelivery;
 import app.domain.model.StatusHistory;
 import app.domain.model.enums.Status;
 import app.domain.ports.ServiceDeliveryPort;
+import app.application.usecase.EmployeeUseCase;
+import app.domain.model.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -28,17 +30,20 @@ public class MonitoringController {
 
     @Autowired
     private ServiceDeliveryPort serviceDeliveryPort;
+    @Autowired
+    private EmployeeUseCase employeeUseCase;
 
     /**
      * Obtiene la actividad de un mensajero para una fecha específica.
      * Devuelve estadísticas del día y línea de tiempo de eventos.
      */
-    @GetMapping("/messenger/{messengerId}/activity")
+    @GetMapping("/messenger/{messengerUuid}/activity")
     public ResponseEntity<MessengerActivityResponse> getMessengerActivity(
-            @PathVariable Long messengerId,
+            @PathVariable String messengerUuid,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 
-        List<ServiceDelivery> allServices = serviceDeliveryPort.findByMessengerAndDate(messengerId, date);
+        Employee messenger = employeeUseCase.findByUuid(messengerUuid);
+        List<ServiceDelivery> allServices = serviceDeliveryPort.findByMessengerAndDate(messenger.getIdEmployee(), date);
 
         int assigned = 0;
         int delivered = 0;

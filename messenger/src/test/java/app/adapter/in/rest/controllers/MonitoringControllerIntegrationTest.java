@@ -101,7 +101,7 @@ class MonitoringControllerIntegrationTest extends AbstractIntegrationTest {
 
         String today = LocalDate.now().toString();
 
-        mockMvc.perform(get("/monitoring/messenger/" + messenger.getIdEmployee() + "/activity")
+        mockMvc.perform(get("/monitoring/messenger/" + messenger.getUuid() + "/activity")
                 .param("date", today))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.dailyStats.total").value(1))
@@ -116,7 +116,7 @@ class MonitoringControllerIntegrationTest extends AbstractIntegrationTest {
      * Verifica que el endpoint de monitoreo devuelva 403 para el rol de mensajero.
      */
     void shouldReturnForbiddenForMessenger() throws Exception {
-        mockMvc.perform(get("/monitoring/messenger/1/activity")
+        mockMvc.perform(get("/monitoring/messenger/550e8400-e29b-41d4-a716-446655440000/activity")
                 .param("date", "2024-01-05"))
                 .andExpect(status().isForbidden());
     }

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class Dealership {
     private Long idDealership;
+    private String uuid;
     private String name;
     private String address;
     private String phone;
@@ -23,6 +24,14 @@ public class Dealership {
 
     public void setIdDealership(Long idDealership) {
         this.idDealership = idDealership;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getName() {

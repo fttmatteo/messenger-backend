@@ -7,6 +7,7 @@ import app.domain.model.enums.Role;
  */
 public class EmployeeResponse {
     private Long idEmployee;
+    private String uuid;
     private Long document;
     private String fullName;
     private String phone;
@@ -15,8 +16,9 @@ public class EmployeeResponse {
     public EmployeeResponse() {
     }
 
-    public EmployeeResponse(Long idEmployee, Long document, String fullName, String phone, Role role) {
+    public EmployeeResponse(Long idEmployee, String uuid, Long document, String fullName, String phone, Role role) {
         this.idEmployee = idEmployee;
+        this.uuid = uuid;
         this.document = document;
         this.fullName = fullName;
         this.phone = phone;
@@ -29,6 +31,14 @@ public class EmployeeResponse {
 
     public void setIdEmployee(Long idEmployee) {
         this.idEmployee = idEmployee;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public Long getDocument() {

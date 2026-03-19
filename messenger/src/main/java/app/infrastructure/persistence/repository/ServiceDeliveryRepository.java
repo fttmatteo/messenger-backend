@@ -66,6 +66,13 @@ public interface ServiceDeliveryRepository extends JpaRepository<ServiceDelivery
         List<ServiceDeliveryEntity> findByDeletedTrue();
 
         /**
+         * Encuentra un servicio por su UUID público y que no esté eliminado.
+         * Usa EntityGraph para cargar relaciones y evitar N+1.
+         */
+        @EntityGraph(attributePaths = { "plate", "dealership", "messenger", "signature" })
+        Optional<ServiceDeliveryEntity> findByUuidAndDeletedFalse(String uuid);
+
+        /**
          * Encuentra servicios con paginación filtrado por estado de eliminación.
          * Usa EntityGraph para cargar relaciones y evitar N+1.
          */

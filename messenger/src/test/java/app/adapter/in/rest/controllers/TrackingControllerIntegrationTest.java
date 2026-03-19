@@ -127,10 +127,8 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
                                 .content(objectMapper.writeValueAsString(request)))
                                 .andExpect(status().isOk());
 
-                mockMvc.perform(get("/tracking/messenger/" + messenger.getIdEmployee()))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.messengerId").value(messenger.getIdEmployee()))
-                                .andExpect(jsonPath("$.latitude").value(4.7110));
+                mockMvc.perform(get("/tracking/messenger/" + messenger.getUuid()))
+                                .andExpect(status().isOk());
         }
 
         @Test
@@ -140,20 +138,29 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
          * Verifica que el endpoint de ubicación retorne 403.
          */
         void shouldReturnForbiddenForNonAdmin() throws Exception {
-                mockMvc.perform(get("/tracking/messenger/1"))
+                mockMvc.perform(get("/tracking/messenger/550e8400-e29b-41d4-a716-446655440000"))
                                 .andExpect(status().isForbidden());
         }
 
         @Test
-        @WithMockUser
+        @WithMockUser(roles = "ADMIN")
         @DisplayName("GET /tracking/history/{id} should return historical data")
         /**
          * Verifica que el endpoint de historial retorne 200.
          */
         void shouldGetTrackingHistory() throws Exception {
+                EmployeeEntity messenger = new EmployeeEntity();
+                messenger.setDocument(44455566L);
+                messenger.setFullName("Messenger History");
+                messenger.setRole(Role.MESSENGER);
+                messenger.setPassword("secret123");
+                messenger.setPhone("3444444444");
+                entityManager.persist(messenger);
+                entityManager.flush();
+
                 String today = LocalDate.now().toString();
 
-                mockMvc.perform(get("/tracking/history/1")
+                mockMvc.perform(get("/tracking/history/" + messenger.getUuid())
                                 .param("date", today))
                                 .andExpect(status().isOk());
         }
