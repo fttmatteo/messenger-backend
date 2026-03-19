@@ -114,7 +114,7 @@ class EmployeeControllerIntegrationTest extends AbstractIntegrationTest {
         entityManager.persist(emp);
         entityManager.flush();
 
-        mockMvc.perform(delete("/employees/deleteEmployee/" + emp.getIdEmployee())
+        mockMvc.perform(delete("/employees/deleteEmployee/" + emp.getUuid())
                 .with(csrf()))
                 .andExpect(status().isNoContent());
 

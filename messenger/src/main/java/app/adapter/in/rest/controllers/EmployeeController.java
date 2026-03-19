@@ -60,14 +60,14 @@ public class EmployeeController {
     }
 
     /**
-     * Busca un empleado por su ID (solo ADMIN).
+     * Busca un empleado por su UUID público (solo ADMIN).
      */
-    @GetMapping("/findByEmployeeId/{id}")
+    @GetMapping("/findByEmployeeId/{uuid}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<EmployeeResponse> findById(@PathVariable Long id) {
-        Employee employee = employeeUseCase.findById(id);
+    public ResponseEntity<EmployeeResponse> findByUuid(@PathVariable String uuid) {
+        Employee employee = employeeUseCase.findByUuid(uuid);
         if (employee == null) {
-            throw new app.domain.exception.ResourceNotFoundException("Empleado con ID " + id + " no encontrado");
+            throw new app.domain.exception.ResourceNotFoundException("Empleado con UUID " + uuid + " no encontrado");
         }
         return ResponseEntity.ok(responseMapper.toResponse(employee));
     }
@@ -75,10 +75,10 @@ public class EmployeeController {
     /**
      * Actualiza los datos de un empleado (solo ADMIN).
      */
-    @PutMapping("/updateEmployee/{id}")
+    @PutMapping("/updateEmployee/{uuid}")
     @PreAuthorize("hasRole('ADMIN')")
     @AuditableAction(action = "UPDATE_EMPLOYEE", description = "Actualizar empleado existente")
-    public ResponseEntity<EmployeeResponse> update(@PathVariable Long id, @Valid @RequestBody EmployeeRequest request)
+    public ResponseEntity<EmployeeResponse> update(@PathVariable String uuid, @Valid @RequestBody EmployeeRequest request)
             throws Exception {
         Employee employee = builder.buildForUpdate(
                 request.getDocument(),
@@ -86,18 +86,20 @@ public class EmployeeController {
                 request.getPhone(),
                 request.getPassword(),
                 request.getRole());
-        Employee updated = employeeUseCase.update(id, employee);
+        Employee existing = employeeUseCase.findByUuid(uuid);
+        Employee updated = employeeUseCase.update(existing.getIdEmployee(), employee);
         return ResponseEntity.ok(responseMapper.toResponse(updated));
     }
 
     /**
-     * Elimina un empleado por su ID (solo ADMIN).
+     * Elimina un empleado por su UUID (solo ADMIN).
      */
-    @DeleteMapping("/deleteEmployee/{id}")
+    @DeleteMapping("/deleteEmployee/{uuid}")
     @PreAuthorize("hasRole('ADMIN')")
     @AuditableAction(action = "DELETE_EMPLOYEE", description = "Eliminar empleado")
-    public ResponseEntity<Void> delete(@PathVariable Long id) throws Exception {
-        employeeUseCase.deleteById(id);
+    public ResponseEntity<Void> delete(@PathVariable String uuid) throws Exception {
+        Employee existing = employeeUseCase.findByUuid(uuid);
+        employeeUseCase.deleteById(existing.getIdEmployee());
         return ResponseEntity.noContent().build();
     }
 }

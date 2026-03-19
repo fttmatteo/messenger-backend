@@ -73,4 +73,13 @@ public class EmployeeAdapter implements EmployeePort {
     public void deleteById(Long idEmployee) {
         repository.deleteById(idEmployee);
     }
+
+    @Override
+    /**
+     * Busca empleado por UUID público.
+     */
+    public Employee findByUuid(String uuid) {
+        Optional<EmployeeEntity> entity = repository.findByUuid(uuid);
+        return entity.map(mapper::toDomain).orElse(null);
+    }
 }

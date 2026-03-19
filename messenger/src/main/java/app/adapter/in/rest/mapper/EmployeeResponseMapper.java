@@ -17,6 +17,7 @@ public class EmployeeResponseMapper {
 
         return new EmployeeResponse(
                 employee.getIdEmployee(),
+                employee.getUuid(),
                 employee.getDocument(),
                 employee.getFullName(),
                 employee.getPhone(),

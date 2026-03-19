@@ -83,4 +83,13 @@ public class DealershipAdapter implements DealershipPort {
         Optional<DealershipEntity> entity = repository.findByWhatsappPin(whatsappPin);
         return entity.map(mapper::toDomain).orElse(null);
     }
+
+    @Override
+    /**
+     * Busca concesionario por UUID público.
+     */
+    public Dealership findByUuid(String uuid) {
+        Optional<DealershipEntity> entity = repository.findByUuid(uuid);
+        return entity.map(mapper::toDomain).orElse(null);
+    }
 }

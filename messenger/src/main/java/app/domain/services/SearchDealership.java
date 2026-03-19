@@ -47,4 +47,15 @@ public class SearchDealership {
         }
         return dealership;
     }
+
+    /**
+     * Busca un concesionario por su UUID público.
+     */
+    public Dealership findByUuid(String uuid) {
+        Dealership dealership = dealershipPort.findByUuid(uuid);
+        if (dealership == null) {
+            throw new ResourceNotFoundException("El concesionario con UUID " + uuid + " no existe.");
+        }
+        return dealership;
+    }
 }

@@ -16,6 +16,7 @@ public class DealershipResponseMapper {
         }
         DealershipResponse response = new DealershipResponse(
                 dealership.getIdDealership(),
+                dealership.getUuid(),
                 dealership.getName(),
                 dealership.getAddress(),
                 dealership.getPhone(),

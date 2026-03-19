@@ -37,4 +37,9 @@ public interface DealershipPort {
      * Busca un concesionario por su PIN de WhatsApp.
      */
     Dealership findByWhatsappPin(String whatsappPin);
+
+    /**
+     * Busca un concesionario por su UUID público.
+     */
+    Dealership findByUuid(String uuid);
 }

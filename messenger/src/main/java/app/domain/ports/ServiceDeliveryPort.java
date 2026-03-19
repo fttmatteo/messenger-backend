@@ -42,6 +42,11 @@ public interface ServiceDeliveryPort {
         ServiceDelivery findByIdActive(Long idServiceDelivery);
 
         /**
+         * Busca un servicio activo (no eliminado) por su UUID público.
+         */
+        ServiceDelivery findByUuidActive(String uuid);
+
+        /**
          * Recupera todos los servicios marcados como eliminados.
          */
         List<ServiceDelivery> findDeleted();

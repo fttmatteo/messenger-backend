@@ -4,6 +4,7 @@ import app.domain.model.enums.Status;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Entidad JPA que representa la tabla 'service_deliveries'.
@@ -15,6 +16,9 @@ public class ServiceDeliveryEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_service_delivery")
     private Long idServiceDelivery;
+
+    @Column(name = "uuid", unique = true, nullable = false, length = 36, columnDefinition = "CHAR(36)")
+    private String uuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "plate_id", nullable = false)
@@ -53,6 +57,14 @@ public class ServiceDeliveryEntity {
 
     public void setIdServiceDelivery(Long idServiceDelivery) {
         this.idServiceDelivery = idServiceDelivery;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public PlateEntity getPlate() {
@@ -141,6 +153,9 @@ public class ServiceDeliveryEntity {
     protected void onCreate() {
         if (this.createdAt == null) {
             this.createdAt = java.time.LocalDateTime.now();
+        }
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID().toString();
         }
     }
 

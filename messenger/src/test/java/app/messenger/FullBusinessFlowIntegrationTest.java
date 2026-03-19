@@ -131,8 +131,8 @@ class FullBusinessFlowIntegrationTest extends AbstractIntegrationTest {
                                 .andExpect(jsonPath("$.plate.plateNumber", org.hamcrest.Matchers.is("XYZ789")))
                                 .andReturn();
 
-                Long serviceId = objectMapper.readTree(serviceResult.getResponse().getContentAsString())
-                                .get("idServiceDelivery").asLong();
+                String serviceUuid = objectMapper.readTree(serviceResult.getResponse().getContentAsString())
+                                .get("uuid").asText();
 
                 byte[] validSignatureBytes = createValidPngImage(200, 100);
                 byte[] validPhotoBytes = createValidPngImage(1024, 768);
@@ -141,7 +141,7 @@ class FullBusinessFlowIntegrationTest extends AbstractIntegrationTest {
                 MockMultipartFile photo1 = new MockMultipartFile("photos", "photo1.png", "image/png",
                                 validPhotoBytes);
 
-                mockMvc.perform(multipart("/services/updateService/" + serviceId)
+                mockMvc.perform(multipart("/services/updateService/" + serviceUuid)
                                 .file(signatureFile)
                                 .file(photo1)
                                 .param("status", "DELIVERED")
@@ -155,7 +155,7 @@ class FullBusinessFlowIntegrationTest extends AbstractIntegrationTest {
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.currentStatus", org.hamcrest.Matchers.is("DELIVERED")));
 
-                mockMvc.perform(get("/services/findByServiceId/" + serviceId)
+                mockMvc.perform(get("/services/findByServiceId/" + serviceUuid)
                                 .with(user("999999").roles("ADMIN")))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.history",

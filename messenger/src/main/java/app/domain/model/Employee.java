@@ -8,6 +8,7 @@ import app.domain.model.enums.Role;
  */
 public class Employee {
     private Long idEmployee;
+    private String uuid;
     private Long document;
     private String fullName;
     private String phone;
@@ -20,6 +21,14 @@ public class Employee {
 
     public void setIdEmployee(Long idEmployee) {
         this.idEmployee = idEmployee;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public Long getDocument() {

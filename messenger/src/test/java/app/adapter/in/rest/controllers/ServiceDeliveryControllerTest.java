@@ -78,12 +78,14 @@ class ServiceDeliveryControllerTest {
 
         sampleService = new ServiceDelivery();
         sampleService.setIdServiceDelivery(1L);
+        sampleService.setUuid("550e8400-e29b-41d4-a716-446655440000");
         sampleService.setPlate(plate);
         sampleService.setCurrentStatus(Status.ASSIGNED);
         sampleService.setMessenger(messengerUser);
 
         sampleResponse = new ServiceDeliveryResponse();
         sampleResponse.setIdServiceDelivery(1L);
+        sampleResponse.setUuid("550e8400-e29b-41d4-a716-446655440000");
         sampleResponse.setCurrentStatus(Status.ASSIGNED);
     }
 
@@ -102,8 +104,9 @@ class ServiceDeliveryControllerTest {
             admin.setRole(Role.ADMIN);
 
             when(securityHelper.getCurrentUser()).thenReturn(admin);
+            when(serviceDeliveryUseCase.findByUuid("550e8400-e29b-41d4-a716-446655440000")).thenReturn(sampleService);
 
-            mockMvc.perform(delete("/services/deleteService/1"))
+            mockMvc.perform(delete("/services/deleteService/550e8400-e29b-41d4-a716-446655440000"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.message").exists());
 
@@ -126,10 +129,11 @@ class ServiceDeliveryControllerTest {
             admin.setRole(Role.ADMIN);
 
             when(securityHelper.getCurrentUser()).thenReturn(admin);
+            when(serviceDeliveryUseCase.findByUuid("550e8400-e29b-41d4-a716-446655440000")).thenReturn(sampleService);
             when(serviceDeliveryUseCase.restore(1L, 1L)).thenReturn(sampleService);
             when(responseMapper.toResponse(sampleService)).thenReturn(sampleResponse);
-
-            mockMvc.perform(post("/services/trash/restore/1"))
+ 
+            mockMvc.perform(post("/services/trash/restore/550e8400-e29b-41d4-a716-446655440000"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.idServiceDelivery").value(1L));
 

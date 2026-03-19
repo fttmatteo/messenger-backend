@@ -5,6 +5,7 @@ package app.adapter.in.rest.response;
  */
 public class DealershipResponse {
     private Long idDealership;
+    private String uuid;
     private String name;
     private String address;
     private String phone;
@@ -17,9 +18,10 @@ public class DealershipResponse {
     public DealershipResponse() {
     }
 
-    public DealershipResponse(Long idDealership, String name, String address, String phone, String zone,
+    public DealershipResponse(Long idDealership, String uuid, String name, String address, String phone, String zone,
             String whatsappPin) {
         this.idDealership = idDealership;
+        this.uuid = uuid;
         this.name = name;
         this.address = address;
         this.phone = phone;
@@ -33,6 +35,14 @@ public class DealershipResponse {
 
     public void setIdDealership(Long idDealership) {
         this.idDealership = idDealership;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getName() {

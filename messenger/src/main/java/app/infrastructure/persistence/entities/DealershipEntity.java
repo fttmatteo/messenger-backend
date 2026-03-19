@@ -3,6 +3,7 @@ package app.infrastructure.persistence.entities;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import java.util.UUID;
 
 /**
  * Entidad JPA para representar un concesionario.
@@ -16,6 +17,9 @@ public class DealershipEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idDealership;
+
+    @Column(name = "uuid", unique = true, nullable = false, length = 36, columnDefinition = "CHAR(36)")
+    private String uuid;
 
     @Column(nullable = false, unique = true)
     private String name;
@@ -41,12 +45,27 @@ public class DealershipEntity {
     @Column(name = "whatsapp_pin", unique = true)
     private String whatsappPin;
 
+    @PrePersist
+    protected void onCreate() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID().toString();
+        }
+    }
+
     public Long getIdDealership() {
         return idDealership;
     }
 
     public void setIdDealership(Long idDealership) {
         this.idDealership = idDealership;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getName() {

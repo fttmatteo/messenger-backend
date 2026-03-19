@@ -4,6 +4,7 @@ import app.domain.model.enums.Role;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import java.util.UUID;
 
 /**
  * Entidad JPA que representa la tabla 'employees'.
@@ -18,6 +19,9 @@ public class EmployeeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_employee")
     private Long idEmployee;
+
+    @Column(name = "uuid", unique = true, nullable = false, length = 36, columnDefinition = "CHAR(36)")
+    private String uuid;
 
     @Column(unique = true, nullable = false)
     private Long document;
@@ -35,12 +39,27 @@ public class EmployeeEntity {
     @Column(nullable = false)
     private Role role;
 
+    @PrePersist
+    protected void onCreate() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID().toString();
+        }
+    }
+
     public Long getIdEmployee() {
         return idEmployee;
     }
 
     public void setIdEmployee(Long idEmployee) {
         this.idEmployee = idEmployee;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public Long getDocument() {
