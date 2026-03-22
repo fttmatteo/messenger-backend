@@ -1,0 +1,11 @@
+.git
+.github
+.vscode
+messenger/target
+scripts
+test-*.sh
+*.md
+.env
+.env.example
+Messenger_API.postman_collection.json
+.gitignore

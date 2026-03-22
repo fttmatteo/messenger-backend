@@ -32,7 +32,7 @@ ENV SPRING_PROFILES_ACTIVE=prod
 
 # Forzar timezone de Colombia en el contenedor y JVM
 ENV TZ=America/Bogota
-ENV JAVA_OPTS="-Duser.timezone=America/Bogota"
+ENV JAVA_OPTS="-Duser.timezone=America/Bogota -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:InitialRAMPercentage=50.0"
 
 # Exponer el puerto de la aplicación
 EXPOSE 8080
