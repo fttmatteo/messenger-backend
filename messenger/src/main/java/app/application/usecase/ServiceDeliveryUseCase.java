@@ -10,6 +10,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -75,6 +78,10 @@ public class ServiceDeliveryUseCase {
     /**
      * Crea un servicio a partir de una imagen de placa procesada por OCR.
      */
+    @Caching(evict = {
+        @CacheEvict(value = "services", allEntries = true),
+        @CacheEvict(value = "service-details", allEntries = true)
+    })
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "CREATE_SERVICE", description = "Crear servicio desde imagen OCR")
     public ServiceDelivery createServiceFromImage(File imageFile, Long dealershipId, Long messengerId, Double latitude,
@@ -101,6 +108,10 @@ public class ServiceDeliveryUseCase {
     /**
      * Crea un servicio utilizando un número de placa ingresado manualmente.
      */
+    @Caching(evict = {
+        @CacheEvict(value = "services", allEntries = true),
+        @CacheEvict(value = "service-details", allEntries = true)
+    })
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "CREATE_SERVICE_MANUAL", description = "Crear servicio con placa manual")
     public ServiceDelivery createServiceWithManualPlate(File imageFile, String manualPlateNumber, Long dealershipId,
@@ -133,6 +144,10 @@ public class ServiceDeliveryUseCase {
     /**
      * Actualiza el estado de un servicio existente.
      */
+    @Caching(evict = {
+        @CacheEvict(value = "services", allEntries = true),
+        @CacheEvict(value = "service-details", allEntries = true)
+    })
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "UPDATE_STATUS", description = "Actualizar estado de servicio")
     public ServiceDelivery updateStatus(Long serviceId, Status newStatus, String observation,
@@ -145,6 +160,10 @@ public class ServiceDeliveryUseCase {
      * Actualiza el estado de un servicio incluyendo la carga de archivos (fotos,
      * firmas).
      */
+    @Caching(evict = {
+        @CacheEvict(value = "services", allEntries = true),
+        @CacheEvict(value = "service-details", allEntries = true)
+    })
     @Transactional(rollbackFor = Exception.class)
     public ServiceDelivery updateStatusWithFiles(Long serviceId, Status newStatus, String observation,
             File signatureFile, File signatureGifFile, List<File> photoFiles, Long userId, Double latitude,
@@ -207,6 +226,10 @@ public class ServiceDeliveryUseCase {
     /**
      * Reasigna un servicio cancelado a un nuevo mensajero (solo admin).
      */
+    @Caching(evict = {
+        @CacheEvict(value = "services", allEntries = true),
+        @CacheEvict(value = "service-details", allEntries = true)
+    })
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "REASSIGN_MESSENGER", description = "Reasignar servicio a otro mensajero")
     public ServiceDelivery reassignMessenger(Long serviceId, Long newMessengerId, Long adminUserId) throws Exception {
@@ -216,6 +239,7 @@ public class ServiceDeliveryUseCase {
     /**
      * Busca un servicio por su ID (versión de solo lectura).
      */
+    @Cacheable(value = "service-details", key = "'id:' + #id")
     @Transactional(readOnly = true)
     public ServiceDelivery findById(Long id) throws Exception {
         return searchService.findById(id);
@@ -224,6 +248,7 @@ public class ServiceDeliveryUseCase {
     /**
      * Busca un servicio por su UUID público.
      */
+    @Cacheable(value = "service-details", key = "'uuid:' + #uuid")
     @Transactional(readOnly = true)
     public ServiceDelivery findByUuid(String uuid) throws Exception {
         return searchService.findByUuid(uuid);
@@ -291,6 +316,10 @@ public class ServiceDeliveryUseCase {
     /**
      * Mueve un servicio a la papelera (Soft Delete).
      */
+    @Caching(evict = {
+        @CacheEvict(value = "services", allEntries = true),
+        @CacheEvict(value = "service-details", allEntries = true)
+    })
     @AuditableAction(action = "DELETE_SERVICE", description = "Mover servicio a papelera")
     public void deleteById(Long id, Long userId) throws Exception {
         deleteService.deleteById(id, userId);
@@ -307,6 +336,10 @@ public class ServiceDeliveryUseCase {
     /**
      * Restaura un servicio previamente eliminado de la papelera.
      */
+    @Caching(evict = {
+        @CacheEvict(value = "services", allEntries = true),
+        @CacheEvict(value = "service-details", allEntries = true)
+    })
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "RESTORE_SERVICE", description = "Restaurar servicio desde papelera")
     public ServiceDelivery restore(Long id, Long userId) throws Exception {
@@ -317,6 +350,10 @@ public class ServiceDeliveryUseCase {
      * Vacía la papelera eliminando permanentemente todos los servicios marcados
      * como eliminados.
      */
+    @Caching(evict = {
+        @CacheEvict(value = "services", allEntries = true),
+        @CacheEvict(value = "service-details", allEntries = true)
+    })
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "EMPTY_TRASH", description = "Vaciar papelera completamente")
     public int emptyTrash(Long userId) {
@@ -326,6 +363,10 @@ public class ServiceDeliveryUseCase {
     /**
      * Elimina permanentemente un servicio específico de la papelera.
      */
+    @Caching(evict = {
+        @CacheEvict(value = "services", allEntries = true),
+        @CacheEvict(value = "service-details", allEntries = true)
+    })
     @Transactional(rollbackFor = Exception.class)
     @AuditableAction(action = "ARCHIVE_SERVICE", description = "Archivar permanentemente un servicio de la papelera")
     public void permanentDeleteById(Long id, Long userId) throws Exception {

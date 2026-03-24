@@ -47,11 +47,14 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+      - dependency-name: "com.google.cloud:libraries-bom"
     # Agrupar actualizaciones menores y de parche
     groups:
       todas-las-dependencias:
         patterns:
           - "*"
+        exclude-patterns:
+          - "com.google.cloud:libraries-bom"
         update-types:
           - "minor"
           - "patch"
