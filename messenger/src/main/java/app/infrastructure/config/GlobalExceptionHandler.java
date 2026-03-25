@@ -197,7 +197,26 @@ public class GlobalExceptionHandler {
         }
 
         /**
-         * Maneja excepciones generales de seguridad.
+     * Maneja errores de lectura de mensaje HTTP (ej. JSON malformado).
+     */
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(
+            org.springframework.http.converter.HttpMessageNotReadableException ex,
+            HttpServletRequest request) {
+        
+        logger.error("Error de lectura JSON en [{}]: {}", request.getRequestURI(), ex.getMessage());
+        
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Malformed JSON",
+                "El cuerpo de la petición no es un JSON válido o tiene un formato incorrecto",
+                request.getRequestURI());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    /**
+     * Maneja excepciones generales de seguridad.
          * Devuelve FORBIDDEN (403).
          */
         @ExceptionHandler(SecurityException.class)

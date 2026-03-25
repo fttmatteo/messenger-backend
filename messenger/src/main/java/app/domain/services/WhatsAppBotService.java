@@ -5,6 +5,7 @@ import app.domain.model.ServiceDelivery;
 import app.domain.model.StatusHistory;
 import app.domain.model.Location;
 import app.domain.util.LogSanitizer;
+import org.springframework.scheduling.annotation.Async;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import app.domain.model.WhatsAppSession;
@@ -61,6 +62,7 @@ public class WhatsAppBotService {
     /**
      * Procesa un mensaje entrante de WhatsApp.
      */
+    @Async
     @Transactional
     public void processMessage(String from, String messageBody) {
         String text = messageBody.trim();
