@@ -11,7 +11,7 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "dealerships")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "dealerships_v2")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "dealerships_v3")
 public class DealershipEntity {
 
     @Id
