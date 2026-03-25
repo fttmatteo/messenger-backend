@@ -103,7 +103,8 @@ public class WhatsAppWebhookController {
                 }
             }
         } catch (Exception e) {
-            logger.error("Error procesando webhook: {}", e.getMessage(), e);
+            logger.error("Error procesando webhook. Raw body: {}", rawBody);
+            logger.error("Error detalalle: {}", e.getMessage(), e);
         }
 
         return ResponseEntity.ok("EVENT_RECEIVED");
