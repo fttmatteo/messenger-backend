@@ -39,6 +39,7 @@ public class WhatsAppSessionAdapter implements WhatsAppSessionPort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<WhatsAppSession> findActiveSession(String phoneNumber) {
         return sessionRepository
                 .findByPhoneNumberAndExpiresAtAfter(phoneNumber, LocalDateTime.now())
@@ -96,6 +97,7 @@ public class WhatsAppSessionAdapter implements WhatsAppSessionPort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Dealership> findDealershipByPin(String pin) {
         return dealershipRepository.findByWhatsappPin(pin)
                 .map(this::dealershipToDomain);
@@ -107,6 +109,7 @@ public class WhatsAppSessionAdapter implements WhatsAppSessionPort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<WhatsAppSession> findActiveSessionsByDealership(Long dealershipId) {
         return sessionRepository
                 .findByDealership_IdDealershipAndExpiresAtAfter(dealershipId, LocalDateTime.now())
@@ -116,6 +119,7 @@ public class WhatsAppSessionAdapter implements WhatsAppSessionPort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<WhatsAppSession> findInactiveSessions(LocalDateTime threshold) {
         return sessionRepository
                 .findByExpiresAtAfterAndLastActivityAtBeforeAndTimeoutNotifiedFalse(LocalDateTime.now(), threshold)

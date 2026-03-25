@@ -7,6 +7,7 @@ import app.infrastructure.persistence.mapper.DealershipMapper;
 import app.infrastructure.persistence.repository.DealershipRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,6 +24,7 @@ public class DealershipAdapter implements DealershipPort {
     private DealershipMapper mapper;
 
     @Override
+    @Transactional
     /**
      * Guarda la entidad mapeada desde el dominio y devuelve el resultado mapeado de
      * nuevo.
@@ -34,6 +36,7 @@ public class DealershipAdapter implements DealershipPort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     /**
      * Busca por ID delegando al repositorio JPA.
      */
@@ -49,6 +52,7 @@ public class DealershipAdapter implements DealershipPort {
      * Busca todos los concesionarios delegando al repositorio JPA.
      */
     @Override
+    @Transactional(readOnly = true)
     public List<Dealership> findAll() {
         return repository.findAll().stream()
                 .map(mapper::toDomain)
@@ -64,6 +68,7 @@ public class DealershipAdapter implements DealershipPort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     /**
      * Busca por nombre delegando al repositorio JPA.
      */
@@ -76,6 +81,7 @@ public class DealershipAdapter implements DealershipPort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     /**
      * Busca un concesionario por su PIN de WhatsApp.
      */
@@ -85,6 +91,7 @@ public class DealershipAdapter implements DealershipPort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     /**
      * Busca concesionario por UUID público.
      */

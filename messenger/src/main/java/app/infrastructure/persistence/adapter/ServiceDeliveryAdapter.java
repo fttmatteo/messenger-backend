@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -25,10 +26,11 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     @Autowired
     private ServiceDeliveryMapper mapper;
 
-    @Override
     /**
      * Guarda el servicio convirtiéndolo a entidad.
      */
+    @Override
+    @Transactional
     public ServiceDelivery save(ServiceDelivery serviceDelivery) {
         ServiceDeliveryEntity entity = mapper.toEntity(serviceDelivery);
         ServiceDeliveryEntity savedEntity = repository.save(entity);
@@ -47,6 +49,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
      * Busca un servicio por su ID.
      */
     @Override
+    @Transactional(readOnly = true)
     public ServiceDelivery findById(Long idServiceDelivery) {
         Optional<ServiceDeliveryEntity> entity = repository.findById(idServiceDelivery);
         if (entity.isPresent()) {
@@ -59,6 +62,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
      * Busca todos los servicios de entrega por placa.
      */
     @Override
+    @Transactional(readOnly = true)
     public List<ServiceDelivery> findByPlateNumber(String plateNumber) {
         return repository.findByPlate_PlateNumber(plateNumber).stream()
                 .map(mapper::toDomain)
@@ -69,6 +73,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
      * Busca todos los servicios de entrega por mensajero.
      */
     @Override
+    @Transactional(readOnly = true)
     public List<ServiceDelivery> findByMessengerId(Long messengerId) {
         return repository.findByMessenger_IdEmployee(messengerId).stream()
                 .map(mapper::toDomain)
@@ -79,6 +84,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
      * Busca servicio activo (no eliminado).
      */
     @Override
+    @Transactional(readOnly = true)
     public ServiceDelivery findByIdActive(Long idServiceDelivery) {
         Optional<ServiceDeliveryEntity> entity = repository.findByIdServiceDeliveryAndDeletedFalse(idServiceDelivery);
         return entity.map(mapper::toDomain).orElse(null);
@@ -88,6 +94,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
      * Busca servicio activo por UUID público.
      */
     @Override
+    @Transactional(readOnly = true)
     public ServiceDelivery findByUuidActive(String uuid) {
         Optional<ServiceDeliveryEntity> entity = repository.findByUuidAndDeletedFalse(uuid);
         return entity.map(mapper::toDomain).orElse(null);
@@ -97,6 +104,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
      * Busca todos los servicios de entrega eliminados.
      */
     @Override
+    @Transactional(readOnly = true)
     public List<ServiceDelivery> findDeleted() {
         return repository.findByDeletedTrue().stream()
                 .map(mapper::toDomain)
@@ -107,6 +115,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
      * Busca todos los servicios de entrega paginados.
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<ServiceDelivery> findAllPaginated(String keyword, Boolean deleted,
             List<app.domain.model.enums.Status> statuses, Pageable pageable) {
         Page<ServiceDeliveryEntity> entityPage;
@@ -124,6 +133,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
      * Busca todos los servicios de entrega paginados por mensajero.
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<ServiceDelivery> findByMessengerPaginated(Long messengerId, String keyword, Boolean deleted,
             List<app.domain.model.enums.Status> statuses, Pageable pageable) {
         Page<ServiceDeliveryEntity> entityPage;
@@ -144,6 +154,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
      * Busca servicios en la papelera que hayan expirado antes de la fecha dada.
      */
     @Override
+    @Transactional(readOnly = true)
     public List<ServiceDelivery> findDeletedExpiredBefore(LocalDateTime date) {
         return repository.findByDeletedTrueAndDeletedAtBefore(date).stream()
                 .map(mapper::toDomain)
@@ -195,6 +206,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
      * Busca servicios de un mensajero que tengan actividad en una fecha específica.
      */
     @Override
+    @Transactional(readOnly = true)
     public List<ServiceDelivery> findByMessengerAndDate(Long messengerId, java.time.LocalDate date) {
         LocalDateTime startOfDay = date.atStartOfDay();
         LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
@@ -208,6 +220,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
      * Busca servicios por número de placa filtrado por concesionario.
      */
     @Override
+    @Transactional(readOnly = true)
     public List<ServiceDelivery> findByPlateNumberAndDealershipId(String plateNumber, Long dealershipId) {
         return repository.findByPlate_PlateNumberAndDealership_IdDealershipAndDeletedFalse(plateNumber, dealershipId)
                 .stream()
@@ -220,6 +233,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
      * eliminados).
      */
     @Override
+    @Transactional(readOnly = true)
     public List<ServiceDelivery> findByDealershipIdAndStatuses(Long dealershipId,
             List<app.domain.model.enums.Status> statuses) {
         return repository.findByDealership_IdDealershipAndCurrentStatusInAndDeletedFalse(dealershipId, statuses)
@@ -232,6 +246,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
      * Busca servicios pendientes (no entregados) de un concesionario.
      */
     @Override
+    @Transactional(readOnly = true)
     public List<ServiceDelivery> findPendingByDealershipId(Long dealershipId) {
         List<app.domain.model.enums.Status> pendingStatuses = List.of(
                 app.domain.model.enums.Status.ASSIGNED,
@@ -244,6 +259,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
      * paginación.
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<ServiceDelivery> findByDealershipIdAndStatusesPaginated(Long dealershipId,
             List<app.domain.model.enums.Status> statuses, Pageable pageable) {
         return repository
