@@ -7,6 +7,7 @@ import app.infrastructure.persistence.mapper.PlateMapper;
 import app.infrastructure.persistence.repository.PlateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,6 +27,7 @@ public class PlateAdapter implements PlatePort {
      * Guarda la información de la placa.
      */
     @Override
+    @Transactional
     public void save(Plate plate) {
         PlateEntity entity = mapper.toEntity(plate);
         PlateEntity savedEntity = repository.save(entity);
@@ -36,6 +38,7 @@ public class PlateAdapter implements PlatePort {
      * Busca una placa por su ID.
      */
     @Override
+    @Transactional(readOnly = true)
     public Plate findById(Long id) {
         Optional<PlateEntity> entity = repository.findById(id);
         if (entity.isPresent()) {
@@ -48,6 +51,7 @@ public class PlateAdapter implements PlatePort {
      * Busca una placa por su cadena alfanumérica.
      */
     @Override
+    @Transactional(readOnly = true)
     public Plate findByPlateNumber(String plateNumber) {
         PlateEntity entity = repository.findByPlateNumber(plateNumber);
         if (entity != null) {
@@ -60,6 +64,7 @@ public class PlateAdapter implements PlatePort {
      * Busca todas las placas vehiculares.
      */
     @Override
+    @Transactional(readOnly = true)
     public List<Plate> findAll() {
         return repository.findAll().stream()
                 .map(mapper::toDomain)

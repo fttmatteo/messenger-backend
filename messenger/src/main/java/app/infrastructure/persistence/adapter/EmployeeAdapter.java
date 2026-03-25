@@ -7,6 +7,7 @@ import app.infrastructure.persistence.mapper.EmployeeMapper;
 import app.infrastructure.persistence.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,6 +27,7 @@ public class EmployeeAdapter implements EmployeePort {
     /**
      * Persiste un empleado transformándolo a entidad JPA.
      */
+    @Transactional
     public Employee save(Employee employee) {
         EmployeeEntity entity = mapper.toEntity(employee);
         EmployeeEntity savedEntity = repository.save(entity);
@@ -36,6 +38,7 @@ public class EmployeeAdapter implements EmployeePort {
     /**
      * Busca empleado por ID.
      */
+    @Transactional(readOnly = true)
     public Employee findById(Long idEmployee) {
         Optional<EmployeeEntity> entity = repository.findById(idEmployee);
         if (entity.isPresent()) {
@@ -48,6 +51,7 @@ public class EmployeeAdapter implements EmployeePort {
     /**
      * Busca empleado por número de documento.
      */
+    @Transactional(readOnly = true)
     public Employee findByDocument(Long document) {
         EmployeeEntity entity = repository.findByDocument(document);
         if (entity != null) {
@@ -60,6 +64,7 @@ public class EmployeeAdapter implements EmployeePort {
      * Busca todos los empleados delegando al repositorio JPA.
      */
     @Override
+    @Transactional(readOnly = true)
     public List<Employee> findAll() {
         return repository.findAll().stream()
                 .map(mapper::toDomain)
@@ -78,6 +83,7 @@ public class EmployeeAdapter implements EmployeePort {
     /**
      * Busca empleado por UUID público.
      */
+    @Transactional(readOnly = true)
     public Employee findByUuid(String uuid) {
         Optional<EmployeeEntity> entity = repository.findByUuid(uuid);
         return entity.map(mapper::toDomain).orElse(null);
