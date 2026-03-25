@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,7 +40,6 @@ public class WhatsAppTimeoutScheduler {
      * Revisa sesiones inactivas cada minuto.
      */
     @Scheduled(fixedDelay = 60000) // Se ejecuta cada minuto
-    @Transactional
     @SchedulerLock(name = "wa_timeout_lock", lockAtMostFor = "PT50S", lockAtLeastFor = "PT30S")
     public void checkInactivityTimeouts() {
         LocalDateTime threshold = LocalDateTime.now().minusMinutes(TIMEOUT_MINUTES);
@@ -74,7 +73,6 @@ public class WhatsAppTimeoutScheduler {
      * Limpia sesiones expiradas diariamente a las 4:00 AM.
      */
     @Scheduled(cron = "0 0 4 * * ?")
-    @Transactional
     @SchedulerLock(name = "wa_session_cleanup_lock", lockAtMostFor = "PT10M", lockAtLeastFor = "PT5M")
     public void cleanupExpiredSessions() {
         int deleted = sessionRepository.deleteExpiredSessions(LocalDateTime.now());
