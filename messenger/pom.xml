@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.11</version> 
+		<version>3.5.12</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent> 
 	<groupId>app</groupId> 
@@ -186,11 +186,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-test-autoconfigure</artifactId>
-			<scope>test</scope>
-		</dependency>
 
 		<!-- ArchUnit (Architecture Testing) -->
 		<dependency>
