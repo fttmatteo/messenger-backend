@@ -78,13 +78,13 @@ public class WhatsAppWebhookController {
                                     if (isDuplicate(message.getId())) {
                                         continue;
                                     }
+
+                                    String from = message.getFrom();
                                     if ("text".equals(message.getType()) && message.getText() != null) {
-                                        String from = message.getFrom();
                                         String text = message.getText().getBody();
                                         botService.processMessage(from, text);
                                     } else if ("interactive".equals(message.getType())
                                             && message.getInteractive() != null) {
-                                        String from = message.getFrom();
                                         WebhookPayload.Interactive interactive = message.getInteractive();
                                         if ("button_reply".equals(interactive.getType())
                                                 && interactive.getButtonReply() != null) {
@@ -103,7 +103,7 @@ public class WhatsAppWebhookController {
                 }
             }
         } catch (Exception e) {
-            logger.error("Error procesando webhook: {}", e.getMessage(), e);
+            logger.error("Error procesando webhook. Raw body: {}. Error: {}", rawBody, e.getMessage(), e);
         }
 
         return ResponseEntity.ok("EVENT_RECEIVED");

@@ -117,12 +117,6 @@ public class WhatsAppBotService {
                 int remaining = rateLimitPort.recordFailedAttempt(from);
                 int attemptsDone = 3 - remaining;
 
-                // Aplicar delay progresivo
-                try {
-                    Thread.sleep(attemptsDone * 2000L);
-                } catch (InterruptedException ignored) {
-                }
-
                 if (remaining == 0) {
                     messagePort.sendTextMessage(from,
                             "❌ PIN incorrecto. Has alcanzado el máximo de intentos permitidos. Por seguridad, tu acceso se ha bloqueado por 15 minutos.");

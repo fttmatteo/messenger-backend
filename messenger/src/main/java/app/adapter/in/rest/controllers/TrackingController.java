@@ -65,6 +65,12 @@ public class TrackingController {
     public ResponseEntity<LiveTrackingResponse> updateLocation(
             @Valid @RequestBody LiveTrackingRequest request) {
 
+        if (request.getLatitude() == null || request.getLongitude() == null) {
+            logger.warn("Intento de actualización de tracking con coordenadas nulas para messengerId: {}",
+                    request.getMessengerId());
+            return ResponseEntity.badRequest().build();
+        }
+
         LiveTracking domainTracking = new LiveTracking();
         domainTracking.setMessengerId(request.getMessengerId());
 
