@@ -164,4 +164,23 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
                                 .param("date", today))
                                 .andExpect(status().isOk());
         }
+
+        @Test
+        @WithMockUser(roles = "MESSENGER")
+        @DisplayName("POST /tracking/update should return 400 if coordinates are null")
+        /**
+         * Verifica que el endpoint de actualización retorne 400 si faltan coordenadas.
+         */
+        void shouldReturnBadRequestForNullCoordinates() throws Exception {
+                LiveTrackingRequest request = new LiveTrackingRequest();
+                request.setMessengerId(1L);
+                request.setLatitude(null);
+                request.setLongitude(null);
+
+                mockMvc.perform(post("/tracking/update")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                                .andExpect(status().isBadRequest());
+        }
 }

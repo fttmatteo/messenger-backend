@@ -11,6 +11,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Optional;
 
+import java.util.List;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -103,7 +104,97 @@ class WhatsAppBotServiceTest {
 
     @Test
     /**
-     * Verifica que el bot procese el mensaje y espere el PIN.
+     * Verifica que el bot cambie al estado AWAITING_PLATE al seleccionar la opción 1.
+     */
+    void testProcessMessage_MenuOption1_SwitchToAwaitingPlate() {
+        String from = "123456789";
+        Dealership dealership = new Dealership();
+        dealership.setIdDealership(1L);
+        dealership.setName("Test Dealer");
+
+        WhatsAppSession session = new WhatsAppSession();
+        session.setDealership(dealership);
+        session.setConversationState(app.domain.model.enums.WhatsAppConversationState.MENU);
+
+        when(sessionPort.findActiveSession(from)).thenReturn(Optional.of(session));
+
+        botService.processMessage(from, "1");
+
+        verify(sessionPort, atLeastOnce()).updateSession(argThat(s -> s.getConversationState() == app.domain.model.enums.WhatsAppConversationState.AWAITING_PLATE));
+        verify(messagePort).sendTextMessage(eq(from), contains("Escribe el número de la placa"));
+    }
+
+    @Test
+    /**
+     * Verifica que el bot busque una placa directamente si el mensaje parece una placa.
+     */
+    void testProcessMessage_Menu_LooksLikePlate_DirectSearch() {
+        String from = "123456789";
+        String plate = "ABC-123";
+        Dealership dealership = new Dealership();
+        dealership.setIdDealership(1L);
+        dealership.setName("Test Dealer");
+
+        WhatsAppSession session = new WhatsAppSession();
+        session.setDealership(dealership);
+        session.setConversationState(app.domain.model.enums.WhatsAppConversationState.MENU);
+
+        when(sessionPort.findActiveSession(from)).thenReturn(Optional.of(session));
+        when(searchService.findByPlateAndDealership(eq(plate), anyLong())).thenReturn(List.of());
+
+        botService.processMessage(from, plate);
+
+        verify(searchService).findByPlateAndDealership(eq(plate), eq(1L));
+        verify(messagePort).sendTextMessage(eq(from), contains("No se encontró la placa"));
+    }
+
+    @Test
+    /**
+     * Verifica que el bot cierre la sesión al seleccionar la opción 0.
+     */
+    void testProcessMessage_MenuOption0_CloseSession() {
+        String from = "123456789";
+        Dealership dealership = new Dealership();
+        dealership.setIdDealership(1L);
+
+        WhatsAppSession session = new WhatsAppSession();
+        session.setDealership(dealership);
+        session.setConversationState(app.domain.model.enums.WhatsAppConversationState.MENU);
+
+        when(sessionPort.findActiveSession(from)).thenReturn(Optional.of(session));
+
+        botService.processMessage(from, "0");
+
+        verify(sessionPort).deleteByPhoneNumber(from);
+        verify(messagePort).sendTextMessage(eq(from), contains("Sesión cerrada correctamente"));
+    }
+
+    @Test
+    /**
+     * Verifica que el bot maneje la paginación de listas.
+     */
+    void testProcessMessage_Menu_NextPage() {
+        String from = "123456789";
+        Dealership dealership = new Dealership();
+        dealership.setIdDealership(1L);
+
+        WhatsAppSession session = new WhatsAppSession();
+        session.setDealership(dealership);
+        session.setConversationState(app.domain.model.enums.WhatsAppConversationState.MENU);
+        session.setCurrentPage(0);
+        session.setLastFilterStatuses("ASSIGNED");
+
+        when(sessionPort.findActiveSession(from)).thenReturn(Optional.of(session));
+        when(searchService.findByDealershipAndStatusesPaginated(anyLong(), anyList(), any())).thenReturn(org.springframework.data.domain.Page.empty());
+
+        botService.processMessage(from, "NEXT_PAGE");
+
+        verify(sessionPort, atLeastOnce()).updateSession(argThat(s -> s.getCurrentPage() == 1));
+    }
+
+    @Test
+    /**
+     * Verifica que el bot responda correctamente cuando ya está bloqueado.
      */
     void testProcessMessage_AlreadyBlocked() {
         String from = "123456789";

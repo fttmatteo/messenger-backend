@@ -107,6 +107,40 @@ class UpdateLiveTrackingUseCaseTest {
     }
 
     @Test
+    @DisplayName("Should not save history if accuracy is exactly 100m")
+    /**
+     * Verifica que no se guarde el historial si la precisión es exactamente 100m.
+     */
+    void shouldNotSaveHistoryOnAccuracyBorderline() {
+        LiveTracking incoming = new LiveTracking();
+        incoming.setMessengerId(10L);
+        incoming.setCurrentLocation(new Location(4.60, -74.08, null, 100.1));
+        incoming.setSpeed(50.0);
+
+        useCase.execute(incoming);
+
+        verify(trackingPort, times(1)).saveLiveLocation(incoming);
+        verify(trackingPort, never()).saveTrackingHistory(any(TrackingHistory.class));
+    }
+
+    @Test
+    @DisplayName("Should handle heartbeat with no existing location")
+    /**
+     * Verifica que el latido funcione incluso si no hay una ubicación previa.
+     */
+    void shouldHandleHeartbeatWithNoPriorLocation() {
+        LiveTracking heartbeat = new LiveTracking();
+        heartbeat.setMessengerId(10L);
+
+        when(trackingPort.getLastLocation(10L)).thenReturn(Optional.empty());
+
+        LiveTracking result = useCase.executeHeartbeat(heartbeat);
+
+        assertNotNull(result.getLastHeartbeat());
+        verify(trackingPort).saveLiveLocation(any(LiveTracking.class));
+    }
+
+    @Test
     @DisplayName("Should preserve existing location data when heartbeat is received")
     /**
      * Verifica que los datos de ubicación existentes se conserven cuando se recibe
