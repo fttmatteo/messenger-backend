@@ -2,7 +2,7 @@
     "info": {
         "_postman_id": "messenger-api-collection",
         "name": "Messenger API - Backend",
-        "description": "Complete API documentation for the Messenger/Delivery Management System Backend.\n\n## Authentication\nAll endpoints except `/auth/login` and `/files/**` require JWT authentication.\n\nAdd the token to your requests:\n- Header: `Authorization: Bearer {{token}}`\n\n## Roles\n- **ADMIN**: Full access (CANCELED, RESOLVED states only)\n- **MESSENGER**: Limited access (PENDING, DELIVERED, RETURNED states only)\n\n## Status Flow\n- ASSIGNED → PENDING, DELIVERED, RETURNED (Messenger)\n- PENDING → CANCELED, RESOLVED (Admin only)\n- DELIVERED → CANCELED, RESOLVED (Admin, within 72h)\n- CANCELED → Can be reassigned (Admin)\n\n## Available Statuses\n`ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED` \n\n## Rate Limiting\n- **Auth**: 10 req/min\n- **General**: 100 req/min\n- **WebSocket**: 5 sec interval",
+        "description": "Complete API documentation for the Messenger/Delivery Management System Backend.\n\nVersion: 1.11.1\n\n## Authentication\nAll endpoints except `/auth/login` and `/files/**` require JWT authentication.\n\nAdd the token to your requests:\n- Header: `Authorization: Bearer {{token}}`\n\n## Roles\n- **ADMIN**: Full access (CANCELED, RESOLVED states only)\n- **MESSENGER**: Limited access (PENDING, DELIVERED, RETURNED states only)\n\n## Status Flow\n- ASSIGNED → PENDING, DELIVERED, RETURNED (Messenger)\n- PENDING → CANCELED, RESOLVED (Admin only)\n- DELIVERED → CANCELED, RESOLVED (Admin, within 72h)\n- CANCELED → Can be reassigned (Admin)\n\n## Available Statuses\n`ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED` \n\n## Rate Limiting\n- **Auth**: 10 req/min\n- **General**: 100 req/min\n- **WebSocket**: 5 sec interval",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "variable": [
@@ -34,6 +34,16 @@
         {
             "key": "password",
             "value": "password123",
+            "type": "string"
+        },
+        {
+            "key": "uuid",
+            "value": "550e8400-e29b-41d4-a716-446655440000",
+            "type": "string"
+        },
+        {
+            "key": "serviceUuid",
+            "value": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
             "type": "string"
         }
     ],
@@ -180,7 +190,7 @@
                                 }
                             ]
                         },
-                        "method": "GET",
+                        "method": "POST",
                         "header": [],
                         "url": {
                             "raw": "{{baseUrl}}/auth/ws-token",
@@ -299,14 +309,14 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "{{baseUrl}}/employees/findByEmployeeId/1",
+                            "raw": "{{baseUrl}}/employees/findByEmployeeId/{{uuid}}",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "employees",
                                 "findByEmployeeId",
-                                "1"
+                                "{{uuid}}"
                             ]
                         }
                     },
@@ -337,14 +347,14 @@
                             }
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/employees/updateEmployee/1",
+                            "raw": "{{baseUrl}}/employees/updateEmployee/{{uuid}}",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "employees",
                                 "updateEmployee",
-                                "1"
+                                "{{uuid}}"
                             ]
                         }
                     },
@@ -366,14 +376,14 @@
                         "method": "DELETE",
                         "header": [],
                         "url": {
-                            "raw": "{{baseUrl}}/employees/deleteEmployee/1",
+                            "raw": "{{baseUrl}}/employees/deleteEmployee/{{uuid}}",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "employees",
                                 "deleteEmployee",
-                                "1"
+                                "{{uuid}}"
                             ]
                         }
                     },
@@ -401,7 +411,7 @@
                         "header": [],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"name\": \"Concesionario Norte\",\n    \"address\": \"Calle 100 # 15-20, Bogotá\",\n    \"city\": \"Bogotá\",\n    \"latitude\": 4.6854,\n    \"longitude\": -74.0532\n}",
+                            "raw": "{\n    \"name\": \"Concesionario Norte\",\n    \"address\": \"Calle 100 # 15-20, Bogotá\",\n    \"phone\": \"3001234567\",\n    \"zone\": \"Norte\",\n    \"whatsappPin\": \"1234\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -495,7 +505,7 @@
                         "header": [],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"name\": \"Concesionario Norte Actualizado\",\n    \"address\": \"Avenida 19 # 122-80, Bogotá\",\n    \"city\": \"Bogotá\",\n    \"latitude\": 4.7001,\n    \"longitude\": -74.0450\n}",
+                            "raw": "{\n    \"name\": \"Concesionario Norte Actualizado\",\n    \"address\": \"Avenida 19 # 122-80, Bogotá\",\n    \"phone\": \"3009876543\",\n    \"zone\": \"Norte\",\n    \"whatsappPin\": \"1234\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -540,6 +550,64 @@
                                 "dealerships",
                                 "geocodeDealership",
                                 "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Find By ID",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/dealerships/findByDealershipId/{{uuid}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "dealerships",
+                                "findByDealershipId",
+                                "{{uuid}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Dealership",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/dealerships/deleteDealership/{{uuid}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "dealerships",
+                                "deleteDealership",
+                                "{{uuid}}"
                             ]
                         }
                     },
@@ -626,6 +694,18 @@
                                     "key": "manualPlateNumber",
                                     "value": "",
                                     "type": "text"
+                                },
+                                {
+                                    "key": "latitude",
+                                    "value": "4.6789",
+                                    "type": "text",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "longitude",
+                                    "value": "-74.0567",
+                                    "type": "text",
+                                    "disabled": true
                                 }
                             ]
                         },
@@ -669,18 +749,48 @@
                                     "key": "observation",
                                     "value": "Entregado a cliente",
                                     "type": "text"
+                                },
+                                {
+                                    "key": "signature",
+                                    "type": "file",
+                                    "src": [],
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "signatureGif",
+                                    "type": "file",
+                                    "src": [],
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "photos",
+                                    "type": "file",
+                                    "src": [],
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "latitude",
+                                    "value": "4.6789",
+                                    "type": "text",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "longitude",
+                                    "value": "-74.0567",
+                                    "type": "text",
+                                    "disabled": true
                                 }
                             ]
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/services/updateService/1",
+                            "raw": "{{baseUrl}}/services/updateService/{{uuid}}",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "services",
                                 "updateService",
-                                "1"
+                                "{{uuid}}"
                             ]
                         }
                     },
@@ -711,14 +821,14 @@
                             }
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/services/reassign/1",
+                            "raw": "{{baseUrl}}/services/reassign/{{uuid}}",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "services",
                                 "reassign",
-                                "1"
+                                "{{uuid}}"
                             ]
                         }
                     },
@@ -740,14 +850,14 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "{{baseUrl}}/services/findByServiceId/1",
+                            "raw": "{{baseUrl}}/services/findByServiceId/{{uuid}}",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "services",
                                 "findByServiceId",
-                                "1"
+                                "{{uuid}}"
                             ]
                         }
                     },
@@ -825,14 +935,14 @@
                         "method": "DELETE",
                         "header": [],
                         "url": {
-                            "raw": "{{baseUrl}}/services/deleteService/1",
+                            "raw": "{{baseUrl}}/services/deleteService/{{uuid}}",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "services",
                                 "deleteService",
-                                "1"
+                                "{{uuid}}"
                             ]
                         }
                     },
@@ -882,7 +992,7 @@
                         "method": "POST",
                         "header": [],
                         "url": {
-                            "raw": "{{baseUrl}}/services/trash/restore/1",
+                            "raw": "{{baseUrl}}/services/trash/restore/{{uuid}}",
                             "host": [
                                 "{{baseUrl}}"
                             ],
@@ -890,7 +1000,7 @@
                                 "services",
                                 "trash",
                                 "restore",
-                                "1"
+                                "{{uuid}}"
                             ]
                         }
                     },
@@ -941,14 +1051,14 @@
                         "method": "DELETE",
                         "header": [],
                         "url": {
-                            "raw": "{{baseUrl}}/services/trash/1",
+                            "raw": "{{baseUrl}}/services/trash/{{uuid}}",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "services",
                                 "trash",
-                                "1"
+                                "{{uuid}}"
                             ]
                         }
                     },
@@ -1113,6 +1223,52 @@
                         }
                     },
                     "response": []
+                },
+                {
+                    "name": "Calculate Distance",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/locations/distance?fromLat=4.6789&fromLng=-74.0567&toLat=4.6854&toLng=-74.0532",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "locations",
+                                "distance"
+                            ],
+                            "query": [
+                                {
+                                    "key": "fromLat",
+                                    "value": "4.6789"
+                                },
+                                {
+                                    "key": "fromLng",
+                                    "value": "-74.0567"
+                                },
+                                {
+                                    "key": "toLat",
+                                    "value": "4.6854"
+                                },
+                                {
+                                    "key": "toLng",
+                                    "value": "-74.0532"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
                 }
             ]
         },
@@ -1136,7 +1292,7 @@
                         "header": [],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"messengerId\": 1,\n    \"latitude\": 4.6789,\n    \"longitude\": -74.0567,\n    \"accuracy\": 10.0,\n    \"speed\": 40.0,\n    \"heading\": 90.0,\n    \"status\": \"ACTIVE\",\n    \"deviceId\": \"postman-test-device\"\n}",
+                            "raw": "{\n    \"messengerId\": 1,\n    \"latitude\": 4.6789,\n    \"longitude\": -74.0567,\n    \"accuracy\": 10.0,\n    \"speed\": 40.0,\n    \"heading\": 90.0,\n    \"status\": \"ACTIVE\",\n    \"deviceId\": \"postman-test-device\",\n    \"lastUpdate\": \"2024-01-05T12:00:00Z\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -1172,14 +1328,14 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "{{baseUrl}}/tracking/messenger/1",
+                            "raw": "{{baseUrl}}/tracking/messenger/{{uuid}}",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "tracking",
                                 "messenger",
-                                "1"
+                                "{{uuid}}"
                             ]
                         }
                     },
@@ -1201,20 +1357,77 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "{{baseUrl}}/tracking/history/1?date=2024-01-05",
+                            "raw": "{{baseUrl}}/tracking/history/{{uuid}}?date=2024-01-05",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "tracking",
                                 "history",
-                                "1"
+                                "{{uuid}}"
                             ],
                             "query": [
                                 {
                                     "key": "date",
                                     "value": "2024-01-05"
                                 }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Active Messengers",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/tracking/active",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "tracking",
+                                "active"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get History By Service",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/tracking/service/{{serviceUuid}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "tracking",
+                                "service",
+                                "{{serviceUuid}}"
                             ]
                         }
                     },
@@ -1241,14 +1454,14 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "{{baseUrl}}/monitoring/messenger/1/activity?date=2024-01-05",
+                            "raw": "{{baseUrl}}/monitoring/messenger/{{uuid}}/activity?date=2024-01-05",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "monitoring",
                                 "messenger",
-                                "1",
+                                "{{uuid}}",
                                 "activity"
                             ],
                             "query": [

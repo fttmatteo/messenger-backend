@@ -49,7 +49,18 @@ else
 fi
 
 echo ""
-echo "3. Verificando tablas de la aplicación..."
+echo "3. Verificando archivos de migración locales..."
+MIGRATION_PATH="src/main/resources/db/migration"
+if [ -d "$MIGRATION_PATH" ]; then
+  count=$(ls -1 "$MIGRATION_PATH"/*.sql 2>/dev/null | wc -l)
+  echo "Se encontraron $count archivos de migración en $MIGRATION_PATH"
+  ls -1 "$MIGRATION_PATH"/*.sql | xargs -n 1 basename | tail -n 5
+else
+  echo "Carpeta de migraciones NO encontrada en $MIGRATION_PATH"
+fi
+
+echo ""
+echo "4. Verificando tablas de la aplicación..."
 mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" \
   -e "SHOW TABLES;" 2>/dev/null
 

@@ -124,6 +124,15 @@ if echo "$cors_response" | grep -qi "Access-Control-Allow-Headers"; then
     else
         echo -e "${GREEN}✓${NC} Headers restringidos (más seguro que '*')"
     fi
+    
+    # Verificar headers específicos recientemente agregados
+    if echo "$allowed_headers" | grep -qi "X-Correlation-Id"; then
+        echo -e "${GREEN}✓${NC} CORS: X-Correlation-Id permitido correctamente"
+    else
+        echo -e "${RED}✗${NC} CORS: X-Correlation-Id NO encontrado en headers permitidos"
+        ((failed++))
+    fi
+    
     ((passed++))
 else
     echo -e "${RED}✗${NC} CORS: Access-Control-Allow-Headers NO encontrado"
