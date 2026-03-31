@@ -1,4 +1,4 @@
-> **Copyright (C) 2026 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**
+> **Copyright (C) 2026 Mateo Valencia Ardila. Licenciado bajo la Licencia Apache, Versión 2.0.**
 
 <div align="center">
 
@@ -9,7 +9,7 @@
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Redis](https://img.shields.io/badge/Redis-7.0+-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 [![Google Cloud](https://img.shields.io/badge/Google_Cloud-1.0+-4479A1?style=for-the-badge&logo=google&logoColor=white)](https://cloud.google.com/)
-[![License](https://img.shields.io/badge/Licencia-Propietaria-red?style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/badge/Licencia-Apache_2.0-blue.svg?style=for-the-badge)](LICENSE)
 
 
 **Sistema de entregas con reconocimiento automático de placas vehiculares mediante OCR.**
