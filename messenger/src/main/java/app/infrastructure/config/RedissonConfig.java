@@ -6,7 +6,6 @@ import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 /**
  * Configuración de Redisson para Hibernate L2 Cache.
@@ -15,7 +14,6 @@ import org.springframework.context.annotation.Profile;
  * garantizar compatibilidad con Redis Cloud y cualquier proveedor de Redis.
  */
 @Configuration
-@Profile("!test")
 public class RedissonConfig {
 
     @Value("${spring.data.redis.host:localhost}")

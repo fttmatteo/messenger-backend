@@ -47,22 +47,19 @@ public class GoogleCloudStorageAdapter implements StoragePort {
 
     public GoogleCloudStorageAdapter(
             @Value("${google.cloud.storage.bucket-name}") String bucketName,
-            @Value("${google.cloud.storage.project-id}") String projectId,
             @Value("${google.cloud.storage.signed-url-expiration-hours:24}") int urlExpirationHours,
             ImageOptimizer imageOptimizer,
-            StorageCachePort cachePort)
+            StorageCachePort cachePort,
+            Storage storage,
+            GoogleCredentials credentials)
             throws IOException {
 
         this.bucketName = bucketName;
         this.defaultUrlExpirationHours = urlExpirationHours;
-        this.credentials = GoogleCredentials.getApplicationDefault();
         this.imageOptimizer = imageOptimizer;
         this.cachePort = cachePort;
-        this.storage = StorageOptions.newBuilder()
-                .setProjectId(projectId)
-                .setCredentials(credentials)
-                .build()
-                .getService();
+        this.storage = storage;
+        this.credentials = credentials;
     }
 
     /**
