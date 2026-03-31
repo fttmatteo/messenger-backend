@@ -27,6 +27,15 @@ public class RedissonConfig {
     @Value("${spring.data.redis.password:}")
     private String redisPassword;
 
+    @Value("${spring.data.redis.lettuce.pool.max-active:4}")
+    private int maxActive;
+
+    @Value("${spring.data.redis.lettuce.pool.min-idle:1}")
+    private int minIdle;
+
+    @Value("${spring.data.redis.timeout:5000}")
+    private int timeout;
+
     /**
      * Crea el cliente Redisson configurado para conectar a Redis Cloud
      * o cualquier instancia de Redis usando las mismas credenciales
@@ -41,11 +50,11 @@ public class RedissonConfig {
         config.useSingleServer()
                 .setAddress(address)
                 .setPassword(redisPassword != null && !redisPassword.isEmpty() ? redisPassword : null)
-                .setConnectionMinimumIdleSize(1)
-                .setConnectionPoolSize(4)
+                .setConnectionMinimumIdleSize(minIdle)
+                .setConnectionPoolSize(maxActive)
                 .setSubscriptionConnectionPoolSize(2)
-                .setConnectTimeout(10000)
-                .setTimeout(5000)
+                .setConnectTimeout(timeout * 2)
+                .setTimeout(timeout)
                 .setRetryAttempts(3)
                 .setClientName("hibernate-cache");
 
