@@ -1,3 +1,5 @@
+> **Copyright (C) 2026 Mateo Valencia Ardila. Todos los derechos reservados. El código fuente de esta aplicación está protegido por las leyes de derechos de autor. Registro DNDA No. 13-108-139. Queda estrictamente prohibida su copia, distribución o modificación sin autorización expresa.**
+
 # Guía de Colaboración - Backend
 
 Esta guía establece los estándares y reglas para contribuir al backend del proyecto Messenger.
@@ -26,3 +28,5 @@ Para mantener la integridad del código y cumplir con los estándares del proyec
 3. Asegúrate de que el archivo `.env` o credenciales de **MySQL/GCP** estén en el `.gitignore`.
 4. Sube tu rama y abre el Pull Request en GitHub.
 5. Espera la revisión y aprobación final.
+
+> **Copyright (C) 2026 Mateo Valencia Ardila. Todos los derechos reservados. El código fuente de esta aplicación está protegido por las leyes de derechos de autor. Registro DNDA No. 13-108-139. Queda estrictamente prohibida su copia, distribución o modificación sin autorización expresa.**

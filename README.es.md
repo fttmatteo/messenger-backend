@@ -1,4 +1,4 @@
-> **Copyright (C) 2026 Mateo Valencia Ardila. Licenciado bajo la Licencia Apache, Versión 2.0.**
+> **Copyright (C) 2026 Mateo Valencia Ardila. Todos los derechos reservados. El código fuente de esta aplicación está protegido por las leyes de derechos de autor. Registro DNDA No. 13-108-139. Queda estrictamente prohibida su copia, distribución o modificación sin autorización expresa.**
 
 <div align="center">
 
@@ -1110,7 +1110,4 @@ npx cap open android
 
 ---
 
-## Licencia
-Ver archivo [LICENSE](./LICENSE).
-
-> **Copyright (C) 2026 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**
+> **Copyright (C) 2026 Mateo Valencia Ardila. Todos los derechos reservados. El código fuente de esta aplicación está protegido por las leyes de derechos de autor. Registro DNDA No. 13-108-139. Queda estrictamente prohibida su copia, distribución o modificación sin autorización expresa.**
