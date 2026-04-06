@@ -45,7 +45,7 @@ public class SecurityConfig {
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                                 .csrf(csrf -> csrf
                                                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                                                .ignoringRequestMatchers("/auth/**", "/api/files/**",
+                                                .ignoringRequestMatchers("/auth/**",
                                                                 "/api/whatsapp/**",
                                                                 "/actuator/health", "/v3/api-docs/**", "/swagger-ui/**")
                                                 .ignoringRequestMatchers(request -> {
@@ -92,7 +92,6 @@ public class SecurityConfig {
                                                 .requestMatchers("/employees/**").hasRole("ADMIN")
                                                 .requestMatchers("/dealerships/**").authenticated()
                                                 .requestMatchers("/services/**").authenticated()
-                                                .requestMatchers("/api/files/**").permitAll()
                                                 .requestMatchers("/api/whatsapp/**").permitAll()
                                                 .requestMatchers(org.springframework.http.HttpMethod.GET,
                                                                 "/settings/status-colors")
