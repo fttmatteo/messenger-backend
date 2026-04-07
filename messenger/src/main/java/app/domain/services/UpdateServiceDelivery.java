@@ -207,7 +207,7 @@ public class UpdateServiceDelivery {
      * Valida que se adjunten las evidencias (firma, fotos) requeridas para el nuevo
      * estado.
      */
-    private void validateEvidence(Status status, Signature signature, List<Photo> photos, String observation)
+    void validateEvidence(Status status, Signature signature, List<Photo> photos, String observation)
             throws BusinessException {
 
         if (status == Status.CANCELED || status == Status.RESOLVED || status == Status.ASSIGNED) {
