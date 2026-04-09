@@ -1,4 +1,4 @@
-> **Copyright (C) 2026 Mateo Valencia Ardila. Licensed under the Apache License, Version 2.0.**
+> **Copyright (C) 2026 Mateo Valencia Ardila. Todos los derechos reservados. El código fuente de esta aplicación está protegido por las leyes de derechos de autor. Registro DNDA No. 13-108-139. Queda estrictamente prohibida su copia, distribución o modificación sin autorización expresa.**
 
 <div align="center">
 
@@ -9,45 +9,46 @@
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Redis](https://img.shields.io/badge/Redis-7.0+-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 [![Google Cloud](https://img.shields.io/badge/Google_Cloud-1.0+-4479A1?style=for-the-badge&logo=google&logoColor=white)](https://cloud.google.com/)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg?style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/badge/License-Propietario-red.svg?style=for-the-badge)](LICENSE)
 
-**Delivery management system with automatic license plate recognition via OCR.**
+**Sistema de entregas con reconocimiento automático de placas vehiculares mediante OCR.**
 
-[🇪🇸 Versión en Español](./README.es.md)
+[🇺🇸 English Version](./README.en.md)
 
 </div>
 
 ---
 
-## Table of Contents
+## Tabla de Contenidos
 
-- [Architecture](#-architecture)
-- [Tech Stack](#-tech-stack)
-- [Project Structure](#-project-structure)
-- [Environment Profiles](#-environment-profiles)
+- [Arquitectura](#-arquitectura)
+- [Stack Tecnológico](#-stack-tecnológico)
+- [Estructura del Proyecto](#-estructura-del-proyecto)
+- [Perfiles de Ambiente](#-perfiles-de-ambiente)
 - [API Endpoints](#-api-endpoints)
-- [Database Schema](#-database-schema)
-- [Real-Time Tracking](#-real-time-tracking)
-- [State Flow](#-state-flow)
-- [Security](#-security)
-- [Observability](#-observability)
-- [Auditing](#-auditing)
-- [Setup & Installation](#️-setup--installation)
+- [Esquema de Base de Datos](#-esquema-de-base-datos)
+- [Tracking en Tiempo Real](#-tracking-en-tiempo-real)
+- [Flujo de Estados](#-flujo-de-estados)
+- [Seguridad](#-seguridad)
+- [Observabilidad](#-observabilidad)
+- [Auditoría](#-auditoría)
+- [Configuración e Instalación](#️-configuración-e-instalación)
 - [CI/CD](#-cicd)
 - [Testing](#-testing)
-- [Performance Optimization](#-performance-optimization)
-- [Postman Collection](#-postman-collection)
-- [Android Integration](#-android-integration)
+- [Optimización de Rendimiento](#-optimización-de-rendimiento)
+- [Colección Postman](#-colección-postman)
+- [Integración Android](#-integración-android)
 
 ---
 
-## Architecture
-The project implements **Hexagonal Architecture (Ports & Adapters)** to keep the domain isolated from external dependencies.
+## Arquitectura
+
+El proyecto implementa **Arquitectura Hexagonal (Ports & Adapters)** para mantener el dominio aislado de las dependencias externas.
 
 ```mermaid
 graph LR
-    %% External Actors
-    USER((User/App))
+    %% Actores Externos
+    USER((Usuario/App))
     MAPS{{G-Maps}}
     GCS{{GCS}}
     WAPP{{WhatsApp}}
@@ -55,241 +56,246 @@ graph LR
     DB[(MySQL)]
     REDIS[(Redis)]
 
-    subgraph IN [Input Adapters]
+    subgraph IN [Adaptadores de Entrada]
         direction TB
         REST[REST API]
         SOC[WebSockets]
     end
 
-    subgraph CORE [Application Core]
+    subgraph CORE [Capa Core / Aplicación]
         direction TB
-        subgraph APP [Application Layer]
-            UC[Use Cases]
+        subgraph APP [Capa de Aplicación]
+            UC[Casos de Uso]
         end
-        subgraph DOMAIN [Domain Layer]
-            SVC[Domain Services]
-            PORTS[Ports]
-            MODEL[Domain Models]
+        subgraph DOMAIN [Capa de Dominio]
+            SVC[Servicios de Dominio]
+            PORTS[Puertos]
+            MODEL[Modelos de Dominio]
         end
     end
 
-    subgraph OUT [Output Adapters]
+    subgraph OUT [Adaptadores de Salida]
         direction TB
-        PERS[Persistence]
-        CLD[Cloud Services]
+        PERS[Persistencia]
+        CLD[Servicios Cloud]
         WABA[WhatsApp]
-        VIS[Vision/OCR]
-        SEC[Security]
+        VIS[Visión/OCR]
+        SEC[Seguridad]
     end
 
-    %% Inbound Flow
+    %% Flujo de Entrada
     USER --> REST & SOC
     REST & SOC --> UC
 
-    %% Application Logic
+    %% Lógica de Aplicación
     UC --> SVC
     UC --> PORTS
     SVC --> MODEL
 
-    %% Outbound Flow (Dependency Inversion)
+    %% Flujo de Salida (Inversión de Dependencia)
     PERS -.-> PORTS
     CLD -.-> PORTS
     WABA -.-> PORTS
     VIS -.-> PORTS
     SEC -.-> PORTS
 
-    %% Infrastructure Connections
+    %% Conexiones de Infraestructura
     PERS --> DB
     CLD --> GCS & MAPS
     WABA --> WAPP
     VIS --> OCR_EXT
     SEC --> REDIS
 
-    %% Styling
+    %% Estilos
     style CORE fill:#0d1117,stroke:#30363d,stroke-width:2px,color:#c9d1d9
     style DOMAIN fill:#161b22,stroke:#58a6ff,stroke-dasharray: 5 5,color:#c9d1d9
     style APP fill:#161b22,stroke:#30363d,color:#c9d1d9
     style IN fill:#051d33,stroke:#1f6feb,color:#c9d1d9
     style OUT fill:#2d1a05,stroke:#f0883e,color:#c9d1d9
-    
+
     classDef actor fill:#21262d,stroke:#8b949e,color:#c9d1d9
     class USER,MAPS,GCS,WAPP,OCR_EXT,DB,REDIS actor
 ```
 
 ---
 
-## Tech Stack
-| Component | Technology |
-|-----------|------------|
-| **Framework** | Spring Boot 3.5.10 |
-| **Language** | Java 17 |
-| **Database** | MySQL 8.0+ |
-| **Migrations** | Flyway |
-| **Cache/Streaming** | Redis |
-| **Security** | JWT + BCrypt + Cloudflare Turnstile (Bot Protection) + Bucket4j (Distributed Rate Limiting with Redis) |
-| **Documentation** | OpenAPI / Swagger UI |
-| **OCR** | Plate Recognizer API |
-| **Speech-to-Text** | Google Cloud Speech-to-Text |
-| **Storage** | Google Cloud Storage |
-| **Maps** | Google Maps Platform |
-| **Mobile Client** | Capacitor (Android App Generation) |
-| **WhatsApp** | WhatsApp Cloud API (Meta) |
-| **Real-Time** | WebSocket + Redis |
-| **Build** | Maven 3.9+ |
-| **Monitoring** | Spring Boot Actuator (Health, Metrics) |
-| **Auditing** | JPA Callbacks + AOP (Aspect Oriented Programming) |
-| **CI/CD** | GitHub Actions |
-| **Architecture Testing** | ArchUnit |
-| **Performance** | Spring Cache + Redis, Hibernate L2 Cache, Lazy Loading, Database Indices |
+## Stack Tecnológico
+
+| Componente                | Tecnología                                                                                                    |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| **Framework**             | Spring Boot 3.5.10                                                                                            |
+| **Lenguaje**              | Java 17                                                                                                       |
+| **Base de Datos**         | MySQL 8.0+                                                                                                    |
+| **Migraciones**           | Flyway                                                                                                        |
+| **Cache/Streaming**       | Redis                                                                                                         |
+| **Seguridad**             | JWT + BCrypt + Cloudflare Turnstile (Protección contra Bots) + Bucket4j (Rate Limiting Distribuido con Redis) |
+| **Documentación**         | OpenAPI / Swagger UI                                                                                          |
+| **OCR**                   | Plate Recognizer API                                                                                          |
+| **Speech-to-Text**        | Google Cloud Speech-to-Text                                                                                   |
+| **Almacenamiento**        | Google Cloud Storage                                                                                          |
+| **Mapas**                 | Google Maps Platform                                                                                          |
+| **Cliente Móvil**         | Capacitor (Generación de App Android)                                                                         |
+| **WhatsApp**              | WhatsApp Cloud API (Meta)                                                                                     |
+| **Tiempo Real**           | WebSocket + Redis                                                                                             |
+| **Build**                 | Maven 3.9+                                                                                                    |
+| **Monitoreo**             | Spring Boot Actuator (Health, Metrics)                                                                        |
+| **Auditoría**             | JPA Callbacks + AOP (Aspect Oriented Programming)                                                             |
+| **CI/CD**                 | GitHub Actions                                                                                                |
+| **Tests de Arquitectura** | ArchUnit                                                                                                      |
+| **Rendimiento**           | Spring Cache + Redis, Hibernate L2 Cache, Lazy Loading, Índices de Base de Datos                              |
 
 ---
 
-## Project Structure
+## Estructura del Proyecto
+
 ```
 messenger/
 ├── src/main/java/app/
 │   ├── MessengerApplication.java
 │   ├── adapter/
-│   │   ├── in/                          # Input Adapters
-│   │   │   ├── builder/                 # Object Builders
+│   │   ├── in/                          # Adaptadores de entrada
+│   │   │   ├── builder/                 # Constructores de objetos
 │   │   │   ├── rest/
 │   │   │   │   ├── controllers/         # REST Controllers
-│   │   │   │   ├── mapper/              # Request/Response Mappers
-│   │   │   │   ├── request/             # Input DTOs
-│   │   │   │   └── response/            # Output DTOs
-│   │   │   └── websocket/               # Real-time tracking
-│   │   └── out/                         # Output Adapters
+│   │   │   │   ├── mapper/              # Mappers Request/Response
+│   │   │   │   ├── request/             # DTOs de entrada
+│   │   │   │   └── response/            # DTOs de salida
+│   │   │   └── websocket/               # Tracking en tiempo real
+│   │   └── out/                         # Adaptadores de salida
 │   │       ├── maps/                    # Google Maps Integration
 │   │       ├── ocr/                     # Plate Recognizer OCR
-│   │       ├── persistence/             # JPA Adapters
+│   │       ├── persistence/             # Adaptadores JPA
 │   │       ├── security/                # JWT Adapter
 │   │       ├── storage/                 # Google Cloud Storage
 │   │       ├── tracking/                # Location Tracking
 │   │       └── whatsapp/                # WhatsApp Cloud API
 │   ├── application/
-│   │   └── usecase/                     # 11 Use Cases (Monitoring, Settings, Location...)
+│   │   └── usecase/                     # 11 Casos de Uso (Monitoreo, Location, Tracking...)
 │   ├── domain/
 │   │   ├── exception/                   # BusinessException, InputsException...
-│   │   ├── model/                       # 14+ Models + 7 Enums + Auth
+│   │   ├── model/                       # 14+ Modelos + 7 Enums + Auth
 │   │   │   └── enums/                   # Role, Status, PlateType...
-│   │   ├── ports/                       # 14 Ports (interfaces)
-│   │   └── services/                    # Domain Services
+│   │   ├── ports/                       # 14 Puertos (interfaces)
+│   │   └── services/                    # Servicios de dominio
 │   └── infrastructure/
-│       ├── audit/                       # AOP Audit System
-│       ├── config/                      # Spring Configuration
-│       ├── exception/                   # Global Error Handler
+│       ├── audit/                       # Sistema de Auditoría AOP
+│       ├── config/                      # Configuración de Spring
+│       ├── exception/                   # Manejo global de errores
 │       ├── persistence/
-│       │   └── entities/                # JPA Entities
-│       ├── scheduler/                   # Trash Cleanup Jobs
-│       └── security/                    # Spring Security Config / Filters
+│       │   └── entities/                # Entidades JPA
+│       ├── scheduler/                   # Tareas de limpieza (Trash)
+│       └── security/                    # Configuración de Seguridad / Filtros
 └── src/main/resources/
-    ├── application.properties           # Base Configuration
-    ├── application-local.properties     # Local Development (H2)
-    ├── application-dev.properties       # Development with APIs
-    ├── application-test.properties      # Automated Testing
-    ├── application-prod.properties      # Production
-    └── db/migration/                    # Flyway Migrations
+    ├── application.properties           # Configuración base
+    ├── application-local.properties     # Desarrollo local (H2)
+    ├── application-dev.properties       # Desarrollo con APIs
+    ├── application-test.properties      # Testing automatizado
+    ├── application-prod.properties      # Producción
+    └── db/migration/                    # Migraciones Flyway
 ```
 
 ---
 
-## Environment Profiles
-| Profile | Purpose | Database | External APIs | JWT Exp. |
-|---------|---------|----------|---------------|----------|
-| `local` | Local development without dependencies | MySQL Local | Mock/Disabled | 8 hours |
-| `dev` | Development with real services | MySQL | Enabled | 8 hours |
-| `test` | Automated testing (CI/CD) | Testcontainers (MySQL/Redis) | Mock | 1 hour |
-| `prod` | Production (Cloud Run) | Cloud SQL (MySQL 8) | Enabled | 30 min |
+## Perfiles de Ambiente
+
+| Perfil  | Propósito                         | Base de Datos                | APIs Externas      | JWT Exp. |
+| ------- | --------------------------------- | ---------------------------- | ------------------ | -------- |
+| `local` | Desarrollo local sin dependencias | MySQL Local                  | Mock/Deshabilitado | 8 horas  |
+| `dev`   | Desarrollo con servicios reales   | MySQL                        | Habilitado         | 8 horas  |
+| `test`  | Testing automatizado (CI/CD)      | Testcontainers (MySQL/Redis) | Mock               | 1 hora   |
+| `prod`  | Producción (Cloud Run)            | Cloud SQL (MySQL 8)          | Habilitado         | 30 min   |
 
 ---
 
-### Quick Start (Docker Zero-Config)
-For a quick demonstration without manual setup, use Docker Compose. This will spin up the frontend, backend, database, and redis automatically.
+### Inicio Rápido (Docker Zero-Config)
 
-1. Navigate to backend root: `cd messenger-backend`
-2. Run: `docker-compose -f docker-compose.local.yml up --build`
-3. Access: `http://localhost`
+Para una demostración rápida sin configurar dependencias, usa Docker Compose. Esto levantará el frontend, backend, base de datos y redis automáticamente.
+
+1. Navega a la raíz del backend: `cd messenger-backend`
+2. Ejecuta: `docker-compose -f docker-compose.local.yml up --build`
+3. Accede a: `http://localhost`
 
 ---
 
-### Development with Hot Reloading
-For active development with automatic code reloading (no need to restart containers when making changes):
+### Desarrollo con Hot Reloading
+
+Para desarrollo activo con recarga automática de código (sin necesidad de reiniciar los contenedores al hacer cambios):
 
 ```bash
 docker-compose -f docker-compose.dev.yml up --build
 ```
 
-| Service | URL | Description |
-|---------|-----|-------------|
-| Frontend (Vite HMR) | `http://localhost:5173` | Auto-reloads on file save |
-| Backend API | `http://localhost:8080` | Auto-restarts on recompile |
-| PHPMyAdmin | `http://localhost:8081` | Database management |
-| Remote Debug | Port `5005` | Attach IntelliJ/VS Code debugger |
+| Servicio            | URL                     | Descripción                               |
+| ------------------- | ----------------------- | ----------------------------------------- |
+| Frontend (Vite HMR) | `http://localhost:5173` | Se recarga automáticamente al guardar     |
+| Backend API         | `http://localhost:8080` | Se reinicia automáticamente al recompilar |
+| PHPMyAdmin          | `http://localhost:8081` | Gestión de base de datos                  |
+| Debug Remoto        | Puerto `5005`           | Conectar debugger de IntelliJ/VS Code     |
 
 > [!TIP]
-> Check the **[Quick Start Guide](./GUIA_RAPIDA.md)** (Spanish) for more details on test credentials and phpMyAdmin access.
+> Consulta la **[Guía de Inicio Rápido](./GUIA_RAPIDA.md)** para más detalles sobre credenciales de prueba y acceso a phpMyAdmin.
 
 ---
 
-### Profiles
+### Perfiles
 
 <details>
-<summary><b>Local</b> - No external dependencies</summary>
+<summary><b>Local</b> - Sin dependencias externas</summary>
 
-- MySQL Local database (Dockerized)
-- **Zero-Config**: Pre-configured with test keys and Mocks
-- **Data Seeding**: Automatic user initialization (Admin/Messenger) via `DataInitializer`
-- Simulated OCR (MockOcrAdapter)
-- Local file storage (LocalStorageAdapter)
-- Detailed logging
-- Perfect for quick demos and offline development
+- Base de datos MySQL Local (Dockerizada)
+- **Zero-Config**: Perfil pre-configurado con llaves de prueba y Mocks
+- **Carga de Datos**: Inicialización automática de usuarios (Admin/Messenger) via `DataInitializer`
+- OCR simulado (MockOcrAdapter)
+- Almacenamiento local (LocalStorageAdapter)
+- Logs detallados
+- Perfecto para demostraciones rápidas y desarrollo offline
 
 </details>
 
 <details>
-<summary><b>Dev</b> - Development with APIs</summary>
+<summary><b>Dev</b> - Desarrollo con APIs</summary>
 
-- MySQL development database
-- Google Cloud APIs enabled
-- SQL visible for debugging
-- Actuator endpoints enabled
-- Tracking interval: 15 seconds
-
-</details>
-
-<details>
-<summary><b>Test</b> - Automated testing</summary>
-
-- **Testcontainers integration**: Automated lifecycle for MySQL 8.0 and Redis 7.2.
-- **Hierarchical Singleton Pattern**: BaseContainerTest ensures infrastructure starts once per JVM.
-- **Data Isolation**: Each execution environment is clean and isolated.
-- **Real Migrations**: Full parity with production database schema via Flyway.
+- MySQL de desarrollo
+- Google Cloud APIs habilitadas
+- SQL visible para debugging
+- Actuator endpoints habilitados
+- Tracking interval: 15 segundos
 
 </details>
 
 <details>
-<summary><b>Prod</b> - Production (Cloud Run Optimized)</summary>
+<summary><b>Test</b> - Testing automatizado</summary>
 
-- MySQL with mandatory SSL
-- Optimized connection pool (HikariCP)
-- **Structured JSON Logging** (Logstash Encoder)
-- Graceful shutdown enabled (30s timeout)
-- Security headers (HSTS, HTTP-only cookies)
-- Compression enabled
-- No exposed stack traces
-- Cloud Run Proxy support (Forwarded Headers)
+- **Integración con Testcontainers**: Ciclo de vida automatizado para MySQL 8.0 y Redis 7.2.
+- **Patrón Singleton Jerárquico**: `BaseContainerTest` asegura que la infraestructura se inicie una sola vez por JVM.
+- **Aislamiento de Datos**: Cada ejecución ocurre en un entorno limpio y aislado.
+- **Paridad con Flyway**: Los tests corren contra el mismo esquema de migraciones que producción.
+
+</details>
+
+<details>
+<summary><b>Prod</b> - Producción (Optimizado Cloud Run)</summary>
+
+- MySQL con SSL obligatorio
+- Pool de conexiones optimizado (HikariCP)
+- **Logging Estructurado JSON** (Logstash Encoder)
+- Graceful shutdown habilitado (30s timeout)
+- Headers de seguridad (HSTS, HTTP-only cookies)
+- Compresión habilitada
+- Sin stack traces expuestos
+- Soporte Proxy Cloud Run (Forwarded Headers)
 
 </details>
 
 ---
 
-### Activation
+### Activación
 
 ```bash
-# Environment variable (recommended)
+# Variable de entorno (recomendado)
 export SPRING_PROFILES_ACTIVE=dev
 
-# Command line
+# Línea de comandos
 ./mvnw spring-boot:run -Dspring.profiles.active=dev
 
 # Docker
@@ -300,128 +306,142 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 ## API Endpoints
 
-### Authentication (`/auth`)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/auth/login` | Login and receive access + refresh tokens (Requires `turnstileToken`) |
-| `POST` | `/auth/refresh` | Renew access token with refresh token |
-| `GET` | `/auth/ws-token` | Get temporary token for WebSocket connection |
-| `POST` | `/auth/logout` | Logout and clear authentication cookies |
+### Autenticación (`/auth`)
+
+| Método | Endpoint         | Descripción                                                                     |
+| ------ | ---------------- | ------------------------------------------------------------------------------- |
+| `POST` | `/auth/login`    | Iniciar sesión y obtener tokens de acceso + refresh (Requiere `turnstileToken`) |
+| `POST` | `/auth/refresh`  | Renovar token de acceso con refresh token                                       |
+| `GET`  | `/auth/ws-token` | Obtener token temporal para conexión WebSocket                                  |
+| `POST` | `/auth/logout`   | Cerrar sesión y limpiar cookies de autenticación                                |
 
 ---
 
-### Employees (`/employees`) - ADMIN only
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/employees/createEmployee` | Create new employee |
-| `GET` | `/employees/allEmployees` | List all employees |
-| `GET` | `/employees/findByEmployeeId/{id}` | Get employee by ID |
-| `PUT` | `/employees/updateEmployee/{id}` | Update existing employee |
-| `DELETE` | `/employees/deleteEmployee/{id}` | Delete employee |
+### Empleados (`/employees`) - Solo ADMIN
+
+| Método   | Endpoint                           | Descripción                   |
+| -------- | ---------------------------------- | ----------------------------- |
+| `POST`   | `/employees/createEmployee`        | Crear nuevo empleado          |
+| `GET`    | `/employees/allEmployees`          | Listar todos los empleados    |
+| `GET`    | `/employees/findByEmployeeId/{id}` | Obtener empleado por ID       |
+| `PUT`    | `/employees/updateEmployee/{id}`   | Actualizar empleado existente |
+| `DELETE` | `/employees/deleteEmployee/{id}`   | Eliminar empleado             |
 
 ---
 
-### Dealerships (`/dealerships`)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/dealerships/createDealership` | Create dealership (ADMIN) |
-| `GET` | `/dealerships/allDealerships` | List all dealerships |
-| `GET` | `/dealerships/findByDealershipId/{id}` | Get by ID |
-| `GET` | `/dealerships/findByDealershipName/{name}` | Get by Name |
-| `PUT` | `/dealerships/updateDealership/{id}` | Update dealership (ADMIN) |
-| `DELETE` | `/dealerships/deleteDealership/{id}` | Delete dealership (ADMIN) |
-| `POST` | `/dealerships/geocodeDealership/{id}` | Geocode dealership address (ADMIN) |
+### Concesionarios (`/dealerships`)
+
+| Método   | Endpoint                                   | Descripción                                     |
+| -------- | ------------------------------------------ | ----------------------------------------------- |
+| `POST`   | `/dealerships/createDealership`            | Crear concesionario (ADMIN)                     |
+| `GET`    | `/dealerships/allDealerships`              | Listar todos los concesionarios                 |
+| `GET`    | `/dealerships/findByDealershipId/{id}`     | Obtener por ID                                  |
+| `GET`    | `/dealerships/findByDealershipName/{name}` | Obtener por Nombre                              |
+| `PUT`    | `/dealerships/updateDealership/{id}`       | Actualizar concesionario (ADMIN)                |
+| `DELETE` | `/dealerships/deleteDealership/{id}`       | Eliminar concesionario (ADMIN)                  |
+| `POST`   | `/dealerships/geocodeDealership/{id}`      | Geocodificar dirección de concesionario (ADMIN) |
 
 ---
 
-### Service Deliveries (`/services`)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/services/extractPlate` | Extract plate from image using OCR (preview before creating) |
-| `POST` | `/services/createService` | Create service (multipart: image + data) |
-| `PUT` | `/services/updateService/{id}` | Update status (multipart: status + evidence + GIF) |
-| `PUT` | `/services/reassign/{id}` | Reassign to another messenger (ADMIN/CANCELED) |
-| `GET` | `/services/findByServiceId/{id}` | Get service by ID |
-| `GET` | `/services/allServicesPageable` | List services with **pagination, search & sorting** |
-| `GET` | `/services/stats/daily` | DISABLED - Daily stats (requires messengerId, from, to) |
-| `DELETE` | `/services/deleteService/{id}` | Move to trash (ADMIN) |
-| `GET` | `/services/trash` | List deleted services (ADMIN) |
-| `POST` | `/services/trash/restore/{id}` | Restore from trash (ADMIN) |
-| `DELETE` | `/services/trash/empty` | Empty trash permanently (ADMIN) |
-| `DELETE` | `/services/trash/{id}` | Permanent delete individual item (ADMIN) |
+### Servicios de Entrega (`/services`)
+
+| Método   | Endpoint                         | Descripción                                                          |
+| -------- | -------------------------------- | -------------------------------------------------------------------- |
+| `POST`   | `/services/extractPlate`         | Extraer placa de imagen usando OCR (preview antes de crear)          |
+| `POST`   | `/services/createService`        | Crear servicio (multipart: imagen + datos)                           |
+| `PUT`    | `/services/updateService/{id}`   | Actualizar estado (multipart: estado + evidencias + GIF)             |
+| `PUT`    | `/services/reassign/{id}`        | Reasignar a otro mensajero (ADMIN/CANCELED)                          |
+| `GET`    | `/services/findByServiceId/{id}` | Obtener servicio por ID                                              |
+| `GET`    | `/services/allServicesPageable`  | Listar servicios con **paginación, búsqueda y ordenamiento**         |
+| `GET`    | `/services/stats/daily`          | INHABILITADO - Estadísticas diarias (requiere messengerId, from, to) |
+| `DELETE` | `/services/deleteService/{id}`   | Mover a papelera (ADMIN)                                             |
+| `GET`    | `/services/trash`                | Listar servicios eliminados (ADMIN)                                  |
+| `POST`   | `/services/trash/restore/{id}`   | Restaurar desde papelera (ADMIN)                                     |
+| `DELETE` | `/services/trash/empty`          | Vaciar papelera permanentemente (ADMIN)                              |
+| `DELETE` | `/services/trash/{id}`           | Eliminación individual permanente (ADMIN)                            |
 
 ---
 
-### Transcription (`/api/transcribe`)
-| `POST` | `/api/transcribe` | Transcribe audio file to text using Google Cloud STT |
+### Transcripción (`/api/transcribe`)
+
+| `POST` | `/api/transcribe` | Transcribir archivo de audio a texto usando Google Cloud STT |
 
 ---
 
 ### WhatsApp (`/api/whatsapp`)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET`  | `/api/whatsapp/webhook` | Webhook verification (required by Meta) |
-| `POST` | `/api/whatsapp/webhook` | Receive incoming messages (Validated with HMAC-SHA256) |
+
+| Método | Endpoint                | Descripción                                                |
+| ------ | ----------------------- | ---------------------------------------------------------- |
+| `GET`  | `/api/whatsapp/webhook` | Verificación de webhook (requerido por Meta)               |
+| `POST` | `/api/whatsapp/webhook` | Recepción de mensajes entrantes (Validado con HMAC-SHA256) |
 
 > [!TIP]
-> **WhatsApp Bot Workflow**:
-> 1. User sends a message.
-> 2. Bot requests a 4-digit PIN (requested every 12 hours).
-> 3. After authentication, the user can query plate status or list pending deliveries.
+> **Flujo del Bot de WhatsApp**:
+>
+> 1. El usuario envía un mensaje.
+> 2. El bot solicita un PIN de acceso de 4 dígitos (se solicita cada 12 horas).
+> 3. Tras la autenticación, el usuario puede consultar estados de placas o listar entregas pendientes.
 
 > [!CAUTION]
-> **File Constraints**:
-> - **Images**: Max 10MB (JPEG/PNG)
-> - **GIFs**: Max 5MB (GIF87a/GIF89a)
-> - **Signatures**: Max 2MB (SVG/PNG)
+> **Restricciones de Archivos**:
+>
+> - **Imágenes**: Máx 10MB (JPEG/PNG)
+> - **GIFs**: Máx 5MB (GIF87a/GIF89a)
+> - **Firmas**: Máx 2MB (SVG/PNG)
 
 ---
 
-### System Settings (`/settings`) - ADMIN only
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/settings/status-colors` | Get status color configuration |
-| `PUT` | `/settings/status-colors` | Update status color configuration |
+### Configuraciones del Sistema (`/settings`) - Solo ADMIN
+
+| Método | Endpoint                  | Descripción                                    |
+| ------ | ------------------------- | ---------------------------------------------- |
+| `GET`  | `/settings/status-colors` | Obtener configuración de colores de estados    |
+| `PUT`  | `/settings/status-colors` | Actualizar configuración de colores de estados |
 
 ---
 
-### Locations & Routes (`/locations`)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/locations/geocode` | Address to coordinates |
-| `POST` | `/locations/route` | DISABLED - Calculate optimized route |
-| `GET` | `/locations/distance` | Distance + time estimate between points |
-| `GET` | `/locations/reverse` | Coordinates to address |
+### Ubicaciones y Rutas (`/locations`)
+
+| Método | Endpoint              | Descripción                              |
+| ------ | --------------------- | ---------------------------------------- |
+| `POST` | `/locations/geocode`  | Dirección a coordenadas                  |
+| `POST` | `/locations/route`    | INHABILITADO - Calcular ruta optimizada  |
+| `GET`  | `/locations/distance` | Distancia + tiempo estimado entre puntos |
+| `GET`  | `/locations/reverse`  | Coordenadas a dirección                  |
 
 ---
 
-### Files (`/files`)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/files/{filename}` | Download protected file (photos/signatures/GIFs) |
+### Archivos (`/files`)
+
+| Método | Endpoint            | Descripción                                     |
+| ------ | ------------------- | ----------------------------------------------- |
+| `GET`  | `/files/{filename}` | Descargar archivo protegido (fotos/firmas/GIFs) |
 
 ---
 
-### Real-Time Tracking (`/tracking` & WebSocket)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `WS` | `/ws/tracking/update` | Update location via WebSocket (with Heartbeat) |
-| `POST` | `/tracking/update` | DISABLED - REST alternative for location updates |
-| `GET` | `/tracking/messenger/{id}` | Get last known location (ADMIN) |
-| `GET` | `/tracking/active` | Get all active messengers (ADMIN) |
-| `GET` | `/tracking/history/{id}` | Get history by date (`?date=YYYY-MM-DD`) |
-| `GET` | `/tracking/service/{id}` | Get history for a specific service |
+### Tracking en Tiempo Real (`/tracking` & WebSocket)
+
+| Método | Endpoint                   | Descripción                                               |
+| ------ | -------------------------- | --------------------------------------------------------- |
+| `WS`   | `/ws/tracking/update`      | Actualizar ubicación vía WebSocket (con Heartbeat)        |
+| `POST` | `/tracking/update`         | INHABILITADO - Alternativa REST para actualizar ubicación |
+| `GET`  | `/tracking/messenger/{id}` | Obtener última ubicación conocida (ADMIN)                 |
+| `GET`  | `/tracking/active`         | Listar todos los mensajeros activos (ADMIN)               |
+| `GET`  | `/tracking/history/{id}`   | Obtener historial por fecha (`?date=YYYY-MM-DD`)          |
+| `GET`  | `/tracking/service/{id}`   | Obtener historial para un servicio específico             |
 
 ---
 
-### Monitoring (`/monitoring`) - ADMIN only
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/monitoring/messenger/{id}/activity` | Get daily activity timeline + stats for a messenger |
+### Monitoreo (`/monitoring`) - Solo ADMIN
+
+| Método | Endpoint                              | Descripción                                            |
+| ------ | ------------------------------------- | ------------------------------------------------------ |
+| `GET`  | `/monitoring/messenger/{id}/activity` | Línea de tiempo y estadísticas diarias de un mensajero |
 
 ---
 
-## Database Schema
+## Esquema de Base de Datos
+
 ```mermaid
 erDiagram
     employees {
@@ -433,7 +453,7 @@ erDiagram
         String password
         Role role
     }
-    
+
     dealerships {
         Long id_dealership PK
         String name UK
@@ -445,14 +465,14 @@ erDiagram
         Boolean is_geolocated
         String whatsapp_pin UK
     }
-    
+
     plates {
         Long id_plate PK
         String plate_number UK
         PlateType plate_type
         LocalDateTime upload_date
     }
-    
+
     service_deliveries {
         Long id_service_delivery PK
         Long plate_id FK
@@ -465,14 +485,14 @@ erDiagram
         Boolean deleted
         LocalDateTime deleted_at
     }
-    
+
     signatures {
         Long id_signature PK
         String signature_path
         String gif_path
         LocalDateTime upload_date
     }
-    
+
     photos {
         Long id_photo PK
         String photo_path
@@ -481,7 +501,7 @@ erDiagram
         Long status_history_id FK
         LocalDateTime upload_date
     }
-    
+
     status_history {
         Long id_status_history PK
         Status previous_status
@@ -494,7 +514,7 @@ erDiagram
         Double delivery_longitude
         String observation
     }
-    
+
     tracking_history {
         Long history_id PK
         Long messenger_id FK
@@ -505,7 +525,7 @@ erDiagram
         TrackingSource source
         LocalDateTime recorded_at
     }
-    
+
     system_settings {
         String setting_key PK
         String setting_value
@@ -526,7 +546,7 @@ erDiagram
         LocalDateTime expires_at
         LocalDateTime created_at
     }
-    
+
     employees ||--o{ service_deliveries : "delivers"
     dealerships ||--o{ service_deliveries : "receives"
     plates ||--o{ service_deliveries : "has"
@@ -544,120 +564,133 @@ erDiagram
 ---
 
 ### Enums
-| Enum | Values |
-|------|--------|
-| **Role** | `ADMIN`, `MESSENGER` |
-| **PlateType** | `CAR` (ABC 123), `MOTORCYCLE` (ABC 12A), `MOTORCAR` (123 ABC) |
-| **Status** | `ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED`, `FAILED`(DISABLED), `DELETED` |
-| **PhotoType** | `PLATE_DETECTION`, `EVIDENCE` |
-| **TrackingStatus** | `ACTIVE`, `INACTIVE`, `OFFLINE` |
-| **TrackingSource** | `GPS`, `NETWORK`, `MANUAL` |
+
+| Enum               | Valores                                                                                                   |
+| ------------------ | --------------------------------------------------------------------------------------------------------- |
+| **Role**           | `ADMIN`, `MESSENGER`                                                                                      |
+| **PlateType**      | `CAR` (ABC 123), `MOTORCYCLE` (ABC 12A), `MOTORCAR` (123 ABC)                                             |
+| **Status**         | `ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED`, `FAILED`(INHABILITADO), `DELETED` |
+| **PhotoType**      | `PLATE_DETECTION`, `EVIDENCE`                                                                             |
+| **TrackingStatus** | `ACTIVE`, `INACTIVE`, `OFFLINE`                                                                           |
+| **TrackingSource** | `GPS`, `NETWORK`, `MANUAL`                                                                                |
 
 ---
 
-## Real-Time Tracking
-GPS tracking system using **Redis** + **WebSocket** for messenger monitoring.
+## Tracking en Tiempo Real
 
-### Features
-| Feature | Description |
-|---------|-------------|
-| **Live location** | Updates every 45 seconds (5s rate limit) |
-| **Delivery validation** | DISABLED - Maximum 200m radius from destination |
-| **Technical accuracy** | < 100m GPS error filtered for history |
-| **Complete history** | Permanent retention (Historical Archive) |
-| **Low latency** | Redis for location caching |
-| **WebSocket** | Real-time data updates (Server Push) |
+Sistema de tracking GPS usando **Redis** + **WebSocket** para monitoreo de mensajeros.
 
----
+### Características
 
-### WebSocket API
-Connection URL: `ws://localhost:8080/ws/tracking`
-
-| Type | Destination | Description |
-|------|-------------|-------------|
-| `SEND` | `/app/tracking/update` | Send GPS location update |
-| `SEND` | `/app/tracking/heartbeat` | Send keep-alive signal (no GPS) |
-| `SUB` | `/topic/tracking/{id}` | Receive updates for specific messenger |
-| `SUB` | `/topic/tracking/all` | Receive updates for all messengers (Admin) |
+| Feature                   | Descripción                                           |
+| ------------------------- | ----------------------------------------------------- |
+| **Ubicación en vivo**     | Actualización cada 45 seg (mín. 5s)                   |
+| **Validación de entrega** | INHABILITADO - Radio máximo de 200m del destino       |
+| **Precisión técnica**     | Filtro de error GPS < 100m para historial             |
+| **Historial completo**    | Retención permanente (Archivado histórico)            |
+| **Baja latencia**         | Redis para caché de ubicaciones                       |
+| **WebSocket**             | Actualizaciones de datos en tiempo real (Server Push) |
 
 ---
 
-### Google Maps Integration
-- **Geocoding**: Address ↔ Coordinates
-- **Directions API**: DISABLED - Optimized routes
-- **Distance Matrix**: Time estimation
-- **Reverse Geocoding**: Coordinates → Address
+### API WebSocket
+
+URL de conexión: `ws://localhost:8080/ws/tracking`
+
+| Tipo   | Destino                   | Descripción                              |
+| ------ | ------------------------- | ---------------------------------------- |
+| `SEND` | `/app/tracking/update`    | Enviar actualización de GPS              |
+| `SEND` | `/app/tracking/heartbeat` | Enviar señal de vida (sin GPS)           |
+| `SUB`  | `/topic/tracking/{id}`    | Recibir actualizaciones de un mensajero  |
+| `SUB`  | `/topic/tracking/all`     | Recibir actualizaciones de todos (Admin) |
 
 ---
 
-### Business Rules
+### Integración Google Maps
+
+- **Geocoding**: Dirección ↔ Coordenadas
+- **Directions API**: INHABILITADO - Rutas optimizadas
+- **Distance Matrix**: Estimación de tiempos
+- **Reverse Geocoding**: Coordenadas → Dirección
+
+---
+
+### Reglas de Negocio
+
 > [!IMPORTANT]
-> **Role-Based Status Transitions**
-> - **MESSENGER** can only use: `PENDING`, `DELIVERED`, `RETURNED`.
-> - **ADMIN** can only use: `CANCELED`, `RESOLVED`.
-> - Services can be modified at any time regardless of their current state.
-> - Admins can reassign **CANCELED** services to another messenger.
+> **Transiciones de Estado por Rol**
+>
+> - **MENSAJERO** solo puede trabajar con: `PENDING`, `DELIVERED`, `RETURNED`.
+> - **ADMIN** solo puede trabajar con: `CANCELED`, `RESOLVED`.
+> - Los servicios pueden ser modificados en cualquier momento sin importar su estado actual.
+> - Los administradores pueden reasignar servicios en estado **CANCELED** a otro mensajero.
 
 > [!NOTE]
-> **Evidence Requirements**
-> - **DELIVERED**: Signature and GIF verification are mandatory.
-> - **PENDING**: Signature, GIF verification, at least one photo, and observation are mandatory.
-> - **RETURNED**: At least one photo and observation are mandatory (no signature required).
-> - **CANCELED** & **RESOLVED**: No additional evidence required.
+> **Requisitos de Evidencia**
+>
+> - **DELIVERED**: Firma y verificación GIF obligatorias.
+> - **PENDING**: Firma, verificación GIF, al menos una foto y observación obligatorias.
+> - **RETURNED**: Al menos una foto y observación obligatorias (no requiere firma).
+> - **CANCELED** & **RESOLVED**: No requieren evidencia adicional.
 
 > [!NOTE]
-> **Soft Delete (Trash Bin)**
-> Deleted services are moved to a **trash bin** and permanently deleted after **60 days**.
-> Admins can restore services from the trash before permanent deletion.
+> **Eliminación Suave (Papelera)**
+> Los servicios eliminados se mueven a una **papelera** y se archivan permanentemente después de **60 días**.
+> Los administradores pueden restaurar servicios de la papelera antes de la eliminación permanente.
 
 ---
 
-### State Rules
-| State | Messenger | Admin | Delete |
-|-------|-----------|-------|--------|
-| `ASSIGNED` | → `PENDING`, `DELIVERED`, `RETURNED` | → `CANCELED`, `RESOLVED` | ✅ Trash |
-| `RETURNED` | → `PENDING`, `DELIVERED` | → `CANCELED`, `RESOLVED` | ✅ Trash |
-| `PENDING` | → `DELIVERED`, `RETURNED` | → `CANCELED`, `RESOLVED` | ✅ Trash |
-| `DELIVERED` | → `PENDING`, `RETURNED` | → `CANCELED`, `RESOLVED` | ✅ Trash |
-| `CANCELED` | - | Admin can **reassign** → `ASSIGNED` | ✅ Trash |
-| `RESOLVED` | - | - | ✅ Trash |
+### Reglas de Estados
+
+| Estado      | Mensajero                            | Admin                    | Eliminar    |
+| ----------- | ------------------------------------ | ------------------------ | ----------- |
+| `ASSIGNED`  | → `PENDING`, `DELIVERED`, `RETURNED` | → `CANCELED`, `RESOLVED` | ✅ Papelera |
+| `RETURNED`  | → `PENDING`, `DELIVERED`             | → `CANCELED`, `RESOLVED` | ✅ Papelera |
+| `PENDING`   | → `DELIVERED`, `RETURNED`            | → `CANCELED`, `RESOLVED` | ✅ Papelera |
+| `DELIVERED` | → `PENDING`, `RETURNED`              | → `CANCELED`, `RESOLVED` | ✅ Papelera |
+| `CANCELED`  | -                                    | Reasignar → `ASSIGNED`   | ✅ Papelera |
+| `RESOLVED`  | -                                    | -                        | ✅ Papelera |
 
 ---
 
-### Permissions Summary
-| Role | Available States | Special Actions | Notes |
-|------|------------------|-----------------|-------|
-| **MESSENGER** | `PENDING`, `DELIVERED`, `RETURNED` | - | Can change services to any allowed state at any time |
-| **ADMIN** | `CANCELED`, `RESOLVED` | **Reassign messenger** (from `CANCELED` only) | Can change services to admin states from any current state |
+### Resumen de Permisos
+
+| Rol           | Estados Disponibles                | Acciones Especiales                                   | Notas                                                                           |
+| ------------- | ---------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------- |
+| **MENSAJERO** | `PENDING`, `DELIVERED`, `RETURNED` | -                                                     | Puede cambiar servicios a cualquier estado permitido en cualquier momento       |
+| **ADMIN**     | `CANCELED`, `RESOLVED`             | **Reasignar mensajero** (desde `CANCELED` únicamente) | Puede cambiar servicios a estados administrativos desde cualquier estado actual |
 
 ---
 
-### Reassignment Flow
+### Flujo de Reasignación
+
 ```mermaid
 flowchart LR
-    A[Service in CANCELED] --> B{Admin reassigns}
-    B --> C[New messenger assigned]
-    C --> D[Status → ASSIGNED]
+    A[Servicio en CANCELED] --> B{Admin reasigna}
+    B --> C[Nuevo mensajero asignado]
+    C --> D[Estado → ASSIGNED]
 ```
 
 ---
 
-### Trash Management (Soft Delete & Archive)
-| Action | Endpoint | Description |
-|--------|----------|-------------|
-| Delete → Trash | `DELETE /services/{id}` | Moves to trash (soft delete) |
-| View Trash | `GET /services/trash` | Lists deleted services (ADMIN) |
-| Restore | `POST /services/trash/restore/{id}` | Restores from trash (ADMIN) |
-| Empty Trash | `POST /services/trash/empty` | Archives all trash items (ADMIN) |
-| Auto-Archive | Scheduled job (3 AM daily) | Archives services after 60 days |
+### Gestión de Papelera (Soft Delete y Archivo)
 
-**Archive System**: Services are permanently archived to dedicated tables (`deleted_services`, `deleted_status_history`, `deleted_photos`, `deleted_tracking_history`, `deleted_signatures`) instead of being deleted. All historical data is preserved for auditing and analytics.
+| Acción              | Endpoint                            | Descripción                                        |
+| ------------------- | ----------------------------------- | -------------------------------------------------- |
+| Eliminar → Papelera | `DELETE /services/{id}`             | Mueve a papelera (soft delete)                     |
+| Ver Papelera        | `GET /services/trash`               | Lista servicios eliminados (ADMIN)                 |
+| Restaurar           | `POST /services/trash/restore/{id}` | Restaura desde papelera (ADMIN)                    |
+| Vaciar Papelera     | `POST /services/trash/empty`        | Archiva todos los elementos de la papelera (ADMIN) |
+| Archivo Automático  | Job programado (3 AM diario)        | Archiva servicios después de 60 días               |
+
+**Sistema de Archivo**: Los servicios se archivan permanentemente en tablas dedicadas (`deleted_services`, `deleted_status_history`, `deleted_photos`, `deleted_tracking_history`, `deleted_signatures`) en lugar de ser eliminados. Todos los datos históricos se preservan para auditoría y análisis.
 
 ---
 
-## Security
+## Seguridad
 
-### JWT Authentication with Refresh Tokens
+### Autenticación JWT con Refresh Tokens
+
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
 │   Client    │────▶│   /login    │────▶│   Server    │
@@ -692,342 +725,381 @@ flowchart LR
                    New token pair
 ```
 
-| Token | Prod Duration | Dev Duration | Local Duration | Usage |
-|-------|---------------|--------------|----------------|-------|
-| **Access Token** | 30 minutes | 8 hours | 8 hours | Header `Authorization: Bearer <token>` |
-| **Refresh Token** | 12 hours | 8 days | 8 days | Endpoint `/auth/refresh` to renew |
+| Token             | Duración (prod) | Duración (dev) | Duración (local) | Uso                                    |
+| ----------------- | --------------- | -------------- | ---------------- | -------------------------------------- |
+| **Access Token**  | 30 minutos      | 8 horas        | 8 horas          | Header `Authorization: Bearer <token>` |
+| **Refresh Token** | 12 horas        | 8 días         | 8 días           | Endpoint `/auth/refresh` para renovar  |
 
 ---
 
-### Security Features
-- **Token Rotation**: Each refresh generates a new token pair
-- **Stateless**: No tokens stored server-side (Redis only for data caching)
-- **Auto Expiration**: Tokens expire automatically
-- **HMAC-SHA256**: Robust digital signature algorithm
-- **File Validation**: Magic bytes check for GIF/Images to prevent content spoofing
+### Características de Seguridad
+
+- **Token Rotation**: Cada refresh genera un nuevo par de tokens
+- **Stateless**: No se almacenan tokens en el servidor (Redis solo para caché de datos)
+- **Expiración Automática**: Tokens expire automáticamente
+- **HMAC-SHA256**: Algoritmo robusto de firma digital
+- **Validación de Archivos**: Verificación de Magic Bytes para evitar suplantación de contenido
 
 ---
 
-### Public Identification (UUID)
-To enhance security and facilitate offline synchronization, the system uses **UUID v4** for public identification of entities (Service Deliveries, Dealerships, Employees).
-- **Non-Enumerable**: Prevents ID enumeration attacks by using non-sequential identifiers.
-- **Offline-First Ready**: Allows the mobile client to generate temporary IDs or handle synchronization without primary key conflicts.
-- **Internal Performance**: Numeric IDs are maintained as internal primary keys for optimal database performance, but are never exposed through the public API.
+### Identificación Pública (UUID)
+
+Para mejorar la seguridad y facilitar la sincronización offline, el sistema utiliza **UUID v4** para la identificación pública de entidades (Servicios, Concesionarios, Empleados).
+
+- **No Enumerable**: Previene ataques de enumeración de IDs mediante identificadores no secuenciales.
+- **Preparado para Offline-First**: Permite al cliente móvil gestionar la sincronización y referencias sin conflictos de llaves primarias.
+- **Rendimiento Interno**: Se mantienen los IDs numéricos como llaves primarias internas para un rendimiento óptimo en la base de datos, pero nunca se exponen a través de la API pública.
 
 ---
 
-### Distributed Rate Limiting
-- **Cloudflare Turnstile**: Mandatory bot protection for all login attempts to prevent automated attacks.
-- **Redis-Backed Throttling**:
-  - Global enforcement across multiple instances (Cloud Run compatible).
-  - `AUTH`: 10 requests / minute (Brute-force protection).
-  - `GENERAL`: 100 requests / minute.
-- **Resilience**:
-  - Automatic fallback to in-memory rate limiting if Redis is unavailable.
-  - Memory-efficient TTL management for Redis keys.
-- **WebSocket Throttling**: 5 seconds minimum interval between updates per messenger.
-- **WhatsApp Security**:
-  - **Webhook validation**: Uses HMAC-SHA256 with Meta's App Secret to verify request origin.
-  - **PIN Protection**: 4-digit PIN authentication required to access dealership data.
-  - **Brute-force protection**: Bot access is blocked for 15 minutes after 3 failed PIN attempts, with progressive delays between attempts.
-- Response headers: `X-Rate-Limit-Remaining`, `X-Rate-Limit-Retry-After-Seconds`
+### Rate Limiting Distribuido
+
+- **Cloudflare Turnstile**: Protección obligatoria contra bots en todos los intentos de inicio de sesión para evitar ataques automatizados.
+- **Limitación en Redis**:
+  - Protección global sincronizada entre múltiples instancias (Cloud Run).
+  - `AUTENTICACIÓN`: 10 peticiones / minuto (Protección brute-force).
+  - `GENERAL`: 100 peticiones / minuto.
+- **Resiliencia**:
+  - Fallback automático a memoria local si Redis no está disponible.
+  - Gestión eficiente de memoria mediante TTL dinámico en Redis.
+- **Limitación WebSocket**: Intervalo mínimo de 5 segundos entre actualizaciones por mensajero.
+- **Seguridad WhatsApp**:
+  - **Validación de Webhook**: Usa HMAC-SHA256 con el App Secret de Meta para verificar el origen de la petición.
+  - **Protección por PIN**: Autenticación por PIN de 4 dígitos requerida para acceder a los datos de concesionarios.
+  - **Protección Fuerza Bruta**: El acceso al bot se bloquea por 15 minutos tras 3 intentos fallidos de PIN, con delays progresivos entre intentos.
+- Headers de respuesta: `X-Rate-Limit-Remaining`, `X-Rate-Limit-Retry-After-Seconds`
 
 ---
 
-### Roles & Permissions
-- **ADMIN**: Full access to all endpoints
-- **MESSENGER**: Only manages own services and location
+### Roles y Permisos
+
+- **ADMIN**: Acceso completo a todos los endpoints
+- **MESSENGER**: Solo gestiona sus propios servicios y ubicación
 
 ---
 
-### Security Headers (Production)
+### Headers de Seguridad (Producción)
+
 - HSTS (HTTP Strict Transport Security)
 - Cookies: `Secure`, `HttpOnly`, `SameSite=Strict`
-- CORS configured by origin
-- No stack trace exposure
+- CORS configurado por origen
+- Sin exposición de stack traces
 
 ---
 
-## Observability
+## Observabilidad
 
-### Monitoring Endpoints (Actuator)
-| Endpoint | Description | Profile | Access |
-|----------|-------------|---------|--------|
-| `/actuator/health` | Health status (DB, Redis, Disk) | All | Public |
-| `/actuator/metrics` | JVM and HTTP metrics | `dev`, `local` | Private (JWT) |
-| `/actuator/info` | Build information | All | Private (JWT) |
+### Endpoints de Monitoreo (Actuator)
 
----
-
-### Cloud Run Optimization
-- **JSON Logging (Prod):** Structured output compatible with Google Cloud Logging
-- **Graceful Shutdown:** Waits 30s to finish active connections
-- **SSL Offloading:** Trusts proxy headers (`X-Forwarded-Proto`) from Cloud Run
+| Endpoint            | Descripción                        | Perfil         | Acceso        |
+| ------------------- | ---------------------------------- | -------------- | ------------- |
+| `/actuator/health`  | Estado de salud (DB, Redis, Disco) | Todos          | Público       |
+| `/actuator/metrics` | Métricas de JVM y HTTP             | `dev`, `local` | Privado (JWT) |
+| `/actuator/info`    | Información de la build            | Todos          | Privado (JWT) |
 
 ---
 
-### API Documentation
-| Endpoint | Description |
-|----------|-------------|
-| `/swagger-ui/index.html` | Interactive Swagger UI |
-| `/v3/api-docs` | OpenAPI 3.0 Specification (JSON) |
-| `/v3/api-docs.yaml` | OpenAPI 3.0 Specification (YAML) |
+### Optimización para Cloud Run
+
+- **Logging JSON (Prod):** Salida estructurada compatible con Google Cloud Logging
+- **Graceful Shutdown:** Espera 30s para terminar conexiones activas
+- **SSL Offloading:** Confía en headers de proxy (`X-Forwarded-Proto`) de Cloud Run
+
+---
+
+### Documentación API
+
+| Endpoint                 | Descripción                       |
+| ------------------------ | --------------------------------- |
+| `/swagger-ui/index.html` | Interfaz Swagger UI interactiva   |
+| `/v3/api-docs`           | Especificación OpenAPI 3.0 (JSON) |
+| `/v3/api-docs.yaml`      | Especificación OpenAPI 3.0 (YAML) |
 
 > [!TIP]
-> Swagger UI is publicly accessible in `dev` profile. In production, consider restricting access via security configuration.
+> Swagger UI es accesible públicamente en el perfil `dev`. En producción, considera restringir el acceso mediante configuración de seguridad.
 
 ---
 
-## Auditing
+## Auditoría
 
-### AOP-Based Audit System
-The application includes a centralized **audit logging system** using Aspect-Oriented Programming (AOP). Critical actions are automatically logged with user context, timing, and results.
+### Sistema de Auditoría Basado en AOP
 
----
-
-### Audited Actions
-| Component | Action | Description |
-|-----------|--------|-------------|
-| **AuthController** | `LOGIN` | User login attempts |
-| | `TOKEN_REFRESH` | Access token renewal |
-| **ServiceDeliveryUseCase** | `CREATE_SERVICE` | Create service from OCR image |
-| | `CREATE_SERVICE_MANUAL` | Create service with manual plate |
-| | `UPDATE_STATUS` | Update service status |
-| | `REASSIGN_MESSENGER` | Reassign service to another messenger |
-| | `DELETE_SERVICE` | Move service to trash |
-| | `RESTORE_SERVICE` | Restore service from trash |
-| | `EMPTY_TRASH` | Permanently empty trash |
-| | `ARCHIVE_SERVICE` | Manually archive service from trash |
-| **EmployeeUseCase** | `CREATE_EMPLOYEE` | Create new employee |
-| | `UPDATE_EMPLOYEE` | Update employee information |
-| | `DELETE_EMPLOYEE` | Delete employee |
+La aplicación incluye un **sistema de logging de auditoría centralizado** usando Programación Orientada a Aspectos (AOP). Las acciones críticas se registran automáticamente con contexto de usuario, tiempo y resultados.
 
 ---
 
-## Architecture Verification
-The project includes **ArchUnit** tests to enforce structural integrity and ensure that the **Hexagonal Architecture** principles are never violated.
+### Acciones Auditadas
 
-### Automated Rules
-- **Layer Isolation**: Domain and Application layers must never depend on Infrastructure.
-- **Dependency Flow**: Input adapters must only talk to Use Cases, and Use Cases must only interact with Domain services or Ports.
-- **Package Integrity**: Controllers, entities, and repositories must reside in their respective adapter/infrastructure packages.
+| Componente                 | Acción                  | Descripción                                  |
+| -------------------------- | ----------------------- | -------------------------------------------- |
+| **AuthController**         | `LOGIN`                 | Intentos de inicio de sesión                 |
+|                            | `TOKEN_REFRESH`         | Renovación de token de acceso                |
+| **ServiceDeliveryUseCase** | `CREATE_SERVICE`        | Crear servicio desde imagen OCR              |
+|                            | `CREATE_SERVICE_MANUAL` | Crear servicio con placa manual              |
+|                            | `UPDATE_STATUS`         | Actualizar estado de servicio                |
+|                            | `REASSIGN_MESSENGER`    | Reasignar servicio a otro mensajero          |
+|                            | `DELETE_SERVICE`        | Mover servicio a papelera                    |
+|                            | `RESTORE_SERVICE`       | Restaurar servicio desde papelera            |
+|                            | `EMPTY_TRASH`           | Vaciar papelera permanentemente              |
+|                            | `ARCHIVE_SERVICE`       | Archivar servicio de la papelera manualmente |
+| **EmployeeUseCase**        | `CREATE_EMPLOYEE`       | Crear nuevo empleado                         |
+|                            | `UPDATE_EMPLOYEE`       | Actualizar información de empleado           |
+|                            | `DELETE_EMPLOYEE`       | Eliminar empleado                            |
 
-Run architecture tests:
+---
+
+## Verificación de Arquitectura
+
+El proyecto incluye pruebas de **ArchUnit** para forzar la integridad estructural y asegurar que los principios de la **Arquitectura Hexagonal** nunca sean violados.
+
+### Reglas Automatizadas
+
+- **Aislamiento de Capas**: Las capas de Dominio y Aplicación nunca deben depender de la Infraestructura.
+- **Flujo de Dependencias**: Los adaptadores de entrada solo deben hablar con los Casos de Uso, y los Casos de Uso solo deben interactuar con servicios de Dominio o Puertos.
+- **Integridad de Paquetes**: Controladores, entidades y repositorios deben residir en sus respectivos paquetes de adaptador/infraestructura.
+
+Ejecutar pruebas de arquitectura:
+
 ```bash
 mvn test -Dtest=HexagonalArchitectureTest
 ```
 
 ---
 
-### Log Format
-```
-AUDIT | timestamp | user_document | action | method | params | status | duration | error
-```
+### Formato del Log
 
-**Example:**
 ```
-2025-12-21 00:42:00.123 [AUDIT] AUDIT | 2025-12-21 00:42:00 | 123456 | UPDATE_STATUS | ServiceDeliveryUseCase.updateStatus | [1, DELIVERED, "Delivered", ...] | SUCCESS | 125ms |
+AUDIT | timestamp | documento_usuario | accion | metodo | parametros | estado | duracion | error
 ```
 
----
+**Ejemplo:**
 
-### Configuration
-- **Logger Name:** `AUDIT`
-- **Level:** `WARN` (always visible in all environments)
-- **Output:** Console (Cloud Run captures stdout)
-- **File Output:** Optional, enable `AUDIT_FILE` appender in `logback-spring.xml`
-
----
- 
-## Performance Optimization
-The system includes multiple optimization layers to ensure high performance and low latency.
- 
-### Caching Strategy (Redis)
-- **Spring Cache Abstraction**: Application-level caching using `@Cacheable` and `@CacheEvict`.
-  - `Dealerships`: TTL 30 minutes.
-  - `Employees`: TTL 15 minutes.
-- **Hibernate Second-Level Cache (L2)**: Entity-level caching via Redisson to reduce database load.
-  - Enabled for `DealershipEntity`, `EmployeeEntity`, and `PlateEntity`.
-- **Custom Serialization**: Optimized `ObjectMapper` with `JavaTimeModule` support for `LocalDateTime`.
+```
+2025-12-21 00:42:00.123 [AUDIT] AUDIT | 2025-12-21 00:42:00 | 123456 | UPDATE_STATUS | ServiceDeliveryUseCase.updateStatus | [1, DELIVERED, "Entregado", ...] | SUCCESS | 125ms |
+```
 
 ---
 
-### Data Fetching Optimization
-- **Lazy Loading**: Most relationships in `ServiceDeliveryEntity` are configured as `FetchType.LAZY` to avoid loading unnecessary data.
-- **Entity Graphs**: Explicit `@EntityGraph` definitions in repositories to solve the N+1 problem by fetching only required associations in a single query.
+### Configuración
+
+- **Nombre del Logger:** `AUDIT`
+- **Nivel:** `WARN` (siempre visible en todos los ambientes)
+- **Salida:** Consola (Cloud Run captura stdout)
+- **Salida a Archivo:** Opcional, habilitar `AUDIT_FILE` appender en `logback-spring.xml`
 
 ---
 
-### Image Optimization
-- **Automatic Resizing**: Images are automatically resized to a maximum of 1280px preserving aspect ratio.
-- **Smart Compression**: Quality reduction to 75% for JPEG files using the `Thumbnailator` library.
+## Optimización de Rendimiento
+
+El sistema incluye múltiples capas de optimización para garantizar un alto rendimiento y baja latencia.
+
+### Estrategia de Caché (Redis)
+
+- **Abstracción de Spring Cache**: Caché a nivel de aplicación usando `@Cacheable` y `@CacheEvict`.
+  - `Dealerships` (Concesionarios): TTL 30 minutos.
+  - `Employees` (Empleados): TTL 15 minutos.
+- **Hibernate Second-Level Cache (L2)**: Caché a nivel de entidad vía Redisson para reducir la carga en la base de datos.
+  - Habilitado para `DealershipEntity`, `EmployeeEntity`, y `PlateEntity`.
+- **Serialización Personalizada**: `ObjectMapper` optimizado con soporte para `JavaTimeModule` para manejar `LocalDateTime`.
 
 ---
 
-### Connection Pool Tuning (HikariCP)
-- **Optimized for Cloud SQL**: Fine-tuned parameters for low-resource environments (db-f1-micro).
-- **Leak Detection**: Active threshold to identify and prevent connection leaks.
+### Optimización de Carga de Datos
+
+- **Lazy Loading (Carga Perezosa)**: La mayoría de las relaciones en `ServiceDeliveryEntity` están configuradas como `FetchType.LAZY` para evitar cargar datos innecesarios.
+- **Entity Graphs**: Definiciones explícitas de `@EntityGraph` en los repositorios para resolver el problema N+1, cargando solo las asociaciones requeridas en una única consulta.
 
 ---
 
-## Setup & Installation
+### Optimización de Imágenes
 
-### Prerequisites
-| Requirement | Version |
-|-------------|---------|
-| Java | 17+ |
-| MySQL | 8.0+ |
-| Redis | 6.0+ |
-| Maven | 3.9+ |
+- **Redimensionamiento Automático**: Las imágenes se redimensionan automáticamente a un máximo de 1280px (ancho o alto) preservando la relación de aspecto.
+- **Compresión Inteligente**: Reducción de calidad al 75% para archivos JPEG usando la librería `Thumbnailator`, reduciendo significativamente el uso de almacenamiento y ancho de banda sin pérdida de detalle perceptible.
 
 ---
 
-### Environment Variables Required
-| Variable | Description | Default/Example |
-|----------|-------------|-----------------|
-| `DB_NAME` | MySQL Database Name | `messenger_db` |
-| `DB_USERNAME` | Database User | `root` |
-| `DB_PASSWORD` | Database Password | `******` |
-| `REDIS_HOST` | Redis Server Host | `localhost` |
-| `JWT_SECRET` | 256-bit Key for Tokens | `openssl rand -base64 64` |
-| `GOOGLE_MAPS_API_KEY` | Google Maps Platform Key | `AIza...` |
-| `GCS_BUCKET_NAME` | Bucket for evidence | `plak-evidence` |
-| `TURNSTILE_SECRET_KEY`| Cloudflare Secret Key | `0x4AAAAAA...` |
-| `CORS_ALLOWED_ORIGINS`| Allowed Frontend URLs | `http://localhost:5173` |
-| `WHATSAPP_PHONE_NUMBER_ID`| WhatsApp Phone ID | `123456789...` |
-| `WHATSAPP_ACCESS_TOKEN`| Meta Permanent Token | `EAAG...` |
-| `WHATSAPP_VERIFY_TOKEN`| Custom Webhook Token | `my_secret_token` |
-| `WHATSAPP_APP_SECRET`  | Meta App Secret | `abc123...` |
+### Tuning del Pool de Conexiones (HikariCP)
+
+- **Optimizado para Cloud SQL**: Parámetros ajustados para entornos de recursos limitados (db-f1-micro).
+- **Detección de Fugas**: Umbral activo para identificar y prevenir fugas de conexiones.
+- **Caché de Statements**: Habilitado para mejorar el rendimiento de ejecución de consultas.
 
 ---
 
-### Quick Start (Docker) - Recommended
-Run the full stack locally with one command.
+## Configuración e Instalación
 
-#### Prerequisites
-- Docker & Docker Compose
+### Prerrequisitos
+
+| Requisito | Versión |
+| --------- | ------- |
+| Java      | 17+     |
+| MySQL     | 8.0+    |
+| Redis     | 6.0+    |
+| Maven     | 3.9+    |
+
+---
+
+### Variables de Entorno Requeridas
+
+| Variable                   | Descripción                   | Default/Ejemplo           |
+| -------------------------- | ----------------------------- | ------------------------- |
+| `DB_NAME`                  | Nombre de la DB MySQL         | `messenger_db`            |
+| `DB_USERNAME`              | Usuario de la DB              | `root`                    |
+| `DB_PASSWORD`              | Contraseña de la DB           | `******`                  |
+| `REDIS_HOST`               | Host del servidor Redis       | `localhost`               |
+| `JWT_SECRET`               | Clave 256-bit para Tokens     | `openssl rand -base64 64` |
+| `GOOGLE_MAPS_API_KEY`      | Key de Google Maps            | `AIza...`                 |
+| `GCS_BUCKET_NAME`          | Bucket para evidencias        | `plak-evidence`           |
+| `TURNSTILE_SECRET_KEY`     | Cloudflare Secret Key         | `0x4AAAAAA...`            |
+| `CORS_ALLOWED_ORIGINS`     | URLs de frontend permitidas   | `http://localhost:5173`   |
+| `WHATSAPP_PHONE_NUMBER_ID` | ID del Teléfono de WhatsApp   | `123456789...`            |
+| `WHATSAPP_ACCESS_TOKEN`    | Token Permanente de Meta      | `EAAG...`                 |
+| `WHATSAPP_VERIFY_TOKEN`    | Token de Verificación Webhook | `mi_token_secreto`        |
+| `WHATSAPP_APP_SECRET`      | App Secret de Meta            | `abc123...`               |
+
+---
+
+### Inicio Rápido (Docker) - Recomendado
+
+Ejecuta el stack completo localmente con un solo comando.
+
+#### Requisitos Previos
+
+- Docker y Docker Compose
 - Git
 
-#### Steps
-1. **Clone the repository**
+#### Pasos
+
+1. **Clonar el repositorio**
+
    ```bash
    git clone https://github.com/StartApp-FTT/messenger-backend.git
    cd messenger-backend
    ```
 
-2. **Configure Environment**
+2. **Configurar Entorno**
+
    ```bash
    cd messenger
    cp .env.example .env
-   # Edit .env with your Google Maps Key & Credentials
+   # Edita .env con tu Key de Google Maps y Credenciales
    ```
 
-3. **Run with Docker**
+3. **Ejecutar con Docker**
    ```bash
    cd ..
    docker-compose -f docker-compose.local.yml up --build
    ```
 
-The API will be available at `http://localhost:8080`.
+La API estará disponible en `http://localhost:8080`.
 
 ---
 
-### Manual Quick Start
+### Instalación Manual
+
 ```bash
-# 1. Clone
+# 1. Clonar
 git clone <repository-url>
 cd messenger-backend/messenger
 
-# 2. Configure variables (see above section)
+# 2. Configurar variables (ver sección anterior)
 
-# 3. Start Redis
+# 3. Iniciar Redis
 redis-server
 
-# 4. Run
+# 4. Ejecutar
 ./mvnw spring-boot:run -Dspring.profiles.active=dev
 ```
 
-API available at `http://localhost:8080`
+La API estará disponible en `http://localhost:8080`
 
 ---
 
 ## CI/CD
-Automated pipeline with **GitHub Actions**:
+
+Pipeline automatizado con **GitHub Actions**:
 
 ```yaml
 # .github/workflows/maven.yml
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: ["main", "develop"]
   pull_request:
-    branches: [ "main", "develop" ]
+    branches: ["main", "develop"]
 ```
 
 ---
 
-### Features
-| Feature | Description |
-|---------|-------------|
-| Automated build | Java 17 + Maven |
-| Dependency caching | Faster builds |
-| Secure secrets | Credential injection |
-| Testing | Profile test with Docker (MySQL/Redis) |
+### Características
+
+| Feature               | Descripción                             |
+| --------------------- | --------------------------------------- |
+| Build automático      | Java 17 + Maven                         |
+| Caché de dependencias | Builds más rápidos                      |
+| Secrets seguros       | Inyección de credenciales               |
+| Testing               | Profile `test` con Docker (MySQL/Redis) |
 
 ---
 
-### Required GitHub Secrets
+### Secrets de GitHub Requeridos
+
 ```
 GOOGLE_APPLICATION_CREDENTIALS_JSON
 ```
 
 > [!NOTE]
-> The CI pipeline uses an ephemeral **Docker** environment (MySQL + Redis) for integration tests, ensuring maximum parity with production. No external DB secrets are required.
+> El pipeline utiliza un entorno efímero con **Docker** (MySQL + Redis) para los tests de integración, garantizando máxima paridad con producción. No se requieren secrets de BD externa.
 
 ---
 
 ## Testing
-The project implements a robust testing strategy across all layers of the hexagonal architecture.
 
-| Level | Strategy | Technology |
-|-------|----------|------------|
-| **Unit** | Isolated logic verification | JUnit 5 + Mockito |
-| **Integration** | Infrastructure & Service validation | Spring Boot Test + **Testcontainers** |
-| **Persistence** | Data mapping & Query validation | `@DataJpaTest` + Real MySQL |
-| **Architecture** | Hexagonal rules compliance | **ArchUnit** |
-| **Mutation** | Test effectiveness measurement | **Pitest** |
-| **E2E (Client)** | Full business flow validation | **Playwright** (in `messenger-frontend`) |
+El proyecto implementa una estrategia de pruebas robusta en todas las capas de la arquitectura hexagonal.
 
----
-
-### Key Features
-- **Testcontainers (MySQL & Redis)**: No manual Docker setup required. Tests download and manage containers automatically.
-- **Integral Strategy (Full-Stack)**: The project is complemented by a frontend E2E suite that validates real integration with backend endpoints, including security bypass (Turnstile) and sensor simulation (GPS/Camera).
-- **Hierarchical Singleton Pattern**: `BaseContainerTest` shares infrastructure across test contexts, drastically reducing startup time.
-- **Mutation Testing**: Metrics beyond line coverage, injecting faults to ensure assertions actually detect errors.
-- **Flyway Parity**: Integration tests run on the exact same migrations used in production.
+| Nivel            | Estrategia                                | Tecnología                               |
+| ---------------- | ----------------------------------------- | ---------------------------------------- |
+| **Unitario**     | Verificación lógica aislada               | JUnit 5 + Mockito                        |
+| **Integración**  | Validación de infra y servicios           | Spring Boot Test + **Testcontainers**    |
+| **Persistencia** | Validación de mapeos y queries            | `@DataJpaTest` + MySQL Real              |
+| **Arquitectura** | Cumplimiento de reglas hexagonales        | **ArchUnit**                             |
+| **Mutación**     | Medición de efectividad de tests          | **Pitest**                               |
+| **E2E (Client)** | Validación de flujos completos de negocio | **Playwright** (en `messenger-frontend`) |
 
 ---
 
-### Running Tests
+### Características Clave
+
+- **Testcontainers (MySQL & Redis)**: No requiere configuración manual de Docker. Los tests descargan y gestionan los contenedores necesarios automáticamente.
+- **Estrategia Integral (Full-Stack)**: El proyecto se complementa con una suite E2E en el frontend que valida la integración real con los endpoints del backend, incluyendo bypass de seguridad (Turnstile) y simulación de sensores (GPS/Cámara).
+- **Patrón Singleton Jerárquico**: Uso de `BaseContainerTest` para compartir la infraestructura entre múltiples contextos de prueba, reduciendo drásticamente el tiempo de inicio.
+- **Pruebas de Mutación**: Métricas que van más allá de la cobertura de líneas, inyectando fallos para verificar que los asertos de los tests realmente detecten errores.
+- **Paridad con Flyway**: Los tests de integración corren exactamente sobre las mismas migraciones que se usan en producción.
+
+---
+
+### Ejecución de Pruebas
+
 ```bash
-# Standard tests (Unit + Integration)
+# Tests estándar (Unitarios + Integración)
 ./mvnw test
 
-# Mutation Testing (Pitest)
+# Pruebas de Mutación (Pitest)
 ./mvnw org.pitest:pitest-maven:mutationCoverage
 ```
 
 ---
 
-## Postman Collection
+## Colección Postman
+
 **[Messenger_API.postman_collection.json](./Messenger_API.postman_collection.json)**
 
-### Features
-- **JWT and Refresh Token** saved automatically
-- **Environment variables** preconfigured (`baseUrl`, `token`, `refreshToken`)
-- **Automated tests** that save tokens to collection variables
-- **Payload examples** for all endpoints
-- **10 controllers** fully documented:
+### Características
+
+- **Token JWT y Refresh Token** guardados automáticamente
+- **Variables de entorno** preconfiguradas (`baseUrl`, `token`, `refreshToken`)
+- **Tests automáticos** que guardan tokens en variables de colección
+- **Ejemplos de payloads** para todos los endpoints
+- **10 controladores** completamente documentados:
   - Authentication (Login + Refresh)
   - Employees
   - Dealerships
@@ -1041,75 +1113,85 @@ The project implements a robust testing strategy across all layers of the hexago
 
 ---
 
-### Usage
-1. Import collection in Postman
-2. Configure `baseUrl` variable (default: `http://localhost:8080`)
-3. Run **"Login"** first
-4. Tokens (`token` and `refreshToken`) are saved automatically
-5. All other endpoints use the token automatically
-6. When access token expires, run **"Refresh Token"**
+### Uso
+
+1. Importar colección en Postman
+2. Configurar variable `baseUrl` (default: `http://localhost:8080`)
+3. Ejecutar **"Login"** primero
+4. Los tokens (`token` y `refreshToken`) se guardan automáticamente
+5. Todos los demás endpoints usan el token automáticamente
+6. Cuando el access token expire, ejecutar **"Refresh Token"**
 
 ---
 
-## Android Integration
-The system includes a native Android application built with **Capacitor**, providing a seamless mobile experience for messengers.
+## Integración Android
 
-### Technical Details
+El sistema incluye una aplicación nativa para Android construida con **Capacitor**, proporcionando una experiencia móvil fluida para los mensajeros.
+
+### Detalles Técnicos
+
 - **App ID**: `com.plak.messenger`
 - **Framework**: Ionic + Capacitor
-- **Plugins**: 
-  - `CapacitorHttp`: Optimized native network requests.
-  - `PushNotifications`: Real-time alerts for updates.
-  - `StatusBar`: Custom UI overlays for edge-to-edge experience.
+- **Plugins**:
+  - `CapacitorHttp`: Peticiones de red nativas optimizadas.
+  - `PushNotifications`: Alertas en tiempo real para actualizaciones de servicios.
+  - `StatusBar`: Personalización de la interfaz para una experiencia edge-to-edge.
 
 ---
 
-### Key Features & Permissions
-The app requests the following permissions to function correctly:
-- **Location**: `ACCESS_FINE_LOCATION` & `ACCESS_BACKGROUND_LOCATION` for real-time tracking even when the app is minimized.
-- **Camera**: `CAMERA` for OCR license plate recognition and delivery evidence.
-- **Notifications**: `POST_NOTIFICATIONS` for delivery updates.
-- **Foreground Service**: Ensures tracking persistence during deliveries.
+### Características y Permisos
+
+La aplicación requiere los siguientes permisos para su correcto funcionamiento:
+
+- **Ubicación**: `ACCESS_FINE_LOCATION` y `ACCESS_BACKGROUND_LOCATION` para el seguimiento en tiempo real incluso cuando la app está minimizada.
+- **Cámara**: `CAMERA` para el reconocimiento de placas (OCR) y evidencias de entrega.
+- **Notificaciones**: `POST_NOTIFICATIONS` para actualizaciones de servicios.
+- **Servicio de Primer Plano**: Garantiza la persistencia del tracking durante las entregas.
 
 ---
 
-### Development Setup (Emulator)
-To connect the Android Emulator to your local backend development environment:
-1. Ensure the backend is running on `localhost:8080`.
-2. The Android project is pre-configured to use `10.0.2.2` to access the host machine's `localhost`.
-3. Cleartext traffic is permitted for `10.0.2.2` in `network_security_config.xml`.
+### Configuración de Desarrollo (Emulador)
+
+Para conectar el emulador de Android a tu entorno local de desarrollo:
+
+1. Asegúrate de que el backend esté corriendo en `localhost:8080`.
+2. El proyecto de Android está pre-configurado para usar `10.0.2.2` para acceder al `localhost` de la máquina host.
+3. El tráfico de texto claro (HTTP) está permitido para `10.0.2.2` en `network_security_config.xml`.
 
 ---
 
-### Commands
-From the `messenger-frontend` directory:
+### Comandos Útiles
+
+Desde el directorio `messenger-frontend`:
+
 ```bash
-# Sync web assets to Android project
+# Sincronizar activos web con el proyecto Android
 npx cap sync android
 
-# Open in Android Studio
+# Abrir el proyecto en Android Studio
 npx cap open android
 ```
 
 ---
 
-## Support & Contact
-**Official Documentation:**
-- [Spring Boot Documentation](https://spring.io/projects/spring-boot)
+## Soporte y Contacto
+
+**Documentación Oficial:**
+
+- [Documentación de Spring Boot](https://spring.io/projects/spring-boot)
 - [Google Cloud Run](https://cloud.google.com/run/docs)
 
-**Documentation:**
-- [**GitHub Secrets Guide**](./.github/SECRETS.md)
-- [**Security Policy**](./.github/SECURITY.md)
+**Documentación:**
 
-**Project Specific:**
-- Repository: `messenger-backend`
-- Author: [Mateo Valencia Ardila](https://github.com/fttmatteo)
+- [**Secretos de GitHub**](./.github/SECRETS.md)
+- [**Política de Seguridad**](./.github/SECURITY.md)
+
+**Proyecto Específico:**
+
+- Repositorio: `messenger-backend`
+- Autor: [Mateo Valencia Ardila](https://github.com/fttmatteo)
 - Email: [contacto@plak.digital](mailto:contacto@plak.digital)
 
 ---
 
-## License
-See [LICENSE](./LICENSE).
-
-> **Copyright (C) 2026 Mateo Valencia Ardila. All rights reserved. Confidential and Proprietary.**
+> **Copyright (C) 2026 Mateo Valencia Ardila. Todos los derechos reservados. El código fuente de esta aplicación está protegido por las leyes de derechos de autor. Registro DNDA No. 13-108-139. Queda estrictamente prohibida su copia, distribución o modificación sin autorización expresa.**

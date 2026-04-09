@@ -103,7 +103,8 @@ public class WhatsAppWebhookController {
                 }
             }
         } catch (Exception e) {
-            logger.error("Error procesando webhook. Raw body: {}. Error: {}", rawBody, e.getMessage(), e);
+            logger.error("Error procesando webhook. Tamaño del payload: {} bytes. Error: {}",
+                    rawBody != null ? rawBody.length() : 0, e.getMessage());
         }
 
         return ResponseEntity.ok("EVENT_RECEIVED");
@@ -112,8 +113,8 @@ public class WhatsAppWebhookController {
     private boolean isValidSignature(String payload, String signatureWithPrefix) {
         String appSecret = config.getAppSecret();
         if (appSecret == null || appSecret.isEmpty()) {
-            logger.warn("App Secret no configurado. Saltando validación de firma.");
-            return true;
+            logger.error("App Secret no configurado. Rechazando petición del webhook por seguridad.");
+            return false;
         }
 
         if (signatureWithPrefix == null || !signatureWithPrefix.startsWith("sha256=")) {
@@ -131,21 +132,33 @@ public class WhatsAppWebhookController {
             mac.init(signingKey);
 
             byte[] rawHmac = mac.doFinal(payload.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-            String expectedSignature = bytesToHex(rawHmac);
+            byte[] receivedHmac = hexToBytes(signature);
+            if (receivedHmac == null) {
+                return false;
+            }
 
-            return expectedSignature.equalsIgnoreCase(signature);
+            return java.security.MessageDigest.isEqual(rawHmac, receivedHmac);
         } catch (Exception e) {
             logger.error("Error validando firma: {}", e.getMessage());
             return false;
         }
     }
 
-    private String bytesToHex(byte[] bytes) {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : bytes) {
-            sb.append(String.format("%02x", b));
+    private byte[] hexToBytes(String hex) {
+        if (hex == null || hex.length() % 2 != 0) {
+            return null;
         }
-        return sb.toString();
+        int len = hex.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            int high = Character.digit(hex.charAt(i), 16);
+            int low = Character.digit(hex.charAt(i + 1), 16);
+            if (high == -1 || low == -1) {
+                return null;
+            }
+            data[i / 2] = (byte) ((high << 4) + low);
+        }
+        return data;
     }
 
     /**

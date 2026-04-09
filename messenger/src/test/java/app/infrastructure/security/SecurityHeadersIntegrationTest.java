@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.Matchers.containsString;
+
 /**
  * Pruebas de integración para auditar los headers de seguridad.
  * Verifica que el sistema cumpla con estándares profesionales de seguridad Web.
@@ -36,6 +38,15 @@ class SecurityHeadersIntegrationTest extends AbstractIntegrationTest {
                 // X-XSS-Protection: 1; mode=block para activar protección XSS del navegador
                 .andExpect(header().string("X-XSS-Protection", "1; mode=block"))
                 // Pragma: no-cache para compatibilidad con HTTP/1.0
-                .andExpect(header().string("Pragma", "no-cache"));
+                .andExpect(header().string("Pragma", "no-cache"))
+                // Content-Security-Policy para prevenir inyección de scripts
+                .andExpect(header().string("Content-Security-Policy", containsString("default-src 'self'")))
+                .andExpect(header().string("Content-Security-Policy", containsString("frame-ancestors 'none'")))
+                // Referrer-Policy para controlar información de origen
+                .andExpect(header().string("Referrer-Policy", "strict-origin-when-cross-origin"))
+                // Permissions-Policy para restringir APIs del navegador
+                .andExpect(header().string("Permissions-Policy",
+                        containsString("camera=(self)")));
     }
 }
+
