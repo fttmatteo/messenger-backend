@@ -13,6 +13,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -22,6 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(WhatsAppWebhookController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class WhatsAppWebhookControllerTest {
+
+        private static final String TEST_APP_SECRET = "test-app-secret-for-unit-tests";
 
         @Autowired
         private MockMvc mockMvc;
@@ -44,15 +50,31 @@ class WhatsAppWebhookControllerTest {
         @BeforeEach
         void setUp() {
                 when(config.getVerifyToken()).thenReturn("test-token");
-                when(config.getAppSecret()).thenReturn("");
+                when(config.getAppSecret()).thenReturn(TEST_APP_SECRET);
                 valueOperations = mock(ValueOperations.class);
                 when(redisTemplate.opsForValue()).thenReturn(valueOperations);
                 when(valueOperations.setIfAbsent(anyString(), anyString(), any())).thenReturn(true);
         }
 
+        /**
+         * Calcula la firma HMAC-SHA256 del payload con el secreto de prueba.
+         */
+        private String computeSignature(String payload) throws Exception {
+                SecretKeySpec signingKey = new SecretKeySpec(
+                                TEST_APP_SECRET.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+                Mac mac = Mac.getInstance("HmacSHA256");
+                mac.init(signingKey);
+                byte[] rawHmac = mac.doFinal(payload.getBytes(StandardCharsets.UTF_8));
+                StringBuilder sb = new StringBuilder();
+                for (byte b : rawHmac) {
+                        sb.append(String.format("%02x", b));
+                }
+                return "sha256=" + sb;
+        }
+
         @Test
         /**
-         * Verifica que el webhook procese mensajes de texto.
+         * Verifica que el webhook procese mensajes de texto cuando la firma es válida.
          */
         void shouldProcessTextMessage() throws Exception {
                 String json = "{" +
@@ -79,6 +101,7 @@ class WhatsAppWebhookControllerTest {
 
                 mockMvc.perform(post("/api/whatsapp/webhook")
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .header("X-Hub-Signature-256", computeSignature(json))
                                 .content(json))
                                 .andExpect(status().isOk());
 
@@ -87,7 +110,7 @@ class WhatsAppWebhookControllerTest {
 
         @Test
         /**
-         * Verifica que el webhook procese respuestas de botón.
+         * Verifica que el webhook procese respuestas de botón cuando la firma es válida.
          */
         void shouldProcessButtonReply() throws Exception {
                 String json = "{" +
@@ -113,6 +136,7 @@ class WhatsAppWebhookControllerTest {
 
                 mockMvc.perform(post("/api/whatsapp/webhook")
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .header("X-Hub-Signature-256", computeSignature(json))
                                 .content(json))
                                 .andExpect(status().isOk());
 
@@ -121,7 +145,7 @@ class WhatsAppWebhookControllerTest {
 
         @Test
         /**
-         * Verifica que el webhook procese respuestas de lista.
+         * Verifica que el webhook procese respuestas de lista cuando la firma es válida.
          */
         void shouldProcessListReply() throws Exception {
                 String json = "{" +
@@ -147,6 +171,7 @@ class WhatsAppWebhookControllerTest {
 
                 mockMvc.perform(post("/api/whatsapp/webhook")
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .header("X-Hub-Signature-256", computeSignature(json))
                                 .content(json))
                                 .andExpect(status().isOk());
 
@@ -182,8 +207,58 @@ class WhatsAppWebhookControllerTest {
 
                 mockMvc.perform(post("/api/whatsapp/webhook")
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .header("X-Hub-Signature-256", computeSignature(json))
                                 .content(json))
                                 .andExpect(status().isOk());
+
+                verify(botService, never()).processMessage(anyString(), anyString());
+        }
+
+        @Test
+        /**
+         * Verifica que el webhook rechace peticiones cuando el App Secret no está
+         * configurado (fail-closed).
+         */
+        void shouldRejectWhenAppSecretNotConfigured() throws Exception {
+                when(config.getAppSecret()).thenReturn("");
+
+                String json = "{\"object\":\"whatsapp_business_account\",\"entry\":[]}";
+
+                mockMvc.perform(post("/api/whatsapp/webhook")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json))
+                                .andExpect(status().isForbidden());
+
+                verify(botService, never()).processMessage(anyString(), anyString());
+        }
+
+        @Test
+        /**
+         * Verifica que el webhook rechace peticiones con firma inválida.
+         */
+        void shouldRejectInvalidSignature() throws Exception {
+                String json = "{\"object\":\"whatsapp_business_account\",\"entry\":[]}";
+
+                mockMvc.perform(post("/api/whatsapp/webhook")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("X-Hub-Signature-256", "sha256=invalidsignature000000000000000000000000000000000000000000000000")
+                                .content(json))
+                                .andExpect(status().isForbidden());
+
+                verify(botService, never()).processMessage(anyString(), anyString());
+        }
+
+        @Test
+        /**
+         * Verifica que el webhook rechace peticiones sin cabecera de firma.
+         */
+        void shouldRejectMissingSignature() throws Exception {
+                String json = "{\"object\":\"whatsapp_business_account\",\"entry\":[]}";
+
+                mockMvc.perform(post("/api/whatsapp/webhook")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json))
+                                .andExpect(status().isForbidden());
 
                 verify(botService, never()).processMessage(anyString(), anyString());
         }
