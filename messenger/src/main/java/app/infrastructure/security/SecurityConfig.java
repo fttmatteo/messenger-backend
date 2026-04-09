@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -59,7 +60,10 @@ public class SecurityConfig {
                                                 .frameOptions(frame -> frame.deny())
                                                 .httpStrictTransportSecurity(hsts -> hsts
                                                                 .includeSubDomains(true)
-                                                                .maxAgeInSeconds(31536000))
+                                                                .maxAgeInSeconds(63072000)
+                                                                .preload(true))
+                                                .referrerPolicy(referrer -> referrer
+                                                                .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
                                                 .contentSecurityPolicy(csp -> csp
                                                                 .policyDirectives(
                                                                                 "default-src 'self'; " +
@@ -79,7 +83,9 @@ public class SecurityConfig {
                                                                                                 "form-action 'self'; " +
                                                                                                 "object-src 'none'; " +
                                                                                                 "child-src 'self'; " +
-                                                                                                "media-src 'self';")))
+                                                                                                "media-src 'self';"))
+                                                .permissionsPolicyHeader(permissions -> permissions
+                                                                .policy("camera=(self), microphone=(), geolocation=(self), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()")))
                                 .exceptionHandling(exception -> exception
                                                 .authenticationEntryPoint(jwtAuthenticationEntryPoint))
                                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
