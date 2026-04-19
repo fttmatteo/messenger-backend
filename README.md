@@ -4,6 +4,8 @@
 
 # Messenger Backend API
 
+<img src="https://img.shields.io/badge/Version-1.11.5-blue.svg" alt="Version">
+
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.10-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
@@ -29,7 +31,6 @@
 - [Esquema de Base de Datos](#-esquema-de-base-datos)
 - [Tracking en Tiempo Real](#-tracking-en-tiempo-real)
 - [Flujo de Estados](#-flujo-de-estados)
-- [Seguridad](#-seguridad)
 - [Observabilidad](#-observabilidad)
 - [Auditoría](#-auditoría)
 - [Configuración e Instalación](#️-configuración-e-instalación)
@@ -687,83 +688,6 @@ flowchart LR
 
 ---
 
-## Seguridad
-
-### Autenticación JWT con Refresh Tokens
-
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Client    │────▶│   /login    │────▶│   Server    │
-└─────────────┘     └─────────────┘     └─────────────┘
-                           │
-                           ▼
-              ┌─────────────────────────┐
-              │  {                      │
-              │    token: "...",        │
-              │    refreshToken: "...", │
-              │    role: "ADMIN"        │
-              │  }                      │
-              └─────────────────────────┘
-                           │
-                           ▼
-                   ┌───────────────┐
-                   │  API Request  │
-                   │  Header:      │
-                   │  Authorization│
-                   │  Bearer token │
-                   └───────────────┘
-                           │
-                   Token expired?
-                           │
-                           ▼
-                   ┌───────────────┐
-                   │ /auth/refresh │
-                   │ refreshToken  │
-                   └───────────────┘
-                           │
-                           ▼
-                   New token pair
-```
-
-| Token             | Duración (prod) | Duración (dev) | Duración (local) | Uso                                    |
-| ----------------- | --------------- | -------------- | ---------------- | -------------------------------------- |
-| **Access Token**  | 30 minutos      | 8 horas        | 8 horas          | Header `Authorization: Bearer <token>` |
-| **Refresh Token** | 12 horas        | 8 días         | 8 días           | Endpoint `/auth/refresh` para renovar  |
-
----
-
-### Características de Seguridad
-
-- **Token Rotation**: Cada refresh genera un nuevo par de tokens
-- **Stateless**: No se almacenan tokens en el servidor (Redis solo para caché de datos)
-- **Expiración Automática**: Tokens expire automáticamente
-- **HMAC-SHA256**: Algoritmo robusto de firma digital
-- **Validación de Archivos**: Verificación de Magic Bytes para evitar suplantación de contenido
-
----
-
-### Identificación Pública (UUID)
-
-Para mejorar la seguridad y facilitar la sincronización offline, el sistema utiliza **UUID v4** para la identificación pública de entidades (Servicios, Concesionarios, Empleados).
-
-- **No Enumerable**: Previene ataques de enumeración de IDs mediante identificadores no secuenciales.
-- **Preparado para Offline-First**: Permite al cliente móvil gestionar la sincronización y referencias sin conflictos de llaves primarias.
-- **Rendimiento Interno**: Se mantienen los IDs numéricos como llaves primarias internas para un rendimiento óptimo en la base de datos, pero nunca se exponen a través de la API pública.
-
----
-
-### Rate Limiting Distribuido
-
-- **Cloudflare Turnstile**: Protección obligatoria contra bots en todos los intentos de inicio de sesión para evitar ataques automatizados.
-- **Limitación en Redis**:
-  - Protección global sincronizada entre múltiples instancias (Cloud Run).
-  - `AUTENTICACIÓN`: 10 peticiones / minuto (Protección brute-force).
-  - `GENERAL`: 100 peticiones / minuto.
-- **Resiliencia**:
-  - Fallback automático a memoria local si Redis no está disponible.
-  - Gestión eficiente de memoria mediante TTL dinámico en Redis.
-- **Limitación WebSocket**: Intervalo mínimo de 5 segundos entre actualizaciones por mensajero.
-- **Seguridad WhatsApp**:
   - **Validación de Webhook**: Usa HMAC-SHA256 con el App Secret de Meta para verificar el origen de la petición.
   - **Protección por PIN**: Autenticación por PIN de 4 dígitos requerida para acceder a los datos de concesionarios.
   - **Protección Fuerza Bruta**: El acceso al bot se bloquea por 15 minutos tras 3 intentos fallidos de PIN, con delays progresivos entre intentos.
@@ -1184,7 +1108,6 @@ npx cap open android
 **Documentación:**
 
 - [**Secretos de GitHub**](./.github/SECRETS.md)
-- [**Política de Seguridad**](./.github/SECURITY.md)
 
 **Proyecto Específico:**
 

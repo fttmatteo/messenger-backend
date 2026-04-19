@@ -4,6 +4,8 @@
 
 # Messenger Backend API
 
+<img src="https://img.shields.io/badge/Version-1.11.5-blue.svg" alt="Version">
+
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.10-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
@@ -29,7 +31,6 @@
 - [Database Schema](#-database-schema)
 - [Real-Time Tracking](#-real-time-tracking)
 - [State Flow](#-state-flow)
-- [Security](#-security)
 - [Observability](#-observability)
 - [Auditing](#-auditing)
 - [Setup & Installation](#️-setup--installation)
@@ -687,106 +688,6 @@ flowchart LR
 
 ---
 
-## Security
-
-### JWT Authentication with Refresh Tokens
-
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Client    │────▶│   /login    │────▶│   Server    │
-└─────────────┘     └─────────────┘     └─────────────┘
-                           │
-                           ▼
-              ┌─────────────────────────┐
-              │  {                      │
-              │    token: "...",        │
-              │    refreshToken: "...", │
-              │    role: "ADMIN"        │
-              │  }                      │
-              └─────────────────────────┘
-                           │
-                           ▼
-                   ┌───────────────┐
-                   │  API Request  │
-                   │  Header:      │
-                   │  Authorization│
-                   │  Bearer token │
-                   └───────────────┘
-                           │
-                   Token expired?
-                           │
-                           ▼
-                   ┌───────────────┐
-                   │ /auth/refresh │
-                   │ refreshToken  │
-                   └───────────────┘
-                           │
-                           ▼
-                   New token pair
-```
-
-| Token             | Prod Duration | Dev Duration | Local Duration | Usage                                  |
-| ----------------- | ------------- | ------------ | -------------- | -------------------------------------- |
-| **Access Token**  | 30 minutes    | 8 hours      | 8 hours        | Header `Authorization: Bearer <token>` |
-| **Refresh Token** | 12 hours      | 8 days       | 8 days         | Endpoint `/auth/refresh` to renew      |
-
----
-
-### Security Features
-
-- **Token Rotation**: Each refresh generates a new token pair
-- **Stateless**: No tokens stored server-side (Redis only for data caching)
-- **Auto Expiration**: Tokens expire automatically
-- **HMAC-SHA256**: Robust digital signature algorithm
-- **File Validation**: Magic bytes check for GIF/Images to prevent content spoofing
-
----
-
-### Public Identification (UUID)
-
-To enhance security and facilitate offline synchronization, the system uses **UUID v4** for public identification of entities (Service Deliveries, Dealerships, Employees).
-
-- **Non-Enumerable**: Prevents ID enumeration attacks by using non-sequential identifiers.
-- **Offline-First Ready**: Allows the mobile client to generate temporary IDs or handle synchronization without primary key conflicts.
-- **Internal Performance**: Numeric IDs are maintained as internal primary keys for optimal database performance, but are never exposed through the public API.
-
----
-
-### Distributed Rate Limiting
-
-- **Cloudflare Turnstile**: Mandatory bot protection for all login attempts to prevent automated attacks.
-- **Redis-Backed Throttling**:
-  - Global enforcement across multiple instances (Cloud Run compatible).
-  - `AUTH`: 10 requests / minute (Brute-force protection).
-  - `GENERAL`: 100 requests / minute.
-- **Resilience**:
-  - Automatic fallback to in-memory rate limiting if Redis is unavailable.
-  - Memory-efficient TTL management for Redis keys.
-- **WebSocket Throttling**: 5 seconds minimum interval between updates per messenger.
-- **WhatsApp Security**:
-  - **Webhook validation**: Uses HMAC-SHA256 with Meta's App Secret to verify request origin.
-  - **PIN Protection**: 4-digit PIN authentication required to access dealership data.
-  - **Brute-force protection**: Bot access is blocked for 15 minutes after 3 failed PIN attempts, with progressive delays between attempts.
-- Response headers: `X-Rate-Limit-Remaining`, `X-Rate-Limit-Retry-After-Seconds`
-
----
-
-### Roles & Permissions
-
-- **ADMIN**: Full access to all endpoints
-- **MESSENGER**: Only manages own services and location
-
----
-
-### Security Headers (Production)
-
-- HSTS (HTTP Strict Transport Security)
-- Cookies: `Secure`, `HttpOnly`, `SameSite=Strict`
-- CORS configured by origin
-- No stack trace exposure
-
----
-
 ## Observability
 
 ### Monitoring Endpoints (Actuator)
@@ -1182,8 +1083,7 @@ npx cap open android
 
 **Documentation:**
 
-- [**GitHub Secrets Guide**](./.github/SECRETS.md)
-- [**Security Policy**](./.github/SECURITY.md)
+- [**GitHub Secrets**](./.github/SECRETS.md)
 
 **Project Specific:**
 
