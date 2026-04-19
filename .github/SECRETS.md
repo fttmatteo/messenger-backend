@@ -7,11 +7,11 @@
 
 ---
 
-# Secrets Management 🔐
+# Secrets Management
 
 To ensure project security and operability, different secrets are used depending on the environment (CI/CD vs. Production).
 
-## 🤖 CI/CD Secrets (GitHub Actions)
+## CI/CD Secrets (GitHub Actions)
 
 The continuous integration pipeline (`maven.yml`) executes tests using ephemeral Docker containers for the database and Redis. Most configurations are "hardcoded" in `application-test.properties` to facilitate testing, but one secret is required to validate build integrity with Google Cloud.
 
@@ -27,7 +27,7 @@ The continuous integration pipeline (`maven.yml`) executes tests using ephemeral
 
 ---
 
-## 🚀 Production Secrets (Cloud Run / Deploy)
+## Production Secrets (Cloud Run / Deploy)
 
 When deploying to a real environment, you **DO** need to configure all the following environment variables or secrets in your cloud platform (Google Cloud Run revision settings).
 
@@ -52,7 +52,7 @@ When deploying to a real environment, you **DO** need to configure all the follo
 
 ---
 
-## 🛠️ How to configure `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+## How to configure `GOOGLE_APPLICATION_CREDENTIALS_JSON`
 
 This is the only complex secret required for CI. Follow these steps:
 
@@ -88,11 +88,11 @@ This is the only complex secret required for CI. Follow these steps:
 
 ---
 
-# Gestión de Secretos 🔐
+# Gestión de Secretos
 
 Para garantizar la seguridad y operatividad del proyecto, se utilizan diferentes secretos dependiendo del entorno (CI/CD vs Producción).
 
-## 🤖 Secretos para CI/CD (GitHub Actions)
+## Secretos para CI/CD (GitHub Actions)
 
 El pipeline de integración continua (`maven.yml`) ejecuta pruebas utilizando contenedores Docker efímeros para la base de datos y Redis. La mayoría de configuraciones están "hardcodeadas" en `application-test.properties` para facilitar el testing, pero se requiere un secreto para validar la integridad del build con Google Cloud.
 
@@ -108,7 +108,7 @@ El pipeline de integración continua (`maven.yml`) ejecuta pruebas utilizando co
 
 ---
 
-## 🚀 Secretos para Producción (Cloud Run / Deploy)
+## Secretos para Producción (Cloud Run / Deploy)
 
 Al desplegar en un entorno real, **SÍ** necesitas configurar todas las siguientes variables de entorno o secretos en tu plataforma de nube (Google Cloud Run revision settings).
 
@@ -133,7 +133,7 @@ Al desplegar en un entorno real, **SÍ** necesitas configurar todas las siguient
 
 ---
 
-## 🛠️ Cómo configurar `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+## Cómo configurar `GOOGLE_APPLICATION_CREDENTIALS_JSON`
 
 Este es el único secreto complejo requerido para el CI. Sigue estos pasos:
 
