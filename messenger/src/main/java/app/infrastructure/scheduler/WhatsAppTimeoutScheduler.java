@@ -40,7 +40,6 @@ public class WhatsAppTimeoutScheduler {
      * Revisa sesiones inactivas cada minuto.
      */
     @Scheduled(fixedDelay = 60000) // Se ejecuta cada minuto
-    @Transactional
     @SchedulerLock(name = "wa_timeout_lock", lockAtMostFor = "PT50S", lockAtLeastFor = "PT30S")
     public void checkInactivityTimeouts() {
         LocalDateTime threshold = LocalDateTime.now().minusMinutes(TIMEOUT_MINUTES);
