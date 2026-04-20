@@ -255,6 +255,14 @@ public class ServiceDeliveryUseCase {
     }
 
     /**
+     * Busca un servicio por su UUID público incluyendo eliminados.
+     */
+    @Transactional(readOnly = true)
+    public ServiceDelivery findByUuidIncludingDeleted(String uuid) throws Exception {
+        return searchService.findByUuidIncludingDeleted(uuid);
+    }
+
+    /**
      * Recupera todos los servicios con paginación, ordenamiento y filtro de estado.
      */
     @Transactional(readOnly = true)

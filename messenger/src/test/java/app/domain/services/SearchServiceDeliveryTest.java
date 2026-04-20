@@ -55,6 +55,23 @@ class SearchServiceDeliveryTest {
     }
 
     @Test
+    @DisplayName("Debe buscar servicio incluyendo eliminados por UUID")
+    /**
+     * Verifica recuperación de servicio por UUID incluso si está eliminado.
+     */
+    void shouldFindIncludingDeletedByUuid() throws BusinessException {
+        ServiceDelivery s = new ServiceDelivery();
+        s.setUuid("uuid-123");
+        s.setDeleted(true);
+        when(serviceDeliveryPort.findByUuidIncludingDeleted("uuid-123")).thenReturn(s);
+
+        ServiceDelivery result = searchServiceDelivery.findByUuidIncludingDeleted("uuid-123");
+
+        assertEquals("uuid-123", result.getUuid());
+        assertTrue(result.isDeleted());
+    }
+
+    @Test
     @DisplayName("Debe buscar servicios por placa")
     /**
      * Verifica la búsqueda de servicios por número de placa.

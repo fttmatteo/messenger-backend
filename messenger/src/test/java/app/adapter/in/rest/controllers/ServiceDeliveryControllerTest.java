@@ -129,7 +129,7 @@ class ServiceDeliveryControllerTest {
             admin.setRole(Role.ADMIN);
 
             when(securityHelper.getCurrentUser()).thenReturn(admin);
-            when(serviceDeliveryUseCase.findByUuid("550e8400-e29b-41d4-a716-446655440000")).thenReturn(sampleService);
+            when(serviceDeliveryUseCase.findByUuidIncludingDeleted("550e8400-e29b-41d4-a716-446655440000")).thenReturn(sampleService);
             when(serviceDeliveryUseCase.restore(1L, 1L)).thenReturn(sampleService);
             when(responseMapper.toResponse(sampleService)).thenReturn(sampleResponse);
  

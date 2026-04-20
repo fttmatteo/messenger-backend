@@ -47,6 +47,11 @@ public interface ServiceDeliveryPort {
         ServiceDelivery findByUuidActive(String uuid);
 
         /**
+         * Busca un servicio por su UUID público incluyendo eliminados.
+         */
+        ServiceDelivery findByUuidIncludingDeleted(String uuid);
+
+        /**
          * Recupera todos los servicios marcados como eliminados.
          */
         List<ServiceDelivery> findDeleted();

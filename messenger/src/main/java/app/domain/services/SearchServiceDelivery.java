@@ -42,6 +42,17 @@ public class SearchServiceDelivery {
     }
 
     /**
+     * Busca un servicio por UUID incluyendo los eliminados.
+     */
+    public ServiceDelivery findByUuidIncludingDeleted(String uuid) throws BusinessException {
+        ServiceDelivery service = serviceDeliveryPort.findByUuidIncludingDeleted(uuid);
+        if (service == null) {
+            throw new BusinessException("El servicio con UUID " + uuid + " no existe.");
+        }
+        return service;
+    }
+
+    /**
      * Busca un servicio por ID incluyendo los eliminados.
      */
     public ServiceDelivery findByIdIncludingDeleted(Long id) throws BusinessException {

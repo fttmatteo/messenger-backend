@@ -94,6 +94,15 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     }
 
     /**
+     * Busca servicio por UUID público incluyendo eliminados.
+     */
+    @Override
+    public ServiceDelivery findByUuidIncludingDeleted(String uuid) {
+        Optional<ServiceDeliveryEntity> entity = repository.findByUuid(uuid);
+        return entity.map(mapper::toDomain).orElse(null);
+    }
+
+    /**
      * Busca todos los servicios de entrega eliminados.
      */
     @Override
