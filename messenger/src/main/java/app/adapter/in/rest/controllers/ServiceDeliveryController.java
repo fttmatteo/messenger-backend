@@ -360,7 +360,7 @@ public class ServiceDeliveryController {
     public ResponseEntity<ServiceDeliveryResponse> restore(@PathVariable String uuid) throws Exception {
 
         Employee currentUser = securityHelper.getCurrentUser();
-        ServiceDelivery serviceForId = serviceDeliveryUseCase.findByUuid(uuid);
+        ServiceDelivery serviceForId = serviceDeliveryUseCase.findByUuidIncludingDeleted(uuid);
         ServiceDelivery restored = serviceDeliveryUseCase.restore(serviceForId.getIdServiceDelivery(), currentUser.getIdEmployee());
 
         return ResponseEntity.ok(responseMapper.toResponse(restored));
@@ -390,7 +390,7 @@ public class ServiceDeliveryController {
     public ResponseEntity<Map<String, String>> permanentDeleteFromTrash(@PathVariable String uuid) throws Exception {
 
         Employee currentUser = securityHelper.getCurrentUser();
-        ServiceDelivery serviceForId = serviceDeliveryUseCase.findByUuid(uuid);
+        ServiceDelivery serviceForId = serviceDeliveryUseCase.findByUuidIncludingDeleted(uuid);
         serviceDeliveryUseCase.permanentDeleteById(serviceForId.getIdServiceDelivery(), currentUser.getIdEmployee());
 
         return ResponseEntity.ok(Map.of("message", "Servicio eliminado permanentemente"));
