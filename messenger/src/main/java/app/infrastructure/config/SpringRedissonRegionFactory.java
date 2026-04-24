@@ -37,9 +37,10 @@ public class SpringRedissonRegionFactory extends RedissonRegionFactory {
                 .setPassword(password != null && !password.isEmpty() ? password : null)
                 .setConnectionMinimumIdleSize(2)
                 .setConnectionPoolSize(8)
-                .setConnectTimeout(10000)
-                .setTimeout(5000)
-                .setRetryAttempts(3)
+                .setConnectTimeout(20000)
+                .setTimeout(10000)
+                .setRetryAttempts(5)
+                .setPingConnectionInterval(30000)
                 .setClientName("hibernate-l2-cache");
 
         RedissonClient redissonClient = Redisson.create(config);

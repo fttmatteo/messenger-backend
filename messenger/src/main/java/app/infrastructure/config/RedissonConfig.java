@@ -53,7 +53,8 @@ public class RedissonConfig {
                 .setSubscriptionConnectionPoolSize(2)
                 .setConnectTimeout(timeout * 2)
                 .setTimeout(timeout)
-                .setRetryAttempts(3)
+                .setRetryAttempts(5)
+                .setPingConnectionInterval(30000)
                 .setClientName("hibernate-cache");
 
         return Redisson.create(config);
