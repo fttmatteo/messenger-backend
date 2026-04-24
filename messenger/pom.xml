@@ -11,7 +11,7 @@
 	<groupId>app</groupId> 
 	<artifactId>messenger</artifactId>
 	<version>1.11.7</version>
-	<packaging>jar</packaging> 
+	<packaging>jar</packaging>
 	<name>PLAK</name>
 	<description>Sistema de gestión PLAK</description>
 	<url/> 
