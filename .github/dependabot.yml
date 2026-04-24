@@ -18,6 +18,10 @@ updates:
     labels:
       - "dependencies"
       - "github-actions"
+    groups:
+      actions-patch-updates:
+        update-types:
+          - "patch"
     ignore:
       - dependency-name: "*"
         update-types: 
@@ -37,6 +41,10 @@ updates:
     labels:
       - "dependencies"
       - "java"
+    groups:
+      maven-patch-updates:
+        update-types:
+          - "patch"
     ignore:
       - dependency-name: "*"
         update-types: 
