@@ -46,9 +46,11 @@ public class TokenBlacklistService implements app.domain.ports.TokenBlacklistPor
         try {
             java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(token.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder(64);
             for (byte b : hash) {
-                sb.append(String.format("%02x", b));
+                int v = b & 0xff;
+                sb.append("0123456789abcdef".charAt(v >>> 4));
+                sb.append("0123456789abcdef".charAt(v & 0xf));
             }
             return sb.toString();
         } catch (java.security.NoSuchAlgorithmException e) {

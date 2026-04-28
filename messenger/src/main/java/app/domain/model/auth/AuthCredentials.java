@@ -13,7 +13,7 @@ public class AuthCredentials {
     private Long document;
 
     @NotBlank(message = "La contraseña es requerida")
-    @Size(min = 4, max = 128, message = "La contraseña debe tener entre 4 y 128 caracteres")
+    @Size(min = 8, max = 128, message = "La contraseña debe tener entre 8 y 128 caracteres")
     private String password;
 
     @NotBlank(message = "El token de verificación es requerido")
