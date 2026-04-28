@@ -40,12 +40,20 @@ public class TokenBlacklistService implements app.domain.ports.TokenBlacklistPor
     }
 
     /**
-     * Genera un hash para el token.
+     * Genera un hash SHA-256 para el token para evitar almacenar el token completo.
      */
     private String hashToken(String token) {
-        if (token.length() <= 32) {
-            return token;
+        try {
+            java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(token.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hash) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (java.security.NoSuchAlgorithmException e) {
+            // SHA-256 is guaranteed to be available in every JVM
+            throw new IllegalStateException("SHA-256 algorithm not available", e);
         }
-        return token.substring(token.length() - 32);
     }
 }
