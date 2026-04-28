@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import app.adapter.in.rest.request.LiveTrackingRequest;
+import app.adapter.in.rest.request.BulkLocationsRequest;
 import app.domain.model.enums.Role;
 import app.domain.model.enums.TrackingStatus;
 import app.infrastructure.persistence.entities.EmployeeEntity;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import app.support.AbstractIntegrationTest;
@@ -182,5 +184,52 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                                 .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        @WithMockUser(roles = "ADMIN")
+        @DisplayName("POST /tracking/messengers/bulk-locations should return locations map")
+        /**
+         * Verifica que el endpoint de ubicaciones en bulk retorne 200 y el mapa.
+         */
+        void shouldGetBulkLastLocationsForAdmin() throws Exception {
+                EmployeeEntity messenger1 = new EmployeeEntity();
+                messenger1.setDocument(100100100L);
+                messenger1.setFullName("Bulk Messenger 1");
+                messenger1.setRole(Role.MESSENGER);
+                messenger1.setPassword("secret123");
+                messenger1.setPhone("3555555555");
+                entityManager.persist(messenger1);
+
+                EmployeeEntity messenger2 = new EmployeeEntity();
+                messenger2.setDocument(200200200L);
+                messenger2.setFullName("Bulk Messenger 2");
+                messenger2.setRole(Role.MESSENGER);
+                messenger2.setPassword("secret123");
+                messenger2.setPhone("3666666666");
+                entityManager.persist(messenger2);
+                
+                entityManager.flush();
+
+                app.domain.model.LiveTracking liveTracking = new app.domain.model.LiveTracking();
+                liveTracking.setMessengerId(messenger1.getIdEmployee());
+                liveTracking.setCurrentLocation(new app.domain.model.Location(4.0, -74.0, LocalDateTime.now(), 10.0));
+                liveTracking.setStatus(TrackingStatus.ACTIVE);
+                
+                org.mockito.Mockito.when(trackingPort.getLastLocation(messenger1.getIdEmployee()))
+                                .thenReturn(java.util.Optional.of(liveTracking));
+                org.mockito.Mockito.when(trackingPort.getLastLocation(messenger2.getIdEmployee()))
+                                .thenReturn(java.util.Optional.empty());
+
+                BulkLocationsRequest request = new BulkLocationsRequest();
+                request.setUuids(Arrays.asList(messenger1.getUuid(), messenger2.getUuid()));
+
+                mockMvc.perform(post("/tracking/messengers/bulk-locations")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$." + messenger1.getUuid()).exists())
+                                .andExpect(jsonPath("$." + messenger2.getUuid()).doesNotExist());
         }
 }

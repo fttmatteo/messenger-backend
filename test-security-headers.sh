@@ -1,25 +1,21 @@
 #!/bin/bash
 
-# SPRINT 1 - Testing de Security Headers
 # Este script prueba que los headers de seguridad se configuraron correctamente
 
 echo "🔒 SPRINT 1 - Verificación de Security Headers"
 echo "=============================================="
 echo ""
 
-# Colores para output
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# URL del servidor (cambiar según ambiente)
 BASE_URL="${API_URL:-http://localhost:8080}"
 
 echo "📍 Testeando servidor: $BASE_URL"
 echo ""
 
-# Función para verificar header
 check_header() {
     local header_name="$1"
     local expected_value="$2"
@@ -35,7 +31,6 @@ check_header() {
     fi
 }
 
-# Verificar que el servidor esté corriendo
 echo "1️⃣  Verificando conectividad..."
 if curl -s -f "$BASE_URL/actuator/health" > /dev/null 2>&1; then
     echo -e "${GREEN}✓${NC} Servidor accesible\n"
@@ -45,14 +40,12 @@ else
     exit 1
 fi
 
-# Verificar Security Headers
 echo "2️⃣  Verificando Security Headers HTTP..."
 echo ""
 
 passed=0
 failed=0
 
-# X-Content-Type-Options
 if check_header "X-Content-Type-Options" "nosniff"; then
     ((passed++))
 else
@@ -60,7 +53,6 @@ else
 fi
 echo ""
 
-# X-XSS-Protection
 if check_header "X-XSS-Protection" "1; mode=block"; then
     ((passed++))
 else
@@ -68,7 +60,6 @@ else
 fi
 echo ""
 
-# X-Frame-Options
 if check_header "X-Frame-Options" "DENY"; then
     ((passed++))
 else
@@ -76,7 +67,6 @@ else
 fi
 echo ""
 
-# Strict-Transport-Security (solo en HTTPS)
 if [[ $BASE_URL == https://* ]]; then
     if check_header "Strict-Transport-Security" "max-age=31536000"; then
         ((passed++))
@@ -86,7 +76,6 @@ if [[ $BASE_URL == https://* ]]; then
     echo ""
 fi
 
-# Content-Security-Policy
 if check_header "Content-Security-Policy" "default-src"; then
     ((passed++))
 else
@@ -94,7 +83,6 @@ else
 fi
 echo ""
 
-# Verificar CORS Headers
 echo "3️⃣  Verificando CORS Configuration..."
 echo ""
 
@@ -117,7 +105,6 @@ if echo "$cors_response" | grep -qi "Access-Control-Allow-Headers"; then
     echo -e "${GREEN}✓${NC} CORS: Headers permitidos configurados"
     echo "  → $allowed_headers"
     
-    # Verificar que NO sea "*"
     if echo "$allowed_headers" | grep -q "\*"; then
         echo -e "${YELLOW}⚠${NC}  Advertencia: Se permiten TODOS los headers (*)"
         echo "     Recomendación: Restringir a lista específica"
@@ -125,7 +112,6 @@ if echo "$cors_response" | grep -qi "Access-Control-Allow-Headers"; then
         echo -e "${GREEN}✓${NC} Headers restringidos (más seguro que '*')"
     fi
     
-    # Verificar headers específicos recientemente agregados
     if echo "$allowed_headers" | grep -qi "X-Correlation-Id"; then
         echo -e "${GREEN}✓${NC} CORS: X-Correlation-Id permitido correctamente"
     else
@@ -140,7 +126,6 @@ else
 fi
 echo ""
 
-# Verificar CSRF Token
 echo "4️⃣  Verificando CSRF Configuration..."
 echo ""
 
@@ -154,7 +139,6 @@ else
 fi
 echo ""
 
-# Resumen
 echo "=============================================="
 echo "📊 RESUMEN DE TESTS"
 echo "=============================================="

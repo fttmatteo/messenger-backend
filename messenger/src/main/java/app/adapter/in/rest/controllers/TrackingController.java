@@ -1,6 +1,7 @@
 package app.adapter.in.rest.controllers;
 
 import app.adapter.in.rest.request.LiveTrackingRequest;
+import app.adapter.in.rest.request.BulkLocationsRequest;
 import app.adapter.in.rest.response.LiveTrackingResponse;
 import app.adapter.in.rest.response.TrackingHistoryResponse;
 import app.adapter.in.rest.mapper.TrackingResponseMapper;
@@ -22,7 +23,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,7 +93,6 @@ public class TrackingController {
         LiveTracking tracking = updateLiveTracking.execute(domainTracking);
         LiveTrackingResponse response = responseMapper.toResponse(tracking);
 
-        // Publicar en Redis Pub/Sub para notificar al admin en tiempo real
         try {
             String jsonResponse = objectMapper.writeValueAsString(response);
             redisTemplate.convertAndSend(RedisPubSubConfig.TRACKING_TOPIC, jsonResponse);
@@ -119,6 +121,32 @@ public class TrackingController {
         }
 
         return ResponseEntity.ok(responseMapper.toResponse(tracking));
+    }
+
+    /**
+     * Obtiene la última ubicación de múltiples mensajeros en una sola llamada (bulk).
+     * Optimizado para evitar el problema N+1 desde el cliente.
+     */
+    @PostMapping("/messengers/bulk-locations")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, LiveTrackingResponse>> getBulkLastLocations(
+            @Valid @RequestBody BulkLocationsRequest request) {
+
+        Map<String, LiveTrackingResponse> responseMap = new HashMap<>();
+
+        for (String uuid : request.getUuids()) {
+            try {
+                Employee messenger = employeeUseCase.findByUuid(uuid);
+                LiveTracking tracking = trackingPort.getLastLocation(messenger.getIdEmployee()).orElse(null);
+                if (tracking != null) {
+                    responseMap.put(uuid, responseMapper.toResponse(tracking));
+                }
+            } catch (Exception e) {
+                logger.debug("Error obteniendo ubicación para UUID {}: {}", uuid, e.getMessage());
+            }
+        }
+
+        return ResponseEntity.ok(responseMap);
     }
 
     /**

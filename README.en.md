@@ -4,7 +4,7 @@
 
 # Messenger Backend API
 
-<img src="https://img.shields.io/badge/Version-1.11.7-blue.svg" alt="Version">
+<img src="https://img.shields.io/badge/Version-1.11.8-blue.svg" alt="Version">
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.10-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
@@ -427,6 +427,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `WS`   | `/ws/tracking/update`      | Update location via WebSocket (with Heartbeat)   |
 | `POST` | `/tracking/update`         | DISABLED - REST alternative for location updates |
 | `GET`  | `/tracking/messenger/{id}` | Get last known location (ADMIN)                  |
+| `POST` | `/tracking/messengers/bulk-locations` | Get last location of multiple messengers (ADMIN) |
 | `GET`  | `/tracking/active`         | Get all active messengers (ADMIN)                |
 | `GET`  | `/tracking/history/{id}`   | Get history by date (`?date=YYYY-MM-DD`)         |
 | `GET`  | `/tracking/service/{id}`   | Get history for a specific service               |

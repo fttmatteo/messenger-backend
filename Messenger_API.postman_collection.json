@@ -1432,6 +1432,44 @@
                         }
                     },
                     "response": []
+                },
+                {
+                    "name": "Get Bulk Locations (Admin)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"uuids\": [\"{{uuid}}\"]\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/tracking/messengers/bulk-locations",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "tracking",
+                                "messengers",
+                                "bulk-locations"
+                            ]
+                        }
+                    },
+                    "response": []
                 }
             ]
         },
