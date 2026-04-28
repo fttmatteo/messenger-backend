@@ -427,6 +427,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `WS`   | `/ws/tracking/update`      | Actualizar ubicación vía WebSocket (con Heartbeat)        |
 | `POST` | `/tracking/update`         | INHABILITADO - Alternativa REST para actualizar ubicación |
 | `GET`  | `/tracking/messenger/{id}` | Obtener última ubicación conocida (ADMIN)                 |
+| `POST` | `/tracking/messengers/bulk-locations` | Obtener última ubicación de varios mensajeros (ADMIN) |
 | `GET`  | `/tracking/active`         | Listar todos los mensajeros activos (ADMIN)               |
 | `GET`  | `/tracking/history/{id}`   | Obtener historial por fecha (`?date=YYYY-MM-DD`)          |
 | `GET`  | `/tracking/service/{id}`   | Obtener historial para un servicio específico             |
