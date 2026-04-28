@@ -41,7 +41,6 @@ test_login() {
     fi
 }
 
-# Test: 5 failed attempts should block on attempt 6
 echo "Test 1: Attempting login 6 times with wrong password"
 echo "======================================================="
 
