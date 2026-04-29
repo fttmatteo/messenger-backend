@@ -32,7 +32,6 @@
 - [Real-Time Tracking](#-real-time-tracking)
 - [State Flow](#-state-flow)
 - [Observability](#-observability)
-- [Auditing](#-auditing)
 - [Setup & Installation](#️-setup--installation)
 - [CI/CD](#-cicd)
 - [Testing](#-testing)
@@ -141,7 +140,6 @@ graph LR
 | **Build**                | Maven 3.9+                                                                                             |
 | **Migrations**           | Flyway (Database Versioning)                                                                           |
 | **Monitoring**           | Spring Boot Actuator (Health, Metrics)                                                                 |
-| **Auditing**             | JPA Callbacks + AOP (Aspect Oriented Programming)                                                      |
 | **CI/CD**                | GitHub Actions                                                                                         |
 | **Architecture Testing** | ArchUnit                                                                                               |
 | **Performance**          | Spring Cache + Redis, Hibernate L2 Cache, Lazy Loading, Database Indices                               |
@@ -180,7 +178,6 @@ messenger/
 │   │   ├── ports/                       # 14 Ports (interfaces)
 │   │   └── services/                    # Domain Services
 │   └── infrastructure/
-│       ├── audit/                       # AOP Audit System
 │       ├── config/                      # Spring Configuration
 │       ├── exception/                   # Global Error Handler
 │       ├── persistence/
@@ -723,34 +720,6 @@ flowchart LR
 
 ---
 
-## Auditing
-
-### AOP-Based Audit System
-
-The application includes a centralized **audit logging system** using Aspect-Oriented Programming (AOP). Critical actions are automatically logged with user context, timing, and results.
-
----
-
-### Audited Actions
-
-| Component                  | Action                  | Description                           |
-| -------------------------- | ----------------------- | ------------------------------------- |
-| **AuthController**         | `LOGIN`                 | User login attempts                   |
-|                            | `TOKEN_REFRESH`         | Access token renewal                  |
-| **ServiceDeliveryUseCase** | `CREATE_SERVICE`        | Create service from OCR image         |
-|                            | `CREATE_SERVICE_MANUAL` | Create service with manual plate      |
-|                            | `UPDATE_STATUS`         | Update service status                 |
-|                            | `REASSIGN_MESSENGER`    | Reassign service to another messenger |
-|                            | `DELETE_SERVICE`        | Move service to trash                 |
-|                            | `RESTORE_SERVICE`       | Restore service from trash            |
-|                            | `EMPTY_TRASH`           | Permanently empty trash               |
-|                            | `ARCHIVE_SERVICE`       | Manually archive service from trash   |
-| **EmployeeUseCase**        | `CREATE_EMPLOYEE`       | Create new employee                   |
-|                            | `UPDATE_EMPLOYEE`       | Update employee information           |
-|                            | `DELETE_EMPLOYEE`       | Delete employee                       |
-
----
-
 ## Architecture Verification
 
 The project includes **ArchUnit** tests to enforce structural integrity and ensure that the **Hexagonal Architecture** principles are never violated.
@@ -766,31 +735,6 @@ Run architecture tests:
 ```bash
 mvn test -Dtest=HexagonalArchitectureTest
 ```
-
----
-
-### Log Format
-
-```
-AUDIT | timestamp | user_document | action | method | params | status | duration | error
-```
-
-**Example:**
-
-```
-2025-12-21 00:42:00.123 [AUDIT] AUDIT | 2025-12-21 00:42:00 | 123456 | UPDATE_STATUS | ServiceDeliveryUseCase.updateStatus | [1, DELIVERED, "Delivered", ...] | SUCCESS | 125ms |
-```
-
----
-
-### Configuration
-
-- **Logger Name:** `AUDIT`
-- **Level:** `WARN` (always visible in all environments)
-- **Output:** Console (Cloud Run captures stdout)
-- **File Output:** Optional, enable `AUDIT_FILE` appender in `logback-spring.xml`
-
----
 
 ## Performance Optimization
 

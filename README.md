@@ -32,7 +32,6 @@
 - [Tracking en Tiempo Real](#-tracking-en-tiempo-real)
 - [Flujo de Estados](#-flujo-de-estados)
 - [Observabilidad](#-observabilidad)
-- [Auditoría](#-auditoría)
 - [Configuración e Instalación](#️-configuración-e-instalación)
 - [CI/CD](#-cicd)
 - [Testing](#-testing)
@@ -141,7 +140,6 @@ graph LR
 | **Build**                 | Maven 3.9+                                                                                                    |
 | **Migraciones**           | Flyway (Versionamiento de base de datos)                                                                      |
 | **Monitoreo**             | Spring Boot Actuator (Health, Metrics)                                                                        |
-| **Auditoría**             | JPA Callbacks + AOP (Aspect Oriented Programming)                                                             |
 | **CI/CD**                 | GitHub Actions                                                                                                |
 | **Tests de Arquitectura** | ArchUnit                                                                                                      |
 | **Rendimiento**           | Spring Cache + Redis, Hibernate L2 Cache, Lazy Loading, Índices de Base de Datos                              |
@@ -180,7 +178,6 @@ messenger/
 │   │   ├── ports/                       # 14 Puertos (interfaces)
 │   │   └── services/                    # Servicios de dominio
 │   └── infrastructure/
-│       ├── audit/                       # Sistema de Auditoría AOP
 │       ├── config/                      # Configuración de Spring
 │       ├── exception/                   # Manejo global de errores
 │       ├── persistence/
@@ -746,34 +743,6 @@ flowchart LR
 
 ---
 
-## Auditoría
-
-### Sistema de Auditoría Basado en AOP
-
-La aplicación incluye un **sistema de logging de auditoría centralizado** usando Programación Orientada a Aspectos (AOP). Las acciones críticas se registran automáticamente con contexto de usuario, tiempo y resultados.
-
----
-
-### Acciones Auditadas
-
-| Componente                 | Acción                  | Descripción                                  |
-| -------------------------- | ----------------------- | -------------------------------------------- |
-| **AuthController**         | `LOGIN`                 | Intentos de inicio de sesión                 |
-|                            | `TOKEN_REFRESH`         | Renovación de token de acceso                |
-| **ServiceDeliveryUseCase** | `CREATE_SERVICE`        | Crear servicio desde imagen OCR              |
-|                            | `CREATE_SERVICE_MANUAL` | Crear servicio con placa manual              |
-|                            | `UPDATE_STATUS`         | Actualizar estado de servicio                |
-|                            | `REASSIGN_MESSENGER`    | Reasignar servicio a otro mensajero          |
-|                            | `DELETE_SERVICE`        | Mover servicio a papelera                    |
-|                            | `RESTORE_SERVICE`       | Restaurar servicio desde papelera            |
-|                            | `EMPTY_TRASH`           | Vaciar papelera permanentemente              |
-|                            | `ARCHIVE_SERVICE`       | Archivar servicio de la papelera manualmente |
-| **EmployeeUseCase**        | `CREATE_EMPLOYEE`       | Crear nuevo empleado                         |
-|                            | `UPDATE_EMPLOYEE`       | Actualizar información de empleado           |
-|                            | `DELETE_EMPLOYEE`       | Eliminar empleado                            |
-
----
-
 ## Verificación de Arquitectura
 
 El proyecto incluye pruebas de **ArchUnit** para forzar la integridad estructural y asegurar que los principios de la **Arquitectura Hexagonal** nunca sean violados.
@@ -789,31 +758,6 @@ Ejecutar pruebas de arquitectura:
 ```bash
 mvn test -Dtest=HexagonalArchitectureTest
 ```
-
----
-
-### Formato del Log
-
-```
-AUDIT | timestamp | documento_usuario | accion | metodo | parametros | estado | duracion | error
-```
-
-**Ejemplo:**
-
-```
-2025-12-21 00:42:00.123 [AUDIT] AUDIT | 2025-12-21 00:42:00 | 123456 | UPDATE_STATUS | ServiceDeliveryUseCase.updateStatus | [1, DELIVERED, "Entregado", ...] | SUCCESS | 125ms |
-```
-
----
-
-### Configuración
-
-- **Nombre del Logger:** `AUDIT`
-- **Nivel:** `WARN` (siempre visible en todos los ambientes)
-- **Salida:** Consola (Cloud Run captura stdout)
-- **Salida a Archivo:** Opcional, habilitar `AUDIT_FILE` appender en `logback-spring.xml`
-
----
 
 ## Optimización de Rendimiento
 
