@@ -1,19 +1,22 @@
 package app.domain.services;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import app.domain.exception.BusinessException;
 import app.domain.model.ServiceDelivery;
 import app.domain.ports.ServiceDeliveryPort;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SearchServiceDelivery Unit Tests")
@@ -27,9 +30,6 @@ class SearchServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe buscar servicio activo por ID")
-    /**
-     * Verifica recuperación de servicio activo (no eliminado) por ID.
-     */
     void shouldFindActiveById() {
         ServiceDelivery s = new ServiceDelivery();
         s.setIdServiceDelivery(1L);
@@ -42,9 +42,6 @@ class SearchServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si servicio no existe o está en papelera")
-    /**
-     * Verifica que se lance excepción cuando el servicio no existe o está en la papelera.
-     */
     void shouldThrowExceptionIfServiceNotFoundOrDeleted() {
         when(serviceDeliveryPort.findByIdActive(99L)).thenReturn(null);
 
@@ -56,9 +53,6 @@ class SearchServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe buscar servicio incluyendo eliminados por UUID")
-    /**
-     * Verifica recuperación de servicio por UUID incluso si está eliminado.
-     */
     void shouldFindIncludingDeletedByUuid() throws BusinessException {
         ServiceDelivery s = new ServiceDelivery();
         s.setUuid("uuid-123");
@@ -72,45 +66,39 @@ class SearchServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe buscar servicios por placa")
-    /**
-     * Verifica la búsqueda de servicios por número de placa.
-     */
-    void shouldFindByPlateNumber() {
-        when(serviceDeliveryPort.findByPlateNumber("ABC-123")).thenReturn(Arrays.asList(new ServiceDelivery()));
+    @DisplayName("Debe buscar servicios por placa y concesionario con paginación")
+    void shouldFindByPlateAndDealershipPaginated() {
+        when(serviceDeliveryPort.findByPlateAndDealershipPaginated(eq("ABC-123"), eq(1L), any()))
+                .thenReturn(new PageImpl<>(Arrays.asList(new ServiceDelivery())));
 
-        List<ServiceDelivery> result = searchServiceDelivery.findByPlate("ABC-123");
+        Page<ServiceDelivery> result = searchServiceDelivery.findByPlateAndDealershipPaginated("ABC-123", 1L,
+                PageRequest.of(0, 10));
 
-        assertEquals(1, result.size());
+        assertEquals(1, result.getContent().size());
     }
 
     @Test
     @DisplayName("Debe retornar servicios eliminados (papelera)")
-    /**
-     * Verifica que se retornen solo los servicios marcados como eliminados.
-     */
     void shouldFindDeleted() {
         ServiceDelivery deleted = new ServiceDelivery();
         deleted.setIdServiceDelivery(1L);
         deleted.setDeleted(true);
+        Page<ServiceDelivery> page = new PageImpl<>(Arrays.asList(deleted));
 
-        when(serviceDeliveryPort.findDeleted()).thenReturn(Arrays.asList(deleted));
+        when(serviceDeliveryPort.findDeleted(any(Pageable.class))).thenReturn(page);
 
-        List<ServiceDelivery> result = searchServiceDelivery.findDeleted();
+        Page<ServiceDelivery> result = searchServiceDelivery.findDeleted(PageRequest.of(0, 10));
 
-        assertEquals(1, result.size());
-        assertTrue(result.get(0).isDeleted());
+        assertEquals(1, result.getContent().size());
+        assertTrue(result.getContent().get(0).isDeleted());
     }
 
     @Test
     @DisplayName("Debe retornar lista vacía si no hay servicios en papelera")
-    /**
-     * Verifica que se retorne lista vacía cuando no hay servicios en la papelera.
-     */
-    void shouldReturnEmptyListIfNoDeletedServices() {
-        when(serviceDeliveryPort.findDeleted()).thenReturn(Collections.emptyList());
+    void shouldReturnEmptyPageIfNoDeletedServices() {
+        when(serviceDeliveryPort.findDeleted(any(Pageable.class))).thenReturn(Page.empty());
 
-        List<ServiceDelivery> result = searchServiceDelivery.findDeleted();
+        Page<ServiceDelivery> result = searchServiceDelivery.findDeleted(PageRequest.of(0, 10));
 
         assertTrue(result.isEmpty());
     }

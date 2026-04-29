@@ -40,7 +40,9 @@ class DeleteEmployeeTest {
         e.setIdEmployee(1L);
         e.setDocument(123L);
         when(employeePort.findById(1L)).thenReturn(e);
-        when(serviceDeliveryPort.findByMessengerId(1L)).thenReturn(java.util.Collections.emptyList());
+        when(serviceDeliveryPort.findByMessengerPaginated(1L, null, null, null,
+                org.springframework.data.domain.PageRequest.of(0, 1)))
+                .thenReturn(new org.springframework.data.domain.PageImpl<>(java.util.Collections.emptyList()));
 
         deleteEmployee.deleteById(1L);
 
@@ -57,7 +59,10 @@ class DeleteEmployeeTest {
         e.setIdEmployee(1L);
         e.setDocument(123L);
         when(employeePort.findById(1L)).thenReturn(e);
-        when(serviceDeliveryPort.findByMessengerId(1L)).thenReturn(java.util.List.of(new ServiceDelivery()));
+        when(serviceDeliveryPort.findByMessengerPaginated(1L, null, null, null,
+                org.springframework.data.domain.PageRequest.of(0, 1)))
+                .thenReturn(new org.springframework.data.domain.PageImpl<>(java.util.List.of(new ServiceDelivery()),
+                        org.springframework.data.domain.PageRequest.of(0, 1), 1));
 
         BusinessException ex = assertThrows(BusinessException.class, () -> deleteEmployee.deleteById(1L));
 

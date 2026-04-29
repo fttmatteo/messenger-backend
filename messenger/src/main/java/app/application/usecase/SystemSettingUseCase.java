@@ -4,7 +4,6 @@ import app.domain.model.SystemSetting;
 import app.domain.ports.SystemSettingPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,8 +16,11 @@ public class SystemSettingUseCase {
 
     private static final Logger logger = LoggerFactory.getLogger(SystemSettingUseCase.class);
 
-    @Autowired
-    private SystemSettingPort systemSettingPort;
+    private final SystemSettingPort systemSettingPort;
+
+    public SystemSettingUseCase(SystemSettingPort systemSettingPort) {
+        this.systemSettingPort = systemSettingPort;
+    }
 
     private static final String STATUS_COLORS_KEY = "STATUS_COLORS";
 

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -47,18 +46,27 @@ public class ServiceDeliveryUseCase {
     private static final Logger logger = LoggerFactory.getLogger(ServiceDeliveryUseCase.class);
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
-    @Autowired
-    private CreateServiceDelivery createService;
-    @Autowired
-    private UpdateServiceDelivery updateService;
-    @Autowired
-    private SearchServiceDelivery searchService;
-    @Autowired
-    private DeleteServiceDelivery deleteService;
-    @Autowired
-    private StoragePort storagePort;
-    @Autowired
-    private OcrPort ocrPort;
+    private final CreateServiceDelivery createService;
+    private final UpdateServiceDelivery updateService;
+    private final SearchServiceDelivery searchService;
+    private final DeleteServiceDelivery deleteService;
+    private final StoragePort storagePort;
+    private final OcrPort ocrPort;
+
+    public ServiceDeliveryUseCase(
+            CreateServiceDelivery createService,
+            UpdateServiceDelivery updateService,
+            SearchServiceDelivery searchService,
+            DeleteServiceDelivery deleteService,
+            StoragePort storagePort,
+            OcrPort ocrPort) {
+        this.createService = createService;
+        this.updateService = updateService;
+        this.searchService = searchService;
+        this.deleteService = deleteService;
+        this.storagePort = storagePort;
+        this.ocrPort = ocrPort;
+    }
 
     /**
      * Extrae la placa de una imagen sin crear el servicio.
@@ -306,14 +314,6 @@ public class ServiceDeliveryUseCase {
     }
 
     /**
-     * Busca servicios asociados a un número de placa específico.
-     */
-    @Transactional(readOnly = true)
-    public List<ServiceDelivery> findByPlate(String plateNumber) {
-        return searchService.findByPlate(plateNumber);
-    }
-
-    /**
      * Mueve un servicio a la papelera (método simple sin auditoría de usuario
      * explícito).
      */
@@ -334,11 +334,11 @@ public class ServiceDeliveryUseCase {
     }
 
     /**
-     * Recupera todos los servicios que han sido movidos a la papelera.
+     * Recupera todos los servicios que han sido movidos a la papelera con paginación.
      */
     @Transactional(readOnly = true)
-    public List<ServiceDelivery> findDeleted() {
-        return searchService.findDeleted();
+    public Page<ServiceDelivery> findDeleted(Pageable pageable) {
+        return searchService.findDeleted(pageable);
     }
 
     /**

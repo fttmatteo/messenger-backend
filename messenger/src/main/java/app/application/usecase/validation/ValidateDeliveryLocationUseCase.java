@@ -6,7 +6,6 @@ import app.domain.model.Location;
 import app.domain.ports.DealershipPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +17,15 @@ public class ValidateDeliveryLocationUseCase {
 
     private static final Logger logger = LoggerFactory.getLogger(ValidateDeliveryLocationUseCase.class);
 
-    @Autowired
-    private DealershipPort dealershipPort;
+    private final DealershipPort dealershipPort;
+    private final Double maxDistanceMeters;
 
-    @Value("${tracking.max.distance.validation:200}")
-    private Double maxDistanceMeters;
+    public ValidateDeliveryLocationUseCase(
+            DealershipPort dealershipPort,
+            @Value("${tracking.max.distance.validation:200}") Double maxDistanceMeters) {
+        this.dealershipPort = dealershipPort;
+        this.maxDistanceMeters = maxDistanceMeters;
+    }
 
     /**
      * Valida si la ubicación de entrega está dentro del rango permitido del

@@ -7,7 +7,6 @@ import app.domain.ports.DealershipPort;
 import app.domain.ports.LocationPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,10 +20,13 @@ public class CalculateOptimalRouteUseCase {
 
     private static final Logger logger = LoggerFactory.getLogger(CalculateOptimalRouteUseCase.class);
 
-    @Autowired
-    private LocationPort locationPort;
-    @Autowired
-    private DealershipPort dealershipPort;
+    private final LocationPort locationPort;
+    private final DealershipPort dealershipPort;
+
+    public CalculateOptimalRouteUseCase(LocationPort locationPort, DealershipPort dealershipPort) {
+        this.locationPort = locationPort;
+        this.dealershipPort = dealershipPort;
+    }
 
     /**
      * Calcula la ruta óptima desde un origen visitando múltiples concesionarios.

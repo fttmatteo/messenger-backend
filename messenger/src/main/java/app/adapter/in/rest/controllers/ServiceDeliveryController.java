@@ -338,18 +338,28 @@ public class ServiceDeliveryController {
     }
 
     /**
-     * Lista los servicios que están en la papelera.
+     * Lista los servicios que están en la papelera con paginación.
      */
     @GetMapping("/trash")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<ServiceDeliveryResponse>> findDeleted() {
+    public ResponseEntity<PageResponse<ServiceDeliveryResponse>> findDeleted(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
-        List<ServiceDelivery> services = serviceDeliveryUseCase.findDeleted();
-        List<ServiceDeliveryResponse> responses = services.stream()
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        Page<ServiceDelivery> servicePage = serviceDeliveryUseCase.findDeleted(pageable);
+
+        List<ServiceDeliveryResponse> mappedContent = servicePage.getContent()
+                .stream()
                 .map(responseMapper::toSummaryResponse)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(responses);
+        Page<ServiceDeliveryResponse> responsePage = new org.springframework.data.domain.PageImpl<>(
+                mappedContent,
+                servicePage.getPageable(),
+                servicePage.getTotalElements());
+
+        return ResponseEntity.ok(PageResponse.from(responsePage));
     }
 
     /**

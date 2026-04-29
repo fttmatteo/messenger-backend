@@ -1,6 +1,8 @@
 package app.application.usecase.tracking;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import app.domain.model.TrackingHistory;
 import app.domain.ports.TrackingPort;
@@ -13,12 +15,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("GetTrackingHistoryUseCase Unit Tests")
-/**
- * Clase de pruebas unitarias para el caso de uso de recuperación de historial de seguimiento.
- */
 class GetTrackingHistoryUseCaseTest {
 
     @Mock
@@ -28,27 +31,23 @@ class GetTrackingHistoryUseCaseTest {
     private GetTrackingHistoryUseCase getTrackingHistory;
 
     @Test
-    @DisplayName("Debe consultar por mensajero y fecha")
-    /**
-     * Verifica recuperación de historial filtrado por mensajero y fecha.
-     */
-    void shouldGetByMessengerAndDate() {
+    @DisplayName("Debe consultar por mensajero y fecha con paginación")
+    void shouldGetByMessengerAndDatePaginated() {
         Long messengerId = 1L;
         LocalDate date = LocalDate.now();
-        List<TrackingHistory> expected = Collections.emptyList();
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<TrackingHistory> expected = new PageImpl<>(Collections.emptyList());
 
-        when(trackingPort.getHistoryByMessenger(messengerId, date)).thenReturn(expected);
+        when(trackingPort.getHistoryByMessengerPaginated(eq(messengerId), eq(date), any(Pageable.class)))
+                .thenReturn(expected);
 
-        List<TrackingHistory> result = getTrackingHistory.byMessengerAndDate(messengerId, date);
+        Page<TrackingHistory> result = getTrackingHistory.byMessengerAndDatePaginated(messengerId, date, pageable);
 
         assertEquals(expected, result);
     }
 
     @Test
     @DisplayName("Debe consultar por servicio")
-    /**
-     * Verifica recuperación de historial asociado a un servicio específico.
-     */
     void shouldGetByService() {
         Long serviceId = 100L;
         List<TrackingHistory> expected = Collections.emptyList();

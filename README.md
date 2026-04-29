@@ -4,10 +4,10 @@
 
 # Messenger Backend API
 
-<img src="https://img.shields.io/badge/Version-1.11.8-blue.svg" alt="Version">
+<img src="https://img.shields.io/badge/Version-1.12.0-blue.svg" alt="Version">
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
-[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.10-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.14-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Redis](https://img.shields.io/badge/Redis-7.0+-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 [![Google Cloud](https://img.shields.io/badge/Google_Cloud-1.0+-4479A1?style=for-the-badge&logo=google&logoColor=white)](https://cloud.google.com/)
@@ -139,6 +139,7 @@ graph LR
 | **WhatsApp**              | WhatsApp Cloud API (Meta)                                                                                     |
 | **Tiempo Real**           | WebSocket + Redis                                                                                             |
 | **Build**                 | Maven 3.9+                                                                                                    |
+| **Migraciones**           | Flyway (Versionamiento de base de datos)                                                                      |
 | **Monitoreo**             | Spring Boot Actuator (Health, Metrics)                                                                        |
 | **Auditoría**             | JPA Callbacks + AOP (Aspect Oriented Programming)                                                             |
 | **CI/CD**                 | GitHub Actions                                                                                                |
@@ -350,16 +351,16 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | -------- | -------------------------------- | -------------------------------------------------------------------- |
 | `POST`   | `/services/extractPlate`         | Extraer placa de imagen usando OCR (preview antes de crear)          |
 | `POST`   | `/services/createService`        | Crear servicio (multipart: imagen + datos)                           |
-| `PUT`    | `/services/updateService/{id}`   | Actualizar estado (multipart: estado + evidencias + GIF)             |
-| `PUT`    | `/services/reassign/{id}`        | Reasignar a otro mensajero (ADMIN/CANCELED)                          |
-| `GET`    | `/services/findByServiceId/{id}` | Obtener servicio por ID                                              |
+| `PUT`    | `/services/updateService/{uuid}` | Actualizar estado (multipart: estado + evidencias + GIF)             |
+| `PUT`    | `/services/reassign/{uuid}`      | Reasignar a otro mensajero (ADMIN/CANCELED)                          |
+| `GET`    | `/services/findByServiceId/{uuid}`| Obtener servicio por UUID                                            |
 | `GET`    | `/services/allServicesPageable`  | Listar servicios con **paginación, búsqueda y ordenamiento**         |
 | `GET`    | `/services/stats/daily`          | INHABILITADO - Estadísticas diarias (requiere messengerId, from, to) |
-| `DELETE` | `/services/deleteService/{id}`   | Mover a papelera (ADMIN)                                             |
-| `GET`    | `/services/trash`                | Listar servicios eliminados (ADMIN)                                  |
-| `POST`   | `/services/trash/restore/{id}`   | Restaurar desde papelera (ADMIN)                                     |
+| `DELETE` | `/services/deleteService/{uuid}` | Mover a papelera (ADMIN)                                             |
+| `GET`    | `/services/trash`                | Listar servicios eliminados con **paginación** (ADMIN)               |
+| `POST`   | `/services/trash/restore/{uuid}` | Restaurar desde papelera (ADMIN)                                     |
 | `DELETE` | `/services/trash/empty`          | Vaciar papelera permanentemente (ADMIN)                              |
-| `DELETE` | `/services/trash/{id}`           | Eliminación individual permanente (ADMIN)                            |
+| `DELETE` | `/services/trash/{uuid}`         | Eliminación individual permanente (ADMIN)                            |
 
 ---
 
@@ -424,13 +425,13 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Método | Endpoint                   | Descripción                                               |
 | ------ | -------------------------- | --------------------------------------------------------- |
-| `WS`   | `/ws/tracking/update`      | Actualizar ubicación vía WebSocket (con Heartbeat)        |
+| `WS`   | `/ws/tracking/update`             | Actualizar ubicación vía WebSocket (con Heartbeat)         |
 | `POST` | `/tracking/update`         | INHABILITADO - Alternativa REST para actualizar ubicación |
-| `GET`  | `/tracking/messenger/{id}` | Obtener última ubicación conocida (ADMIN)                 |
-| `POST` | `/tracking/messengers/bulk-locations` | Obtener última ubicación de varios mensajeros (ADMIN) |
-| `GET`  | `/tracking/active`         | Listar todos los mensajeros activos (ADMIN)               |
-| `GET`  | `/tracking/history/{id}`   | Obtener historial por fecha (`?date=YYYY-MM-DD`)          |
-| `GET`  | `/tracking/service/{id}`   | Obtener historial para un servicio específico             |
+| `GET`  | `/tracking/messenger/{uuid}`      | Obtener última ubicación conocida (ADMIN)                  |
+| `POST` | `/tracking/messengers/bulk-locations`| Obtener última ubicación de varios mensajeros (ADMIN)  |
+| `GET`  | `/tracking/active`                | Listar todos los mensajeros activos (ADMIN)                |
+| `GET`  | `/tracking/history/pageable/{uuid}`| Obtener historial de ubicaciones con **paginación**       |
+| `GET`  | `/tracking/service/{uuid}`        | Obtener historial para un servicio específico              |
 
 ---
 

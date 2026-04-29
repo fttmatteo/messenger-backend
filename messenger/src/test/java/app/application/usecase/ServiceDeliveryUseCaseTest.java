@@ -205,16 +205,6 @@ class ServiceDeliveryUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe buscar por placa")
-        void shouldFindByPlate() {
-            when(searchService.findByPlate("ABC123")).thenReturn(List.of(sampleService));
-
-            List<ServiceDelivery> result = serviceDeliveryUseCase.findByPlate("ABC123");
-
-            assertEquals(1, result.size());
-        }
-
-        @Test
         @DisplayName("Debe mapear campos de ordenamiento correctamente en paginación")
         void shouldMapSortFieldsInPagination() {
             serviceDeliveryUseCase.findAllPaginated(0, 10, "messengerName", "asc", null, null);
@@ -264,20 +254,18 @@ class ServiceDeliveryUseCaseTest {
 
         @Test
         @DisplayName("Debe listar servicios en papelera")
-        /**
-         * Verifica que se puedan recuperar los servicios eliminados.
-         */
         void shouldFindDeleted() {
             ServiceDelivery deletedService = new ServiceDelivery();
             deletedService.setIdServiceDelivery(2L);
             deletedService.setDeleted(true);
+            org.springframework.data.domain.Page<ServiceDelivery> page = new org.springframework.data.domain.PageImpl<>(java.util.List.of(deletedService));
 
-            when(searchService.findDeleted()).thenReturn(List.of(deletedService));
+            when(searchService.findDeleted(org.mockito.ArgumentMatchers.any(org.springframework.data.domain.Pageable.class))).thenReturn(page);
 
-            List<ServiceDelivery> result = serviceDeliveryUseCase.findDeleted();
+            org.springframework.data.domain.Page<ServiceDelivery> result = serviceDeliveryUseCase.findDeleted(org.springframework.data.domain.PageRequest.of(0, 10));
 
-            assertEquals(1, result.size());
-            assertTrue(result.get(0).isDeleted());
+            assertEquals(1, result.getContent().size());
+            assertTrue(result.getContent().get(0).isDeleted());
         }
 
         @Test

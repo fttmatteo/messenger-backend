@@ -68,6 +68,11 @@ services:
       - WHATSAPP_SESSION_EXPIRATION_HOURS=${WHATSAPP_SESSION_EXPIRATION_HOURS:-12}
       # Credenciales de Google Cloud (montadas como volumen)
       - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials/service-account.json
+      # Habilitar Flyway en desarrollo vía Docker Compose
+      - SPRING_FLYWAY_ENABLED=true
+      - SPRING_FLYWAY_BASELINE_ON_MIGRATE=true
+      - SPRING_FLYWAY_BASELINE_VERSION=15
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=none
       # Habilitar debug remoto (conectar desde IntelliJ/VS Code al puerto 5005)
       - MAVEN_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
     depends_on:

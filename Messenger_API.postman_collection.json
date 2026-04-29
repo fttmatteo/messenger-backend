@@ -2,7 +2,7 @@
     "info": {
         "_postman_id": "messenger-api-collection",
         "name": "Messenger API - Backend",
-        "description": "Complete API documentation for the Messenger/Delivery Management System Backend.\n\nVersion: 1.11.1\n\n## Authentication\nAll endpoints except `/auth/login` and `/files/**` require JWT authentication.\n\nAdd the token to your requests:\n- Header: `Authorization: Bearer {{token}}`\n\n## Roles\n- **ADMIN**: Full access (CANCELED, RESOLVED states only)\n- **MESSENGER**: Limited access (PENDING, DELIVERED, RETURNED states only)\n\n## Status Flow\n- ASSIGNED → PENDING, DELIVERED, RETURNED (Messenger)\n- PENDING → CANCELED, RESOLVED (Admin only)\n- DELIVERED → CANCELED, RESOLVED (Admin, within 72h)\n- CANCELED → Can be reassigned (Admin)\n\n## Available Statuses\n`ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED` \n\n## Rate Limiting\n- **Auth**: 10 req/min\n- **General**: 100 req/min\n- **WebSocket**: 5 sec interval",
+        "description": "Complete API documentation for the Messenger/Delivery Management System Backend.\n\nVersion: 1.11.1\n\n## Authentication\nAll endpoints except `/auth/login` and `/files/**` require JWT authentication.\n\nAdd the token to your requests:\n- Header: `Authorization: Bearer {{token}}`\n\n## Roles\n- **ADMIN**: Full access (CANCELED, RESOLVED states only)\n- **MESSENGER**: Limited access (PENDING, DELIVERED, RETURNED states only)\n\n## Status Flow\n- ASSIGNED → PENDING, DELIVERED, RETURNED (Messenger)\n- PENDING → CANCELED, RESOLVED (Admin only)\n- DELIVERED → CANCELED, RESOLVED (Admin, within 72h)\n- CANCELED → Can be reassigned (Admin)\n\n## Available Statuses\n`ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED` \n\n## Rate Limiting\n- **Auth**: 10 req/min\n- **General**: 100 req/min\n- **WebSocket**: 5 sec interval\n\nUpdated to Paginated Architecture v1.12.0\n\nUpdated to Paginated Architecture v1.12.0",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "variable": [
@@ -864,7 +864,7 @@
                     "response": []
                 },
                 {
-                    "name": "Get All Services (Paginated)",
+                    "name": "Get All Services",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -949,7 +949,7 @@
                     "response": []
                 },
                 {
-                    "name": "Get Trash (Deleted Services)",
+                    "name": "Get Trash",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -1342,41 +1342,6 @@
                     "response": []
                 },
                 {
-                    "name": "Get Tracking History",
-                    "request": {
-                        "auth": {
-                            "type": "bearer",
-                            "bearer": [
-                                {
-                                    "key": "token",
-                                    "value": "{{token}}",
-                                    "type": "string"
-                                }
-                            ]
-                        },
-                        "method": "GET",
-                        "header": [],
-                        "url": {
-                            "raw": "{{baseUrl}}/tracking/history/{{uuid}}?date=2024-01-05",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "tracking",
-                                "history",
-                                "{{uuid}}"
-                            ],
-                            "query": [
-                                {
-                                    "key": "date",
-                                    "value": "2024-01-05"
-                                }
-                            ]
-                        }
-                    },
-                    "response": []
-                },
-                {
                     "name": "Get Active Messengers",
                     "request": {
                         "auth": {
@@ -1470,14 +1435,9 @@
                         }
                     },
                     "response": []
-                }
-            ]
-        },
-        {
-            "name": "📊 Monitoring (Admin)",
-            "item": [
+                },
                 {
-                    "name": "Messenger Activity",
+                    "name": "Get Tracking History",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -1492,20 +1452,77 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "{{baseUrl}}/monitoring/messenger/{{uuid}}/activity?date=2024-01-05",
+                            "raw": "{{baseUrl}}/tracking/history/pageable/{{messengerUuid}}?date=2025-12-29&page=0&size=100",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "tracking",
+                                "history",
+                                "pageable",
+                                "{{messengerUuid}}"
+                            ],
+                            "query": [
+                                {
+                                    "key": "date",
+                                    "value": "2025-12-29"
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "0"
+                                },
+                                {
+                                    "key": "size",
+                                    "value": "100"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "📊 Monitoring (Admin)",
+            "item": [
+                {
+                    "name": "Get Messenger Activity",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/monitoring/messenger/{{messengerUuid}}/activity?date=2025-12-29&page=0&size=100",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "monitoring",
                                 "messenger",
-                                "{{uuid}}",
+                                "{{messengerUuid}}",
                                 "activity"
                             ],
                             "query": [
                                 {
                                     "key": "date",
-                                    "value": "2024-01-05"
+                                    "value": "2025-12-29"
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "0"
+                                },
+                                {
+                                    "key": "size",
+                                    "value": "100"
                                 }
                             ]
                         }

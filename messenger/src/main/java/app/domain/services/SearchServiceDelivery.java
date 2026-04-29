@@ -1,7 +1,6 @@
 package app.domain.services;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,8 +15,11 @@ import app.domain.ports.ServiceDeliveryPort;
 @Service
 public class SearchServiceDelivery {
 
-    @Autowired
-    private ServiceDeliveryPort serviceDeliveryPort;
+    private final ServiceDeliveryPort serviceDeliveryPort;
+
+    public SearchServiceDelivery(ServiceDeliveryPort serviceDeliveryPort) {
+        this.serviceDeliveryPort = serviceDeliveryPort;
+    }
 
     /**
      * Busca un servicio por ID (excluye los eliminados).
@@ -64,14 +66,6 @@ public class SearchServiceDelivery {
     }
 
     /**
-     * Busca servicios por número de placa (excluye los eliminados).
-     */
-    public List<ServiceDelivery> findByPlate(String plateNumber) {
-        String normalized = plateNumber.trim().toUpperCase();
-        return serviceDeliveryPort.findByPlateNumber(normalized);
-    }
-
-    /**
      * Retorna todos los servicios con paginación y filtro de estado.
      */
     public Page<ServiceDelivery> findAllPaginated(String keyword, Boolean deleted,
@@ -89,10 +83,10 @@ public class SearchServiceDelivery {
     }
 
     /**
-     * Retorna todos los servicios en la papelera.
+     * Retorna todos los servicios en la papelera con paginación.
      */
-    public List<ServiceDelivery> findDeleted() {
-        return serviceDeliveryPort.findDeleted();
+    public Page<ServiceDelivery> findDeleted(Pageable pageable) {
+        return serviceDeliveryPort.findDeleted(pageable);
     }
 
     /**
@@ -106,27 +100,12 @@ public class SearchServiceDelivery {
     }
 
     /**
-     * Busca servicios por número de placa filtrado por concesionario.
+     * Busca servicios por número de placa filtrado por concesionario con paginación.
      */
-    public List<ServiceDelivery> findByPlateAndDealership(String plateNumber, Long dealershipId) {
+    public Page<ServiceDelivery> findByPlateAndDealershipPaginated(String plateNumber, Long dealershipId,
+            Pageable pageable) {
         String normalized = plateNumber.trim().toUpperCase();
-        return serviceDeliveryPort.findByPlateNumberAndDealershipId(normalized, dealershipId);
-    }
-
-    /**
-     * Retorna todos los servicios pendientes de un concesionario.
-     */
-    public List<ServiceDelivery> findPendingByDealership(Long dealershipId) {
-        return serviceDeliveryPort.findPendingByDealershipId(dealershipId);
-    }
-
-    /**
-     * Retorna todos los servicios de un concesionario filtrados por una lista de
-     * estados.
-     */
-    public List<ServiceDelivery> findByDealershipAndStatuses(Long dealershipId,
-            List<app.domain.model.enums.Status> statuses) {
-        return serviceDeliveryPort.findByDealershipIdAndStatuses(dealershipId, statuses);
+        return serviceDeliveryPort.findByPlateAndDealershipPaginated(normalized, dealershipId, pageable);
     }
 
     /**

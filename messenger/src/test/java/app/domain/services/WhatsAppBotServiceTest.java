@@ -11,7 +11,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Optional;
 
-import java.util.List;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -140,11 +139,12 @@ class WhatsAppBotServiceTest {
         session.setConversationState(app.domain.model.enums.WhatsAppConversationState.MENU);
 
         when(sessionPort.findActiveSession(from)).thenReturn(Optional.of(session));
-        when(searchService.findByPlateAndDealership(eq(plate), anyLong())).thenReturn(List.of());
+        when(searchService.findByPlateAndDealershipPaginated(eq(plate), anyLong(), any()))
+                .thenReturn(org.springframework.data.domain.Page.empty());
 
         botService.processMessage(from, plate);
 
-        verify(searchService).findByPlateAndDealership(eq(plate), eq(1L));
+        verify(searchService).findByPlateAndDealershipPaginated(eq(plate), eq(1L), any());
         verify(messagePort).sendTextMessage(eq(from), contains("No se encontró la placa"));
     }
 

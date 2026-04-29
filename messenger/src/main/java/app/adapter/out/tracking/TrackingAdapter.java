@@ -40,6 +40,8 @@ public class TrackingAdapter implements TrackingPort {
     @Qualifier("liveTrackingRedisTemplate")
     private RedisTemplate<String, LiveTracking> redisTemplate;
     @Autowired
+    private org.springframework.data.redis.core.StringRedisTemplate stringRedisTemplate;
+    @Autowired
     private TrackingHistoryRepository historyRepository;
     @Autowired
     private TrackingMapper mapper;
@@ -166,22 +168,21 @@ public class TrackingAdapter implements TrackingPort {
     }
 
     /**
-     * Consulta el historial de un mensajero en una fecha específica desde la BD.
+     * Consulta el historial de un mensajero en una fecha específica desde la BD con paginación.
      */
     @Override
-    public List<TrackingHistory> getHistoryByMessenger(Long messengerId, LocalDate date) {
+    public org.springframework.data.domain.Page<TrackingHistory> getHistoryByMessengerPaginated(Long messengerId, LocalDate date,
+            org.springframework.data.domain.Pageable pageable) {
         if (messengerId == null || date == null) {
-            return new ArrayList<>();
+            return org.springframework.data.domain.Page.empty();
         }
 
         LocalDateTime startOfDay = date.atStartOfDay();
         LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
-        List<TrackingHistoryEntity> entities = historyRepository
-                .findByMessengerIdAndRecordedAtBetween(messengerId, startOfDay, endOfDay);
 
-        return entities.stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
+        return historyRepository
+                .findByMessengerIdAndRecordedAtBetween(messengerId, startOfDay, endOfDay, pageable)
+                .map(mapper::toDomain);
     }
 
     /**
@@ -199,5 +200,32 @@ public class TrackingAdapter implements TrackingPort {
         return entities.stream()
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<String> getMessengerName(Long messengerId) {
+        try {
+            String key = "tracking:name:" + messengerId;
+            String name = stringRedisTemplate.opsForValue().get(key);
+            if (name != null) {
+                return Optional.of(name);
+            }
+            return getLastLocation(messengerId).map(LiveTracking::getMessengerName)
+                    .filter(n -> n != null && !n.isEmpty());
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public void saveMessengerName(Long messengerId, String name) {
+        if (messengerId == null || name == null || name.isEmpty())
+            return;
+        try {
+            String key = "tracking:name:" + messengerId;
+            stringRedisTemplate.opsForValue().set(key, name, 24, TimeUnit.HOURS);
+        } catch (Exception e) {
+            logger.warn("Error guardando nombre de mensajero en Redis: {}", e.getMessage());
+        }
     }
 }

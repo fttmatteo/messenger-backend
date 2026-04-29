@@ -4,8 +4,9 @@ import app.domain.model.LiveTracking;
 import app.domain.model.TrackingHistory;
 import java.time.LocalDate;
 import java.util.List;
-
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Puerto de salida para rastreo GPS de mensajeros en tiempo real.
@@ -33,12 +34,25 @@ public interface TrackingPort {
     TrackingHistory saveTrackingHistory(TrackingHistory history);
 
     /**
-     * Consulta el historial de ubicaciones de un mensajero en una fecha específica.
+     * Consulta el historial de tracking de un mensajero en una fecha específica con
+     * paginación.
      */
-    List<TrackingHistory> getHistoryByMessenger(Long messengerId, LocalDate date);
+    Page<TrackingHistory> getHistoryByMessengerPaginated(Long messengerId,
+            LocalDate date,
+            Pageable pageable);
 
     /**
-     * Consulta el historial de ubicaciones asociado a un servicio de entrega.
+     * Consulta el historial de tracking asociado a un servicio específico.
      */
-    List<TrackingHistory> getHistoryByService(Long serviceDeliveryId);
+    java.util.List<TrackingHistory> getHistoryByService(Long serviceDeliveryId);
+
+    /**
+     * Obtiene el nombre del mensajero desde la caché o BD.
+     */
+    java.util.Optional<String> getMessengerName(Long messengerId);
+
+    /**
+     * Guarda el nombre del mensajero en la caché.
+     */
+    void saveMessengerName(Long messengerId, String name);
 }

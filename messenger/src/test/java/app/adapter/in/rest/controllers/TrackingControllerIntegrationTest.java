@@ -162,9 +162,18 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
 
                 String today = LocalDate.now().toString();
 
-                mockMvc.perform(get("/tracking/history/" + messenger.getUuid())
-                                .param("date", today))
-                                .andExpect(status().isOk());
+                org.mockito.Mockito.when(trackingPort.getHistoryByMessengerPaginated(
+                                org.mockito.ArgumentMatchers.anyLong(),
+                                org.mockito.ArgumentMatchers.any(),
+                                org.mockito.ArgumentMatchers.any()))
+                                .thenReturn(org.springframework.data.domain.Page.empty());
+
+                mockMvc.perform(get("/tracking/history/pageable/" + messenger.getUuid())
+                                .param("date", today)
+                                .param("page", "0")
+                                .param("size", "10"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.content").exists());
         }
 
         @Test

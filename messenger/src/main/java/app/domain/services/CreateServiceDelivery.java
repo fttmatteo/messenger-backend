@@ -59,7 +59,9 @@ public class CreateServiceDelivery {
 
         String normalizedPlate = plateNumber.trim().toUpperCase();
 
-        if (!serviceDeliveryPort.findByPlateNumber(normalizedPlate).isEmpty()) {
+        var existingServices = serviceDeliveryPort.findAllPaginated(normalizedPlate, false, null,
+                org.springframework.data.domain.PageRequest.of(0, 1));
+        if (existingServices.getTotalElements() > 0) {
             throw new BusinessException(
                     "La placa " + normalizedPlate + " ya tiene un servicio registrado en el sistema.");
         }

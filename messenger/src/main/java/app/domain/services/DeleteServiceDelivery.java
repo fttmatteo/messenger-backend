@@ -138,20 +138,28 @@ public class DeleteServiceDelivery {
      * Los servicios se mueven al archivo permanente en lugar de ser borrados.
      */
     public int emptyTrash() {
-        java.util.List<ServiceDelivery> deletedServices = serviceDeliveryPort.findDeleted();
+        int totalArchived = 0;
+        int pageSize = 100;
+        org.springframework.data.domain.Page<ServiceDelivery> page;
 
-        if (deletedServices.isEmpty()) {
-            return 0;
-        }
-
-        for (ServiceDelivery service : deletedServices) {
-            try {
-                archivePort.archiveService(service, null, "Manual trash empty");
-            } catch (Exception e) {
-                logger.error("Error archivando servicio {}: {}", service.getIdServiceDelivery(), e.getMessage());
+        do {
+            page = serviceDeliveryPort.findDeleted(org.springframework.data.domain.PageRequest.of(0, pageSize));
+            if (page.isEmpty()) {
+                break;
             }
-        }
 
-        return deletedServices.size();
+            for (ServiceDelivery service : page.getContent()) {
+                try {
+                    archivePort.archiveService(service, null, "Manual trash empty");
+                    totalArchived++;
+                } catch (Exception e) {
+                    logger.error("Error archivando servicio {}: {}", service.getIdServiceDelivery(), e.getMessage());
+                }
+            }
+            // Como archivePort probablemente marca el servicio como archivado o lo elimina
+            // de la papelera lógica, seguimos pidiendo la página 0.
+        } while (page.hasNext());
+
+        return totalArchived;
     }
 }

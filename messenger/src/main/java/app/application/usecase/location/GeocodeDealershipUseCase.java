@@ -6,7 +6,6 @@ import app.domain.ports.DealershipPort;
 import app.domain.ports.LocationPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,10 +16,13 @@ public class GeocodeDealershipUseCase {
 
     private static final Logger logger = LoggerFactory.getLogger(GeocodeDealershipUseCase.class);
 
-    @Autowired
-    private LocationPort locationPort;
-    @Autowired
-    private DealershipPort dealershipPort;
+    private final LocationPort locationPort;
+    private final DealershipPort dealershipPort;
+
+    public GeocodeDealershipUseCase(LocationPort locationPort, DealershipPort dealershipPort) {
+        this.locationPort = locationPort;
+        this.dealershipPort = dealershipPort;
+    }
 
     /**
      * Ejecuta la geocodificación de un concesionario y actualiza su ubicación.
