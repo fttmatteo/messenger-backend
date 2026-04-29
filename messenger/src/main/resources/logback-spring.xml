@@ -16,8 +16,7 @@
               value="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [%X{correlationId}] [%thread] %cyan(%logger{36}) - %msg%n"/>
 
     <!-- Appender para consola (desarrollo y producción en Cloud Run) -->
-    <!-- Appender para consola (desarrollo) -->
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <appender name="CONSOLE_DEV" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>${CONSOLE_LOG_PATTERN}</pattern>
             <charset>UTF-8</charset>
@@ -172,39 +171,39 @@
 
     <!-- Logger para manejo global de excepciones -->
     <logger name="app.infrastructure.config.GlobalExceptionHandler" level="ERROR" additivity="false">
-        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="CONSOLE_DEV"/>
     </logger>
 
     <!-- Logger para servicios externos (Google Maps, Plate Recognizer, Cloud Storage) -->
     <logger name="app.adapter.out.maps" level="INFO" additivity="false">
-        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="CONSOLE_DEV"/>
     </logger>
 
     <logger name="app.adapter.out.ocr" level="INFO" additivity="false">
-        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="CONSOLE_DEV"/>
     </logger>
 
     <logger name="app.adapter.out.storage" level="INFO" additivity="false">
-        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="CONSOLE_DEV"/>
     </logger>
 
     <!-- Logger para tracking de mensajeros -->
     <logger name="app.adapter.out.tracking" level="INFO" additivity="false">
-        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="CONSOLE_DEV"/>
     </logger>
 
     <!-- Logger para seguridad y autenticación -->
     <logger name="app.adapter.out.security" level="INFO" additivity="false">
-        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="CONSOLE_DEV"/>
     </logger>
 
     <logger name="app.infrastructure.security" level="INFO" additivity="false">
-        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="CONSOLE_DEV"/>
     </logger>
 
     <!-- Logger para casos de uso críticos -->
     <logger name="app.application.usecase.ServiceDeliveryUseCase" level="INFO" additivity="false">
-        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="CONSOLE_DEV"/>
     </logger>
 
     <!-- ===================================== -->
@@ -235,7 +234,7 @@
     <springProfile name="dev">
         <!-- Nivel DEBUG para ver todos los detalles -->
         <logger name="app" level="DEBUG" additivity="false">
-            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="CONSOLE_DEV"/>
         </logger>
 
         <!-- Mostrar queries SQL en desarrollo -->
@@ -243,7 +242,7 @@
         <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
 
         <root level="INFO">
-            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="CONSOLE_DEV"/>
         </root>
     </springProfile>
 
@@ -263,9 +262,11 @@
         </root>
     </springProfile>
 
-    <!-- Configuración por defecto (cuando no hay perfil activo) -->
-    <root level="INFO">
-        <appender-ref ref="CONSOLE"/>
-    </root>
+    <!-- Configuración por defecto (cuando no hay perfil activo o perfiles no dev/prod) -->
+    <springProfile name="default, !dev &amp; !prod">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE_DEV"/>
+        </root>
+    </springProfile>
 
 </configuration>

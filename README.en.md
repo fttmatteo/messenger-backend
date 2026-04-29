@@ -4,10 +4,10 @@
 
 # Messenger Backend API
 
-<img src="https://img.shields.io/badge/Version-1.11.8-blue.svg" alt="Version">
+<img src="https://img.shields.io/badge/Version-1.12.0-blue.svg" alt="Version">
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
-[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.10-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.14-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Redis](https://img.shields.io/badge/Redis-7.0+-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 [![Google Cloud](https://img.shields.io/badge/Google_Cloud-1.0+-4479A1?style=for-the-badge&logo=google&logoColor=white)](https://cloud.google.com/)
@@ -139,6 +139,7 @@ graph LR
 | **WhatsApp**             | WhatsApp Cloud API (Meta)                                                                              |
 | **Real-Time**            | WebSocket + Redis                                                                                      |
 | **Build**                | Maven 3.9+                                                                                             |
+| **Migrations**           | Flyway (Database Versioning)                                                                           |
 | **Monitoring**           | Spring Boot Actuator (Health, Metrics)                                                                 |
 | **Auditing**             | JPA Callbacks + AOP (Aspect Oriented Programming)                                                      |
 | **CI/CD**                | GitHub Actions                                                                                         |
@@ -350,16 +351,16 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | -------- | -------------------------------- | ------------------------------------------------------------ |
 | `POST`   | `/services/extractPlate`         | Extract plate from image using OCR (preview before creating) |
 | `POST`   | `/services/createService`        | Create service (multipart: image + data)                     |
-| `PUT`    | `/services/updateService/{id}`   | Update status (multipart: status + evidence + GIF)           |
-| `PUT`    | `/services/reassign/{id}`        | Reassign to another messenger (ADMIN/CANCELED)               |
-| `GET`    | `/services/findByServiceId/{id}` | Get service by ID                                            |
+| `PUT`    | `/services/updateService/{uuid}` | Update status (multipart: status + evidence + GIF)           |
+| `PUT`    | `/services/reassign/{uuid}`      | Reassign to another messenger (ADMIN/CANCELED)               |
+| `GET`    | `/services/findByServiceId/{uuid}`| Get service by UUID                                         |
 | `GET`    | `/services/allServicesPageable`  | List services with **pagination, search & sorting**          |
 | `GET`    | `/services/stats/daily`          | DISABLED - Daily stats (requires messengerId, from, to)      |
-| `DELETE` | `/services/deleteService/{id}`   | Move to trash (ADMIN)                                        |
-| `GET`    | `/services/trash`                | List deleted services (ADMIN)                                |
-| `POST`   | `/services/trash/restore/{id}`   | Restore from trash (ADMIN)                                   |
+| `DELETE` | `/services/deleteService/{uuid}` | Move to trash (ADMIN)                                        |
+| `GET`    | `/services/trash`                | List deleted services with **pagination** (ADMIN)            |
+| `POST`   | `/services/trash/restore/{uuid}` | Restore from trash (ADMIN)                                   |
 | `DELETE` | `/services/trash/empty`          | Empty trash permanently (ADMIN)                              |
-| `DELETE` | `/services/trash/{id}`           | Permanent delete individual item (ADMIN)                     |
+| `DELETE` | `/services/trash/{uuid}`         | Permanent delete individual item (ADMIN)                     |
 
 ---
 
@@ -424,13 +425,13 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Method | Endpoint                   | Description                                      |
 | ------ | -------------------------- | ------------------------------------------------ |
-| `WS`   | `/ws/tracking/update`      | Update location via WebSocket (with Heartbeat)   |
+| `WS`   | `/ws/tracking/update`             | Update location via WebSocket (with Heartbeat)    |
 | `POST` | `/tracking/update`         | DISABLED - REST alternative for location updates |
-| `GET`  | `/tracking/messenger/{id}` | Get last known location (ADMIN)                  |
-| `POST` | `/tracking/messengers/bulk-locations` | Get last location of multiple messengers (ADMIN) |
-| `GET`  | `/tracking/active`         | Get all active messengers (ADMIN)                |
-| `GET`  | `/tracking/history/{id}`   | Get history by date (`?date=YYYY-MM-DD`)         |
-| `GET`  | `/tracking/service/{id}`   | Get history for a specific service               |
+| `GET`  | `/tracking/messenger/{uuid}`      | Get last known location (ADMIN)                   |
+| `POST` | `/tracking/messengers/bulk-locations`| Get last location of multiple messengers (ADMIN)  |
+| `GET`  | `/tracking/active`                | Get all active messengers (ADMIN)                 |
+| `GET`  | `/tracking/history/pageable/{uuid}`| Get location history with **pagination**          |
+| `GET`  | `/tracking/service/{uuid}`        | Get history for a specific service                |
 
 ---
 
