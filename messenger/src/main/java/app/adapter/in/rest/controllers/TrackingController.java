@@ -164,21 +164,33 @@ public class TrackingController {
     }
 
     /**
-     * Obtiene el historial de ubicaciones de un mensajero en una fecha específica.
+     * Obtiene el historial de ubicaciones de un mensajero con paginación.
      */
-    @GetMapping("/history/{messengerUuid}")
+    @GetMapping("/history/pageable/{messengerUuid}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<TrackingHistoryResponse>> getHistory(
+    public ResponseEntity<app.adapter.in.rest.response.PageResponse<TrackingHistoryResponse>> getHistoryPaginated(
             @PathVariable String messengerUuid,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "100") int size) {
 
         Employee messenger = employeeUseCase.findByUuid(messengerUuid);
-        List<TrackingHistory> history = getTrackingHistory.byMessengerAndDate(messenger.getIdEmployee(), date);
-        List<TrackingHistoryResponse> response = history.stream()
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size,
+                org.springframework.data.domain.Sort.by("recordedAt").descending());
+
+        org.springframework.data.domain.Page<TrackingHistory> historyPage = getTrackingHistory
+                .byMessengerAndDatePaginated(messenger.getIdEmployee(), date, pageable);
+
+        List<TrackingHistoryResponse> mappedContent = historyPage.getContent().stream()
                 .map(responseMapper::toHistoryResponse)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(response);
+        org.springframework.data.domain.Page<TrackingHistoryResponse> responsePage = new org.springframework.data.domain.PageImpl<>(
+                mappedContent,
+                historyPage.getPageable(),
+                historyPage.getTotalElements());
+
+        return ResponseEntity.ok(app.adapter.in.rest.response.PageResponse.from(responsePage));
     }
 
     /**

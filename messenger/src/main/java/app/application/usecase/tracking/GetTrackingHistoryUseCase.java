@@ -2,7 +2,6 @@ package app.application.usecase.tracking;
 
 import app.domain.model.TrackingHistory;
 import app.domain.ports.TrackingPort;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
@@ -13,14 +12,18 @@ import java.util.List;
 @Service
 public class GetTrackingHistoryUseCase {
 
-    @Autowired
-    private TrackingPort trackingPort;
+    private final TrackingPort trackingPort;
+
+    public GetTrackingHistoryUseCase(TrackingPort trackingPort) {
+        this.trackingPort = trackingPort;
+    }
 
     /**
-     * Consulta el historial de un mensajero por fecha.
+     * Consulta el historial de un mensajero por fecha con paginación.
      */
-    public List<TrackingHistory> byMessengerAndDate(Long messengerId, LocalDate date) {
-        return trackingPort.getHistoryByMessenger(messengerId, date);
+    public org.springframework.data.domain.Page<TrackingHistory> byMessengerAndDatePaginated(Long messengerId, LocalDate date,
+            org.springframework.data.domain.Pageable pageable) {
+        return trackingPort.getHistoryByMessengerPaginated(messengerId, date, pageable);
     }
 
     /**

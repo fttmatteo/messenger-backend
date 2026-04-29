@@ -40,10 +40,14 @@ public class MonitoringController {
     @GetMapping("/messenger/{messengerUuid}/activity")
     public ResponseEntity<MessengerActivityResponse> getMessengerActivity(
             @PathVariable String messengerUuid,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "100") int size) {
 
         Employee messenger = employeeUseCase.findByUuid(messengerUuid);
-        List<ServiceDelivery> allServices = serviceDeliveryPort.findByMessengerAndDate(messenger.getIdEmployee(), date);
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        org.springframework.data.domain.Page<ServiceDelivery> servicePage = serviceDeliveryPort.findByMessengerAndDate(messenger.getIdEmployee(), date, pageable);
+        List<ServiceDelivery> allServices = servicePage.getContent();
 
         int assigned = 0;
         int delivered = 0;

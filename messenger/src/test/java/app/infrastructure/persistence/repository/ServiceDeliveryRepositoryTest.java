@@ -162,13 +162,14 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
         entityManager.flush();
         entityManager.clear();
 
-        List<ServiceDeliveryEntity> results = repository.findByMessengerAndDate(
+        org.springframework.data.domain.Page<ServiceDeliveryEntity> results = repository.findByMessengerAndDate(
                 messenger.getIdEmployee(),
                 targetDate.toLocalDate().atStartOfDay(),
-                targetDate.toLocalDate().plusDays(1).atStartOfDay());
+                targetDate.toLocalDate().plusDays(1).atStartOfDay(),
+                org.springframework.data.domain.PageRequest.of(0, 10));
 
-        assertThat(results).hasSize(2);
-        assertThat(results).extracting(s -> s.getMessenger().getIdEmployee())
+        assertThat(results.getContent()).hasSize(2);
+        assertThat(results.getContent()).extracting(s -> s.getMessenger().getIdEmployee())
                 .containsOnly(messenger.getIdEmployee());
     }
 }

@@ -5,6 +5,7 @@ import app.domain.model.WhatsAppSession;
 import app.domain.ports.WhatsAppMessagePort;
 import app.domain.ports.WhatsAppSessionPort;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,6 +23,7 @@ public class WhatsAppNotificationListener {
         this.sessionPort = sessionPort;
     }
 
+    @Async("whatsappTaskExecutor")
     @EventListener
     public void handlePlateStatusChanged(PlateStatusChangedEvent event) {
         Long dealershipId = event.getDealershipId();
@@ -29,7 +31,6 @@ public class WhatsAppNotificationListener {
         String dealershipName = event.getDealershipName();
         String newStatusName = getFriendlyStatusName(event.getNewStatus());
 
-        // Buscar todas las sesiones activas de este concesionario
         java.util.List<WhatsAppSession> activeSessions = sessionPort.findActiveSessionsByDealership(dealershipId);
 
         if (activeSessions.isEmpty()) {

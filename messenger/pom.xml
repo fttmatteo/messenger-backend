@@ -238,6 +238,12 @@
 			<version>3.52.0</version>
 		</dependency>
 
+		<!-- Apache HttpClient 5 (Pooling para WhatsApp) -->
+		<dependency>
+			<groupId>org.apache.httpcomponents.client5</groupId>
+			<artifactId>httpclient5</artifactId>
+		</dependency>
+
 		<!-- Actuator (Health/Metrics) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

@@ -2,7 +2,6 @@ package app.application.usecase;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import app.domain.model.auth.RefreshTokenRequest;
 import app.domain.model.auth.TokenResponse;
@@ -16,8 +15,11 @@ public class RefreshTokenUseCase {
 
     private static final Logger logger = LoggerFactory.getLogger(RefreshTokenUseCase.class);
 
-    @Autowired
-    private AuthenticationService authenticationService;
+    private final AuthenticationService authenticationService;
+    
+    public RefreshTokenUseCase(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
+    }
 
     /**
      * Renueva un token de acceso utilizando un refresh token válido.

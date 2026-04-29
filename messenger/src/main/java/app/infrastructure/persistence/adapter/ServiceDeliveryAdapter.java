@@ -103,13 +103,12 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     }
 
     /**
-     * Busca todos los servicios de entrega eliminados.
+     * Busca todos los servicios de entrega eliminados con paginación.
      */
     @Override
-    public List<ServiceDelivery> findDeleted() {
-        return repository.findByDeletedTrue().stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
+    public Page<ServiceDelivery> findDeleted(Pageable pageable) {
+        return repository.findByDeleted(true, pageable)
+                .map(mapper::toDomain);
     }
 
     /**
@@ -201,16 +200,15 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     }
 
     /**
-     * Busca servicios de un mensajero que tengan actividad en una fecha específica.
+     * Busca servicios de un mensajero que tengan actividad en una fecha específica con paginación.
      */
     @Override
-    public List<ServiceDelivery> findByMessengerAndDate(Long messengerId, java.time.LocalDate date) {
+    public Page<ServiceDelivery> findByMessengerAndDate(Long messengerId, java.time.LocalDate date, Pageable pageable) {
         LocalDateTime startOfDay = date.atStartOfDay();
         LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
 
-        return repository.findByMessengerAndDate(messengerId, startOfDay, endOfDay).stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
+        return repository.findByMessengerAndDate(messengerId, startOfDay, endOfDay, pageable)
+                .map(mapper::toDomain);
     }
 
     /**

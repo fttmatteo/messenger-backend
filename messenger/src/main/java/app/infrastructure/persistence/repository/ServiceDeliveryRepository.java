@@ -190,10 +190,11 @@ public interface ServiceDeliveryRepository extends JpaRepository<ServiceDelivery
                         "   OR " +
                         "   (h.changeDate >= :startOfDay AND h.changeDate < :endOfDay) " +
                         ")")
-        List<ServiceDeliveryEntity> findByMessengerAndDate(
+        Page<ServiceDeliveryEntity> findByMessengerAndDate(
                         @Param("messengerId") Long messengerId,
                         @Param("startOfDay") LocalDateTime startOfDay,
-                        @Param("endOfDay") LocalDateTime endOfDay);
+                        @Param("endOfDay") LocalDateTime endOfDay,
+                        Pageable pageable);
 
         /**
          * Encuentra servicios por placa y concesionario (no eliminados).

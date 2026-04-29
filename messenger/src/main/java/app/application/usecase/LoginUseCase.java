@@ -2,7 +2,6 @@ package app.application.usecase;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import app.domain.model.auth.AuthCredentials;
 import app.domain.model.auth.TokenResponse;
@@ -19,11 +18,13 @@ public class LoginUseCase {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginUseCase.class);
 
-    @Autowired
-    private AuthenticationService authenticationService;
+    private final AuthenticationService authenticationService;
+    private final EmployeePort employeePort;
 
-    @Autowired
-    private EmployeePort employeePort;
+    public LoginUseCase(AuthenticationService authenticationService, EmployeePort employeePort) {
+        this.authenticationService = authenticationService;
+        this.employeePort = employeePort;
+    }
 
     /**
      * Result object para devolver tanto token como datos del usuario.

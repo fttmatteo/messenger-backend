@@ -3,7 +3,6 @@ package app.application.usecase;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -21,14 +20,21 @@ public class DealershipUseCase {
 
     private static final Logger logger = LoggerFactory.getLogger(DealershipUseCase.class);
 
-    @Autowired
-    private CreateDealership createDealership;
-    @Autowired
-    private UpdateDealership updateDealership;
-    @Autowired
-    private SearchDealership searchDealership;
-    @Autowired
-    private DeleteDealership deleteDealership;
+    private final CreateDealership createDealership;
+    private final UpdateDealership updateDealership;
+    private final SearchDealership searchDealership;
+    private final DeleteDealership deleteDealership;
+
+    public DealershipUseCase(
+            CreateDealership createDealership,
+            UpdateDealership updateDealership,
+            SearchDealership searchDealership,
+            DeleteDealership deleteDealership) {
+        this.createDealership = createDealership;
+        this.updateDealership = updateDealership;
+        this.searchDealership = searchDealership;
+        this.deleteDealership = deleteDealership;
+    }
 
     /**
      * Crea un nuevo concesionario en el sistema.

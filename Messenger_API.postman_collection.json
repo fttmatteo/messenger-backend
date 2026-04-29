@@ -1342,41 +1342,6 @@
                     "response": []
                 },
                 {
-                    "name": "Get Tracking History",
-                    "request": {
-                        "auth": {
-                            "type": "bearer",
-                            "bearer": [
-                                {
-                                    "key": "token",
-                                    "value": "{{token}}",
-                                    "type": "string"
-                                }
-                            ]
-                        },
-                        "method": "GET",
-                        "header": [],
-                        "url": {
-                            "raw": "{{baseUrl}}/tracking/history/{{uuid}}?date=2024-01-05",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "tracking",
-                                "history",
-                                "{{uuid}}"
-                            ],
-                            "query": [
-                                {
-                                    "key": "date",
-                                    "value": "2024-01-05"
-                                }
-                            ]
-                        }
-                    },
-                    "response": []
-                },
-                {
                     "name": "Get Active Messengers",
                     "request": {
                         "auth": {
@@ -1470,6 +1435,50 @@
                         }
                     },
                     "response": []
+                },
+                {
+                    "name": "Get Tracking History (Pageable)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/tracking/history/pageable/{{messengerUuid}}?date=2025-12-29&page=0&size=100",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "tracking",
+                                "history",
+                                "pageable",
+                                "{{messengerUuid}}"
+                            ],
+                            "query": [
+                                {
+                                    "key": "date",
+                                    "value": "2025-12-29"
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "0"
+                                },
+                                {
+                                    "key": "size",
+                                    "value": "100"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
                 }
             ]
         },
@@ -1506,6 +1515,50 @@
                                 {
                                     "key": "date",
                                     "value": "2024-01-05"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Messenger Activity (Pageable)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/monitoring/messenger/{{messengerUuid}}/activity?date=2025-12-29&page=0&size=100",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "monitoring",
+                                "messenger",
+                                "{{messengerUuid}}",
+                                "activity"
+                            ],
+                            "query": [
+                                {
+                                    "key": "date",
+                                    "value": "2025-12-29"
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "0"
+                                },
+                                {
+                                    "key": "size",
+                                    "value": "100"
                                 }
                             ]
                         }

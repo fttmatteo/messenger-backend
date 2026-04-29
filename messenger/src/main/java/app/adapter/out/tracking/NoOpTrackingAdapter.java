@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Implementación simulada de TrackingPort para entornos de prueba sin Redis.
@@ -43,12 +45,22 @@ public class NoOpTrackingAdapter implements TrackingPort {
     }
 
     @Override
-    public List<TrackingHistory> getHistoryByMessenger(Long messengerId, LocalDate date) {
-        return new ArrayList<>();
+    public Page<TrackingHistory> getHistoryByMessengerPaginated(Long messengerId, LocalDate date, Pageable pageable) {
+        return Page.empty();
     }
 
     @Override
     public List<TrackingHistory> getHistoryByService(Long serviceDeliveryId) {
         return new ArrayList<>();
+    }
+
+    @Override
+    public Optional<String> getMessengerName(Long messengerId) {
+        return Optional.empty();
+    }
+
+    @Override
+    public void saveMessengerName(Long messengerId, String name) {
+        // No-op
     }
 }

@@ -1,7 +1,6 @@
 package app.domain.services;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,8 +15,11 @@ import app.domain.ports.ServiceDeliveryPort;
 @Service
 public class SearchServiceDelivery {
 
-    @Autowired
-    private ServiceDeliveryPort serviceDeliveryPort;
+    private final ServiceDeliveryPort serviceDeliveryPort;
+
+    public SearchServiceDelivery(ServiceDeliveryPort serviceDeliveryPort) {
+        this.serviceDeliveryPort = serviceDeliveryPort;
+    }
 
     /**
      * Busca un servicio por ID (excluye los eliminados).
@@ -89,10 +91,10 @@ public class SearchServiceDelivery {
     }
 
     /**
-     * Retorna todos los servicios en la papelera.
+     * Retorna todos los servicios en la papelera con paginación.
      */
-    public List<ServiceDelivery> findDeleted() {
-        return serviceDeliveryPort.findDeleted();
+    public Page<ServiceDelivery> findDeleted(Pageable pageable) {
+        return serviceDeliveryPort.findDeleted(pageable);
     }
 
     /**

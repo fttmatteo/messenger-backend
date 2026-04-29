@@ -4,7 +4,8 @@ import app.domain.ports.WhatsAppMessagePort;
 import app.infrastructure.config.WhatsAppConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -27,9 +28,23 @@ public class WhatsAppCloudClient implements WhatsAppMessagePort {
 
     public WhatsAppCloudClient(WhatsAppConfig config) {
         this.config = config;
-        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(10000);
-        factory.setReadTimeout(10000);
+        
+        org.apache.hc.client5.http.config.ConnectionConfig connectionConfig = org.apache.hc.client5.http.config.ConnectionConfig.custom()
+            .setConnectTimeout(org.apache.hc.core5.util.Timeout.ofMilliseconds(10000))
+            .setSocketTimeout(org.apache.hc.core5.util.Timeout.ofMilliseconds(10000))
+            .build();
+
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        connectionManager.setMaxTotal(20);
+        connectionManager.setDefaultMaxPerRoute(10);
+        connectionManager.setDefaultConnectionConfig(connectionConfig);
+
+        org.apache.hc.client5.http.impl.classic.CloseableHttpClient httpClient = org.apache.hc.client5.http.impl.classic.HttpClients.custom()
+            .setConnectionManager(connectionManager)
+            .build();
+
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
+        
         this.restTemplate = new RestTemplate(factory);
     }
 

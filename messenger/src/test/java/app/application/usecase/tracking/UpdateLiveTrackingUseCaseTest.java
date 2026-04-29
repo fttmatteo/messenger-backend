@@ -3,11 +3,13 @@ package app.application.usecase.tracking;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 import java.util.Optional;
+import app.domain.model.Employee;
 import app.domain.model.LiveTracking;
 import app.domain.model.Location;
 import app.domain.model.TrackingHistory;
@@ -35,10 +37,6 @@ class UpdateLiveTrackingUseCaseTest {
 
     @Test
     @DisplayName("Should save live location and history when location has good accuracy")
-    /**
-     * Verifica que la ubicación en vivo y el historial se guarden cuando la
-     * precisión de la ubicación es buena.
-     */
     void shouldSaveLiveLocationAndHistoryWithGoodAccuracy() {
         LiveTracking incoming = new LiveTracking();
         incoming.setMessengerId(10L);
@@ -55,10 +53,6 @@ class UpdateLiveTrackingUseCaseTest {
 
     @Test
     @DisplayName("Should save only live location if accuracy is too low (> 100m)")
-    /**
-     * Verifica que solo se guarde la ubicación en vivo si la precisión de la
-     * ubicación es demasiado baja (> 100m).
-     */
     void shouldNotSaveHistoryIfAccuracyTooLow() {
         LiveTracking incoming = new LiveTracking();
         incoming.setMessengerId(10L);
@@ -71,10 +65,6 @@ class UpdateLiveTrackingUseCaseTest {
 
     @Test
     @DisplayName("Should save only live location if location is missing (keep alive ping)")
-    /**
-     * Verifica que solo se guarde la ubicación en vivo si la ubicación está
-     * ausente (ping de mantenimiento de vida).
-     */
     void shouldSaveOnlyLiveLocationIfLocationMissing() {
         LiveTracking incoming = new LiveTracking();
         incoming.setMessengerId(10L);
@@ -88,9 +78,6 @@ class UpdateLiveTrackingUseCaseTest {
 
     @Test
     @DisplayName("Should update only heartbeat when executeHeartbeat is called")
-    /**
-     * Verifica que solo se actualice el latido cuando se llama a executeHeartbeat.
-     */
     void shouldUpdateOnlyHeartbeatWithExecuteHeartbeat() {
         LiveTracking heartbeat = new LiveTracking();
         heartbeat.setMessengerId(10L);
@@ -108,9 +95,6 @@ class UpdateLiveTrackingUseCaseTest {
 
     @Test
     @DisplayName("Should not save history if accuracy is exactly 100m")
-    /**
-     * Verifica que no se guarde el historial si la precisión es exactamente 100m.
-     */
     void shouldNotSaveHistoryOnAccuracyBorderline() {
         LiveTracking incoming = new LiveTracking();
         incoming.setMessengerId(10L);
@@ -125,9 +109,6 @@ class UpdateLiveTrackingUseCaseTest {
 
     @Test
     @DisplayName("Should handle heartbeat with no existing location")
-    /**
-     * Verifica que el latido funcione incluso si no hay una ubicación previa.
-     */
     void shouldHandleHeartbeatWithNoPriorLocation() {
         LiveTracking heartbeat = new LiveTracking();
         heartbeat.setMessengerId(10L);
@@ -142,10 +123,6 @@ class UpdateLiveTrackingUseCaseTest {
 
     @Test
     @DisplayName("Should preserve existing location data when heartbeat is received")
-    /**
-     * Verifica que los datos de ubicación existentes se conserven cuando se recibe
-     * un latido.
-     */
     void shouldPreserveExistingLocationOnHeartbeat() {
         LiveTracking existing = new LiveTracking();
         existing.setMessengerId(10L);
@@ -162,5 +139,38 @@ class UpdateLiveTrackingUseCaseTest {
         assertNotNull(result.getCurrentLocation());
         assertEquals("Test User", result.getMessengerName());
         assertNotNull(result.getLastHeartbeat());
+    }
+
+    @Test
+    @DisplayName("Should fetch name from cache and avoid DB call")
+    void shouldFetchNameFromCacheAndAvoidDb() {
+        LiveTracking incoming = new LiveTracking();
+        incoming.setMessengerId(10L);
+        incoming.setCurrentLocation(new Location(4.60, -74.08));
+
+        when(trackingPort.getMessengerName(10L)).thenReturn(Optional.of("Cached Name"));
+
+        LiveTracking result = useCase.execute(incoming);
+
+        assertEquals("Cached Name", result.getMessengerName());
+        verify(employeePort, never()).findById(anyLong());
+    }
+
+    @Test
+    @DisplayName("Should save name in cache when fetched from DB")
+    void shouldSaveNameInCacheWhenFetchedFromDb() {
+        LiveTracking incoming = new LiveTracking();
+        incoming.setMessengerId(10L);
+        incoming.setCurrentLocation(new Location(4.60, -74.08));
+
+        when(trackingPort.getMessengerName(10L)).thenReturn(Optional.empty());
+        Employee employee = new Employee();
+        employee.setFullName("DB Name");
+        when(employeePort.findById(10L)).thenReturn(employee);
+
+        LiveTracking result = useCase.execute(incoming);
+
+        assertEquals("DB Name", result.getMessengerName());
+        verify(trackingPort).saveMessengerName(10L, "DB Name");
     }
 }

@@ -3,7 +3,6 @@ package app.application.usecase;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -22,14 +21,21 @@ public class EmployeeUseCase {
 
     private static final Logger logger = LoggerFactory.getLogger(EmployeeUseCase.class);
 
-    @Autowired
-    private CreateEmployee createEmployee;
-    @Autowired
-    private UpdateEmployee updateEmployee;
-    @Autowired
-    private SearchEmployee searchEmployee;
-    @Autowired
-    private DeleteEmployee deleteEmployee;
+    private final CreateEmployee createEmployee;
+    private final UpdateEmployee updateEmployee;
+    private final SearchEmployee searchEmployee;
+    private final DeleteEmployee deleteEmployee;
+
+    public EmployeeUseCase(
+            CreateEmployee createEmployee,
+            UpdateEmployee updateEmployee,
+            SearchEmployee searchEmployee,
+            DeleteEmployee deleteEmployee) {
+        this.createEmployee = createEmployee;
+        this.updateEmployee = updateEmployee;
+        this.searchEmployee = searchEmployee;
+        this.deleteEmployee = deleteEmployee;
+    }
 
     /**
      * Crea un nuevo empleado.
