@@ -11,7 +11,7 @@ import app.domain.services.CreateEmployee;
 import app.domain.services.DeleteEmployee;
 import app.domain.services.SearchEmployee;
 import app.domain.services.UpdateEmployee;
-import app.infrastructure.audit.AuditableAction;
+
 
 /**
  * Caso de uso para gestión de empleados.
@@ -41,7 +41,7 @@ public class EmployeeUseCase {
      * Crea un nuevo empleado.
      */
     @CacheEvict(value = "employees", allEntries = true)
-    @AuditableAction(action = "CREATE_EMPLOYEE", description = "Crear nuevo empleado")
+
     public Employee create(Employee employee) throws Exception {
         Employee created = createEmployee.create(employee);
         return created;
@@ -51,7 +51,7 @@ public class EmployeeUseCase {
      * Actualiza los datos de un empleado existente.
      */
     @CacheEvict(value = "employees", allEntries = true)
-    @AuditableAction(action = "UPDATE_EMPLOYEE", description = "Actualizar empleado")
+
     public Employee update(Long id, Employee employee) throws Exception {
         Employee updated = updateEmployee.update(id, employee);
         return updated;
@@ -91,7 +91,7 @@ public class EmployeeUseCase {
      * Elimina un empleado del sistema.
      */
     @CacheEvict(value = "employees", allEntries = true)
-    @AuditableAction(action = "DELETE_EMPLOYEE", description = "Eliminar empleado")
+
     public void deleteById(Long id) throws Exception {
         deleteEmployee.deleteById(id);
         logger.warn("Eliminando empleado ID: {}", id);

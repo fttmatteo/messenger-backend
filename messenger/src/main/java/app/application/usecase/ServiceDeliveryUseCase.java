@@ -29,7 +29,7 @@ import app.domain.services.CreateServiceDelivery;
 import app.domain.services.DeleteServiceDelivery;
 import app.domain.services.SearchServiceDelivery;
 import app.domain.services.UpdateServiceDelivery;
-import app.infrastructure.audit.AuditableAction;
+
 
 /**
  * Caso de uso principal para gestión de servicios de entrega.
@@ -91,7 +91,7 @@ public class ServiceDeliveryUseCase {
         @CacheEvict(value = "service-details", allEntries = true)
     })
     @Transactional(rollbackFor = Exception.class)
-    @AuditableAction(action = "CREATE_SERVICE", description = "Crear servicio desde imagen OCR")
+
     public ServiceDelivery createServiceFromImage(File imageFile, Long dealershipId, Long messengerId, Double latitude,
             Double longitude)
             throws Exception {
@@ -121,7 +121,7 @@ public class ServiceDeliveryUseCase {
         @CacheEvict(value = "service-details", allEntries = true)
     })
     @Transactional(rollbackFor = Exception.class)
-    @AuditableAction(action = "CREATE_SERVICE_MANUAL", description = "Crear servicio con placa manual")
+
     public ServiceDelivery createServiceWithManualPlate(File imageFile, String manualPlateNumber, Long dealershipId,
             Long messengerId, Double latitude, Double longitude) throws Exception {
         String timestamp = LocalDateTime.now().format(DATE_FORMAT);
@@ -157,7 +157,7 @@ public class ServiceDeliveryUseCase {
         @CacheEvict(value = "service-details", allEntries = true)
     })
     @Transactional(rollbackFor = Exception.class)
-    @AuditableAction(action = "UPDATE_STATUS", description = "Actualizar estado de servicio")
+
     public ServiceDelivery updateStatus(Long serviceId, Status newStatus, String observation,
             Signature signature, List<Photo> photos, Long userId, Double latitude, Double longitude) throws Exception {
         return updateService.updateStatus(serviceId, newStatus, observation, signature, photos, userId, latitude,
@@ -239,7 +239,7 @@ public class ServiceDeliveryUseCase {
         @CacheEvict(value = "service-details", allEntries = true)
     })
     @Transactional(rollbackFor = Exception.class)
-    @AuditableAction(action = "REASSIGN_MESSENGER", description = "Reasignar servicio a otro mensajero")
+
     public ServiceDelivery reassignMessenger(Long serviceId, Long newMessengerId, Long adminUserId) throws Exception {
         return updateService.reassignMessenger(serviceId, newMessengerId, adminUserId);
     }
@@ -328,7 +328,7 @@ public class ServiceDeliveryUseCase {
         @CacheEvict(value = "services", allEntries = true),
         @CacheEvict(value = "service-details", allEntries = true)
     })
-    @AuditableAction(action = "DELETE_SERVICE", description = "Mover servicio a papelera")
+
     public void deleteById(Long id, Long userId) throws Exception {
         deleteService.deleteById(id, userId);
     }
@@ -349,7 +349,7 @@ public class ServiceDeliveryUseCase {
         @CacheEvict(value = "service-details", allEntries = true)
     })
     @Transactional(rollbackFor = Exception.class)
-    @AuditableAction(action = "RESTORE_SERVICE", description = "Restaurar servicio desde papelera")
+
     public ServiceDelivery restore(Long id, Long userId) throws Exception {
         return deleteService.restore(id, userId);
     }
@@ -363,7 +363,7 @@ public class ServiceDeliveryUseCase {
         @CacheEvict(value = "service-details", allEntries = true)
     })
     @Transactional(rollbackFor = Exception.class)
-    @AuditableAction(action = "EMPTY_TRASH", description = "Vaciar papelera completamente")
+
     public int emptyTrash(Long userId) {
         return deleteService.emptyTrash();
     }
@@ -376,7 +376,7 @@ public class ServiceDeliveryUseCase {
         @CacheEvict(value = "service-details", allEntries = true)
     })
     @Transactional(rollbackFor = Exception.class)
-    @AuditableAction(action = "ARCHIVE_SERVICE", description = "Archivar permanentemente un servicio de la papelera")
+
     public void permanentDeleteById(Long id, Long userId) throws Exception {
         deleteService.archiveService(id);
     }

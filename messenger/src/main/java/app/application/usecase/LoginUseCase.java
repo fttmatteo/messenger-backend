@@ -1,22 +1,18 @@
 package app.application.usecase;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import app.domain.model.auth.AuthCredentials;
 import app.domain.model.auth.TokenResponse;
 import app.domain.model.Employee;
+import app.domain.exception.BusinessException;
 import app.domain.services.AuthenticationService;
 import app.domain.ports.EmployeePort;
-import app.domain.util.LogSanitizer;
 
 /**
  * Caso de uso para login de usuarios.
  */
 @Component
 public class LoginUseCase {
-
-    private static final Logger logger = LoggerFactory.getLogger(LoginUseCase.class);
 
     private final AuthenticationService authenticationService;
     private final EmployeePort employeePort;
@@ -58,23 +54,19 @@ public class LoginUseCase {
     /**
      * Autentica a un usuario y devuelve tokens + información del empleado.
      */
-    @app.infrastructure.audit.AuditableAction(action = "USER_LOGIN", description = "Inicio de sesión de usuario")
     public LoginResult login(AuthCredentials credentials) {
-        Employee employee = employeePort.findByDocument(credentials.getDocument());
-        if (employee == null) {
-            throw new app.domain.exception.BusinessException("Usuario no encontrado");
-        }
-
         try {
-            TokenResponse response = authenticationService.authenticate(credentials);
+            Employee employee = employeePort.findByDocument(credentials.getDocument());
+            if (employee == null) {
+                throw new BusinessException("Usuario no encontrado");
+            }
 
+            TokenResponse response = authenticationService.authenticate(credentials);
             return new LoginResult(response, employee);
-        } catch (app.domain.exception.BusinessException e) {
+        } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
-            logger.error("Error inesperado durante login para documento: {}",
-                    LogSanitizer.maskDocument(credentials.getDocument()), e);
-            throw new app.domain.exception.BusinessException("Error durante autenticación: " + e.getMessage());
+            throw new BusinessException("Error durante autenticación: " + e.getMessage());
         }
     }
 }

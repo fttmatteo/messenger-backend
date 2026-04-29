@@ -20,7 +20,7 @@ import app.domain.model.auth.AuthCredentials;
 import app.domain.model.auth.LoginResponse;
 import app.domain.model.auth.TokenResponse;
 import app.domain.services.LoginRateLimitService;
-import app.infrastructure.audit.AuditableAction;
+
 import app.domain.util.LogSanitizer;
 import app.infrastructure.security.TurnstileValidationService;
 import org.slf4j.Logger;
@@ -55,7 +55,7 @@ public class AuthController {
      * Los tokens se envían en cookies HttpOnly por seguridad.
      */
     @PostMapping("/login")
-    @AuditableAction(action = "LOGIN", description = "Inicio de sesión de usuario")
+
     public ResponseEntity<LoginResponse> login(
             @Valid @RequestBody AuthCredentials credentials,
             HttpServletResponse response) {
@@ -131,10 +131,11 @@ public class AuthController {
         } catch (app.domain.exception.BusinessException e) {
             int remainingAttempts = rateLimitService.recordFailedAttempt(document);
 
-            logger.warn("Login fallido para documento: {}. Intentos restantes: {} - Error: {}",
+            logger.warn("Login fallido para documento: {}. Intentos restantes: {} - Motivo: {}",
                     LogSanitizer.maskDocument(document),
                     remainingAttempts,
-                    e.getMessage());
+                    e.getMessage().contains("Contrasena incorrecta") || e.getMessage().contains("Usuario no encontrado")
+                        ? "Credenciales invalidas" : e.getMessage());
 
             String errorMessage = remainingAttempts > 0
                     ? String.format("Credenciales inválidas. Intentos restantes: %d", remainingAttempts)
@@ -158,7 +159,7 @@ public class AuthController {
      * handshake.
      */
     @PostMapping("/ws-token")
-    @AuditableAction(action = "WS_TOKEN_GEN", description = "Generación de token temporal para WebSocket")
+
     public ResponseEntity<app.domain.model.auth.WsTokenResponse> getWsToken(HttpServletRequest request) {
         // El usuario ya debe estar autenticado por cookie o header para llegar aquí
         String accessToken = extractTokenFromCookie(request, "accessToken");
@@ -187,7 +188,7 @@ public class AuthController {
      * Renueva el token de acceso utilizando un refresh token de cookie.
      */
     @PostMapping("/refresh")
-    @AuditableAction(action = "TOKEN_REFRESH", description = "Renovación de token de acceso")
+
     public ResponseEntity<LoginResponse> refresh(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -241,7 +242,7 @@ public class AuthController {
      * Cierra sesión y limpia las cookies de autenticación.
      */
     @PostMapping("/logout")
-    @AuditableAction(action = "LOGOUT", description = "Cierre de sesión de usuario")
+
     public ResponseEntity<Void> logout(HttpServletResponse response) {
 
         // Limpiamos cookies en la ruta raíz (nueva configuración)

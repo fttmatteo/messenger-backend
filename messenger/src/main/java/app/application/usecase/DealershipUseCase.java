@@ -1,8 +1,6 @@
 package app.application.usecase;
 
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -17,8 +15,6 @@ import app.domain.services.UpdateDealership;
  */
 @Service
 public class DealershipUseCase {
-
-    private static final Logger logger = LoggerFactory.getLogger(DealershipUseCase.class);
 
     private final CreateDealership createDealership;
     private final UpdateDealership updateDealership;
@@ -40,7 +36,6 @@ public class DealershipUseCase {
      * Crea un nuevo concesionario en el sistema.
      */
     @CacheEvict(value = "dealerships", allEntries = true)
-    @app.infrastructure.audit.AuditableAction(action = "CREATE_DEALERSHIP", description = "Crear nuevo concesionario")
     public Dealership create(Dealership dealership) throws Exception {
         Dealership created = createDealership.create(dealership);
         return created;
@@ -50,7 +45,6 @@ public class DealershipUseCase {
      * Actualiza la información de un concesionario existente.
      */
     @CacheEvict(value = "dealerships", allEntries = true)
-    @app.infrastructure.audit.AuditableAction(action = "UPDATE_DEALERSHIP", description = "Actualizar concesionario")
     public Dealership update(Long id, Dealership dealership) throws Exception {
         Dealership updated = updateDealership.update(id, dealership);
         return updated;
@@ -94,9 +88,7 @@ public class DealershipUseCase {
      * Elimina un concesionario por su ID.
      */
     @CacheEvict(value = "dealerships", allEntries = true)
-    @app.infrastructure.audit.AuditableAction(action = "DELETE_DEALERSHIP", description = "Eliminar concesionario")
     public void deleteById(Long id) throws Exception {
         deleteDealership.deleteById(id);
-        logger.warn("Eliminando concesionario ID: {}", id);
     }
 }

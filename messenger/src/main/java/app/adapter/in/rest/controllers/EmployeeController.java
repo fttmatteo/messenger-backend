@@ -12,7 +12,7 @@ import app.adapter.in.rest.request.EmployeeRequest;
 import app.adapter.in.rest.response.EmployeeResponse;
 import app.application.usecase.EmployeeUseCase;
 import app.domain.model.Employee;
-import app.infrastructure.audit.AuditableAction;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,7 +36,7 @@ public class EmployeeController {
      */
     @PostMapping("/createEmployee")
     @PreAuthorize("hasRole('ADMIN')")
-    @AuditableAction(action = "CREATE_EMPLOYEE", description = "Crear nuevo empleado")
+
     public ResponseEntity<EmployeeResponse> create(@Valid @RequestBody EmployeeRequest request) throws Exception {
         Employee employee = builder.build(request.getDocument(),
                 request.getFullName(),
@@ -77,7 +77,7 @@ public class EmployeeController {
      */
     @PutMapping("/updateEmployee/{uuid}")
     @PreAuthorize("hasRole('ADMIN')")
-    @AuditableAction(action = "UPDATE_EMPLOYEE", description = "Actualizar empleado existente")
+
     public ResponseEntity<EmployeeResponse> update(@PathVariable String uuid, @Valid @RequestBody EmployeeRequest request)
             throws Exception {
         Employee employee = builder.buildForUpdate(
@@ -96,7 +96,7 @@ public class EmployeeController {
      */
     @DeleteMapping("/deleteEmployee/{uuid}")
     @PreAuthorize("hasRole('ADMIN')")
-    @AuditableAction(action = "DELETE_EMPLOYEE", description = "Eliminar empleado")
+
     public ResponseEntity<Void> delete(@PathVariable String uuid) throws Exception {
         Employee existing = employeeUseCase.findByUuid(uuid);
         employeeUseCase.deleteById(existing.getIdEmployee());
