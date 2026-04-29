@@ -1,13 +1,12 @@
 package app.domain.services;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import app.domain.exception.BusinessException;
 import app.domain.model.ServiceDelivery;
 import app.domain.ports.ServiceDeliveryPort;
 import java.util.Arrays;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,13 +66,15 @@ class SearchServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe buscar servicios por placa")
-    void shouldFindByPlateNumber() {
-        when(serviceDeliveryPort.findByPlateNumber("ABC-123")).thenReturn(Arrays.asList(new ServiceDelivery()));
+    @DisplayName("Debe buscar servicios por placa y concesionario con paginación")
+    void shouldFindByPlateAndDealershipPaginated() {
+        when(serviceDeliveryPort.findByPlateAndDealershipPaginated(eq("ABC-123"), eq(1L), any()))
+                .thenReturn(new PageImpl<>(Arrays.asList(new ServiceDelivery())));
 
-        List<ServiceDelivery> result = searchServiceDelivery.findByPlate("ABC-123");
+        Page<ServiceDelivery> result = searchServiceDelivery.findByPlateAndDealershipPaginated("ABC-123", 1L,
+                PageRequest.of(0, 10));
 
-        assertEquals(1, result.size());
+        assertEquals(1, result.getContent().size());
     }
 
     @Test

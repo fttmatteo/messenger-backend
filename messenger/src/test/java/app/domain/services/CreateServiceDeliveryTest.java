@@ -2,12 +2,8 @@ package app.domain.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import app.domain.exception.BusinessException;
 import app.domain.model.Dealership;
 import app.domain.model.Employee;
@@ -71,6 +67,10 @@ class CreateServiceDeliveryTest {
         plate.setIdPlate(1L);
         plate.setPlateNumber("ABC123");
         plate.setPlateType(PlateType.CAR);
+
+        // Default mock for duplicate check (not found)
+        lenient().when(serviceDeliveryPort.findAllPaginated(anyString(), anyBoolean(), isNull(), any()))
+                .thenReturn(org.springframework.data.domain.Page.empty());
     }
 
     @Test
@@ -81,8 +81,9 @@ class CreateServiceDeliveryTest {
     void shouldThrowExceptionIfPlateAlreadyExists() {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
-        when(serviceDeliveryPort.findByPlateNumber("ABC123"))
-                .thenReturn(java.util.List.of(new app.domain.model.ServiceDelivery()));
+        when(serviceDeliveryPort.findAllPaginated(eq("ABC123"), eq(false), isNull(), any()))
+                .thenReturn(new org.springframework.data.domain.PageImpl<>(
+                        java.util.List.of(new app.domain.model.ServiceDelivery())));
 
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> createServiceDelivery.create("ABC123", "path/to/photo.jpg", 1L, 12345678L, null, null));

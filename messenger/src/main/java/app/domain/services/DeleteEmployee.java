@@ -27,9 +27,10 @@ public class DeleteEmployee {
             throw new BusinessException("El empleado con ID " + id + " no existe.");
         }
 
-        var deliveries = serviceDeliveryPort.findByMessengerId(id);
-        if (deliveries != null && !deliveries.isEmpty()) {
-            throw new BusinessException("No se puede eliminar. El empleado tiene " + deliveries.size()
+        var deliveriesPage = serviceDeliveryPort.findByMessengerPaginated(id, null, null, null,
+                org.springframework.data.domain.PageRequest.of(0, 1));
+        if (deliveriesPage.getTotalElements() > 0) {
+            throw new BusinessException("No se puede eliminar. El empleado tiene " + deliveriesPage.getTotalElements()
                     + " servicios de entrega asociados.");
         }
 

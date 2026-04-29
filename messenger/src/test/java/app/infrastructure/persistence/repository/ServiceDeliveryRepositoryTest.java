@@ -21,9 +21,6 @@ import app.support.AbstractIntegrationTest;
 
 @Transactional
 @DisplayName("ServiceDeliveryRepository Integration Tests")
-/**
- * Clase de pruebas integración para el repositorio de entregas de servicios.
- */
 class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -32,12 +29,17 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
     @Autowired
     private ServiceDeliveryRepository repository;
 
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private DealershipRepository dealershipRepository;
+
+    @Autowired
+    private PlateRepository plateRepository;
+
     @Test
     @DisplayName("Should correctly calculate daily statistics")
-    /**
-     * Verifica que la query de estadísticas diarias agrupe y cuente correctamente
-     * por estado.
-     */
     void shouldCalculateDailyStatsCorrectly() {
         EmployeeEntity messenger = createEmployee("999999", "Test Messenger");
         entityManager.persist(messenger);
@@ -111,11 +113,6 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("Should find services by messenger and date")
-    /**
-     * Verifica que se filtren correctamente los servicios por mensajero, fecha de
-     * creación
-     * o fecha de cambio de estado.
-     */
     void shouldFindServicesByMessengerAndDate() {
         EmployeeEntity messenger = createEmployee("888888", "Target Messenger");
         entityManager.persist(messenger);
@@ -171,5 +168,45 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
         assertThat(results.getContent()).hasSize(2);
         assertThat(results.getContent()).extracting(s -> s.getMessenger().getIdEmployee())
                 .containsOnly(messenger.getIdEmployee());
+    }
+
+    @Test
+    @org.springframework.transaction.annotation.Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
+    @DisplayName("Should search by keywords using FULLTEXT MATCH AGAINST")
+    void shouldSearchByKeywordsUsingFullText() {
+        EmployeeEntity messenger = createEmployee("111222", "Carlos Santana");
+        employeeRepository.save(messenger);
+
+        DealershipEntity dealership = createDealership("Premium Cars Bogota");
+        dealershipRepository.save(dealership);
+
+        PlateEntity plate = createPlate("MXP001");
+        plateRepository.save(plate);
+
+        ServiceDeliveryEntity service = new ServiceDeliveryEntity();
+        service.setMessenger(messenger);
+        service.setDealership(dealership);
+        service.setPlate(plate);
+        service.setCurrentStatus(Status.ASSIGNED);
+        service.setCreatedAt(LocalDateTime.now());
+        service.setDeleted(false);
+        repository.save(service);
+
+        org.springframework.data.domain.Page<ServiceDeliveryEntity> search1 = repository.searchAll(
+                "%Carlos%", "Carlos*", false, null, org.springframework.data.domain.PageRequest.of(0, 10));
+        assertThat(search1.getContent()).hasSize(1);
+
+        org.springframework.data.domain.Page<ServiceDeliveryEntity> search2 = repository.searchAll(
+                "%Premium%", "Premium*", false, null, org.springframework.data.domain.PageRequest.of(0, 10));
+        assertThat(search2.getContent()).hasSize(1);
+
+        org.springframework.data.domain.Page<ServiceDeliveryEntity> search3 = repository.searchAll(
+                "%MXP001%", "MXP001*", false, null, org.springframework.data.domain.PageRequest.of(0, 10));
+        assertThat(search3.getContent()).hasSize(1);
+
+        repository.deleteAll();
+        plateRepository.deleteAll();
+        dealershipRepository.deleteAll();
+        employeeRepository.deleteAll();
     }
 }

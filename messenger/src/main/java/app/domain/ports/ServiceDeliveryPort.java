@@ -27,16 +27,6 @@ public interface ServiceDeliveryPort {
     ServiceDelivery findById(Long idServiceDelivery);
 
     /**
-     * Busca servicios activos asociados a una placa.
-     */
-    List<ServiceDelivery> findByPlateNumber(String plateNumber);
-
-    /**
-     * Busca servicios asignados a un mensajero.
-     */
-    List<ServiceDelivery> findByMessengerId(Long messengerId);
-
-    /**
      * Busca un servicio activo por ID.
      */
     ServiceDelivery findByIdActive(Long idServiceDelivery);
@@ -98,20 +88,9 @@ public interface ServiceDeliveryPort {
     Page<ServiceDelivery> findByMessengerAndDate(Long messengerId, java.time.LocalDate date, Pageable pageable);
 
     /**
-     * Busca servicios por número de placa filtrado por concesionario.
+     * Busca servicios por número de placa filtrado por concesionario con paginación.
      */
-    List<ServiceDelivery> findByPlateNumberAndDealershipId(String plateNumber, Long dealershipId);
-
-    /**
-     * Busca servicios pendientes (no entregados) de un concesionario.
-     */
-    List<ServiceDelivery> findPendingByDealershipId(Long dealershipId);
-
-    /**
-     * Busca servicios por concesionario y una lista de estados específicos.
-     */
-    List<ServiceDelivery> findByDealershipIdAndStatuses(Long dealershipId,
-            List<app.domain.model.enums.Status> statuses);
+    Page<ServiceDelivery> findByPlateAndDealershipPaginated(String plateNumber, Long dealershipId, Pageable pageable);
 
     /**
      * Busca servicios por concesionario y una lista de estados específicos con

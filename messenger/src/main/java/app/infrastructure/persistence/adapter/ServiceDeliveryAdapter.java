@@ -56,26 +56,6 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     }
 
     /**
-     * Busca todos los servicios de entrega por placa.
-     */
-    @Override
-    public List<ServiceDelivery> findByPlateNumber(String plateNumber) {
-        return repository.findByPlate_PlateNumber(plateNumber).stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Busca todos los servicios de entrega por mensajero.
-     */
-    @Override
-    public List<ServiceDelivery> findByMessengerId(Long messengerId) {
-        return repository.findByMessenger_IdEmployee(messengerId).stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
-    }
-
-    /**
      * Busca servicio activo (no eliminado).
      */
     @Override
@@ -118,8 +98,14 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     public Page<ServiceDelivery> findAllPaginated(String keyword, Boolean deleted,
             List<app.domain.model.enums.Status> statuses, Pageable pageable) {
         Page<ServiceDeliveryEntity> entityPage;
+        List<String> statusStrings = (statuses != null && !statuses.isEmpty())
+                ? statuses.stream().map(Enum::name).collect(Collectors.toList())
+                : null;
+
         if (keyword != null && !keyword.trim().isEmpty()) {
-            entityPage = repository.searchAll(keyword, deleted, statuses, pageable);
+            String keywordLike = "%" + keyword + "%";
+            String keywordBoolean = keyword.trim() + "*";
+            entityPage = repository.searchAll(keywordLike, keywordBoolean, deleted, statusStrings, pageable);
         } else if (statuses != null && !statuses.isEmpty()) {
             entityPage = repository.findByDeletedAndCurrentStatusIn(deleted, statuses, pageable);
         } else {
@@ -135,8 +121,15 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     public Page<ServiceDelivery> findByMessengerPaginated(Long messengerId, String keyword, Boolean deleted,
             List<app.domain.model.enums.Status> statuses, Pageable pageable) {
         Page<ServiceDeliveryEntity> entityPage;
+        List<String> statusStrings = (statuses != null && !statuses.isEmpty())
+                ? statuses.stream().map(Enum::name).collect(Collectors.toList())
+                : null;
+
         if (keyword != null && !keyword.trim().isEmpty()) {
-            entityPage = repository.searchByMessenger(messengerId, keyword, deleted, statuses, pageable);
+            String keywordLike = "%" + keyword + "%";
+            String keywordBoolean = keyword.trim() + "*";
+            entityPage = repository.searchByMessenger(messengerId, keywordLike, keywordBoolean, deleted, statusStrings,
+                    pageable);
         } else if (statuses != null && !statuses.isEmpty()) {
             entityPage = repository.findByMessenger_IdEmployeeAndDeletedAndCurrentStatusIn(messengerId, deleted,
                     statuses,
@@ -212,38 +205,13 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     }
 
     /**
-     * Busca servicios por número de placa filtrado por concesionario.
+     * Busca servicios por número de placa filtrado por concesionario con paginación.
      */
     @Override
-    public List<ServiceDelivery> findByPlateNumberAndDealershipId(String plateNumber, Long dealershipId) {
-        return repository.findByPlate_PlateNumberAndDealership_IdDealershipAndDeletedFalse(plateNumber, dealershipId)
-                .stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Busca servicios por concesionario y una lista de estados específicos (no
-     * eliminados).
-     */
-    @Override
-    public List<ServiceDelivery> findByDealershipIdAndStatuses(Long dealershipId,
-            List<app.domain.model.enums.Status> statuses) {
-        return repository.findByDealership_IdDealershipAndCurrentStatusInAndDeletedFalse(dealershipId, statuses)
-                .stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Busca servicios pendientes (no entregados) de un concesionario.
-     */
-    @Override
-    public List<ServiceDelivery> findPendingByDealershipId(Long dealershipId) {
-        List<app.domain.model.enums.Status> pendingStatuses = List.of(
-                app.domain.model.enums.Status.ASSIGNED,
-                app.domain.model.enums.Status.PENDING);
-        return findByDealershipIdAndStatuses(dealershipId, pendingStatuses);
+    public Page<ServiceDelivery> findByPlateAndDealershipPaginated(String plateNumber, Long dealershipId,
+            Pageable pageable) {
+        return repository.findByPlate_PlateNumberAndDealership_IdDealershipAndDeletedFalse(plateNumber, dealershipId,
+                pageable).map(mapper::toDomain);
     }
 
     /**

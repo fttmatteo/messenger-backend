@@ -205,16 +205,6 @@ class ServiceDeliveryUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe buscar por placa")
-        void shouldFindByPlate() {
-            when(searchService.findByPlate("ABC123")).thenReturn(List.of(sampleService));
-
-            List<ServiceDelivery> result = serviceDeliveryUseCase.findByPlate("ABC123");
-
-            assertEquals(1, result.size());
-        }
-
-        @Test
         @DisplayName("Debe mapear campos de ordenamiento correctamente en paginación")
         void shouldMapSortFieldsInPagination() {
             serviceDeliveryUseCase.findAllPaginated(0, 10, "messengerName", "asc", null, null);

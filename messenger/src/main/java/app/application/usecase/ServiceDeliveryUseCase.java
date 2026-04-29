@@ -314,14 +314,6 @@ public class ServiceDeliveryUseCase {
     }
 
     /**
-     * Busca servicios asociados a un número de placa específico.
-     */
-    @Transactional(readOnly = true)
-    public List<ServiceDelivery> findByPlate(String plateNumber) {
-        return searchService.findByPlate(plateNumber);
-    }
-
-    /**
      * Mueve un servicio a la papelera (método simple sin auditoría de usuario
      * explícito).
      */

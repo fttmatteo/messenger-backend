@@ -141,13 +141,14 @@ public class WhatsAppBotService {
 
         switch (state) {
             case AWAITING_PLATE -> {
-                List<ServiceDelivery> services = searchService.findByPlateAndDealership(text, dealershipId);
-                if (services.isEmpty()) {
+                Page<ServiceDelivery> servicesPage = searchService.findByPlateAndDealershipPaginated(text, dealershipId,
+                        PageRequest.of(0, 5));
+                if (servicesPage.isEmpty()) {
                     messagePort.sendTextMessage(from,
                             "⚠️ No se encontró la placa *" + text.toUpperCase() + "* en " + dealershipName + ".\n\n"
                                     + "Por favor, verifica que la placa sea correcta o consulte más tarde.");
                 } else {
-                    sendPlateDetails(from, services);
+                    sendPlateDetails(from, servicesPage.getContent());
                 }
                 session.setConversationState(WhatsAppConversationState.MENU);
                 sessionPort.updateSession(session);
@@ -202,9 +203,10 @@ public class WhatsAppBotService {
                     default -> {
                         // Si parece una placa, buscarla directamente
                         if (looksLikePlate(text)) {
-                            List<ServiceDelivery> services = searchService.findByPlateAndDealership(text, dealershipId);
-                            if (!services.isEmpty()) {
-                                sendPlateDetails(from, services);
+                            Page<ServiceDelivery> servicesPage = searchService.findByPlateAndDealershipPaginated(text,
+                                    dealershipId, PageRequest.of(0, 5));
+                            if (!servicesPage.isEmpty()) {
+                                sendPlateDetails(from, servicesPage.getContent());
                                 sendMenu(from, dealershipName);
                             } else {
                                 messagePort.sendTextMessage(from,

@@ -1,5 +1,7 @@
 package app.infrastructure.persistence.entities;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -8,6 +10,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "system_settings")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "system_settings")
 public class SystemSettingEntity {
 
     @Id

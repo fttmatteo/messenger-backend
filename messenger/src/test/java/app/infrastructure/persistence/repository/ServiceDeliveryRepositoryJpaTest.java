@@ -27,9 +27,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(TestCacheConfig.class)
 @DisplayName("ServiceDeliveryRepository DataJpaTest")
-/**
- * Clase de pruebas integración para el repositorio de entregas de servicios.
- */
 class ServiceDeliveryRepositoryJpaTest extends BaseContainerTest {
 
     @Autowired
@@ -45,10 +42,8 @@ class ServiceDeliveryRepositoryJpaTest extends BaseContainerTest {
     private PlateRepository plateRepository;
 
     @Test
+    @org.springframework.transaction.annotation.Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
     @DisplayName("Debe buscar servicios por keyword complejas")
-    /**
-     * Verifica que el repositorio pueda buscar servicios por keyword complejas.
-     */
     void shouldSearchByKeyword() {
         EmployeeEntity messenger = new EmployeeEntity();
         messenger.setDocument(123L);
@@ -78,23 +73,25 @@ class ServiceDeliveryRepositoryJpaTest extends BaseContainerTest {
         service.setCreatedAt(LocalDateTime.now());
         serviceDeliveryRepository.save(service);
 
-        Page<ServiceDeliveryEntity> resultPlate = serviceDeliveryRepository.searchAll("KJH", false, null,
+        Page<ServiceDeliveryEntity> resultPlate = serviceDeliveryRepository.searchAll("%KJH%", "KJH*", false, null,
                 PageRequest.of(0, 10));
 
-        Page<ServiceDeliveryEntity> resultName = serviceDeliveryRepository.searchAll("Juan", false, null,
+        Page<ServiceDeliveryEntity> resultName = serviceDeliveryRepository.searchAll("%Juan%", "Juan*", false, null,
                 PageRequest.of(0, 10));
 
         assertEquals(1, resultPlate.getTotalElements());
-        assertEquals("KJH987", resultPlate.getContent().get(0).getPlate().getPlateNumber());
+        assertEquals(service.getIdServiceDelivery(), resultPlate.getContent().get(0).getIdServiceDelivery());
         assertEquals(1, resultName.getTotalElements());
-        assertEquals("Juan Messenger", resultName.getContent().get(0).getMessenger().getFullName());
+        assertEquals(service.getIdServiceDelivery(), resultName.getContent().get(0).getIdServiceDelivery());
+
+        serviceDeliveryRepository.deleteAll();
+        plateRepository.deleteAll();
+        dealershipRepository.deleteAll();
+        employeeRepository.deleteAll();
     }
 
     @Test
     @DisplayName("Debe obtener estadísticas diarias correctamente")
-    /**
-     * Verifica que el repositorio pueda obtener estadísticas diarias correctamente.
-     */
     void shouldGetDailyStats() {
         EmployeeEntity messenger = new EmployeeEntity();
         messenger.setDocument(456L);
