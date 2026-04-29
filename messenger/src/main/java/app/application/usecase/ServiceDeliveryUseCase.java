@@ -23,6 +23,7 @@ import app.domain.model.Photo;
 import app.domain.model.ServiceDelivery;
 import app.domain.model.Signature;
 import app.domain.model.enums.Status;
+import app.domain.util.LogSanitizer;
 import app.domain.ports.OcrPort;
 import app.domain.ports.StoragePort;
 import app.domain.services.CreateServiceDelivery;
@@ -75,7 +76,7 @@ public class ServiceDeliveryUseCase {
     public String extractPlateFromImage(File imageFile) {
         try {
             String extractedText = ocrPort.extractText(imageFile);
-            logger.info("Placa extraída para preview: {}", extractedText);
+            logger.info("Placa extraída para preview: {}", LogSanitizer.maskPlate(extractedText));
             return extractedText != null ? extractedText : "";
         } catch (Exception e) {
             logger.error("Error extrayendo placa para preview: {}", e.getMessage(), e);
@@ -105,7 +106,7 @@ public class ServiceDeliveryUseCase {
             ServiceDelivery service = createService.create(extractedText, savedPath, dealershipId, messengerId,
                     latitude, longitude);
             logger.info("Servicio creado exitosamente vía OCR - ID: {} | Placa: {} | Mensajero: {}",
-                    service.getIdServiceDelivery(), extractedText, messengerId);
+                    service.getIdServiceDelivery(), LogSanitizer.maskPlate(extractedText), messengerId);
             return service;
         } catch (Exception e) {
             cleanupFiles(savedPath);
@@ -133,7 +134,7 @@ public class ServiceDeliveryUseCase {
             ServiceDelivery service = createService.create(manualPlateNumber, savedPath, dealershipId, messengerId,
                     latitude, longitude);
             logger.info("Servicio creado exitosamente vía manual - ID: {} | Placa: {} | Mensajero: {}",
-                    service.getIdServiceDelivery(), manualPlateNumber, messengerId);
+                    service.getIdServiceDelivery(), LogSanitizer.maskPlate(manualPlateNumber), messengerId);
             return service;
         } catch (Exception e) {
             cleanupFiles(savedPath);

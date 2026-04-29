@@ -39,7 +39,7 @@ public class WhatsAppTimeoutScheduler {
     /**
      * Revisa sesiones inactivas cada minuto.
      */
-    @Scheduled(fixedDelay = 60000) // Se ejecuta cada minuto
+    @Scheduled(fixedDelay = 60000)
     @SchedulerLock(name = "wa_timeout_lock", lockAtMostFor = "PT50S", lockAtLeastFor = "PT30S")
     public void checkInactivityTimeouts() {
         LocalDateTime threshold = LocalDateTime.now().minusMinutes(TIMEOUT_MINUTES);
@@ -53,18 +53,16 @@ public class WhatsAppTimeoutScheduler {
 
         for (WhatsAppSession session : inactiveSessions) {
             try {
-                // Notificar al usuario
                 messagePort.sendTextMessage(session.getPhoneNumber(),
                         "⏰ Por inactividad, hemos finalizado el chat. Si necesitas realizar una nueva consulta, ¡escríbeme! 👋");
 
-                // Marcar como notificado para no repetir en la siguiente ejecución
                 session.setTimeoutNotified(true);
                 sessionPort.updateSession(session);
 
                 logger.debug("[Scheduler] Timeout enviado a {}", maskPhone(session.getPhoneNumber()));
             } catch (Exception e) {
-                logger.error("[Scheduler] Error procesando timeout para {}: {}", session.getPhoneNumber(),
-                        e.getMessage());
+                logger.error("[Scheduler] Error procesando timeout para sessionId={} phone={}: {}",
+                        session.getId(), maskPhone(session.getPhoneNumber()), e.getMessage(), e);
             }
         }
     }

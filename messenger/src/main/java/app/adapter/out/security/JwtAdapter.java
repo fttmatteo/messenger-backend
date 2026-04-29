@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import app.domain.model.auth.AuthCredentials;
 import app.domain.model.auth.TokenResponse;
 import app.domain.ports.AuthenticationPort;
+import app.domain.util.LogSanitizer;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -79,7 +80,7 @@ public class JwtAdapter implements AuthenticationPort {
             logger.info("JWT no soportado: {}", e.getMessage());
             return false;
         } catch (IllegalArgumentException e) {
-            logger.info("JWT argumento inválido. Hash: {} - Error: {}", token.hashCode(), e.getMessage());
+            logger.info("JWT argumento inválido. Token: {} - Error: {}", LogSanitizer.maskToken(token), e.getMessage());
             return false;
         }
     }

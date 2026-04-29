@@ -67,8 +67,8 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
             }
 
             if (!jwtAdapter.validateToken(token)) {
-                logger.error("Token JWT inválido o expirado en WebSocket. Token hash: {} | Session: {}",
-                        token.hashCode(), accessor.getSessionId());
+                logger.error("Token JWT inválido o expirado en WebSocket. Token: {} | Session: {}",
+                    LogSanitizer.maskToken(token), accessor.getSessionId());
                 throw new IllegalArgumentException("Token JWT inválido o expirado");
             }
 

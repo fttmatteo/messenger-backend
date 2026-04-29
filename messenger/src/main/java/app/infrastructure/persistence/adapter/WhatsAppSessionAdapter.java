@@ -120,15 +120,21 @@ public class WhatsAppSessionAdapter implements WhatsAppSessionPort {
         return sessionRepository
                 .findByExpiresAtAfterAndLastActivityAtBeforeAndTimeoutNotifiedFalse(LocalDateTime.now(), threshold)
                 .stream()
-                .map(this::toDomain)
+                .map(entity -> toDomain(entity, false))
                 .collect(Collectors.toList());
     }
 
     private WhatsAppSession toDomain(WhatsAppSessionEntity entity) {
+        return toDomain(entity, true);
+    }
+
+    private WhatsAppSession toDomain(WhatsAppSessionEntity entity, boolean includeDealership) {
         WhatsAppSession session = new WhatsAppSession();
         session.setId(entity.getId());
         session.setPhoneNumber(entity.getPhoneNumber());
-        session.setDealership(dealershipToDomain(entity.getDealership()));
+        if (includeDealership) {
+            session.setDealership(dealershipToDomain(entity.getDealership()));
+        }
         session.setExpiresAt(entity.getExpiresAt());
         session.setCreatedAt(entity.getCreatedAt());
         session.setCurrentPage(entity.getCurrentPage());

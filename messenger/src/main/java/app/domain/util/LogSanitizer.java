@@ -55,6 +55,13 @@ public final class LogSanitizer {
         }
         return "****";
     }
+    
+    public static String maskPlate(String plate) {
+        if (plate == null || plate.isBlank()) {
+            return "null";
+        }
+        return maskGeneric(plate, 2);
+    }
 
     public static String maskGeneric(String value, int visibleChars) {
         if (value == null || value.isBlank()) {
