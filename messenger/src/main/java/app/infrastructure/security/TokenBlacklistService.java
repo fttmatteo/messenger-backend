@@ -40,12 +40,16 @@ public class TokenBlacklistService implements app.domain.ports.TokenBlacklistPor
     }
 
     /**
-     * Genera un hash para el token.
+     * Genera un hash SHA-256 para el token para usarlo como clave en Redis.
+     * Esto evita colisiones y protege el contenido original del token.
      */
     private String hashToken(String token) {
-        if (token.length() <= 32) {
-            return token;
+        try {
+            java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(token.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            return java.util.HexFormat.of().formatHex(hash);
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new IllegalStateException("Algoritmo SHA-256 no disponible", e);
         }
-        return token.substring(token.length() - 32);
     }
 }

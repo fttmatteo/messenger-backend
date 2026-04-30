@@ -1,12 +1,18 @@
 package app.domain.model.auth;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 /**
  * Credenciales de autenticación con documento, contraseña y token de Turnstile.
  */
 public class AuthCredentials {
+    @NotNull(message = "El documento es requerido")
     private Long document;
+
+    @NotBlank(message = "La contraseña es requerida")
+    @Size(min = 8, max = 128, message = "La contraseña debe tener entre 8 y 128 caracteres")
     private String password;
 
     @NotBlank(message = "El token de verificación es requerido")

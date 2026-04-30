@@ -121,7 +121,7 @@ class AuthenticationServiceTest {
             BusinessException exception = assertThrows(BusinessException.class,
                     () -> authenticationService.authenticate(credentials));
 
-            assertTrue(exception.getMessage().contains("Usuario no encontrado"));
+            assertTrue(exception.getMessage().contains("Credenciales inválidas"));
         }
 
         @Test
@@ -140,7 +140,7 @@ class AuthenticationServiceTest {
             BusinessException exception = assertThrows(BusinessException.class,
                     () -> authenticationService.authenticate(credentials));
 
-            assertTrue(exception.getMessage().contains("incorrecta"));
+            assertTrue(exception.getMessage().contains("Credenciales inválidas"));
         }
     }
 

@@ -41,7 +41,7 @@ public class AuthenticationService {
     public TokenResponse authenticate(AuthCredentials credentials) throws Exception {
         Employee employee = employeePort.findByDocument(credentials.getDocument());
         if (employee == null) {
-            throw new BusinessException("Usuario no encontrado");
+            throw new BusinessException("Credenciales inválidas");
         }
         if (!passwordEncoder.matches(credentials.getPassword(), employee.getPassword())) {
             if (!isPasswordEncoded(employee.getPassword())
@@ -50,7 +50,7 @@ public class AuthenticationService {
                 employee.setPassword(encoded);
                 employeePort.save(employee);
             } else {
-                throw new BusinessException("Contrasena incorrecta");
+                throw new BusinessException("Credenciales inválidas");
             }
         }
         TokenResponse response = authenticationPort.authenticate(credentials, String.valueOf(employee.getRole()),
@@ -111,7 +111,7 @@ public class AuthenticationService {
         Long document = Long.parseLong(documentStr);
         Employee employee = employeePort.findByDocument(document);
         if (employee == null) {
-            throw new BusinessException("Usuario no encontrado");
+            throw new BusinessException("Credenciales inválidas");
         }
 
         AuthCredentials credentials = new AuthCredentials();
