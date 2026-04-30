@@ -23,21 +23,21 @@
 
 ## Table of Contents
 
-- [Architecture](#-architecture)
-- [Tech Stack](#-tech-stack)
-- [Project Structure](#-project-structure)
-- [Environment Profiles](#-environment-profiles)
-- [API Endpoints](#-api-endpoints)
-- [Database Schema](#-database-schema)
-- [Real-Time Tracking](#-real-time-tracking)
-- [State Flow](#-state-flow)
-- [Observability](#-observability)
-- [Setup & Installation](#️-setup--installation)
-- [CI/CD](#-cicd)
-- [Testing](#-testing)
-- [Performance Optimization](#-performance-optimization)
-- [Postman Collection](#-postman-collection)
-- [Android Integration](#-android-integration)
+- [Architecture](#architecture)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Environment Profiles](#environment-profiles)
+- [API Endpoints](#api-endpoints)
+- [Database Schema](#database-schema)
+- [Real-Time Tracking](#real-time-tracking)
+- [State Flow](#state-flow)
+- [Observability](#observability)
+- [Setup & Installation](#️setup--installation)
+- [CI/CD](#cicd)
+- [Testing](#testing)
+- [Performance Optimization](#performance-optimization)
+- [Postman Collection](#postman-collection)
+- [Android Integration](#android-integration)
 
 ---
 

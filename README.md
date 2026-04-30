@@ -23,21 +23,21 @@
 
 ## Tabla de Contenidos
 
-- [Arquitectura](#-arquitectura)
-- [Stack Tecnológico](#-stack-tecnológico)
-- [Estructura del Proyecto](#-estructura-del-proyecto)
-- [Perfiles de Ambiente](#-perfiles-de-ambiente)
-- [API Endpoints](#-api-endpoints)
-- [Esquema de Base de Datos](#-esquema-de-base-datos)
-- [Tracking en Tiempo Real](#-tracking-en-tiempo-real)
-- [Flujo de Estados](#-flujo-de-estados)
-- [Observabilidad](#-observabilidad)
-- [Configuración e Instalación](#️-configuración-e-instalación)
-- [CI/CD](#-cicd)
-- [Testing](#-testing)
-- [Optimización de Rendimiento](#-optimización-de-rendimiento)
-- [Colección Postman](#-colección-postman)
-- [Integración Android](#-integración-android)
+- [Arquitectura](#arquitectura)
+- [Stack Tecnológico](#stack-tecnológico)
+- [Estructura del Proyecto](#estructura-del-proyecto)
+- [Perfiles de Ambiente](#perfiles-de-ambiente)
+- [API Endpoints](#api-endpoints)
+- [Esquema de Base de Datos](#esquema-de-base-datos)
+- [Tracking en Tiempo Real](#tracking-en-tiempo-real)
+- [Flujo de Estados](#flujo-de-estados)
+- [Observabilidad](#observabilidad)
+- [Configuración e Instalación](#️configuración-e-instalación)
+- [CI/CD](#cicd)
+- [Testing](#testing)
+- [Optimización de Rendimiento](#optimización-de-rendimiento)
+- [Colección Postman](#colección-postman)
+- [Integración Android](#integración-android)
 
 ---
 

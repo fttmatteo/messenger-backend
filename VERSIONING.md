@@ -36,3 +36,5 @@ powershell -ExecutionPolicy Bypass -File .\sync-version.ps1 1.11.8
 ---
 
 > **Nota**: Este script debe ejecutarse desde la raíz del repositorio `messenger-backend`.
+> `git add .`
+> `git commit -m "chore: bump version to 1.8.5"`
