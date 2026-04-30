@@ -1,6 +1,7 @@
 package app.infrastructure.persistence.adapter;
 
 import app.domain.model.Employee;
+import app.domain.model.enums.Role;
 import app.domain.ports.EmployeePort;
 import app.infrastructure.persistence.entities.EmployeeEntity;
 import app.infrastructure.persistence.mapper.EmployeeMapper;
@@ -81,5 +82,15 @@ public class EmployeeAdapter implements EmployeePort {
     public Employee findByUuid(String uuid) {
         Optional<EmployeeEntity> entity = repository.findByUuid(uuid);
         return entity.map(mapper::toDomain).orElse(null);
+    }
+
+    /**
+     * Busca empleados filtrados por rol.
+     */
+    @Override
+    public List<Employee> findByRole(Role role) {
+        return repository.findByRole(role).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
     }
 }

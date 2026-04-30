@@ -1,6 +1,7 @@
 package app.domain.ports;
 
 import app.domain.model.Employee;
+import app.domain.model.enums.Role;
 import java.util.List;
 
 /**
@@ -37,4 +38,9 @@ public interface EmployeePort {
      * Busca un empleado por su UUID público.
      */
     Employee findByUuid(String uuid);
+
+    /**
+     * Busca empleados filtrados por rol.
+     */
+    List<Employee> findByRole(Role role);
 }

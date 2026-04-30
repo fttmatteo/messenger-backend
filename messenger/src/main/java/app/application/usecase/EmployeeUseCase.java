@@ -7,6 +7,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import app.domain.model.Employee;
+import app.domain.model.enums.Role;
 import app.domain.services.CreateEmployee;
 import app.domain.services.DeleteEmployee;
 import app.domain.services.SearchEmployee;
@@ -88,6 +89,14 @@ public class EmployeeUseCase {
     }
 
     /**
+     * Lista empleados filtrados por rol.
+     */
+    @Cacheable(value = "employees", key = "'role:' + #role.name()")
+    public List<Employee> findByRole(Role role) {
+        return searchEmployee.findByRole(role);
+    }
+
+    /**
      * Elimina un empleado del sistema.
      */
     @CacheEvict(value = "employees", allEntries = true)
@@ -95,5 +104,18 @@ public class EmployeeUseCase {
     public void deleteById(Long id) throws Exception {
         deleteEmployee.deleteById(id);
         logger.warn("Eliminando empleado ID: {}", id);
+    }
+
+    /**
+     * Actualiza el perfil del usuario autenticado (solo campos permitidos).
+     */
+    @CacheEvict(value = "employees", allEntries = true)
+    public Employee updateProfile(Long id, Employee incomingData) throws Exception {
+        Employee existing = searchEmployee.findById(id);
+
+        incomingData.setDocument(existing.getDocument());
+        incomingData.setRole(existing.getRole());
+
+        return updateEmployee.update(id, incomingData);
     }
 }

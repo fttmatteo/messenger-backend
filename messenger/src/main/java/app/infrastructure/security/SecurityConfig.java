@@ -96,6 +96,7 @@ public class SecurityConfig {
                                                 .permitAll() // API
                                                 .requestMatchers("/ws/**").permitAll()
                                                 .requestMatchers("/employees/**").hasRole("ADMIN")
+                                                .requestMatchers("/profile/**").authenticated()
                                                 .requestMatchers("/dealerships/**").authenticated()
                                                 .requestMatchers("/services/**").authenticated()
                                                 .requestMatchers("/api/whatsapp/**").permitAll()
