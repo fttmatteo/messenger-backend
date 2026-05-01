@@ -4,7 +4,7 @@
 
 # Messenger Backend API
 
-<img src="https://img.shields.io/badge/Version-1.12.2-blue.svg" alt="Version">
+<img src="https://img.shields.io/badge/Version-1.13.0-blue.svg" alt="Version">
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.14-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
@@ -180,10 +180,17 @@ messenger/
 │   └── infrastructure/
 │       ├── config/                      # Configuración de Spring
 │       ├── exception/                   # Manejo global de errores
+│       ├── external/                    # Clientes de APIs externas (WhatsApp)
+│       ├── health/                      # Indicadores de salud (Actuator)
+│       ├── helper/                      # Utilidades (Security, File, etc.)
 │       ├── persistence/
-│       │   └── entities/                # Entidades JPA
-│       ├── scheduler/                   # Tareas de limpieza (Trash)
-│       └── security/                    # Configuración de Seguridad / Filtros
+│       │   ├── adapter/                 # Implementación de Puertos JPA
+│       │   ├── entities/                # Entidades JPA
+│       │   ├── mapper/                  # Mappers de Entidad a Dominio
+│       │   └── repository/              # Interfaces Spring Data JPA
+│       ├── scheduler/                   # Tareas programadas (Trash, Timeouts)
+│       ├── security/                    # Filtros y servicios de seguridad
+│       └── service/                     # Servicios de infraestructura
 └── src/main/resources/
     ├── application.properties           # Configuración base
     ├── application-local.properties     # Desarrollo local (H2)
@@ -313,6 +320,8 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `POST` | `/auth/refresh`  | Renovar token de acceso con refresh token                                       |
 | `GET`  | `/auth/ws-token` | Obtener token temporal para conexión WebSocket                                  |
 | `POST` | `/auth/logout`   | Cerrar sesión y limpiar cookies de autenticación                                |
+| `GET`  | `/profile/me`    | Obtener perfil del usuario autenticado (ADMIN/MESSENGER)                        |
+| `PUT`  | `/profile/me`    | Actualizar perfil (nombre, teléfono, contraseña - mín. 6 caracteres)            |
 
 ---
 
@@ -446,16 +455,17 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 erDiagram
     employees {
         Long id_employee PK
+        String uuid UK
         Long document UK
         String full_name
         String phone
-
         String password
         Role role
     }
 
     dealerships {
         Long id_dealership PK
+        String uuid UK
         String name UK
         String address
         String phone
@@ -468,6 +478,7 @@ erDiagram
 
     plates {
         Long id_plate PK
+        String uuid UK
         String plate_number UK
         PlateType plate_type
         LocalDateTime upload_date
@@ -475,6 +486,7 @@ erDiagram
 
     service_deliveries {
         Long id_service_delivery PK
+        String uuid UK
         Long plate_id FK
         Long dealership_id FK
         Long messenger_id FK
@@ -620,7 +632,7 @@ URL de conexión: `ws://localhost:8080/ws/tracking`
 > [!IMPORTANT]
 > **Transiciones de Estado por Rol**
 >
-> - **MENSAJERO** solo puede trabajar con: `PENDING`, `DELIVERED`, `RETURNED`.
+> - **MESSENGER** solo puede trabajar con: `PENDING`, `DELIVERED`, `RETURNED`.
 > - **ADMIN** solo puede trabajar con: `CANCELED`, `RESOLVED`.
 > - Los servicios pueden ser modificados en cualquier momento sin importar su estado actual.
 > - Los administradores pueden reasignar servicios en estado **CANCELED** a otro mensajero.

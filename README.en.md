@@ -4,7 +4,7 @@
 
 # Messenger Backend API
 
-<img src="https://img.shields.io/badge/Version-1.12.2-blue.svg" alt="Version">
+<img src="https://img.shields.io/badge/Version-1.13.0-blue.svg" alt="Version">
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.14-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
@@ -180,10 +180,17 @@ messenger/
 │   └── infrastructure/
 │       ├── config/                      # Spring Configuration
 │       ├── exception/                   # Global Error Handler
+│       ├── external/                    # External API Clients (WhatsApp)
+│       ├── health/                      # Health Indicators (Actuator)
+│       ├── helper/                      # Utilities (Security, File, etc.)
 │       ├── persistence/
-│       │   └── entities/                # JPA Entities
-│       ├── scheduler/                   # Trash Cleanup Jobs
-│       └── security/                    # Spring Security Config / Filters
+│       │   ├── adapter/                 # JPA Port Implementations
+│       │   ├── entities/                # JPA Entities
+│       │   ├── mapper/                  # Entity-to-Domain Mappers
+│       │   └── repository/              # Spring Data JPA Repositories
+│       ├── scheduler/                   # Scheduled Jobs (Trash, Timeouts)
+│       ├── security/                    # Security Filters & Services
+│       └── service/                     # Infrastructure Services
 └── src/main/resources/
     ├── application.properties           # Base Configuration
     ├── application-local.properties     # Local Development (H2)
@@ -313,6 +320,8 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `POST` | `/auth/refresh`  | Renew access token with refresh token                                 |
 | `GET`  | `/auth/ws-token` | Get temporary token for WebSocket connection                          |
 | `POST` | `/auth/logout`   | Logout and clear authentication cookies                               |
+| `GET`  | `/profile/me`    | Get authenticated user profile (ADMIN/MESSENGER)                      |
+| `PUT`  | `/profile/me`    | Update profile (name, phone, password - min 6 chars)                  |
 
 ---
 
@@ -446,16 +455,17 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 erDiagram
     employees {
         Long id_employee PK
+        String uuid UK
         Long document UK
         String full_name
         String phone
-
         String password
         Role role
     }
 
     dealerships {
         Long id_dealership PK
+        String uuid UK
         String name UK
         String address
         String phone
@@ -468,6 +478,7 @@ erDiagram
 
     plates {
         Long id_plate PK
+        String uuid UK
         String plate_number UK
         PlateType plate_type
         LocalDateTime upload_date
@@ -475,6 +486,7 @@ erDiagram
 
     service_deliveries {
         Long id_service_delivery PK
+        String uuid UK
         Long plate_id FK
         Long dealership_id FK
         Long messenger_id FK
