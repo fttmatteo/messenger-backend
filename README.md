@@ -477,7 +477,6 @@ erDiagram
 
     plates {
         Long id_plate PK
-        String uuid UK
         String plate_number UK
         PlateType plate_type
         LocalDateTime upload_date
@@ -544,9 +543,26 @@ erDiagram
 
     deleted_services {
         Long id_service_delivery PK
+        Status current_status
+        String observation
+        LocalDateTime created_at
+        LocalDateTime deleted_at
+        LocalDateTime locked_at
+        Long plate_id
+        Long dealership_id
+        Long messenger_id
+        Long signature_id
         LocalDateTime permanently_deleted_at
+        Long permanently_deleted_by
         String deletion_reason
-        String original_data_json
+        String messenger_name
+        String messenger_document
+        String messenger_phone
+        String dealership_name
+        String dealership_address
+        String dealership_zone
+        String plate_number
+        String plate_type
     }
 
     wa_sessions {
@@ -555,6 +571,9 @@ erDiagram
         Long dealership_id FK
         LocalDateTime expires_at
         LocalDateTime created_at
+        Integer current_page
+        LocalDateTime last_activity_at
+        WhatsAppConversationState conversation_state
     }
 
     employees ||--o{ service_deliveries : "delivers"
