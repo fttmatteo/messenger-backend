@@ -44,12 +44,18 @@ public class LocalStorageAdapter implements StoragePort {
 
         // Optimizar si es imagen (JPEG/PNG)
         String format = extension.toLowerCase().replace(".", "");
-        if ("jpg".equals(format) || "jpeg".equals(format) || "png".equals(format)) {
+        boolean shouldOptimize = "jpg".equals(format) || "jpeg".equals(format) || "png".equals(format);
+        
+        if (shouldOptimize) {
+            fileName = customFileName + ".webp";
+            targetPath = subDirPath.resolve(fileName);
+            
             try (InputStream originalStream = Files.newInputStream(file.toPath());
                     InputStream optimizedStream = imageOptimizer.optimize(originalStream, extension)) {
                 Files.copy(optimizedStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
             } catch (Exception e) {
-                // Si falla la optimización, copiar original como fallback
+                fileName = customFileName + extension;
+                targetPath = subDirPath.resolve(fileName);
                 Files.copy(file.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
             }
         } else {
@@ -83,6 +89,7 @@ public class LocalStorageAdapter implements StoragePort {
     /**
      * Elimina un archivo del almacenamiento local.
      */
+    @Override
     public boolean delete(String path) {
         try {
             Path filePath = storagePath.resolve(path);

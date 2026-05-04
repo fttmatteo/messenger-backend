@@ -77,37 +77,40 @@ public class GoogleCloudStorageAdapter implements StoragePort {
 
     private String uploadToGCS(File file, String subDirectory, String fileName) throws IOException {
         String objectName = subDirectory + "/" + fileName;
+        String extension = getExtension(fileName);
+        String format = extension.toLowerCase().replace(".", "");
+        boolean shouldOptimize = "jpg".equals(format) || "jpeg".equals(format) || "png".equals(format);
 
         String contentType = Files.probeContentType(file.toPath());
         if (contentType == null) {
             contentType = "application/octet-stream";
         }
 
-        String extension = getExtension(fileName);
-        String format = extension.toLowerCase().replace(".", "");
+        // Optimizar si es imagen (JPEG/PNG)
+        if (shouldOptimize) {
+            try (InputStream originalStream = Files.newInputStream(file.toPath());
+                    InputStream optimizedStream = imageOptimizer.optimize(originalStream, extension)) {
+
+                String webpObjectName = subDirectory + "/" + fileName.substring(0, fileName.lastIndexOf('.')) + ".webp";
+                BlobId blobId = BlobId.of(bucketName, webpObjectName);
+                
+                BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
+                        .setContentType("image/webp")
+                        .setCacheControl("public, max-age=604800")
+                        .build();
+
+                storage.createFrom(blobInfo, optimizedStream);
+                return webpObjectName;
+            } catch (Exception e) {
+                logger.warn("Falló optimización a WebP, se sube original: {}", e.getMessage());
+            }
+        }
 
         BlobId blobId = BlobId.of(bucketName, objectName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
                 .setContentType(contentType)
+                .setCacheControl("public, max-age=604800")
                 .build();
-
-        // Optimizar si es imagen (JPEG/PNG)
-        if ("jpg".equals(format) || "jpeg".equals(format) || "png".equals(format)) {
-            try (InputStream originalStream = Files.newInputStream(file.toPath());
-                    InputStream optimizedStream = imageOptimizer.optimize(originalStream, extension)) {
-
-                // Si optimizamos, el contenido será image/jpeg (porque ImageOptimizer convierte
-                // a jpg)
-                blobInfo = BlobInfo.newBuilder(blobId)
-                        .setContentType("image/jpeg")
-                        .build();
-
-                storage.createFrom(blobInfo, optimizedStream);
-                return objectName;
-            } catch (Exception e) {
-                logger.warn("Falló optimización de imagen, se sube original: {}", e.getMessage());
-            }
-        }
 
         byte[] fileBytes = Files.readAllBytes(file.toPath());
         storage.create(blobInfo, fileBytes);
@@ -246,6 +249,7 @@ public class GoogleCloudStorageAdapter implements StoragePort {
     /**
      * Elimina un objeto del bucket.
      */
+    @Override
     public boolean delete(String objectName) {
         BlobId blobId = BlobId.of(bucketName, objectName);
         boolean deleted = storage.delete(blobId);

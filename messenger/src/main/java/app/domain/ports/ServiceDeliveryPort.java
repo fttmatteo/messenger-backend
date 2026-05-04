@@ -98,4 +98,24 @@ public interface ServiceDeliveryPort {
      */
     Page<ServiceDelivery> findByDealershipIdAndStatusesPaginated(Long dealershipId,
             List<app.domain.model.enums.Status> statuses, Pageable pageable);
+
+    /**
+     * Recupera todas las fotos registradas en el sistema.
+     */
+    List<app.domain.model.Photo> findAllPhotos();
+
+    /**
+     * Actualiza la información de una foto.
+     */
+    void updatePhoto(app.domain.model.Photo photo);
+
+    /**
+     * Recupera todas las firmas registradas en el sistema.
+     */
+    List<app.domain.model.Signature> findAllSignatures();
+
+    /**
+     * Actualiza la información de una firma.
+     */
+    void updateSignature(app.domain.model.Signature signature);
 }

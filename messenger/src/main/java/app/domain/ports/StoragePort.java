@@ -22,4 +22,9 @@ public interface StoragePort {
      * Obtiene una URL pública o firmada para acceder al archivo.
      */
     String getUrl(String path);
+
+    /**
+     * Elimina un archivo del sistema de almacenamiento.
+     */
+    boolean delete(String path);
 }

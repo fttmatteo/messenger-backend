@@ -225,4 +225,33 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
                 .findByDealership_IdDealershipAndCurrentStatusInAndDeletedFalse(dealershipId, statuses, pageable)
                 .map(mapper::toDomain);
     }
+
+    @Autowired
+    private app.infrastructure.persistence.repository.PhotoRepository photoRepository;
+    @Autowired
+    private app.infrastructure.persistence.repository.SignatureRepository signatureRepository;
+
+    @Override
+    public List<app.domain.model.Photo> findAllPhotos() {
+        return photoRepository.findAll().stream()
+                .map(mapper::mapPhotoToDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updatePhoto(app.domain.model.Photo photo) {
+        photoRepository.save(mapper.mapPhotoToEntity(photo));
+    }
+
+    @Override
+    public List<app.domain.model.Signature> findAllSignatures() {
+        return signatureRepository.findAll().stream()
+                .map(mapper::mapSignatureToDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateSignature(app.domain.model.Signature signature) {
+        signatureRepository.save(mapper.mapSignatureToEntity(signature));
+    }
 }

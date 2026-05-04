@@ -215,12 +215,43 @@ public class ServiceDeliveryMapper {
         return serviceDelivery;
     }
 
-    private Photo mapPhotoToDomain(PhotoEntity p) {
+    public Photo mapPhotoToDomain(PhotoEntity p) {
+        if (p == null) return null;
         Photo photo = new Photo();
         photo.setIdPhoto(p.getIdPhoto());
         photo.setPhotoPath(p.getPhotoPath());
         photo.setUploadDate(p.getUploadDate());
         photo.setPhotoType(p.getPhotoType());
         return photo;
+    }
+
+    public PhotoEntity mapPhotoToEntity(Photo p) {
+        if (p == null) return null;
+        PhotoEntity pEntity = new PhotoEntity();
+        pEntity.setIdPhoto(p.getIdPhoto());
+        pEntity.setPhotoPath(p.getPhotoPath());
+        pEntity.setUploadDate(p.getUploadDate());
+        pEntity.setPhotoType(p.getPhotoType());
+        return pEntity;
+    }
+
+    public Signature mapSignatureToDomain(SignatureEntity s) {
+        if (s == null) return null;
+        Signature signature = new Signature();
+        signature.setIdSignature(s.getIdSignature());
+        signature.setSignaturePath(s.getSignaturePath());
+        signature.setUploadDate(s.getUploadDate());
+        signature.setGifPath(s.getGifPath());
+        return signature;
+    }
+
+    public SignatureEntity mapSignatureToEntity(Signature s) {
+        if (s == null) return null;
+        SignatureEntity sigEntity = new SignatureEntity();
+        sigEntity.setIdSignature(s.getIdSignature());
+        sigEntity.setSignaturePath(s.getSignaturePath());
+        sigEntity.setUploadDate(s.getUploadDate());
+        sigEntity.setGifPath(s.getGifPath());
+        return sigEntity;
     }
 }

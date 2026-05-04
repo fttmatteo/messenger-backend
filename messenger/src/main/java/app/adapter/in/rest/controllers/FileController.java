@@ -73,6 +73,7 @@ public class FileController {
                     }
                     return ResponseEntity.ok()
                             .contentType(MediaType.parseMediaType(contentType))
+                            .header("Cache-Control", "public, max-age=604800")
                             .body(resource);
                 }
             }
