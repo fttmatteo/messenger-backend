@@ -1,4 +1,3 @@
-# ETAPA 1: BUILD (Construcción)
 # Usa una imagen oficial de Maven con JDK 17 para compilar el proyecto.
 FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
@@ -22,6 +21,10 @@ WORKDIR /app
 # Crear un usuario no root y preparar directorios
 RUN groupadd -r messenger && useradd -r -g messenger springuser \
     && mkdir -p /app/uploads && chown -R springuser:messenger /app
+
+# Sincronizar zona horaria del sistema operativo
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 USER springuser:messenger
 
 # Copiar el .jar compilado desde la etapa de BUILD
