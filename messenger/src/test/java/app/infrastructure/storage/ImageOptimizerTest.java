@@ -25,7 +25,7 @@ class ImageOptimizerTest {
         byte[] gifContent = "fake-gif-content".getBytes();
         InputStream inputStream = new ByteArrayInputStream(gifContent);
 
-        InputStream result = imageOptimizer.optimize(inputStream, "gif");
+        InputStream result = imageOptimizer.optimize(inputStream, "gif", false);
 
         assertSame(inputStream, result);
     }
@@ -37,7 +37,7 @@ class ImageOptimizerTest {
     void shouldOptimizeJpeg() throws IOException {
         byte[] imageContent = new byte[100];
         assertThrows(Exception.class, () -> {
-            imageOptimizer.optimize(new ByteArrayInputStream(imageContent), "jpg");
+            imageOptimizer.optimize(new ByteArrayInputStream(imageContent), "jpg", false);
         });
     }
 }

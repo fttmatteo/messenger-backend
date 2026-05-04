@@ -301,6 +301,13 @@
 			<version>0.4.21</version>
 		</dependency>
 
+		<!-- Soporte para WebP (Necesario para ImageIO) -->
+		<dependency>
+			<groupId>com.github.gotson</groupId>
+			<artifactId>webp-imageio</artifactId>
+			<version>0.2.2</version>
+		</dependency>
+
 		<!-- ShedLock (Coordinación de Tareas Distribuidas) -->
 		<dependency>
 			<groupId>net.javacrumbs.shedlock</groupId>

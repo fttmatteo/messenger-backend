@@ -70,42 +70,44 @@ public class GoogleCloudStorageAdapter implements StoragePort {
     public String save(File file, String subDirectory, String customFileName) throws IOException {
         String originalName = file.getName();
         String extension = getExtension(originalName);
-        String fileName = customFileName + extension;
+        String format = extension.toLowerCase().replace(".", "");
+        boolean isOptimizable = "jpg".equals(format) || "jpeg".equals(format) || "png".equals(format) || "webp".equals(format);
 
-        return uploadToGCS(file, subDirectory, fileName);
+        String finalExtension = isOptimizable ? ".webp" : extension;
+        String fileName = customFileName + finalExtension;
+
+        return uploadToGCS(file, subDirectory, fileName, isOptimizable);
     }
 
-    private String uploadToGCS(File file, String subDirectory, String fileName) throws IOException {
+    private String uploadToGCS(File file, String subDirectory, String fileName, boolean optimized) throws IOException {
         String objectName = subDirectory + "/" + fileName;
 
-        String contentType = Files.probeContentType(file.toPath());
+        String contentType = optimized ? "image/webp" : Files.probeContentType(file.toPath());
         if (contentType == null) {
             contentType = "application/octet-stream";
         }
 
-        String extension = getExtension(fileName);
-        String format = extension.toLowerCase().replace(".", "");
+        String cacheControl = "public, max-age=604800";
 
         BlobId blobId = BlobId.of(bucketName, objectName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
                 .setContentType(contentType)
+                .setCacheControl(cacheControl)
                 .build();
 
-        // Optimizar si es imagen (JPEG/PNG)
-        if ("jpg".equals(format) || "jpeg".equals(format) || "png".equals(format)) {
+        if (optimized) {
+            boolean isSignature = "signatures".equalsIgnoreCase(subDirectory);
             try (InputStream originalStream = Files.newInputStream(file.toPath());
-                    InputStream optimizedStream = imageOptimizer.optimize(originalStream, extension)) {
-
-                // Si optimizamos, el contenido será image/jpeg (porque ImageOptimizer convierte
-                // a jpg)
-                blobInfo = BlobInfo.newBuilder(blobId)
-                        .setContentType("image/jpeg")
-                        .build();
+                    InputStream optimizedStream = imageOptimizer.optimize(originalStream, getExtension(file.getName()), isSignature)) {
 
                 storage.createFrom(blobInfo, optimizedStream);
                 return objectName;
             } catch (Exception e) {
                 logger.warn("Falló optimización de imagen, se sube original: {}", e.getMessage());
+                blobInfo = BlobInfo.newBuilder(blobId)
+                        .setContentType(Files.probeContentType(file.toPath()))
+                        .setCacheControl(cacheControl)
+                        .build();
             }
         }
 

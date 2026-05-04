@@ -39,18 +39,22 @@ public class LocalStorageAdapter implements StoragePort {
         Path subDirPath = storagePath.resolve(subDirectory);
         Files.createDirectories(subDirPath);
         String extension = getExtension(file.getName());
-        String fileName = customFileName + extension;
+        String format = extension.toLowerCase().replace(".", "");
+        boolean isOptimizable = "jpg".equals(format) || "jpeg".equals(format) || "png".equals(format) || "webp".equals(format);
+
+        String finalExtension = isOptimizable ? ".webp" : extension;
+        String fileName = customFileName + finalExtension;
         Path targetPath = subDirPath.resolve(fileName);
 
-        // Optimizar si es imagen (JPEG/PNG)
-        String format = extension.toLowerCase().replace(".", "");
-        if ("jpg".equals(format) || "jpeg".equals(format) || "png".equals(format)) {
+        if (isOptimizable) {
+            boolean isSignature = "signatures".equalsIgnoreCase(subDirectory);
             try (InputStream originalStream = Files.newInputStream(file.toPath());
-                    InputStream optimizedStream = imageOptimizer.optimize(originalStream, extension)) {
+                    InputStream optimizedStream = imageOptimizer.optimize(originalStream, extension, isSignature)) {
                 Files.copy(optimizedStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
             } catch (Exception e) {
-                // Si falla la optimización, copiar original como fallback
-                Files.copy(file.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+                String fallbackFileName = customFileName + extension;
+                Files.copy(file.toPath(), subDirPath.resolve(fallbackFileName), StandardCopyOption.REPLACE_EXISTING);
+                return subDirectory + "/" + fallbackFileName;
             }
         } else {
             Files.copy(file.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);

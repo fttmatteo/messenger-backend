@@ -21,45 +21,39 @@ import java.io.InputStream;
 public class ImageOptimizer {
 
     private static final Logger log = LoggerFactory.getLogger(ImageOptimizer.class);
-
+    
     private static final int MAX_WIDTH = 1280;
     private static final int MAX_HEIGHT = 1280;
-    private static final float OUTPUT_QUALITY = 0.75f;
+    private static final float PHOTO_QUALITY = 0.85f;
+    private static final float SIGNATURE_QUALITY = 0.95f;
 
     /**
-     * Optimiza una imagen recibida como InputStream.
-     * Si la imagen es más grande que los límites, la redimensiona manteniendo el
-     * aspecto.
-     * Aplica compresión de calidad JPEG.
+     * Optimiza una imagen convirtiéndola a WebP.
+     * Si la imagen es más grande que los límites, la redimensiona manteniendo el aspecto.
+     * Elimina metadatos EXIF automáticamente al re-codificar.
      */
-    public InputStream optimize(InputStream inputStream, String extension) throws IOException {
+    public InputStream optimize(InputStream inputStream, String extension, boolean isSignature) throws IOException {
         String format = extension.toLowerCase().replace(".", "");
-
-        // No optimizar GIFs (animaciones se perderían con redimensionamiento simple)
+        
         if ("gif".equals(format)) {
             return inputStream;
         }
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            log.debug("Iniciando optimización de imagen formato: {}", format);
 
+            float quality = isSignature ? SIGNATURE_QUALITY : PHOTO_QUALITY;
+            
             Thumbnails.of(inputStream)
                     .size(MAX_WIDTH, MAX_HEIGHT)
-                    .outputQuality(OUTPUT_QUALITY)
-                    .outputFormat("jpg") // Convertimos a JPG para máxima compresión
+                    .outputQuality(quality)
+                    .outputFormat("webp")
                     .toOutputStream(outputStream);
 
             byte[] optimizedBytes = outputStream.toByteArray();
-            log.info("Imagen optimizada. Tamaño final: {} bytes", optimizedBytes.length);
 
             return new ByteArrayInputStream(optimizedBytes);
         } catch (Exception e) {
-            log.error("Error optimizando imagen, se usará el archivo original: {}", e.getMessage(), e);
-            // En caso de error, intentamos resetear el stream si es posible o devolver el
-            // original
-            // Nota: El original puede estar consumido, por lo que lo ideal es que el
-            // llamador
-            // maneje la re-creación del stream si falla.
+            log.error("Error optimizando imagen a WebP: {}", e.getMessage());
             throw e;
         }
     }
