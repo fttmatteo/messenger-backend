@@ -30,13 +30,10 @@ public class FileValidationService {
             "image/webp",
             "image/avif");
 
-    private static final Set<String> ALLOWED_GIF_TYPES = Set.of(
-            "image/webp");
 
     private static final long MAX_IMAGE_SIZE = 10 * 1024 * 1024;
     private static final long MAX_PHOTO_SIZE = 10 * 1024 * 1024;
     private static final long MAX_SIGNATURE_SIZE = 2 * 1024 * 1024;
-    private static final long MAX_GIF_SIZE = 5 * 1024 * 1024;
     private static final int MAX_IMAGE_DIMENSION = 4096;
 
     /**
@@ -132,33 +129,6 @@ public class FileValidationService {
 
     }
 
-    /**
-     * Valida archivos GIF de captura de firma.
-     * Usado para: GIFs de captura durante firma
-     */
-    public void validateGifFile(MultipartFile file) throws SecurityException {
-        if (file == null) {
-            throw new SecurityException("Archivo de animación no proporcionado");
-        }
-
-        if (file.isEmpty()) {
-            throw new SecurityException("Archivo de animación vacío");
-        }
-
-        if (file.getSize() > MAX_GIF_SIZE) {
-            logger.warn("Archivo de animación excede tamaño máximo: {} bytes",
-                    file.getSize());
-            throw new SecurityException(
-                    String.format("Animación demasiado grande. Máximo: %dMB",
-                            MAX_GIF_SIZE / (1024 * 1024)));
-        }
-
-        String detectedType = detectMimeType(file);
-        if (!ALLOWED_GIF_TYPES.contains(detectedType)) {
-            logger.warn("Tipo de animación no permitido: {}", detectedType);
-            throw new SecurityException("Tipo de archivo de animación no permitido (Solo WebP Animado o GIF)");
-        }
-    }
 
     /**
      * Detecta el tipo MIME real del archivo (no solo la extensión).

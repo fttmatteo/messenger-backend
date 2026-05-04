@@ -757,12 +757,6 @@
                                     "disabled": true
                                 },
                                 {
-                                    "key": "signatureGif",
-                                    "type": "file",
-                                    "src": [],
-                                    "disabled": true
-                                },
-                                {
                                     "key": "photos",
                                     "type": "file",
                                     "src": [],

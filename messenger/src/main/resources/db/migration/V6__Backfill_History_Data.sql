@@ -1,5 +1,3 @@
--- Backfill observation and signature_id from service_deliveries to the latest status_history entry for each service
-
 UPDATE status_history sh
 JOIN service_deliveries sd ON sh.service_delivery_id = sd.id_service_delivery
 JOIN (

@@ -9,7 +9,6 @@ public class SignatureResponse {
     private Long idSignature;
     private String signaturePath;
     private LocalDateTime uploadDate;
-    private String gifPath;
 
     public SignatureResponse() {
     }
@@ -18,13 +17,6 @@ public class SignatureResponse {
         this.idSignature = idSignature;
         this.signaturePath = signaturePath;
         this.uploadDate = uploadDate;
-    }
-
-    public SignatureResponse(Long idSignature, String signaturePath, LocalDateTime uploadDate, String gifPath) {
-        this.idSignature = idSignature;
-        this.signaturePath = signaturePath;
-        this.uploadDate = uploadDate;
-        this.gifPath = gifPath;
     }
 
     public Long getIdSignature() {
@@ -49,13 +41,5 @@ public class SignatureResponse {
 
     public void setUploadDate(LocalDateTime uploadDate) {
         this.uploadDate = uploadDate;
-    }
-
-    public String getGifPath() {
-        return gifPath;
-    }
-
-    public void setGifPath(String gifPath) {
-        this.gifPath = gifPath;
     }
 }

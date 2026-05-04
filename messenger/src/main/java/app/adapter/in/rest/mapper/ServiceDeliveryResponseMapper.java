@@ -104,12 +104,10 @@ public class ServiceDeliveryResponseMapper {
         if (service.getSignature() != null) {
             Signature sig = service.getSignature();
             String signedUrl = getFileUrl(sig.getSignaturePath());
-            String gifSignedUrl = getFileUrl(sig.getGifPath());
             response.setSignature(new SignatureResponse(
                     sig.getIdSignature(),
                     signedUrl,
-                    sig.getUploadDate(),
-                    gifSignedUrl));
+                    sig.getUploadDate()));
         }
 
         if (service.getPhotos() != null) {
@@ -149,8 +147,7 @@ public class ServiceDeliveryResponseMapper {
                             historyResponse.setSignature(new SignatureResponse(
                                     sig.getIdSignature(),
                                     getFileUrl(sig.getSignaturePath()),
-                                    sig.getUploadDate(),
-                                    getFileUrl(sig.getGifPath())));
+                                    sig.getUploadDate()));
                         }
                         return historyResponse;
                     })

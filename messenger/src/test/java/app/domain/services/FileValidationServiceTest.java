@@ -36,18 +36,6 @@ class FileValidationServiceTest {
         assertDoesNotThrow(() -> fileValidationService.validateImageFile(file));
     }
 
-    @Test
-    @DisplayName("Validar animación WebP válida debe pasar")
-    void testValidateValidWebpAnimation() throws IOException {
-        byte[] imageBytes = createValidImage("png", 640, 480);
-        MultipartFile file = new MockMultipartFile(
-                "animation",
-                "anim.webp",
-                "image/webp",
-                imageBytes);
-
-        assertDoesNotThrow(() -> fileValidationService.validateGifFile(file));
-    }
 
     @Test
     @DisplayName("Validar imagen PNG válida debe pasar")
@@ -78,21 +66,6 @@ class FileValidationServiceTest {
         assertTrue(exception.getMessage().contains("demasiado grande"));
     }
 
-    @Test
-    @DisplayName("Animación mayor a 5MB debe fallar")
-    void testAnimationTooLargeShouldFail() {
-        byte[] oversizedAnim = new byte[(int) (6 * 1024 * 1024)]; // 6MB > 5MB
-        MultipartFile file = new MockMultipartFile(
-                "animation",
-                "large_anim.webp",
-                "image/webp",
-                oversizedAnim);
-
-        SecurityException exception = assertThrows(
-                SecurityException.class,
-                () -> fileValidationService.validateGifFile(file));
-        assertTrue(exception.getMessage().contains("demasiado grande"));
-    }
 
     @Test
     @DisplayName("Foto mayor a 10MB debe fallar")

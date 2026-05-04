@@ -1,9 +1,7 @@
--- Add signature_id and observation to status_history table safely
 DROP PROCEDURE IF EXISTS AddHistoryColumns;
 DELIMITER //
 CREATE PROCEDURE AddHistoryColumns()
 BEGIN
-    -- Check and add to status_history
     IF NOT EXISTS (
         SELECT * FROM information_schema.COLUMNS 
         WHERE TABLE_SCHEMA = DATABASE() 
@@ -27,7 +25,6 @@ BEGIN
         ADD COLUMN observation VARCHAR(2048);
     END IF;
 
-    -- Check and add to deleted_status_history
     IF NOT EXISTS (
         SELECT * FROM information_schema.COLUMNS 
         WHERE TABLE_SCHEMA = DATABASE() 

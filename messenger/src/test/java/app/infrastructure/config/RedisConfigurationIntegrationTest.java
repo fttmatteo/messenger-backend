@@ -51,7 +51,6 @@ class RedisConfigurationIntegrationTest extends AbstractIntegrationTest {
         
         LettucePoolingClientConfiguration poolConfig = (LettucePoolingClientConfiguration) lettuceFactory.getClientConfiguration();
         
-        // Verificar que los límites coincidan con application.properties (Estandarización Professional)
         assertEquals(4, poolConfig.getPoolConfig().getMaxTotal(), "Max active connections debe ser 4");
         assertEquals(2, poolConfig.getPoolConfig().getMaxIdle(), "Max idle connections debe ser 2");
         assertEquals(1, poolConfig.getPoolConfig().getMinIdle(), "Min idle connections debe ser 1");
@@ -63,7 +62,6 @@ class RedisConfigurationIntegrationTest extends AbstractIntegrationTest {
         Config config = redissonClient.getConfig();
         assertNotNull(config, "Configuración de Redisson no debe ser nula");
         
-        // Redisson usa SingleServerConfig en este proyecto
         assertEquals(4, config.useSingleServer().getConnectionPoolSize(), 
             "Redisson debe usar el mismo pool size de 4 conexiones");
         assertEquals(1, config.useSingleServer().getConnectionMinimumIdleSize(), 
@@ -81,10 +79,8 @@ class RedisConfigurationIntegrationTest extends AbstractIntegrationTest {
         tracking.setStatus(TrackingStatus.ACTIVE);
         tracking.setCurrentLocation(new Location(4.6097, -74.0817, LocalDateTime.now(), 5.0));
 
-        // Escribir
         liveTrackingTemplate.opsForValue().set(key, tracking);
 
-        // Leer
         LiveTracking result = liveTrackingTemplate.opsForValue().get(key);
 
         assertNotNull(result);

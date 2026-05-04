@@ -1,10 +1,5 @@
--- WhatsApp Bot Integration
--- PIN para autenticación de concesionarios y tabla de sesiones
-
--- Agregar PIN a concesionarios (texto plano, ej: 1234)
 ALTER TABLE dealerships ADD COLUMN whatsapp_pin VARCHAR(255);
 
--- Tabla de sesiones de WhatsApp
 CREATE TABLE wa_sessions (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     phone_number VARCHAR(20) NOT NULL,

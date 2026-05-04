@@ -4,7 +4,7 @@
 
 # Messenger Backend API
 
-<img src="https://img.shields.io/badge/Version-1.13.1-blue.svg" alt="Version">
+<img src="https://img.shields.io/badge/Version-1.13.2-blue.svg" alt="Version">
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.14-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
@@ -357,7 +357,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | -------- | -------------------------------- | ------------------------------------------------------------ |
 | `POST`   | `/services/extractPlate`         | Extract plate from image using OCR (preview before creating) |
 | `POST`   | `/services/createService`        | Create service (multipart: image + data)                     |
-| `PUT`    | `/services/updateService/{uuid}` | Update status (multipart: status + evidence + GIF)           |
+| `PUT`    | `/services/updateService/{uuid}` | Update status (multipart: status + evidence)                 |
 | `PUT`    | `/services/reassign/{uuid}`      | Reassign to another messenger (ADMIN/CANCELED)               |
 | `GET`    | `/services/findByServiceId/{uuid}`| Get service by UUID                                         |
 | `GET`    | `/services/allServicesPageable`  | List services with **pagination, search & sorting**          |
@@ -394,7 +394,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 > **File Constraints**:
 >
 > - **Images**: Max 10MB (WebP)
-> - **Animations (Signatures)**: Max 5MB (Animated WebP)
 > - **Signatures (Static)**: Max 2MB (WebP)
 
 ---
@@ -423,7 +422,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Method | Endpoint            | Description                                      |
 | ------ | ------------------- | ------------------------------------------------ |
-| `GET`  | `/files/{filename}` | Download protected file (photos/signatures/GIFs) |
+| `GET`  | `/files/{filename}` | Download protected file (photos/signatures) |
 
 ---
 
@@ -501,7 +500,6 @@ erDiagram
     signatures {
         Long id_signature PK
         String signature_path
-        String gif_path
         LocalDateTime upload_date
     }
 
@@ -640,8 +638,8 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 > [!NOTE]
 > **Evidence Requirements**
 >
-> - **DELIVERED**: Signature and GIF verification are mandatory.
-> - **PENDING**: Signature, GIF verification, at least one photo, and observation are mandatory.
+> - **DELIVERED**: Signature is mandatory.
+> - **PENDING**: Signature, at least one photo, and observation are mandatory.
 > - **RETURNED**: At least one photo and observation are mandatory (no signature required).
 > - **CANCELED** & **RESOLVED**: No additional evidence required.
 

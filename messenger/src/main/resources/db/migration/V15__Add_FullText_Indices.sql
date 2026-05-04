@@ -1,4 +1,3 @@
--- Migración V15: Implementación de búsqueda FULLTEXT para optimización de LIKE %keyword%
 DROP PROCEDURE IF EXISTS AddFullTextIndices;
 DELIMITER //
 CREATE PROCEDURE AddFullTextIndices()

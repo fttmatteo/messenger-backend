@@ -1,4 +1,3 @@
--- Migración V14: Optimización de índices para rendimiento de consultas frecuentes
 DROP PROCEDURE IF EXISTS OptimizePerformanceIndices;
 DELIMITER //
 CREATE PROCEDURE OptimizePerformanceIndices()
