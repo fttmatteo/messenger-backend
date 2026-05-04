@@ -1,5 +1,3 @@
-
--- Tabla principal de Concesionarios
 CREATE TABLE IF NOT EXISTS dealerships (
     id_dealership BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE,
@@ -11,13 +9,12 @@ CREATE TABLE IF NOT EXISTS dealerships (
     is_geolocated BOOLEAN DEFAULT FALSE
 );
 
--- Tabla de Empleados (Mensajeros y Administradores)
 CREATE TABLE IF NOT EXISTS employees (
     id_employee BIGINT AUTO_INCREMENT PRIMARY KEY,
     document BIGINT NOT NULL UNIQUE,
     full_name VARCHAR(255) NOT NULL,
     phone VARCHAR(20),
-    password VARCHAR(255) NOT NULL, -- Contraseña hasheada (BCrypt)
+    password VARCHAR(255) NOT NULL,
     role VARCHAR(50) NOT NULL
 );
 
@@ -34,7 +31,6 @@ CREATE TABLE IF NOT EXISTS signatures (
     upload_date DATETIME(6) NOT NULL
 );
 
--- Tabla central de Servicios de Entrega
 CREATE TABLE IF NOT EXISTS service_deliveries (
     id_service_delivery BIGINT AUTO_INCREMENT PRIMARY KEY,
     plate_id BIGINT NOT NULL,
@@ -45,16 +41,15 @@ CREATE TABLE IF NOT EXISTS service_deliveries (
     signature_id BIGINT,
     created_at DATETIME(6),
     
-    -- Soporte para Soft Delete
     deleted BOOLEAN DEFAULT FALSE,
     deleted_at DATETIME(6) NULL,
-    locked_at DATETIME(6) NULL, -- Bloqueo de edición (72h)
+    locked_at DATETIME(6) NULL,
 
     FOREIGN KEY (plate_id) REFERENCES plates(id_plate),
     FOREIGN KEY (dealership_id) REFERENCES dealerships(id_dealership),
     FOREIGN KEY (messenger_id) REFERENCES employees(id_employee),
     FOREIGN KEY (signature_id) REFERENCES signatures(id_signature),
-
+    
     INDEX idx_service_deliveries_deleted (deleted),
     INDEX idx_service_deliveries_deleted_at (deleted_at)
 );
