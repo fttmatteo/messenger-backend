@@ -235,8 +235,26 @@ public class GoogleCloudStorageAdapter implements StoragePort {
 
     @Override
     public File get(String path) {
-        throw new UnsupportedOperationException(
-                "Para GCS con URLs firmadas, usa directamente getUrl().");
+        if (path == null || path.isEmpty())
+            return null;
+
+        try {
+            Blob blob = storage.get(BlobId.of(bucketName, path));
+            if (blob == null) {
+                logger.warn("Archivo no encontrado en GCS: {}", path);
+                return null;
+            }
+
+            // Creamos un archivo temporal para procesarlo en el backend
+            String extension = getExtension(path);
+            File tempFile = File.createTempFile("gcs_migrate_", extension);
+            blob.downloadTo(tempFile.toPath());
+            
+            return tempFile;
+        } catch (IOException e) {
+            logger.error("Error al descargar archivo de GCS para migración: {}", e.getMessage());
+            return null;
+        }
     }
 
     @Override

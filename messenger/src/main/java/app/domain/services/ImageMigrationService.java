@@ -91,27 +91,32 @@ public class ImageMigrationService {
 
     private boolean processPhotoMigration(Photo photo) {
         String oldPath = photo.getPhotoPath();
+        File oldFile = null;
         try {
-            File oldFile = storagePort.get(oldPath);
+            oldFile = storagePort.get(oldPath);
             if (oldFile == null || !oldFile.exists()) return false;
 
             String newPath = convertAndSave(oldFile, "evidence", "migrated_" + System.currentTimeMillis());
             if (newPath != null) {
                 photo.setPhotoPath(newPath);
                 serviceDeliveryPort.updatePhoto(photo);
+                // Intento de borrado opcional del antiguo en GCS/Local
                 try { storagePort.delete(oldPath); } catch (Exception ignored) {}
                 return true;
             }
         } catch (Exception e) {
-            log.warn("Fallo al migrar foto {}: {}", oldPath, e.getMessage());
+            log.error("Fallo al migrar foto {}: {}. Causa: {}", oldPath, e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "Desconocida");
+        } finally {
+            if (oldFile != null && oldFile.exists()) oldFile.delete();
         }
         return false;
     }
 
     private boolean processSignatureMigration(Signature sig) {
         String oldPath = sig.getSignaturePath();
+        File oldFile = null;
         try {
-            File oldFile = storagePort.get(oldPath);
+            oldFile = storagePort.get(oldPath);
             if (oldFile == null || !oldFile.exists()) return false;
 
             String newPath = convertAndSave(oldFile, "signatures", "migrated_sig_" + System.currentTimeMillis());
@@ -123,23 +128,26 @@ public class ImageMigrationService {
             }
         } catch (Exception e) {
             log.warn("Fallo al migrar firma {}: {}", oldPath, e.getMessage());
+        } finally {
+            if (oldFile != null && oldFile.exists()) oldFile.delete();
         }
         return false;
     }
 
     private String convertAndSave(File file, String folder, String name) {
+        File tempWebp = null;
         try (InputStream is = new FileInputStream(file);
              InputStream optimized = imageOptimizer.optimize(is, file.getName())) {
             
-            File tempFile = File.createTempFile("migrate_", ".webp");
-            java.nio.file.Files.copy(optimized, tempFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            tempWebp = File.createTempFile("migrate_webp_", ".webp");
+            java.nio.file.Files.copy(optimized, tempWebp.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
             
-            String path = storagePort.save(tempFile, folder, name);
-            tempFile.delete();
-            return path;
+            return storagePort.save(tempWebp, folder, name);
         } catch (Exception e) {
             log.error("Error en conversión durante migración: {}", e.getMessage());
             return null;
+        } finally {
+            if (tempWebp != null && tempWebp.exists()) tempWebp.delete();
         }
     }
 

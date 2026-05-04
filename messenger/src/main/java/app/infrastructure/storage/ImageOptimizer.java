@@ -45,7 +45,16 @@ public class ImageOptimizer {
                     .asBufferedImage();
 
             try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-                javax.imageio.ImageWriter writer = javax.imageio.ImageIO.getImageWritersByFormatName("webp").next();
+                log.debug("Iniciando optimización WebP para formato: {}", format);
+
+                // 2. Usar ImageIO con soporte WebP
+                java.util.Iterator<javax.imageio.ImageWriter> writers = javax.imageio.ImageIO.getImageWritersByFormatName("webp");
+                if (!writers.hasNext()) {
+                    log.error("SOPORTE WEBP NO ENCONTRADO EN EL SERVIDOR. Verifique que la librería webp-imageio esté cargada.");
+                    throw new IllegalStateException("Formato WebP no soportado en este entorno");
+                }
+                
+                javax.imageio.ImageWriter writer = writers.next();
                 javax.imageio.ImageWriteParam param = writer.getDefaultWriteParam();
                 
                 if (param.canWriteCompressed()) {
