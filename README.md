@@ -357,7 +357,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | -------- | -------------------------------- | -------------------------------------------------------------------- |
 | `POST`   | `/services/extractPlate`         | Extraer placa de imagen usando OCR (preview antes de crear)          |
 | `POST`   | `/services/createService`        | Crear servicio (multipart: imagen + datos)                           |
-| `PUT`    | `/services/updateService/{uuid}` | Actualizar estado (multipart: estado + evidencias + GIF)             |
+| `PUT`    | `/services/updateService/{uuid}` | Actualizar estado (multipart: estado + evidencias)                 |
 | `PUT`    | `/services/reassign/{uuid}`      | Reasignar a otro mensajero (ADMIN/CANCELED)                          |
 | `GET`    | `/services/findByServiceId/{uuid}`| Obtener servicio por UUID                                            |
 | `GET`    | `/services/allServicesPageable`  | Listar servicios con **paginación, búsqueda y ordenamiento**         |
@@ -422,7 +422,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Método | Endpoint            | Descripción                                     |
 | ------ | ------------------- | ----------------------------------------------- |
-| `GET`  | `/files/{filename}` | Descargar archivo protegido (fotos/firmas/GIFs) |
+| `GET`  | `/files/{filename}` | Descargar archivo protegido (fotos/firmas) |
 
 ---
 
@@ -500,7 +500,6 @@ erDiagram
     signatures {
         Long id_signature PK
         String signature_path
-        String gif_path
         LocalDateTime upload_date
     }
 
@@ -639,8 +638,8 @@ URL de conexión: `ws://localhost:8080/ws/tracking`
 > [!NOTE]
 > **Requisitos de Evidencia**
 >
-> - **DELIVERED**: Firma y verificación GIF obligatorias.
-> - **PENDING**: Firma, verificación GIF, al menos una foto y observación obligatorias.
+> - **DELIVERED**: Firma obligatoria.
+> - **PENDING**: Firma, al menos una foto y observación obligatorias.
 > - **RETURNED**: Al menos una foto y observación obligatorias (no requiere firma).
 > - **CANCELED** & **RESOLVED**: No requieren evidencia adicional.
 

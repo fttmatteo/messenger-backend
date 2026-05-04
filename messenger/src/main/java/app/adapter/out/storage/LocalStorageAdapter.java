@@ -40,7 +40,7 @@ public class LocalStorageAdapter implements StoragePort {
         Files.createDirectories(subDirPath);
         String extension = getExtension(file.getName());
         String format = extension.toLowerCase().replace(".", "");
-        boolean isOptimizable = "jpg".equals(format) || "jpeg".equals(format) || "png".equals(format) || "webp".equals(format) || "gif".equals(format);
+        boolean isOptimizable = "jpg".equals(format) || "jpeg".equals(format) || "png".equals(format) || "webp".equals(format);
 
         String finalExtension = isOptimizable ? ".webp" : extension;
         String fileName = customFileName + finalExtension;

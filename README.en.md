@@ -357,7 +357,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | -------- | -------------------------------- | ------------------------------------------------------------ |
 | `POST`   | `/services/extractPlate`         | Extract plate from image using OCR (preview before creating) |
 | `POST`   | `/services/createService`        | Create service (multipart: image + data)                     |
-| `PUT`    | `/services/updateService/{uuid}` | Update status (multipart: status + evidence + GIF)           |
+| `PUT`    | `/services/updateService/{uuid}` | Update status (multipart: status + evidence)                 |
 | `PUT`    | `/services/reassign/{uuid}`      | Reassign to another messenger (ADMIN/CANCELED)               |
 | `GET`    | `/services/findByServiceId/{uuid}`| Get service by UUID                                         |
 | `GET`    | `/services/allServicesPageable`  | List services with **pagination, search & sorting**          |
@@ -422,7 +422,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Method | Endpoint            | Description                                      |
 | ------ | ------------------- | ------------------------------------------------ |
-| `GET`  | `/files/{filename}` | Download protected file (photos/signatures/GIFs) |
+| `GET`  | `/files/{filename}` | Download protected file (photos/signatures) |
 
 ---
 
@@ -500,7 +500,6 @@ erDiagram
     signatures {
         Long id_signature PK
         String signature_path
-        String gif_path
         LocalDateTime upload_date
     }
 
@@ -639,8 +638,8 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 > [!NOTE]
 > **Evidence Requirements**
 >
-> - **DELIVERED**: Signature and GIF verification are mandatory.
-> - **PENDING**: Signature, GIF verification, at least one photo, and observation are mandatory.
+> - **DELIVERED**: Signature is mandatory.
+> - **PENDING**: Signature, at least one photo, and observation are mandatory.
 > - **RETURNED**: At least one photo and observation are mandatory (no signature required).
 > - **CANCELED** & **RESOLVED**: No additional evidence required.
 
