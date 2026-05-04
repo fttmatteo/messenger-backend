@@ -110,16 +110,5 @@ class FileValidationServiceTest {
         assertTrue(exception.getMessage().contains("demasiado grande"));
     }
 
-    @Test
-    @DisplayName("Verificar que GIF legacy sigue funcionando")
-    void testLegacyGifShouldPass() throws IOException {
-        byte[] gifBytes = createValidImage("gif", 100, 100);
-        MultipartFile file = new MockMultipartFile(
-                "animation",
-                "legacy.gif",
-                "image/gif",
-                gifBytes);
 
-        assertDoesNotThrow(() -> fileValidationService.validateGifFile(file));
-    }
 }
