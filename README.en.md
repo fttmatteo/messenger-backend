@@ -394,7 +394,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 > **File Constraints**:
 >
 > - **Images**: Max 10MB (WebP)
-> - **Animations (Signatures)**: Max 5MB (Animated WebP)
 > - **Signatures (Static)**: Max 2MB (WebP)
 
 ---

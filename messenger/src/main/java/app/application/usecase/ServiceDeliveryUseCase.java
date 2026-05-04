@@ -175,7 +175,7 @@ public class ServiceDeliveryUseCase {
     })
     @Transactional(rollbackFor = Exception.class)
     public ServiceDelivery updateStatusWithFiles(Long serviceId, Status newStatus, String observation,
-            File signatureFile, File signatureGifFile, List<File> photoFiles, Long userId, Double latitude,
+            File signatureFile, List<File> photoFiles, Long userId, Double latitude,
             Double longitude)
             throws Exception {
 
@@ -197,12 +197,6 @@ public class ServiceDeliveryUseCase {
             signature.setSignaturePath(path);
         }
 
-        if (signatureGifFile != null && signature != null) {
-            String gifFileName = "signature-gif_" + plateNumber + "_" + newStatus.name() + "_" + timestamp;
-            String gifPath = storagePort.save(signatureGifFile, "signature-gifs", gifFileName);
-            savedPaths.add(gifPath);
-            signature.setGifPath(gifPath);
-        }
 
         List<Photo> photos = new ArrayList<>();
         if (photoFiles != null && !photoFiles.isEmpty()) {
