@@ -11,11 +11,10 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Utilidad profesional para la optimización de imágenes antes de su
+ * Utilidad profesional para la optimizacion de imagenes antes de su
  * almacenamiento.
- * Implementa redimensionamiento dinámico y compresión de calidad para ahorrar
- * espacio
- * y mejorar el rendimiento de carga en el cliente.
+ * Implementa redimensionamiento dinamico y compresion de calidad para ahorrar
+ * espacio y mejorar el rendimiento de carga en el cliente.
  */
 @Component
 public class ImageOptimizer {
@@ -28,9 +27,9 @@ public class ImageOptimizer {
     private static final float SIGNATURE_QUALITY = 0.95f;
 
     /**
-     * Optimiza una imagen convirtiéndola a WebP.
-     * Si la imagen es más grande que los límites, la redimensiona manteniendo el aspecto.
-     * Elimina metadatos EXIF automáticamente al re-codificar.
+     * Optimiza una imagen convirtiendola a WebP.
+     * Si la imagen es mas grande que los limites, la redimensiona manteniendo el aspecto.
+     * Elimina metadatos EXIF automaticamente al re-codificar.
      */
     public InputStream optimize(InputStream inputStream, String extension, boolean isSignature) throws IOException {
         String format = extension.toLowerCase().replace(".", "");
