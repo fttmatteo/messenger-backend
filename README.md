@@ -795,8 +795,9 @@ El sistema incluye múltiples capas de optimización para garantizar un alto ren
 
 ### Optimización de Imágenes
 
-- **Redimensionamiento Automático**: Las imágenes se redimensionan automáticamente a un máximo de 1280px (ancho o alto) preservando la relación de aspecto.
-- **Compresión Inteligente**: Reducción de calidad al 75% para archivos JPEG usando la librería `Thumbnailator`, reduciendo significativamente el uso de almacenamiento y ancho de banda sin pérdida de detalle perceptible.
+- **Pipeline WebP Nativo**: Conversión y optimización automática a formato WebP de alta eficiencia.
+- **Calidades Diferenciadas**: Calidad de **0.85** para fotos (optimizado para OCR de placas) y **0.95** para firmas digitales (máxima nitidez).
+- **Eliminación de Metadatos**: Limpieza automática de metadatos EXIF durante la re-codificación para mejorar la privacidad y reducir el peso del archivo.
 
 ---
 

@@ -772,8 +772,9 @@ The system includes multiple optimization layers to ensure high performance and 
 
 ### Image Optimization
 
-- **Automatic Resizing**: Images are automatically resized to a maximum of 1280px preserving aspect ratio.
-- **Smart Compression**: Quality reduction to 75% for JPEG files using the `Thumbnailator` library.
+- **Native WebP Pipeline**: Automatic conversion and optimization to high-efficiency WebP format.
+- **Differentiated Quality**: **0.85** quality for photos (optimized for license plate OCR) and **0.95** for digital signatures (maximum sharpness).
+- **Metadata Stripping**: Automatic EXIF metadata removal during re-encoding to improve privacy and reduce file size.
 
 ---
 
