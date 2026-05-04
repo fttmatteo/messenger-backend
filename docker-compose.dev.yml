@@ -34,7 +34,7 @@ services:
   # APP: Backend Spring Boot con Spring DevTools (Auto-restart)
   # Acceder en: http://localhost:8080
   messenger-backend:
-    image: maven:3.9.6-eclipse-temurin-17-alpine
+    image: maven:3.9.6-eclipse-temurin-17
     container_name: messenger-backend-dev
     working_dir: /app
     command: mvn -q spring-boot:run -Dspring-boot.run.jvmArguments="-Duser.timezone=America/Bogota"

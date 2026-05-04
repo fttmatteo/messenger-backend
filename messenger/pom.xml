@@ -301,11 +301,11 @@
 			<version>0.4.21</version>
 		</dependency>
 
-		<!-- Soporte para WebP (Sejda es más estable en Windows para carga nativa) -->
+		<!-- Soporte para WebP (Versión moderna optimizada para Java 17+) -->
 		<dependency>
-			<groupId>org.sejda.imageio</groupId>
+			<groupId>com.github.gotson</groupId>
 			<artifactId>webp-imageio</artifactId>
-			<version>0.1.6</version>
+			<version>0.2.2</version>
 		</dependency>
 
 		<!-- ShedLock (Coordinación de Tareas Distribuidas) -->
