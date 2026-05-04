@@ -34,7 +34,7 @@ public class ImageOptimizer {
     public InputStream optimize(InputStream inputStream, String extension, boolean isSignature) throws IOException {
         String format = extension.toLowerCase().replace(".", "");
         
-        if ("gif".equals(format) || "webp".equals(format)) {
+        if ("webp".equals(format) || "avif".equals(format)) {
             return inputStream;
         }
 

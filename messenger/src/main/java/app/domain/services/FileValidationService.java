@@ -27,10 +27,10 @@ public class FileValidationService {
     private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of(
             "image/jpeg",
             "image/png",
-            "image/webp");
+            "image/webp",
+            "image/avif");
 
     private static final Set<String> ALLOWED_GIF_TYPES = Set.of(
-            "image/gif",
             "image/webp");
 
     private static final long MAX_IMAGE_SIZE = 10 * 1024 * 1024;
@@ -213,11 +213,10 @@ public class FileValidationService {
             }
         }
 
-        if (bytes.length >= 6 &&
-                bytes[0] == 0x47 && bytes[1] == 0x49 && bytes[2] == 0x46 &&
-                bytes[3] == 0x38 && (bytes[4] == 0x37 || bytes[4] == 0x39) &&
-                bytes[5] == 0x61) {
-            return "image/gif";
+        if (bytes.length >= 12 &&
+                bytes[4] == 0x66 && bytes[5] == 0x74 && bytes[6] == 0x79 && bytes[7] == 0x70 &&
+                bytes[8] == 0x61 && bytes[9] == 0x76 && bytes[10] == 0x69 && bytes[11] == 0x66) {
+            return "image/avif";
         }
 
         return null;

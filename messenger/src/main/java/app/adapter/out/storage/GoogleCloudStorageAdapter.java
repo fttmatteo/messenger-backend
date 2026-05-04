@@ -97,15 +97,29 @@ public class GoogleCloudStorageAdapter implements StoragePort {
 
         if (optimized) {
             boolean isSignature = "signatures".equalsIgnoreCase(subDirectory);
+            String extension = getExtension(file.getName());
+            
             try (InputStream originalStream = Files.newInputStream(file.toPath());
-                    InputStream optimizedStream = imageOptimizer.optimize(originalStream, getExtension(file.getName()), isSignature)) {
+                    InputStream optimizedStream = imageOptimizer.optimize(originalStream, extension, isSignature)) {
+
+                String format = extension.toLowerCase().replace(".", "");
+                if ("gif".equals(format) || "webp".equals(format)) {
+                    String realContentType = Files.probeContentType(file.toPath());
+                    if (realContentType != null) {
+                        blobInfo = BlobInfo.newBuilder(blobId)
+                                .setContentType(realContentType)
+                                .setCacheControl(cacheControl)
+                                .build();
+                    }
+                }
 
                 storage.createFrom(blobInfo, optimizedStream);
                 return objectName;
             } catch (Exception e) {
                 logger.warn("Falló optimización de imagen, se sube original: {}", e.getMessage());
+                String fallbackContentType = Files.probeContentType(file.toPath());
                 blobInfo = BlobInfo.newBuilder(blobId)
-                        .setContentType(Files.probeContentType(file.toPath()))
+                        .setContentType(fallbackContentType != null ? fallbackContentType : "application/octet-stream")
                         .setCacheControl(cacheControl)
                         .build();
             }
