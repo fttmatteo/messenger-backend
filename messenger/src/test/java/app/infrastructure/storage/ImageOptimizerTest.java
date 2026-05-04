@@ -19,15 +19,15 @@ class ImageOptimizerTest {
 
     @Test
     /**
-     * Verifica que el optimizador no optimice archivos GIF (Passthrough).
+     * Verifica que el optimizador no optimice archivos AVIF (Passthrough).
      */
-    void shouldNotOptimizeGif() throws IOException {
-        byte[] gifContent = "fake-gif-content".getBytes();
-        InputStream inputStream = new ByteArrayInputStream(gifContent);
+    void shouldNotOptimizeAvif() throws IOException {
+        byte[] avifContent = "fake-avif-content".getBytes();
+        InputStream inputStream = new ByteArrayInputStream(avifContent);
 
-        InputStream result = imageOptimizer.optimize(inputStream, "gif", false);
+        InputStream result = imageOptimizer.optimize(inputStream, "avif", false);
 
-        assertSame(inputStream, result, "El stream de GIF debe devolverse sin cambios");
+        assertSame(inputStream, result, "El stream de AVIF debe devolverse sin cambios");
     }
 
     @Test
