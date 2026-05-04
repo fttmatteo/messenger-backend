@@ -59,6 +59,13 @@ public class ImageOptimizer {
                 
                 if (param.canWriteCompressed()) {
                     param.setCompressionMode(javax.imageio.ImageWriteParam.MODE_EXPLICIT);
+                    
+                    // Algunos writers requieren especificar el tipo de compresión explícitamente
+                    String[] types = param.getCompressionTypes();
+                    if (types != null && types.length > 0) {
+                        param.setCompressionType(types[0]);
+                    }
+                    
                     param.setCompressionQuality(OUTPUT_QUALITY);
                 }
 
