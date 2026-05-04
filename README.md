@@ -393,9 +393,9 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 > [!CAUTION]
 > **Restricciones de Archivos**:
 >
-> - **Imágenes**: Máx 10MB (JPEG/PNG)
-> - **GIFs**: Máx 5MB (GIF87a/GIF89a)
-> - **Firmas**: Máx 2MB (SVG/PNG)
+> - **Imágenes**: Máx 10MB (WebP)
+> - **Animaciones (Firmas)**: Máx 5MB (WebP Animado)
+> - **Firmas (Estáticas)**: Máx 2MB (WebP)
 
 ---
 

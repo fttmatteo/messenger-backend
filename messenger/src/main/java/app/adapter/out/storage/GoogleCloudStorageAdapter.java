@@ -71,7 +71,7 @@ public class GoogleCloudStorageAdapter implements StoragePort {
         String originalName = file.getName();
         String extension = getExtension(originalName);
         String format = extension.toLowerCase().replace(".", "");
-        boolean isOptimizable = "jpg".equals(format) || "jpeg".equals(format) || "png".equals(format) || "webp".equals(format);
+        boolean isOptimizable = "jpg".equals(format) || "jpeg".equals(format) || "png".equals(format) || "webp".equals(format) || "gif".equals(format);
 
         String finalExtension = isOptimizable ? ".webp" : extension;
         String fileName = customFileName + finalExtension;

@@ -19,7 +19,7 @@ class ImageOptimizerTest {
 
     @Test
     /**
-     * Verifica que el optimizador no optimice archivos GIF.
+     * Verifica que el optimizador no optimice archivos GIF (Passthrough).
      */
     void shouldNotOptimizeGif() throws IOException {
         byte[] gifContent = "fake-gif-content".getBytes();
@@ -27,17 +27,33 @@ class ImageOptimizerTest {
 
         InputStream result = imageOptimizer.optimize(inputStream, "gif", false);
 
-        assertSame(inputStream, result);
+        assertSame(inputStream, result, "El stream de GIF debe devolverse sin cambios");
     }
 
     @Test
     /**
-     * Verifica que el optimizador optimice archivos JPEG.
+     * Verifica que el optimizador no optimice archivos WebP (Passthrough para evitar doble compresión).
      */
-    void shouldOptimizeJpeg() throws IOException {
-        byte[] imageContent = new byte[100];
+    void shouldNotOptimizeWebp() throws IOException {
+        byte[] webpContent = "fake-webp-content".getBytes();
+        InputStream inputStream = new ByteArrayInputStream(webpContent);
+
+        InputStream result = imageOptimizer.optimize(inputStream, "webp", false);
+
+        assertSame(inputStream, result, "El stream de WebP debe devolverse sin cambios para evitar doble compresión");
+    }
+
+    @Test
+    /**
+     * Verifica que el optimizador maneje errores de formato correctamente.
+     * En caso de error de lectura, debe intentar devolver el stream original o lanzar excepción controlada.
+     */
+    void shouldHandleInvalidFormatsGracefully() throws IOException {
+        byte[] invalidContent = new byte[10];
+        InputStream inputStream = new ByteArrayInputStream(invalidContent);
+
         assertThrows(Exception.class, () -> {
-            imageOptimizer.optimize(new ByteArrayInputStream(imageContent), "jpg", false);
+            imageOptimizer.optimize(inputStream, "jpg", false);
         });
     }
 }
