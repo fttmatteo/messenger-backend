@@ -374,7 +374,9 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 > 2. El bot solicita un PIN de acceso de 4 dígitos (se solicita cada 12 horas).
 > 3. Tras la autenticación, el usuario puede consultar estados de placas o listar entregas pendientes.
 
-> #### Seguridad del Bot
+> [!IMPORTANT]
+> **Bot Security**:
+>
 > - **Validación de Webhook**: Usa HMAC-SHA256 con el App Secret de Meta para verificar el origen de la petición.
 > - **Protección por PIN**: Autenticación por PIN de 4 dígitos requerida para acceder a los datos de concesionarios (expira cada 12 horas).
 > - **Protección Fuerza Bruta**: El acceso al bot se bloquea por 15 minutos tras 3 intentos fallidos de PIN, gestionado via Redis.

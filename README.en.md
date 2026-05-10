@@ -374,7 +374,9 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 > 2. Bot requests a 4-digit PIN (requested every 12 hours).
 > 3. After authentication, the user can query plate status or list pending deliveries.
 
-> #### Bot Security
+> [!IMPORTANT]
+> **Bot Security**:
+>
 > - **Webhook Validation**: Uses HMAC-SHA256 with Meta's App Secret to verify request origin.
 > - **PIN Protection**: 4-digit PIN required to access dealership data (expires every 12 hours).
 > - **Brute Force Protection**: Bot access is blocked for 15 minutes after 3 failed PIN attempts, managed via Redis.
