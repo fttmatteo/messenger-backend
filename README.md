@@ -28,16 +28,18 @@
 - [Estructura del Proyecto](#estructura-del-proyecto)
 - [Perfiles de Ambiente](#perfiles-de-ambiente)
 - [API Endpoints](#api-endpoints)
-- [Esquema de Base de Datos](#esquema-de-base-datos)
+- [Esquema de Base de Datos](#esquema-de-base-de-datos)
 - [Tracking en Tiempo Real](#tracking-en-tiempo-real)
-- [Flujo de Estados](#flujo-de-estados)
+- [Seguridad](#seguridad)
 - [Observabilidad](#observabilidad)
-- [Configuración e Instalación](#️configuración-e-instalación)
+- [Verificación de Arquitectura](#verificación-de-arquitectura)
+- [Optimización de Rendimiento](#optimización-de-rendimiento)
+- [Configuración e Instalación](#configuración-e-instalación)
 - [CI/CD](#cicd)
 - [Testing](#testing)
-- [Optimización de Rendimiento](#optimización-de-rendimiento)
 - [Colección Postman](#colección-postman)
 - [Integración Android](#integración-android)
+- [Soporte y Contacto](#soporte-y-contacto) 
 
 ---
 
@@ -211,8 +213,6 @@ messenger/
 | `test`  | Testing automatizado (CI/CD)      | Testcontainers (MySQL/Redis) | Mock               | 1 hora   |
 | `prod`  | Producción (Cloud Run)            | Cloud SQL (MySQL 8)          | Habilitado         | 30 min   |
 
----
-
 ### Inicio Rápido (Docker Zero-Config)
 
 Para una demostración rápida sin configurar dependencias, usa Docker Compose. Esto levantará el frontend, backend, base de datos y redis automáticamente.
@@ -220,8 +220,6 @@ Para una demostración rápida sin configurar dependencias, usa Docker Compose. 
 1. Navega a la raíz del backend: `cd messenger-backend`
 2. Ejecuta: `docker-compose -f docker-compose.local.yml up --build`
 3. Accede a: `http://localhost`
-
----
 
 ### Desarrollo con Hot Reloading
 
@@ -240,8 +238,6 @@ docker-compose -f docker-compose.dev.yml up --build
 
 > [!TIP]
 > Consulta la **[Guía de Inicio Rápido](./GUIA_RAPIDA.md)** para más detalles sobre credenciales de prueba y acceso a phpMyAdmin.
-
----
 
 ### Perfiles
 
@@ -293,8 +289,6 @@ docker-compose -f docker-compose.dev.yml up --build
 
 </details>
 
----
-
 ### Activación
 
 ```bash
@@ -323,8 +317,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `GET`  | `/profile/me`    | Obtener perfil del usuario autenticado (ADMIN/MESSENGER)                        |
 | `PUT`  | `/profile/me`    | Actualizar perfil (nombre, teléfono, contraseña - mín. 6 caracteres)            |
 
----
-
 ### Empleados (`/employees`) - Solo ADMIN
 
 | Método   | Endpoint                           | Descripción                   |
@@ -334,8 +326,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `GET`    | `/employees/findByEmployeeId/{id}` | Obtener empleado por ID       |
 | `PUT`    | `/employees/updateEmployee/{id}`   | Actualizar empleado existente |
 | `DELETE` | `/employees/deleteEmployee/{id}`   | Eliminar empleado             |
-
----
 
 ### Concesionarios (`/dealerships`)
 
@@ -348,8 +338,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `PUT`    | `/dealerships/updateDealership/{id}`       | Actualizar concesionario (ADMIN)                |
 | `DELETE` | `/dealerships/deleteDealership/{id}`       | Eliminar concesionario (ADMIN)                  |
 | `POST`   | `/dealerships/geocodeDealership/{id}`      | Geocodificar dirección de concesionario (ADMIN) |
-
----
 
 ### Servicios de Entrega (`/services`)
 
@@ -368,13 +356,9 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `DELETE` | `/services/trash/empty`          | Vaciar papelera permanentemente (ADMIN)                              |
 | `DELETE` | `/services/trash/{uuid}`         | Eliminación individual permanente (ADMIN)                            |
 
----
-
 ### Transcripción (`/api/transcribe`)
 
 | `POST` | `/api/transcribe` | Transcribir archivo de audio a texto usando Google Cloud STT |
-
----
 
 ### WhatsApp (`/api/whatsapp`)
 
@@ -390,13 +374,16 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 > 2. El bot solicita un PIN de acceso de 4 dígitos (se solicita cada 12 horas).
 > 3. Tras la autenticación, el usuario puede consultar estados de placas o listar entregas pendientes.
 
+> #### Seguridad del Bot
+> - **Validación de Webhook**: Usa HMAC-SHA256 con el App Secret de Meta para verificar el origen de la petición.
+> - **Protección por PIN**: Autenticación por PIN de 4 dígitos requerida para acceder a los datos de concesionarios (expira cada 12 horas).
+> - **Protección Fuerza Bruta**: El acceso al bot se bloquea por 15 minutos tras 3 intentos fallidos de PIN, gestionado via Redis.
+
 > [!CAUTION]
 > **Restricciones de Archivos**:
 >
 > - **Imágenes**: Máx 10MB (WebP)
 > - **Firmas (Estáticas)**: Máx 2MB (WebP)
-
----
 
 ### Configuraciones del Sistema (`/settings`) - Solo ADMIN
 
@@ -404,8 +391,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | ------ | ------------------------- | ---------------------------------------------- |
 | `GET`  | `/settings/status-colors` | Obtener configuración de colores de estados    |
 | `PUT`  | `/settings/status-colors` | Actualizar configuración de colores de estados |
-
----
 
 ### Ubicaciones y Rutas (`/locations`)
 
@@ -416,15 +401,11 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `GET`  | `/locations/distance` | Distancia + tiempo estimado entre puntos |
 | `GET`  | `/locations/reverse`  | Coordenadas a dirección                  |
 
----
-
 ### Archivos (`/files`)
 
 | Método | Endpoint            | Descripción                                     |
 | ------ | ------------------- | ----------------------------------------------- |
 | `GET`  | `/files/{filename}` | Descargar archivo protegido (fotos/firmas) |
-
----
 
 ### Tracking en Tiempo Real (`/tracking` & WebSocket)
 
@@ -437,8 +418,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `GET`  | `/tracking/active`                | Listar todos los mensajeros activos (ADMIN)                |
 | `GET`  | `/tracking/history/pageable/{uuid}`| Obtener historial de ubicaciones con **paginación**       |
 | `GET`  | `/tracking/service/{uuid}`        | Obtener historial para un servicio específico              |
-
----
 
 ### Monitoreo (`/monitoring`) - Solo ADMIN
 
@@ -590,8 +569,6 @@ erDiagram
     dealerships ||--o{ wa_sessions : "authorized"
 ```
 
----
-
 ### Enums
 
 | Enum               | Valores                                                                                                   |
@@ -620,8 +597,6 @@ Sistema de tracking GPS usando **Redis** + **WebSocket** para monitoreo de mensa
 | **Baja latencia**         | Redis para caché de ubicaciones                       |
 | **WebSocket**             | Actualizaciones de datos en tiempo real (Server Push) |
 
----
-
 ### API WebSocket
 
 URL de conexión: `ws://localhost:8080/ws/tracking`
@@ -633,16 +608,12 @@ URL de conexión: `ws://localhost:8080/ws/tracking`
 | `SUB`  | `/topic/tracking/{id}`    | Recibir actualizaciones de un mensajero  |
 | `SUB`  | `/topic/tracking/all`     | Recibir actualizaciones de todos (Admin) |
 
----
-
 ### Integración Google Maps
 
 - **Geocoding**: Dirección ↔ Coordenadas
 - **Directions API**: INHABILITADO - Rutas optimizadas
 - **Distance Matrix**: Estimación de tiempos
 - **Reverse Geocoding**: Coordenadas → Dirección
-
----
 
 ### Reglas de Negocio
 
@@ -667,8 +638,6 @@ URL de conexión: `ws://localhost:8080/ws/tracking`
 > Los servicios eliminados se mueven a una **papelera** y se archivan permanentemente después de **60 días**.
 > Los administradores pueden restaurar servicios de la papelera antes de la eliminación permanente.
 
----
-
 ### Reglas de Estados
 
 | Estado      | Mensajero                            | Admin                    | Eliminar    |
@@ -680,16 +649,12 @@ URL de conexión: `ws://localhost:8080/ws/tracking`
 | `CANCELED`  | -                                    | Reasignar → `ASSIGNED`   | ✅ Papelera |
 | `RESOLVED`  | -                                    | -                        | ✅ Papelera |
 
----
-
 ### Resumen de Permisos
 
 | Rol           | Estados Disponibles                | Acciones Especiales                                   | Notas                                                                           |
 | ------------- | ---------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------- |
 | **MENSAJERO** | `PENDING`, `DELIVERED`, `RETURNED` | -                                                     | Puede cambiar servicios a cualquier estado permitido en cualquier momento       |
 | **ADMIN**     | `CANCELED`, `RESOLVED`             | **Reasignar mensajero** (desde `CANCELED` únicamente) | Puede cambiar servicios a estados administrativos desde cualquier estado actual |
-
----
 
 ### Flujo de Reasignación
 
@@ -699,8 +664,6 @@ flowchart LR
     B --> C[Nuevo mensajero asignado]
     C --> D[Estado → ASSIGNED]
 ```
-
----
 
 ### Gestión de Papelera (Soft Delete y Archivo)
 
@@ -716,19 +679,19 @@ flowchart LR
 
 ---
 
-  - **Validación de Webhook**: Usa HMAC-SHA256 con el App Secret de Meta para verificar el origen de la petición.
-  - **Protección por PIN**: Autenticación por PIN de 4 dígitos requerida para acceder a los datos de concesionarios.
-  - **Protección Fuerza Bruta**: El acceso al bot se bloquea por 15 minutos tras 3 intentos fallidos de PIN, con delays progresivos entre intentos.
-- Headers de respuesta: `X-Rate-Limit-Remaining`, `X-Rate-Limit-Retry-After-Seconds`
+## Seguridad
 
----
+### Rate Limiting (Protección contra DoS)
+El sistema implementa un filtro de limitación de tasa basado en IP para prevenir abusos y ataques de fuerza bruta:
+- **Límites**: 100 peticiones/min para endpoints generales, 10 peticiones/min para `/auth/**`.
+- **Persistencia**: Los contadores se mantienen en **Redis** (compartido entre nodos).
+- **Fallback**: Si Redis falla, el sistema conmuta automáticamente a una caché local en memoria para mantener la protección.
+- **Header**: En caso de bloqueo (HTTP 429), se incluye el header `Retry-After` con los segundos de espera requeridos.
 
 ### Roles y Permisos
 
 - **ADMIN**: Acceso completo a todos los endpoints
 - **MESSENGER**: Solo gestiona sus propios servicios y ubicación
-
----
 
 ### Headers de Seguridad (Producción)
 
@@ -749,15 +712,11 @@ flowchart LR
 | `/actuator/metrics` | Métricas de JVM y HTTP             | `dev`, `local` | Privado (JWT) |
 | `/actuator/info`    | Información de la build            | Todos          | Privado (JWT) |
 
----
-
 ### Optimización para Cloud Run
 
 - **Logging JSON (Prod):** Salida estructurada compatible con Google Cloud Logging
 - **Graceful Shutdown:** Espera 30s para terminar conexiones activas
 - **SSL Offloading:** Confía en headers de proxy (`X-Forwarded-Proto`) de Cloud Run
-
----
 
 ### Documentación API
 
@@ -788,6 +747,9 @@ Ejecutar pruebas de arquitectura:
 mvn test -Dtest=HexagonalArchitectureTest
 ```
 
+---
+
+
 ## Optimización de Rendimiento
 
 El sistema incluye múltiples capas de optimización para garantizar un alto rendimiento y baja latencia.
@@ -801,22 +763,16 @@ El sistema incluye múltiples capas de optimización para garantizar un alto ren
   - Habilitado para `DealershipEntity`, `EmployeeEntity`, y `PlateEntity`.
 - **Serialización Personalizada**: `ObjectMapper` optimizado con soporte para `JavaTimeModule` para manejar `LocalDateTime`.
 
----
-
 ### Optimización de Carga de Datos
 
 - **Lazy Loading (Carga Perezosa)**: La mayoría de las relaciones en `ServiceDeliveryEntity` están configuradas como `FetchType.LAZY` para evitar cargar datos innecesarios.
 - **Entity Graphs**: Definiciones explícitas de `@EntityGraph` en los repositorios para resolver el problema N+1, cargando solo las asociaciones requeridas en una única consulta.
-
----
 
 ### Optimización de Imágenes
 
 - **Pipeline WebP Nativo**: Conversión y optimización automática a formato WebP de alta eficiencia.
 - **Calidades Diferenciadas**: Calidad de **0.85** para fotos (optimizado para OCR de placas) y **0.95** para firmas digitales (máxima nitidez).
 - **Eliminación de Metadatos**: Limpieza automática de metadatos EXIF durante la re-codificación para mejorar la privacidad y reducir el peso del archivo.
-
----
 
 ### Tuning del Pool de Conexiones (HikariCP)
 
@@ -837,8 +793,6 @@ El sistema incluye múltiples capas de optimización para garantizar un alto ren
 | Redis     | 6.0+    |
 | Maven     | 3.9+    |
 
----
-
 ### Variables de Entorno Requeridas
 
 | Variable                   | Descripción                   | Default/Ejemplo           |
@@ -856,8 +810,6 @@ El sistema incluye múltiples capas de optimización para garantizar un alto ren
 | `WHATSAPP_ACCESS_TOKEN`    | Token Permanente de Meta      | `EAAG...`                 |
 | `WHATSAPP_VERIFY_TOKEN`    | Token de Verificación Webhook | `mi_token_secreto`        |
 | `WHATSAPP_APP_SECRET`      | App Secret de Meta            | `abc123...`               |
-
----
 
 ### Inicio Rápido (Docker) - Recomendado
 
@@ -893,8 +845,6 @@ Ejecuta el stack completo localmente con un solo comando.
 
 La API estará disponible en `http://localhost:8080`.
 
----
-
 ### Instalación Manual
 
 ```bash
@@ -928,8 +878,6 @@ on:
     branches: ["main", "develop"]
 ```
 
----
-
 ### Características
 
 | Feature               | Descripción                             |
@@ -938,8 +886,6 @@ on:
 | Caché de dependencias | Builds más rápidos                      |
 | Secrets seguros       | Inyección de credenciales               |
 | Testing               | Profile `test` con Docker (MySQL/Redis) |
-
----
 
 ### Secrets de GitHub Requeridos
 
@@ -965,8 +911,6 @@ El proyecto implementa una estrategia de pruebas robusta en todas las capas de l
 | **Mutación**     | Medición de efectividad de tests          | **Pitest**                               |
 | **E2E (Client)** | Validación de flujos completos de negocio | **Playwright** (en `messenger-frontend`) |
 
----
-
 ### Características Clave
 
 - **Testcontainers (MySQL & Redis)**: No requiere configuración manual de Docker. Los tests descargan y gestionan los contenedores necesarios automáticamente.
@@ -974,8 +918,6 @@ El proyecto implementa una estrategia de pruebas robusta en todas las capas de l
 - **Patrón Singleton Jerárquico**: Uso de `BaseContainerTest` para compartir la infraestructura entre múltiples contextos de prueba, reduciendo drásticamente el tiempo de inicio.
 - **Pruebas de Mutación**: Métricas que van más allá de la cobertura de líneas, inyectando fallos para verificar que los asertos de los tests realmente detecten errores.
 - **Paridad con Flyway**: Los tests de integración corren exactamente sobre las mismas migraciones que se usan en producción.
-
----
 
 ### Ejecución de Pruebas
 
@@ -1011,8 +953,6 @@ El proyecto implementa una estrategia de pruebas robusta en todas las capas de l
   - System Settings
   - Transcription
 
----
-
 ### Uso
 
 1. Importar colección en Postman
@@ -1034,10 +974,7 @@ El sistema incluye una aplicación nativa para Android construida con **Capacito
 - **Framework**: Ionic + Capacitor
 - **Plugins**:
   - `CapacitorHttp`: Peticiones de red nativas optimizadas.
-  - `PushNotifications`: Alertas en tiempo real para actualizaciones de servicios.
   - `StatusBar`: Personalización de la interfaz para una experiencia edge-to-edge.
-
----
 
 ### Características y Permisos
 
@@ -1048,8 +985,6 @@ La aplicación requiere los siguientes permisos para su correcto funcionamiento:
 - **Notificaciones**: `POST_NOTIFICATIONS` para actualizaciones de servicios.
 - **Servicio de Primer Plano**: Garantiza la persistencia del tracking durante las entregas.
 
----
-
 ### Configuración de Desarrollo (Emulador)
 
 Para conectar el emulador de Android a tu entorno local de desarrollo:
@@ -1057,8 +992,6 @@ Para conectar el emulador de Android a tu entorno local de desarrollo:
 1. Asegúrate de que el backend esté corriendo en `localhost:8080`.
 2. El proyecto de Android está pre-configurado para usar `10.0.2.2` para acceder al `localhost` de la máquina host.
 3. El tráfico de texto claro (HTTP) está permitido para `10.0.2.2` en `network_security_config.xml`.
-
----
 
 ### Comandos Útiles
 
@@ -1090,7 +1023,5 @@ npx cap open android
 - Repositorio: `messenger-backend`
 - Autor: [Mateo Valencia Ardila](https://github.com/fttmatteo)
 - Email: [contacto@plak.digital](mailto:contacto@plak.digital)
-
----
 
 > **Copyright (C) 2026 Mateo Valencia Ardila. Todos los derechos reservados. El código fuente de esta aplicación está protegido por las leyes de derechos de autor. Registro DNDA No. 13-108-139. Queda estrictamente prohibida su copia, distribución o modificación sin autorización expresa.**
