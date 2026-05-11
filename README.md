@@ -4,7 +4,7 @@
 
 # Messenger Backend API
 
-<img src="https://img.shields.io/badge/Version-1.13.3-blue.svg" alt="Version">
+<img src="https://img.shields.io/badge/Version-1.13.4-blue.svg" alt="Version">
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.14-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
@@ -772,7 +772,7 @@ El sistema incluye múltiples capas de optimización para garantizar un alto ren
 
 ### Optimización de Imágenes
 
-- **Pipeline WebP Nativo**: Conversión y optimización automática a formato WebP de alta eficiencia.
+- **Pipeline WebP Dual**: El frontend realiza una pre-compresión a WebP (calidad 0.85) antes de la subida para ahorrar ancho de banda móvil. El backend recibe, valida y aplica un segundo paso de optimización y saneamiento de metadatos.
 - **Calidades Diferenciadas**: Calidad de **0.85** para fotos (optimizado para OCR de placas) y **0.95** para firmas digitales (máxima nitidez).
 - **Eliminación de Metadatos**: Limpieza automática de metadatos EXIF durante la re-codificación para mejorar la privacidad y reducir el peso del archivo.
 

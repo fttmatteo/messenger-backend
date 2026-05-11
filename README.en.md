@@ -4,7 +4,7 @@
 
 # Messenger Backend API
 
-<img src="https://img.shields.io/badge/Version-1.13.3-blue.svg" alt="Version">
+<img src="https://img.shields.io/badge/Version-1.13.4-blue.svg" alt="Version">
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.14-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
@@ -771,9 +771,9 @@ The system includes multiple optimization layers to ensure high performance and 
 
 ### Image Optimization
 
-- **Native WebP Pipeline**: Automatic conversion and optimization to high-efficiency WebP format.
-- **Differentiated Quality**: **0.85** quality for photos (optimized for license plate OCR) and **0.95** for digital signatures (maximum sharpness).
-- **Metadata Stripping**: Automatic EXIF metadata removal during re-encoding to improve privacy and reduce file size.
+- **Dual WebP Pipeline**: The frontend performs WebP pre-compression (0.85 quality) before upload to save mobile bandwidth. The backend receives, validates, and applies a second optimization and metadata sanitization step.
+- **Differentiated Qualities**: **0.85** quality for photos (optimized for plate OCR) and **0.95** for digital signatures (maximum sharpness).
+- **Metadata Removal**: Automatic EXIF metadata cleaning during re-encoding to improve privacy and reduce file size.
 
 ### Connection Pool Tuning (HikariCP)
 
