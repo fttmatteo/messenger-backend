@@ -4,7 +4,7 @@
 
 # Messenger Backend API
 
-<img src="https://img.shields.io/badge/Version-1.13.3-blue.svg" alt="Version">
+<img src="https://img.shields.io/badge/Version-1.13.4-blue.svg" alt="Version">
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.14-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
@@ -30,14 +30,16 @@
 - [API Endpoints](#api-endpoints)
 - [Database Schema](#database-schema)
 - [Real-Time Tracking](#real-time-tracking)
-- [State Flow](#state-flow)
+- [Security](#security)
 - [Observability](#observability)
-- [Setup & Installation](#️setup--installation)
+- [Architecture Verification](#architecture-verification)
+- [Performance Optimization](#performance-optimization)
+- [Setup & Installation](#setup--installation)
 - [CI/CD](#cicd)
 - [Testing](#testing)
-- [Performance Optimization](#performance-optimization)
 - [Postman Collection](#postman-collection)
 - [Android Integration](#android-integration)
+- [Support & Contact](#support--contact)
 
 ---
 
@@ -211,8 +213,6 @@ messenger/
 | `test`  | Automated testing (CI/CD)              | Testcontainers (MySQL/Redis) | Mock          | 1 hour   |
 | `prod`  | Production (Cloud Run)                 | Cloud SQL (MySQL 8)          | Enabled       | 30 min   |
 
----
-
 ### Quick Start (Docker Zero-Config)
 
 For a quick demonstration without manual setup, use Docker Compose. This will spin up the frontend, backend, database, and redis automatically.
@@ -220,8 +220,6 @@ For a quick demonstration without manual setup, use Docker Compose. This will sp
 1. Navigate to backend root: `cd messenger-backend`
 2. Run: `docker-compose -f docker-compose.local.yml up --build`
 3. Access: `http://localhost`
-
----
 
 ### Development with Hot Reloading
 
@@ -240,8 +238,6 @@ docker-compose -f docker-compose.dev.yml up --build
 
 > [!TIP]
 > Check the **[Quick Start Guide](./GUIA_RAPIDA.md)** (Spanish) for more details on test credentials and phpMyAdmin access.
-
----
 
 ### Profiles
 
@@ -293,8 +289,6 @@ docker-compose -f docker-compose.dev.yml up --build
 
 </details>
 
----
-
 ### Activation
 
 ```bash
@@ -323,8 +317,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `GET`  | `/profile/me`    | Get authenticated user profile (ADMIN/MESSENGER)                      |
 | `PUT`  | `/profile/me`    | Update profile (name, phone, password - min 6 chars)                  |
 
----
-
 ### Employees (`/employees`) - ADMIN only
 
 | Method   | Endpoint                           | Description              |
@@ -334,8 +326,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `GET`    | `/employees/findByEmployeeId/{id}` | Get employee by ID       |
 | `PUT`    | `/employees/updateEmployee/{id}`   | Update existing employee |
 | `DELETE` | `/employees/deleteEmployee/{id}`   | Delete employee          |
-
----
 
 ### Dealerships (`/dealerships`)
 
@@ -348,8 +338,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `PUT`    | `/dealerships/updateDealership/{id}`       | Update dealership (ADMIN)          |
 | `DELETE` | `/dealerships/deleteDealership/{id}`       | Delete dealership (ADMIN)          |
 | `POST`   | `/dealerships/geocodeDealership/{id}`      | Geocode dealership address (ADMIN) |
-
----
 
 ### Service Deliveries (`/services`)
 
@@ -368,13 +356,9 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `DELETE` | `/services/trash/empty`          | Empty trash permanently (ADMIN)                              |
 | `DELETE` | `/services/trash/{uuid}`         | Permanent delete individual item (ADMIN)                     |
 
----
-
 ### Transcription (`/api/transcribe`)
 
 | `POST` | `/api/transcribe` | Transcribe audio file to text using Google Cloud STT |
-
----
 
 ### WhatsApp (`/api/whatsapp`)
 
@@ -390,13 +374,18 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 > 2. Bot requests a 4-digit PIN (requested every 12 hours).
 > 3. After authentication, the user can query plate status or list pending deliveries.
 
+> [!IMPORTANT]
+> **Bot Security**:
+>
+> - **Webhook Validation**: Uses HMAC-SHA256 with Meta's App Secret to verify request origin.
+> - **PIN Protection**: 4-digit PIN required to access dealership data (expires every 12 hours).
+> - **Brute Force Protection**: Bot access is blocked for 15 minutes after 3 failed PIN attempts, managed via Redis.
+
 > [!CAUTION]
 > **File Constraints**:
 >
 > - **Images**: Max 10MB (WebP)
 > - **Signatures (Static)**: Max 2MB (WebP)
-
----
 
 ### System Settings (`/settings`) - ADMIN only
 
@@ -404,8 +393,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | ------ | ------------------------- | --------------------------------- |
 | `GET`  | `/settings/status-colors` | Get status color configuration    |
 | `PUT`  | `/settings/status-colors` | Update status color configuration |
-
----
 
 ### Locations & Routes (`/locations`)
 
@@ -416,15 +403,11 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `GET`  | `/locations/distance` | Distance + time estimate between points |
 | `GET`  | `/locations/reverse`  | Coordinates to address                  |
 
----
-
 ### Files (`/files`)
 
 | Method | Endpoint            | Description                                      |
 | ------ | ------------------- | ------------------------------------------------ |
 | `GET`  | `/files/{filename}` | Download protected file (photos/signatures) |
-
----
 
 ### Real-Time Tracking (`/tracking` & WebSocket)
 
@@ -437,8 +420,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `GET`  | `/tracking/active`                | Get all active messengers (ADMIN)                 |
 | `GET`  | `/tracking/history/pageable/{uuid}`| Get location history with **pagination**          |
 | `GET`  | `/tracking/service/{uuid}`        | Get history for a specific service                |
-
----
 
 ### Monitoring (`/monitoring`) - ADMIN only
 
@@ -590,8 +571,6 @@ erDiagram
     dealerships ||--o{ wa_sessions : "authorized"
 ```
 
----
-
 ### Enums
 
 | Enum               | Values                                                                                                |
@@ -620,8 +599,6 @@ GPS tracking system using **Redis** + **WebSocket** for messenger monitoring.
 | **Low latency**         | Redis for location caching                      |
 | **WebSocket**           | Real-time data updates (Server Push)            |
 
----
-
 ### WebSocket API
 
 Connection URL: `ws://localhost:8080/ws/tracking`
@@ -633,16 +610,12 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 | `SUB`  | `/topic/tracking/{id}`    | Receive updates for specific messenger     |
 | `SUB`  | `/topic/tracking/all`     | Receive updates for all messengers (Admin) |
 
----
-
 ### Google Maps Integration
 
 - **Geocoding**: Address ↔ Coordinates
 - **Directions API**: DISABLED - Optimized routes
 - **Distance Matrix**: Time estimation
 - **Reverse Geocoding**: Coordinates → Address
-
----
 
 ### Business Rules
 
@@ -667,8 +640,6 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 > Deleted services are moved to a **trash bin** and permanently deleted after **60 days**.
 > Admins can restore services from the trash before permanent deletion.
 
----
-
 ### State Rules
 
 | State       | Messenger                            | Admin                               | Delete   |
@@ -680,16 +651,12 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 | `CANCELED`  | -                                    | Admin can **reassign** → `ASSIGNED` | ✅ Trash |
 | `RESOLVED`  | -                                    | -                                   | ✅ Trash |
 
----
-
 ### Permissions Summary
 
 | Role          | Available States                   | Special Actions                               | Notes                                                      |
 | ------------- | ---------------------------------- | --------------------------------------------- | ---------------------------------------------------------- |
 | **MESSENGER** | `PENDING`, `DELIVERED`, `RETURNED` | -                                             | Can change services to any allowed state at any time       |
 | **ADMIN**     | `CANCELED`, `RESOLVED`             | **Reassign messenger** (from `CANCELED` only) | Can change services to admin states from any current state |
-
----
 
 ### Reassignment Flow
 
@@ -699,8 +666,6 @@ flowchart LR
     B --> C[New messenger assigned]
     C --> D[Status → ASSIGNED]
 ```
-
----
 
 ### Trash Management (Soft Delete & Archive)
 
@@ -716,6 +681,29 @@ flowchart LR
 
 ---
 
+## Security
+
+### Rate Limiting (DoS Protection)
+The system implements an IP-based rate limiting filter to prevent abuse and brute force attacks:
+- **Limits**: 100 requests/min for general endpoints, 10 requests/min for `/auth/**`.
+- **Persistence**: Counters are maintained in **Redis** (shared across nodes).
+- **Fallback**: If Redis fails, the system automatically switches to a local in-memory cache to maintain protection.
+- **Header**: In case of blockage (HTTP 429), the `Retry-After` header is included with the required wait time in seconds.
+
+### Roles & Permissions
+
+- **ADMIN**: Full access to all endpoints.
+- **MESSENGER**: Only manages their own services and location.
+
+### Security Headers (Production)
+
+- HSTS (HTTP Strict Transport Security)
+- Cookies: `Secure`, `HttpOnly`, `SameSite=Strict`
+- CORS configured by origin
+- No stack trace exposure
+
+---
+
 ## Observability
 
 ### Monitoring Endpoints (Actuator)
@@ -726,15 +714,11 @@ flowchart LR
 | `/actuator/metrics` | JVM and HTTP metrics            | `dev`, `local` | Private (JWT) |
 | `/actuator/info`    | Build information               | All            | Private (JWT) |
 
----
-
 ### Cloud Run Optimization
 
 - **JSON Logging (Prod):** Structured output compatible with Google Cloud Logging
 - **Graceful Shutdown:** Waits 30s to finish active connections
 - **SSL Offloading:** Trusts proxy headers (`X-Forwarded-Proto`) from Cloud Run
-
----
 
 ### API Documentation
 
@@ -765,6 +749,8 @@ Run architecture tests:
 mvn test -Dtest=HexagonalArchitectureTest
 ```
 
+---
+
 ## Performance Optimization
 
 The system includes multiple optimization layers to ensure high performance and low latency.
@@ -778,22 +764,16 @@ The system includes multiple optimization layers to ensure high performance and 
   - Enabled for `DealershipEntity`, `EmployeeEntity`, and `PlateEntity`.
 - **Custom Serialization**: Optimized `ObjectMapper` with `JavaTimeModule` support for `LocalDateTime`.
 
----
-
 ### Data Fetching Optimization
 
 - **Lazy Loading**: Most relationships in `ServiceDeliveryEntity` are configured as `FetchType.LAZY` to avoid loading unnecessary data.
 - **Entity Graphs**: Explicit `@EntityGraph` definitions in repositories to solve the N+1 problem by fetching only required associations in a single query.
 
----
-
 ### Image Optimization
 
-- **Native WebP Pipeline**: Automatic conversion and optimization to high-efficiency WebP format.
-- **Differentiated Quality**: **0.85** quality for photos (optimized for license plate OCR) and **0.95** for digital signatures (maximum sharpness).
-- **Metadata Stripping**: Automatic EXIF metadata removal during re-encoding to improve privacy and reduce file size.
-
----
+- **Dual WebP Pipeline**: The frontend performs WebP pre-compression (0.85 quality) before upload to save mobile bandwidth. The backend receives, validates, and applies a second optimization and metadata sanitization step.
+- **Differentiated Qualities**: **0.85** quality for photos (optimized for plate OCR) and **0.95** for digital signatures (maximum sharpness).
+- **Metadata Removal**: Automatic EXIF metadata cleaning during re-encoding to improve privacy and reduce file size.
 
 ### Connection Pool Tuning (HikariCP)
 
@@ -813,8 +793,6 @@ The system includes multiple optimization layers to ensure high performance and 
 | Redis       | 6.0+    |
 | Maven       | 3.9+    |
 
----
-
 ### Environment Variables Required
 
 | Variable                   | Description              | Default/Example           |
@@ -832,8 +810,6 @@ The system includes multiple optimization layers to ensure high performance and 
 | `WHATSAPP_ACCESS_TOKEN`    | Meta Permanent Token     | `EAAG...`                 |
 | `WHATSAPP_VERIFY_TOKEN`    | Custom Webhook Token     | `my_secret_token`         |
 | `WHATSAPP_APP_SECRET`      | Meta App Secret          | `abc123...`               |
-
----
 
 ### Quick Start (Docker) - Recommended
 
@@ -869,8 +845,6 @@ Run the full stack locally with one command.
 
 The API will be available at `http://localhost:8080`.
 
----
-
 ### Manual Quick Start
 
 ```bash
@@ -904,8 +878,6 @@ on:
     branches: ["main", "develop"]
 ```
 
----
-
 ### Features
 
 | Feature            | Description                            |
@@ -914,8 +886,6 @@ on:
 | Dependency caching | Faster builds                          |
 | Secure secrets     | Credential injection                   |
 | Testing            | Profile test with Docker (MySQL/Redis) |
-
----
 
 ### Required GitHub Secrets
 
@@ -941,8 +911,6 @@ The project implements a robust testing strategy across all layers of the hexago
 | **Mutation**     | Test effectiveness measurement      | **Pitest**                               |
 | **E2E (Client)** | Full business flow validation       | **Playwright** (in `messenger-frontend`) |
 
----
-
 ### Key Features
 
 - **Testcontainers (MySQL & Redis)**: No manual Docker setup required. Tests download and manage containers automatically.
@@ -950,8 +918,6 @@ The project implements a robust testing strategy across all layers of the hexago
 - **Hierarchical Singleton Pattern**: `BaseContainerTest` shares infrastructure across test contexts, drastically reducing startup time.
 - **Mutation Testing**: Metrics beyond line coverage, injecting faults to ensure assertions actually detect errors.
 - **Flyway Parity**: Integration tests run on the exact same migrations used in production.
-
----
 
 ### Running Tests
 
@@ -987,8 +953,6 @@ The project implements a robust testing strategy across all layers of the hexago
   - System Settings
   - Transcription
 
----
-
 ### Usage
 
 1. Import collection in Postman
@@ -1010,10 +974,7 @@ The system includes a native Android application built with **Capacitor**, provi
 - **Framework**: Ionic + Capacitor
 - **Plugins**:
   - `CapacitorHttp`: Optimized native network requests.
-  - `PushNotifications`: Real-time alerts for updates.
   - `StatusBar`: Custom UI overlays for edge-to-edge experience.
-
----
 
 ### Key Features & Permissions
 
@@ -1024,8 +985,6 @@ The app requests the following permissions to function correctly:
 - **Notifications**: `POST_NOTIFICATIONS` for delivery updates.
 - **Foreground Service**: Ensures tracking persistence during deliveries.
 
----
-
 ### Development Setup (Emulator)
 
 To connect the Android Emulator to your local backend development environment:
@@ -1033,8 +992,6 @@ To connect the Android Emulator to your local backend development environment:
 1. Ensure the backend is running on `localhost:8080`.
 2. The Android project is pre-configured to use `10.0.2.2` to access the host machine's `localhost`.
 3. Cleartext traffic is permitted for `10.0.2.2` in `network_security_config.xml`.
-
----
 
 ### Commands
 
@@ -1066,7 +1023,5 @@ npx cap open android
 - Repository: `messenger-backend`
 - Author: [Mateo Valencia Ardila](https://github.com/fttmatteo)
 - Email: [contacto@plak.digital](mailto:contacto@plak.digital)
-
----
 
 > **Copyright (C) 2026 Mateo Valencia Ardila. All rights reserved. The source code for this application is protected by copyright laws. DNDA Registration No. 13-108-139. Copying, distributing, or modifying this application without express authorization is strictly prohibited.**
