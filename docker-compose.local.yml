@@ -28,11 +28,9 @@ services:
     ports:
       - "8080:8080"
     environment:
-      # Perfil local para que funcione sin APIs externas
       - SPRING_PROFILES_ACTIVE=local
       - DB_HOST=messenger-db
       - REDIS_HOST=messenger-redis
-      # Secretos por defecto (no requieren .env manual)
       - JWT_SECRET=esta-es-una-clave-secreta-de-prueba-para-distribucion-local-min-32-chars
       - DB_NAME=messenger_dev
       - DB_PASSWORD=secret123
