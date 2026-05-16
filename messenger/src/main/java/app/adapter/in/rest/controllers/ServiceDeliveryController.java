@@ -79,14 +79,14 @@ public class ServiceDeliveryController {
         }
 
         return fileHelper.withTempFile(image, imageFile -> {
-            String extractedPlate = serviceDeliveryUseCase.extractPlateFromImage(imageFile);
+            app.domain.ports.OcrResult result = serviceDeliveryUseCase.extractPlateFromImage(imageFile);
 
-            if (extractedPlate == null || extractedPlate.isEmpty()) {
+            if (result.text() == null || result.text().isEmpty()) {
                 return ResponseEntity.ok(PlateExtractionResponse.failure(
-                        "No se pudo detectar la placa. Por favor ingresa la placa manualmente."));
+                        "No se pudo detectar el chasis. Por favor ingresalo manualmente."));
             }
 
-            return ResponseEntity.ok(PlateExtractionResponse.success(extractedPlate));
+            return ResponseEntity.ok(PlateExtractionResponse.success(result.text(), result.score()));
         });
     }
 

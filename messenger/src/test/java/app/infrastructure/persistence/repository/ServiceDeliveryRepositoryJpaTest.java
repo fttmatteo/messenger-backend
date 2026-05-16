@@ -61,7 +61,7 @@ class ServiceDeliveryRepositoryJpaTest extends BaseContainerTest {
 
         PlateEntity plate = new PlateEntity();
         plate.setPlateNumber("KJH987");
-        plate.setPlateType(PlateType.CAR);
+        plate.setPlateType(PlateType.MOTORCYCLE);
         plateRepository.save(plate);
 
         ServiceDeliveryEntity service = new ServiceDeliveryEntity();

@@ -36,25 +36,19 @@ public class ServiceDeliveryValidator extends SimpleValidator {
 
     public String plateNumberValidator(String value) throws InputsException {
         if (value == null || value.trim().isEmpty()) {
-            throw new InputsException("El número de placa no puede estar vacío.");
+            throw new InputsException("El número de chasis no puede estar vacío.");
         }
 
         String cleaned = value.toUpperCase().trim();
 
-        cleaned = cleaned.replaceAll("O", "0")
-                .replaceAll("I", "1")
-                .replaceAll("[^A-Z0-9]", "");
+        cleaned = cleaned.replaceAll("[^A-Z0-9]", "");
 
-        if (cleaned.length() != 6) {
-            throw new InputsException("La placa debe tener 6 caracteres. Formato recibido: " + cleaned);
+        if (cleaned.length() < 10 || cleaned.length() > 20) {
+            throw new InputsException("El número de chasis debe tener entre 10 y 20 caracteres. Recibido: " + cleaned.length());
         }
 
-        boolean isValidCar = cleaned.matches("^[A-Z]{3}[0-9]{3}$");
-        boolean isValidMoto = cleaned.matches("^[A-Z]{3}[0-9]{2}[A-Z]$");
-        boolean isValidOld = cleaned.matches("^[0-9]{3}[A-Z]{3}$");
-
-        if (!isValidCar && !isValidMoto && !isValidOld) {
-            throw new InputsException("Formato de placa inválido.");
+        if (!cleaned.matches("^[A-Z0-9]+$")) {
+            throw new InputsException("Formato de chasis inválido. Solo se permiten letras y números.");
         }
         return cleaned;
     }

@@ -74,7 +74,7 @@ class MonitoringControllerIntegrationTest extends AbstractIntegrationTest {
 
         PlateEntity plate = new PlateEntity();
         plate.setPlateNumber("MON123");
-        plate.setPlateType(PlateType.CAR);
+        plate.setPlateType(PlateType.MOTORCYCLE);
         entityManager.persist(plate);
 
         ServiceDeliveryEntity service = new ServiceDeliveryEntity();

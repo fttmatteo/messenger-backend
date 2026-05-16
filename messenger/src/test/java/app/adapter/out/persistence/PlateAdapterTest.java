@@ -45,7 +45,7 @@ class PlateAdapterTest {
     void shouldSaveAndRetrievePlate() {
         Plate plate = new Plate();
         plate.setPlateNumber("ABC-123");
-        plate.setPlateType(PlateType.CAR);
+        plate.setPlateType(PlateType.MOTORCYCLE);
 
         PlateEntity entity = new PlateEntity();
         entity.setIdPlate(1L);

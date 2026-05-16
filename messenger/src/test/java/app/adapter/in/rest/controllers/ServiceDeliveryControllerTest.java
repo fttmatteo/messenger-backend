@@ -16,6 +16,7 @@ import app.domain.model.enums.Status;
 import app.infrastructure.helper.FileHelper;
 import app.infrastructure.helper.SecurityHelper;
 import app.domain.services.FileValidationService;
+import app.domain.ports.OcrResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -73,8 +74,8 @@ class ServiceDeliveryControllerTest {
         messengerUser.setRole(Role.MESSENGER);
 
         Plate plate = new Plate();
-        plate.setPlateNumber("ABC123");
-        plate.setPlateType(PlateType.CAR);
+        plate.setPlateNumber("ABC1234567");
+        plate.setPlateType(PlateType.MOTORCYCLE);
 
         sampleService = new ServiceDelivery();
         sampleService.setIdServiceDelivery(1L);
@@ -157,11 +158,12 @@ class ServiceDeliveryControllerTest {
                 FileHelper.FileOperation<?> operation = invocation.getArgument(1);
                 return operation.execute(new java.io.File("test.jpg"));
             });
-            when(serviceDeliveryUseCase.extractPlateFromImage(any())).thenReturn("ABC123");
+            when(serviceDeliveryUseCase.extractPlateFromImage(any())).thenReturn(new OcrResult("ABC1234567", 0.95));
 
             mockMvc.perform(multipart("/services/extractPlate").file(file))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.plate").value("ABC123"))
+                    .andExpect(jsonPath("$.plate").value("ABC1234567"))
+                    .andExpect(jsonPath("$.score").value(0.95))
                     .andExpect(jsonPath("$.success").value(true));
         }
 
@@ -178,12 +180,12 @@ class ServiceDeliveryControllerTest {
                 FileHelper.FileOperation<?> operation = invocation.getArgument(1);
                 return operation.execute(new java.io.File("test.jpg"));
             });
-            when(serviceDeliveryUseCase.extractPlateFromImage(any())).thenReturn("");
+            when(serviceDeliveryUseCase.extractPlateFromImage(any())).thenReturn(OcrResult.empty());
 
             mockMvc.perform(multipart("/services/extractPlate").file(file))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(jsonPath("$.plate").isEmpty());
+                    .andExpect(jsonPath("$.message").value("No se pudo detectar el chasis. Por favor ingresalo manualmente."));
         }
     }
 }

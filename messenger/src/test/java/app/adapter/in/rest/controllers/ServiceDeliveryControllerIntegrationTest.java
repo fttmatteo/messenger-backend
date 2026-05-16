@@ -126,7 +126,7 @@ class ServiceDeliveryControllerIntegrationTest extends AbstractIntegrationTest {
     private PlateEntity createPlate(String number) {
         PlateEntity p = new PlateEntity();
         p.setPlateNumber(number);
-        p.setPlateType(app.domain.model.enums.PlateType.CAR);
+        p.setPlateType(app.domain.model.enums.PlateType.MOTORCYCLE);
         return p;
     }
 }

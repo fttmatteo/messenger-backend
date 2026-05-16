@@ -120,7 +120,7 @@ class WhatsAppBotServiceTest {
         botService.processMessage(from, "1");
 
         verify(sessionPort, atLeastOnce()).updateSession(argThat(s -> s.getConversationState() == app.domain.model.enums.WhatsAppConversationState.AWAITING_PLATE));
-        verify(messagePort).sendTextMessage(eq(from), contains("Escribe el número de la placa"));
+        verify(messagePort).sendTextMessage(eq(from), contains("Escribe el número del chasis"));
     }
 
     @Test
@@ -129,7 +129,7 @@ class WhatsAppBotServiceTest {
      */
     void testProcessMessage_Menu_LooksLikePlate_DirectSearch() {
         String from = "123456789";
-        String plate = "ABC-123";
+        String chasis = "ABC12345674567";
         Dealership dealership = new Dealership();
         dealership.setIdDealership(1L);
         dealership.setName("Test Dealer");
@@ -139,13 +139,13 @@ class WhatsAppBotServiceTest {
         session.setConversationState(app.domain.model.enums.WhatsAppConversationState.MENU);
 
         when(sessionPort.findActiveSession(from)).thenReturn(Optional.of(session));
-        when(searchService.findByPlateAndDealershipPaginated(eq(plate), anyLong(), any()))
+        when(searchService.findByPlateAndDealershipPaginated(eq(chasis), anyLong(), any()))
                 .thenReturn(org.springframework.data.domain.Page.empty());
 
-        botService.processMessage(from, plate);
+        botService.processMessage(from, chasis);
 
-        verify(searchService).findByPlateAndDealershipPaginated(eq(plate), eq(1L), any());
-        verify(messagePort).sendTextMessage(eq(from), contains("No se encontró la placa"));
+        verify(searchService).findByPlateAndDealershipPaginated(eq(chasis), eq(1L), any());
+        verify(messagePort).sendTextMessage(eq(from), contains("No se encontró el chasis"));
     }
 
     @Test

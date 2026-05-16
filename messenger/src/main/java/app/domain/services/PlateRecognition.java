@@ -3,56 +3,35 @@ package app.domain.services;
 import org.springframework.stereotype.Service;
 import app.domain.exception.BusinessException;
 import app.domain.model.enums.PlateType;
-import java.util.regex.Pattern;
 
 /**
- * Servicio para reconocimiento y clasificación de placas vehiculares
- * colombianas.
+ * Servicio para reconocimiento y clasificación de chasis
  */
 @Service
 public class PlateRecognition {
 
-    private static final Pattern CAR_PATTERN = Pattern.compile("^[A-Z]{3}\\s*\\d{3}$");
-    private static final Pattern MOTO_PATTERN = Pattern.compile("^[A-Z]{3}\\s*\\d{2}[A-Z]$");
-    private static final Pattern MOTOCARRO_PATTERN = Pattern.compile("^\\d{3}\\s*[A-Z]{3}$");
-
     /**
-     * Determina el tipo de vehículo basado en el formato de la placa.
-     * Soportados: Carro (AAA111), Moto (AAA11A), Motocarro (111AAA).
+     * Determina el tipo de vehículo basado en el formato del chasis.
+     * En este proyecto, todos los seriales de chasis se clasifican como MOTORCYCLE.
      */
     public PlateType determinePlateType(String plateNumber) throws BusinessException {
         if (plateNumber == null || plateNumber.trim().isEmpty()) {
-            throw new BusinessException("El número de placa no puede estar vacío.");
+            throw new BusinessException("El número de chasis no puede estar vacío.");
         }
 
-        String normalizedPlate = plateNumber.trim().toUpperCase();
+        String normalized = plateNumber.trim().toUpperCase().replaceAll("\\s+", "");
 
-        if (CAR_PATTERN.matcher(normalizedPlate).matches()) {
-            return PlateType.CAR;
-        } else if (MOTO_PATTERN.matcher(normalizedPlate).matches()) {
+        if (normalized.length() >= 10 && normalized.length() <= 20) {
             return PlateType.MOTORCYCLE;
-        } else if (MOTOCARRO_PATTERN.matcher(normalizedPlate).matches()) {
-            return PlateType.MOTORCAR;
-        } else {
-            throw new BusinessException("Formato de placa no reconocido: " + normalizedPlate);
         }
+
+        throw new BusinessException("El número de chasis no tiene una longitud válida (10-20): " + normalized);
     }
 
     /**
-     * Formatea una placa para su almacenamiento estandarizado (con espacios si
-     * aplica).
+     * Formatea un chasis para su almacenamiento estandarizado.
      */
     public String formatPlateForStorage(String plateNumber, PlateType type) {
-        String clean = plateNumber.replaceAll("\\s+", "").toUpperCase();
-        switch (type) {
-            case CAR:
-                return clean.substring(0, 3) + " " + clean.substring(3);
-            case MOTORCYCLE:
-                return clean.substring(0, 3) + " " + clean.substring(3);
-            case MOTORCAR:
-                return clean.substring(0, 3) + " " + clean.substring(3);
-            default:
-                return clean;
-        }
+        return plateNumber.replaceAll("\\s+", "").toUpperCase();
     }
 }

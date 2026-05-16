@@ -100,7 +100,7 @@ public class SearchServiceDelivery {
     }
 
     /**
-     * Busca servicios por número de placa filtrado por concesionario con paginación.
+     * Busca servicios por número de chasis filtrado por concesionario con paginación.
      */
     public Page<ServiceDelivery> findByPlateAndDealershipPaginated(String plateNumber, Long dealershipId,
             Pageable pageable) {

@@ -6,6 +6,7 @@ import app.domain.model.ServiceDelivery;
 import app.domain.model.Signature;
 import app.domain.model.enums.Status;
 import app.domain.ports.OcrPort;
+import app.domain.ports.OcrResult;
 import app.domain.ports.StoragePort;
 import app.domain.services.CreateServiceDelivery;
 import app.domain.services.DeleteServiceDelivery;
@@ -56,7 +57,7 @@ class ServiceDeliveryUseCaseTest {
     @BeforeEach
     void setUp() {
         Plate plate = new Plate();
-        plate.setPlateNumber("ABC123");
+        plate.setPlateNumber("ABC1234567");
 
         sampleService = new ServiceDelivery();
         sampleService.setIdServiceDelivery(1L);
@@ -77,18 +78,18 @@ class ServiceDeliveryUseCaseTest {
          * imagen -> Crear servicio.
          */
         void shouldCreateServiceFromOcrDetection() throws Exception {
-            when(ocrPort.extractText(mockImageFile)).thenReturn("ABC123");
+            when(ocrPort.extractText(mockImageFile)).thenReturn(new OcrResult("ABC1234567", 0.95));
             when(storagePort.save(eq(mockImageFile), eq("detections"), anyString()))
                     .thenReturn("/path/to/saved/image.png");
 
-            when(createService.create(eq("ABC123"), anyString(), eq(1L), eq(123456L), isNull(), isNull()))
+            when(createService.create(eq("ABC1234567"), anyString(), eq(1L), eq(123456L), isNull(), isNull()))
                     .thenReturn(sampleService);
 
             serviceDeliveryUseCase.createServiceFromImage(mockImageFile, 1L, 123456L, null, null);
 
             verify(ocrPort).extractText(mockImageFile);
-            verify(storagePort).save(eq(mockImageFile), eq("detections"), contains("ABC123"));
-            verify(createService).create(eq("ABC123"), anyString(), eq(1L), eq(123456L), isNull(), isNull());
+            verify(storagePort).save(eq(mockImageFile), eq("detections"), contains("ABC1234567"));
+            verify(createService).create(eq("ABC1234567"), anyString(), eq(1L), eq(123456L), isNull(), isNull());
         }
 
         @Test
@@ -102,25 +103,24 @@ class ServiceDeliveryUseCaseTest {
             verify(createService, never()).create(anyString(), anyString(), anyLong(), anyLong(), any(), any());
         }
 
-        @Test
-        @DisplayName("Debe extraer placa exitosamente para preview")
         void shouldExtractPlateForPreview() throws Exception {
-            when(ocrPort.extractText(mockImageFile)).thenReturn("ABC123");
+            when(ocrPort.extractText(mockImageFile)).thenReturn(new OcrResult("ABC1234567", 0.95));
 
-            String result = serviceDeliveryUseCase.extractPlateFromImage(mockImageFile);
+            OcrResult result = serviceDeliveryUseCase.extractPlateFromImage(mockImageFile);
 
-            assertEquals("ABC123", result);
+            assertEquals("ABC1234567", result.text());
+            assertEquals(0.95, result.score());
             verify(ocrPort).extractText(mockImageFile);
         }
 
         @Test
-        @DisplayName("Debe retornar string vacio si OCR falla en preview")
         void shouldReturnEmptyStringIfOcrFailsInPreview() throws Exception {
             when(ocrPort.extractText(mockImageFile)).thenThrow(new RuntimeException("OCR Error"));
 
-            String result = serviceDeliveryUseCase.extractPlateFromImage(mockImageFile);
+            OcrResult result = serviceDeliveryUseCase.extractPlateFromImage(mockImageFile);
 
-            assertEquals("", result);
+            assertTrue(result.text().isEmpty());
+            assertEquals(0.0, result.score());
             verify(ocrPort).extractText(mockImageFile);
         }
     }

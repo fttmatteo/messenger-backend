@@ -1,6 +1,7 @@
 package app.adapter.out.ocr;
 
 import app.domain.ports.OcrPort;
+import app.domain.ports.OcrResult;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import java.io.File;
@@ -13,11 +14,11 @@ import java.io.File;
 public class MockOcrAdapter implements OcrPort {
 
     /**
-     * Simula la extracción de texto devolviendo una placa fija para pruebas.
+     * Simula la extracción de texto devolviendo un chasis fijo para pruebas.
      */
     @Override
-    public String extractText(File imageFile) {
-        String mockPlate = "ABC123";
-        return mockPlate;
+    public OcrResult extractText(File imageFile) {
+        String mockChasis = "CHASIS1234567890";
+        return new OcrResult(mockChasis, 1.0);
     }
 }

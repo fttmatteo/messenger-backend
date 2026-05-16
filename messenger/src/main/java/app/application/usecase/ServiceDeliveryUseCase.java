@@ -24,6 +24,7 @@ import app.domain.model.ServiceDelivery;
 import app.domain.model.Signature;
 import app.domain.model.enums.Status;
 import app.domain.util.LogSanitizer;
+import app.domain.ports.OcrResult;
 import app.domain.ports.OcrPort;
 import app.domain.ports.StoragePort;
 import app.domain.services.CreateServiceDelivery;
@@ -69,18 +70,21 @@ public class ServiceDeliveryUseCase {
         this.ocrPort = ocrPort;
     }
 
+
+
     /**
-     * Extrae la placa de una imagen sin crear el servicio.
-     * Permite previsualizar la placa detectada y corregirla si es necesario.
+     * Extrae el chasis de una imagen sin crear el servicio.
+     * Permite previsualizar el chasis detectado y corregirlo si es necesario.
      */
-    public String extractPlateFromImage(File imageFile) {
+    public OcrResult extractPlateFromImage(File imageFile) {
         try {
-            String extractedText = ocrPort.extractText(imageFile);
-            logger.info("Placa extraída para preview: {}", LogSanitizer.maskPlate(extractedText));
-            return extractedText != null ? extractedText : "";
+            OcrResult result = ocrPort.extractText(imageFile);
+            logger.info("Chasis extraído para preview: {} (confianza: {})", 
+                LogSanitizer.maskPlate(result.text()), result.score());
+            return result;
         } catch (Exception e) {
-            logger.error("Error extrayendo placa para preview: {}", e.getMessage(), e);
-            return "";
+            logger.error("Error extrayendo chasis para preview: {}", e.getMessage(), e);
+            return OcrResult.empty();
         }
     }
 
@@ -96,7 +100,8 @@ public class ServiceDeliveryUseCase {
     public ServiceDelivery createServiceFromImage(File imageFile, Long dealershipId, Long messengerId, Double latitude,
             Double longitude)
             throws Exception {
-        String extractedText = ocrPort.extractText(imageFile);
+        OcrResult result = ocrPort.extractText(imageFile);
+        String extractedText = result.text();
         String timestamp = LocalDateTime.now().format(DATE_FORMAT);
         String fileName = extractedText + "_ASSIGNED_" + timestamp;
 

@@ -1,10 +1,9 @@
 package app.domain.model.enums;
 
 /**
- * Tipos de placa vehicular según el tipo de vehículo.
+ * Clasificación del tipo de chasis reconocido.
+ * En este proyecto, se centra exclusivamente en motocicletas.
  */
 public enum PlateType {
-    CAR,
-    MOTORCYCLE,
-    MOTORCAR
+    MOTORCYCLE
 }

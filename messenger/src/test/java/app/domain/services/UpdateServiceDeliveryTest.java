@@ -183,18 +183,16 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe impedir ADMIN usar estados de mensajero (PENDING, DELIVERED, RETURNED)")
-    void shouldForbidAdminFromUsingMessengerStates() {
+    @DisplayName("Debe permitir ADMIN usar estados de mensajero (PENDING, DELIVERED, RETURNED)")
+    void shouldAllowAdminToUseMessengerStates() throws Exception {
         service.setCurrentStatus(Status.ASSIGNED);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(2L)).thenReturn(admin);
+        when(serviceDeliveryPort.save(argThat(s -> s.getCurrentStatus() == Status.PENDING))).thenReturn(service);
 
-        BusinessException ex = assertThrows(BusinessException.class,
-                () -> updateServiceDelivery.updateStatus(1L, Status.PENDING, "Obs", signature, photos, 2L));
+        updateServiceDelivery.updateStatus(1L, Status.PENDING, "Obs", null, null, 2L);
 
-        assertEquals(
-                "Como administrador solo puedes cambiar el estado a: CANCELED o RESOLVED. Para otros estados, el mensajero asignado debe realizar el cambio.",
-                ex.getMessage());
+        verify(serviceDeliveryPort).save(argThat(s -> s.getCurrentStatus() == Status.PENDING));
     }
 
     @Test
@@ -276,7 +274,7 @@ class UpdateServiceDeliveryTest {
     @DisplayName("validateEvidence - Estado ASSIGNED retorna sin lanzar excepción")
     void testValidateEvidence_AssignedStatus_ShouldReturnDirectly() {
         org.junit.jupiter.api.Assertions.assertDoesNotThrow(() ->
-            updateServiceDelivery.validateEvidence(Status.ASSIGNED, null, null, null)
+            updateServiceDelivery.validateEvidence(Status.ASSIGNED, null, null, null, Role.MESSENGER)
         );
     }
 
@@ -284,7 +282,7 @@ class UpdateServiceDeliveryTest {
     @DisplayName("validateEvidence - Estado DELIVERED sin firma lanza excepción")
     void testValidateEvidence_Delivered_MissingSignature_ThrowsException() {
         BusinessException ex = assertThrows(BusinessException.class, () ->
-            updateServiceDelivery.validateEvidence(Status.DELIVERED, null, null, null)
+            updateServiceDelivery.validateEvidence(Status.DELIVERED, null, null, null, Role.MESSENGER)
         );
         assertEquals("Para marcar como ENTREGADO, la firma de recibido es obligatoria.", ex.getMessage());
     }
@@ -293,7 +291,7 @@ class UpdateServiceDeliveryTest {
     @DisplayName("validateEvidence - Estado RETURNED sin fotos (null) lanza excepción")
     void testValidateEvidence_Returned_MissingPhotosNull_ThrowsException() {
         assertThrows(BusinessException.class, () ->
-            updateServiceDelivery.validateEvidence(Status.RETURNED, new Signature(), null, "Observación válida")
+            updateServiceDelivery.validateEvidence(Status.RETURNED, new Signature(), null, "Observación válida", Role.MESSENGER)
         );
     }
 
@@ -301,7 +299,7 @@ class UpdateServiceDeliveryTest {
     @DisplayName("validateEvidence - Estado RETURNED con fotos vacías lanza excepción")
     void testValidateEvidence_Returned_MissingPhotosEmpty_ThrowsException() {
         assertThrows(BusinessException.class, () ->
-            updateServiceDelivery.validateEvidence(Status.RETURNED, new Signature(), new ArrayList<>(), "Observación válida")
+            updateServiceDelivery.validateEvidence(Status.RETURNED, new Signature(), new ArrayList<>(), "Observación válida", Role.MESSENGER)
         );
     }
 
@@ -310,7 +308,7 @@ class UpdateServiceDeliveryTest {
     void testValidateEvidence_Returned_MissingObservationNull_ThrowsException() {
         List<Photo> photos = List.of(new Photo());
         assertThrows(BusinessException.class, () ->
-            updateServiceDelivery.validateEvidence(Status.RETURNED, new Signature(), photos, null)
+            updateServiceDelivery.validateEvidence(Status.RETURNED, new Signature(), photos, null, Role.MESSENGER)
         );
     }
 
@@ -319,7 +317,7 @@ class UpdateServiceDeliveryTest {
     void testValidateEvidence_Returned_MissingObservationBlank_ThrowsException() {
         List<Photo> photos = List.of(new Photo());
         assertThrows(BusinessException.class, () ->
-            updateServiceDelivery.validateEvidence(Status.RETURNED, new Signature(), photos, "   ")
+            updateServiceDelivery.validateEvidence(Status.RETURNED, new Signature(), photos, "   ", Role.MESSENGER)
         );
     }
 
@@ -328,7 +326,7 @@ class UpdateServiceDeliveryTest {
     void testValidateEvidence_Returned_AllEvidences_ShouldPass() {
         List<Photo> photos = List.of(new Photo());
         org.junit.jupiter.api.Assertions.assertDoesNotThrow(() ->
-            updateServiceDelivery.validateEvidence(Status.RETURNED, new Signature(), photos, "Motivo de devolución")
+            updateServiceDelivery.validateEvidence(Status.RETURNED, new Signature(), photos, "Motivo de devolución", Role.MESSENGER)
         );
     }
 
@@ -336,7 +334,7 @@ class UpdateServiceDeliveryTest {
     @DisplayName("validateEvidence - Estado PENDING sin fotos lanza excepción")
     void testValidateEvidence_Pending_MissingPhotos_ThrowsException() {
         assertThrows(BusinessException.class, () ->
-            updateServiceDelivery.validateEvidence(Status.PENDING, new Signature(), null, "Obs")
+            updateServiceDelivery.validateEvidence(Status.PENDING, new Signature(), null, "Obs", Role.MESSENGER)
         );
     }
 
@@ -344,7 +342,7 @@ class UpdateServiceDeliveryTest {
     @DisplayName("validateEvidence - Estado PENDING con fotos vacías lanza excepción")
     void testValidateEvidence_Pending_EmptyPhotos_ThrowsException() {
         assertThrows(BusinessException.class, () ->
-            updateServiceDelivery.validateEvidence(Status.PENDING, new Signature(), new ArrayList<>(), "Obs")
+            updateServiceDelivery.validateEvidence(Status.PENDING, new Signature(), new ArrayList<>(), "Obs", Role.MESSENGER)
         );
     }
 
@@ -353,7 +351,7 @@ class UpdateServiceDeliveryTest {
     void testValidateEvidence_Pending_MissingObservation_ThrowsException() {
         List<Photo> photos = List.of(new Photo());
         assertThrows(BusinessException.class, () ->
-            updateServiceDelivery.validateEvidence(Status.PENDING, new Signature(), photos, "")
+            updateServiceDelivery.validateEvidence(Status.PENDING, new Signature(), photos, "", Role.MESSENGER)
         );
     }
 
@@ -362,7 +360,7 @@ class UpdateServiceDeliveryTest {
     void testValidateEvidence_Pending_BlankObservation_ThrowsException() {
         List<Photo> photos = List.of(new Photo());
         assertThrows(BusinessException.class, () ->
-            updateServiceDelivery.validateEvidence(Status.PENDING, new Signature(), photos, "   ")
+            updateServiceDelivery.validateEvidence(Status.PENDING, new Signature(), photos, "   ", Role.MESSENGER)
         );
     }
 
@@ -371,7 +369,7 @@ class UpdateServiceDeliveryTest {
     void testValidateEvidence_Pending_AllEvidences_ShouldPass() {
         List<Photo> photos = List.of(new Photo());
         org.junit.jupiter.api.Assertions.assertDoesNotThrow(() ->
-            updateServiceDelivery.validateEvidence(Status.PENDING, new Signature(), photos, "Observación pendiente")
+            updateServiceDelivery.validateEvidence(Status.PENDING, new Signature(), photos, "Observación pendiente", Role.MESSENGER)
         );
     }
 
@@ -379,7 +377,7 @@ class UpdateServiceDeliveryTest {
     @DisplayName("validateEvidence - Estado DELIVERED con firma no lanza excepción")
     void testValidateEvidence_Delivered_WithSignature_ShouldPass() {
         org.junit.jupiter.api.Assertions.assertDoesNotThrow(() ->
-            updateServiceDelivery.validateEvidence(Status.DELIVERED, new Signature(), null, null)
+            updateServiceDelivery.validateEvidence(Status.DELIVERED, new Signature(), null, null, Role.MESSENGER)
         );
     }
 
@@ -504,7 +502,7 @@ class UpdateServiceDeliveryTest {
     @DisplayName("validateEvidence - Estado FAILED no coincide con ninguna rama específica")
     void testValidateEvidence_FailedStatus_FallsThrough() {
         org.junit.jupiter.api.Assertions.assertDoesNotThrow(() ->
-            updateServiceDelivery.validateEvidence(Status.FAILED, null, null, null)
+            updateServiceDelivery.validateEvidence(Status.FAILED, null, null, null, Role.MESSENGER)
         );
     }
 
@@ -513,7 +511,7 @@ class UpdateServiceDeliveryTest {
     void testValidateEvidence_Pending_NullObservation_ThrowsException() {
         List<Photo> validPhotos = List.of(new Photo());
         assertThrows(BusinessException.class, () ->
-            updateServiceDelivery.validateEvidence(Status.PENDING, new Signature(), validPhotos, null)
+            updateServiceDelivery.validateEvidence(Status.PENDING, new Signature(), validPhotos, null, Role.MESSENGER)
         );
     }
 

@@ -4,7 +4,7 @@ import app.domain.model.ServiceDelivery;
 import app.domain.model.enums.Status;
 
 /**
- * Evento que se dispara cuando el estado de una placa cambia.
+ * Evento que se dispara cuando el estado de un chasis cambia.
  */
 public class PlateStatusChangedEvent {
     private final ServiceDelivery serviceDelivery;
