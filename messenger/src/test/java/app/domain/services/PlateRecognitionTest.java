@@ -24,166 +24,63 @@ class PlateRecognitionTest {
     }
 
     @Nested
-    @DisplayName("Placas de Carro (CAR)")
-    class CarPlateTests {
+    @DisplayName("Validación de Chasis")
+    class ChasisTests {
 
         @ParameterizedTest
-        @ValueSource(strings = { "ABC123", "ABC 123", "abc123", "Xyz789", "XYZ 789" })
-        @DisplayName("Debe reconocer placas de carro válidas")
-        /**
-         * Verifica reconocimiento de patrones de placas de carro estándar.
-         */
-        void shouldRecognizeValidCarPlates(String plate) {
-            PlateType result = plateRecognition.determinePlateType(plate);
-            assertEquals(PlateType.CAR, result);
+        @ValueSource(strings = { 
+            "1HGCM82633A004123", 
+            "ABC12345674567890", 
+            "MBH9876543210", 
+            "CHASIS123456789" 
+        })
+        @DisplayName("Debe reconocer seriales de chasis válidos como MOTORCYCLE")
+        void shouldRecognizeValidChasis(String chasis) {
+            PlateType result = plateRecognition.determinePlateType(chasis);
+            assertEquals(PlateType.MOTORCYCLE, result);
         }
 
         @Test
-        @DisplayName("Debe reconocer placa de carro con espacios extra")
-        void shouldRecognizeCarPlateWithExtraSpaces() {
-            PlateType result = plateRecognition.determinePlateType("  ABC  123  ");
-            assertEquals(PlateType.CAR, result);
-        }
-    }
-
-    @Nested
-    @DisplayName("Placas de Moto (MOTORCYCLE)")
-    class MotorcyclePlateTests {
-
-        @ParameterizedTest
-        @ValueSource(strings = { "ABC12D", "ABC 12D", "abc12d", "XYZ99A", "XYZ 99A" })
-        @DisplayName("Debe reconocer placas de moto válidas")
-        /**
-         * Verifica reconocimiento de patrones de placas de motocicleta.
-         */
-        void shouldRecognizeValidMotorcyclePlates(String plate) {
-            PlateType result = plateRecognition.determinePlateType(plate);
+        @DisplayName("Debe limpiar espacios al validar chasis")
+        void shouldCleanSpacesInChasis() {
+            PlateType result = plateRecognition.determinePlateType("  ABC 1234567890  ");
             assertEquals(PlateType.MOTORCYCLE, result);
         }
     }
 
     @Nested
-    @DisplayName("Placas de Motocarro (MOTORCAR)")
-    class MotocarPlateTests {
-
-        @ParameterizedTest
-        @ValueSource(strings = { "123ABC", "123 ABC", "789xyz", "456DEF" })
-        @DisplayName("Debe reconocer placas de motocarro válidas")
-        /**
-         * Verifica reconocimiento de patrones de placas de motocarro.
-         */
-        void shouldRecognizeValidMotocarPlates(String plate) {
-            PlateType result = plateRecognition.determinePlateType(plate);
-            assertEquals(PlateType.MOTORCAR, result);
-        }
-    }
-
-    @Nested
-    @DisplayName("Placas Inválidas")
-    class InvalidPlateTests {
+    @DisplayName("Chasis Inválidos")
+    class InvalidChasisTests {
 
         @Test
-        @DisplayName("Debe lanzar excepción para placa nula")
-        /**
-         * Verifica que una placa nula lance una excepción.
-         */
-        void shouldThrowExceptionForNullPlate() {
+        @DisplayName("Debe lanzar excepción para chasis nulo")
+        void shouldThrowExceptionForNullChasis() {
             BusinessException exception = assertThrows(
                     BusinessException.class,
                     () -> plateRecognition.determinePlateType(null));
             assertTrue(exception.getMessage().contains("vacío"));
         }
 
-        @Test
-        @DisplayName("Debe lanzar excepción para placa vacía")
-        /**
-         * Verifica que una placa vacía lance una excepción.
-         */
-        void shouldThrowExceptionForEmptyPlate() {
-            BusinessException exception = assertThrows(
-                    BusinessException.class,
-                    () -> plateRecognition.determinePlateType(""));
-            assertTrue(exception.getMessage().contains("vacío"));
-        }
-
-        @Test
-        @DisplayName("Debe lanzar excepción para placa solo espacios")
-        /**
-         * Verifica que una placa solo con espacios lance una excepción.
-         */
-        void shouldThrowExceptionForWhitespacePlate() {
-            BusinessException exception = assertThrows(
-                    BusinessException.class,
-                    () -> plateRecognition.determinePlateType("   "));
-            assertTrue(exception.getMessage().contains("vacío"));
-        }
-
         @ParameterizedTest
-        @ValueSource(strings = { "AB123", "ABCD123", "AB1234", "12AB34", "ABCDEF", "123456" })
+        @ValueSource(strings = { "ABC123", "12345", "ABCDE1234567890123456" }) // Cortos o muy largos
         @DisplayName("Debe lanzar excepción para formatos inválidos")
-        /**
-         * Verifica que formatos de placa inválidos lancen una excepción.
-         */
-        void shouldThrowExceptionForInvalidFormats(String plate) {
+        void shouldThrowExceptionForInvalidFormats(String chasis) {
             BusinessException exception = assertThrows(
                     BusinessException.class,
-                    () -> plateRecognition.determinePlateType(plate));
-            assertTrue(exception.getMessage().contains("Formato de placa no reconocido"));
+                    () -> plateRecognition.determinePlateType(chasis));
+            assertTrue(exception.getMessage().contains("longitud válida"));
         }
     }
 
     @Nested
-    @DisplayName("Formateo de Placas")
-    class PlateFormattingTests {
+    @DisplayName("Formateo de Chasis")
+    class ChasisFormattingTests {
 
         @Test
-        @DisplayName("Debe formatear placa de carro correctamente")
-        /**
-         * Verifica el formateo estándar para almacenamiento de placas de carro.
-         */
-        void shouldFormatCarPlate() {
-            String result = plateRecognition.formatPlateForStorage("ABC123", PlateType.CAR);
-            assertEquals("ABC 123", result);
-        }
-
-        @Test
-        @DisplayName("Debe formatear placa de moto correctamente")
-        /**
-         * Verifica el formateo estándar para almacenamiento de placas de motocicleta.
-         */
-        void shouldFormatMotorcyclePlate() {
-            String result = plateRecognition.formatPlateForStorage("ABC12D", PlateType.MOTORCYCLE);
-            assertEquals("ABC 12D", result);
-        }
-
-        @Test
-        @DisplayName("Debe formatear placa de motocarro correctamente")
-        /**
-         * Verifica el formateo estándar para almacenamiento de placas de motocarro.
-         */
-        void shouldFormatMotocarPlate() {
-            String result = plateRecognition.formatPlateForStorage("123ABC", PlateType.MOTORCAR);
-            assertEquals("123 ABC", result);
-        }
-
-        @Test
-        @DisplayName("Debe normalizar a mayúsculas al formatear")
-        /**
-         * Verifica que las placas sean normalizadas a mayúsculas al formatear.
-         */
-        void shouldNormalizeToUppercase() {
-            String result = plateRecognition.formatPlateForStorage("abc123", PlateType.CAR);
-            assertEquals("ABC 123", result);
-        }
-
-        @Test
-        @DisplayName("Debe remover espacios extra al formatear")
-        /**
-         * Verifica que los espacios extra sean removidos al formatear.
-         */
-        void shouldRemoveExtraSpaces() {
-            String result = plateRecognition.formatPlateForStorage("ABC  123", PlateType.CAR);
-            assertEquals("ABC 123", result);
+        @DisplayName("Debe formatear chasis correctamente (sin espacios y en mayúsculas)")
+        void shouldFormatChasis() {
+            String result = plateRecognition.formatPlateForStorage("abc 123 4567890", PlateType.MOTORCYCLE);
+            assertEquals("ABC1234567890", result);
         }
     }
 }

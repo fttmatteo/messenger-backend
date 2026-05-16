@@ -33,8 +33,7 @@ public class UpdateServiceDelivery {
 
     private static final Set<Status> MESSENGER_ALLOWED_STATES = Set.of(Status.PENDING, Status.DELIVERED,
             Status.RETURNED);
-    private static final Set<Status> ADMIN_ALLOWED_STATES = Set.of(Status.CANCELED, Status.RESOLVED);
-
+            
     @Autowired
     private ServiceDeliveryPort serviceDeliveryPort;
     @Autowired
@@ -75,7 +74,7 @@ public class UpdateServiceDelivery {
 
         validateStateTransitionByRole(previousStatus, newStatus, userRole);
 
-        validateEvidence(newStatus, signature, photos, observation);
+        validateEvidence(newStatus, signature, photos, observation, userRole);
 
         service.setCurrentStatus(newStatus);
 
@@ -193,22 +192,19 @@ public class UpdateServiceDelivery {
                                 "No tienes permiso para usar el estado " + newStatus + ".");
             }
         }
-
-        if (userRole == Role.ADMIN) {
-            if (!ADMIN_ALLOWED_STATES.contains(newStatus)) {
-                throw new BusinessException(
-                        "Como administrador solo puedes cambiar el estado a: CANCELED o RESOLVED. " +
-                                "Para otros estados, el mensajero asignado debe realizar el cambio.");
-            }
-        }
+        // ADMIN can change to any state.
     }
 
     /**
      * Valida que se adjunten las evidencias (firma, fotos) requeridas para el nuevo
-     * estado.
+     * estado. Omite validación si el usuario es administrador.
      */
-    void validateEvidence(Status status, Signature signature, List<Photo> photos, String observation)
+    void validateEvidence(Status status, Signature signature, List<Photo> photos, String observation, Role userRole)
             throws BusinessException {
+
+        if (userRole == Role.ADMIN) {
+            return;
+        }
 
         if (status == Status.CANCELED || status == Status.RESOLVED || status == Status.ASSIGNED) {
             return;

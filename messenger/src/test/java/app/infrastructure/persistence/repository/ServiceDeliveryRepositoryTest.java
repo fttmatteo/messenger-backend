@@ -47,7 +47,7 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
         DealershipEntity dealership = createDealership("Test Dealer");
         entityManager.persist(dealership);
 
-        PlateEntity plate = createPlate("TEST001");
+        PlateEntity plate = createPlate("CHASIS0001");
         entityManager.persist(plate);
 
         LocalDateTime fixedDate = LocalDateTime.of(2025, 12, 29, 12, 0);
@@ -107,7 +107,7 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
     private PlateEntity createPlate(String number) {
         PlateEntity p = new PlateEntity();
         p.setPlateNumber(number);
-        p.setPlateType(PlateType.CAR);
+        p.setPlateType(PlateType.MOTORCYCLE);
         return p;
     }
 
@@ -123,7 +123,7 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
         DealershipEntity dealership = createDealership("Target Dealer");
         entityManager.persist(dealership);
 
-        PlateEntity plate = createPlate("TGT999");
+        PlateEntity plate = createPlate("CHASIS0002");
         entityManager.persist(plate);
 
         LocalDateTime targetDate = LocalDateTime.of(2025, 1, 15, 10, 0);
@@ -180,7 +180,7 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
         DealershipEntity dealership = createDealership("Premium Cars Bogota");
         dealershipRepository.save(dealership);
 
-        PlateEntity plate = createPlate("MXP001");
+        PlateEntity plate = createPlate("CHASIS0003");
         plateRepository.save(plate);
 
         ServiceDeliveryEntity service = new ServiceDeliveryEntity();
@@ -201,7 +201,7 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
         assertThat(search2.getContent()).hasSize(1);
 
         org.springframework.data.domain.Page<ServiceDeliveryEntity> search3 = repository.searchAll(
-                "%MXP001%", "MXP001*", false, null, org.springframework.data.domain.PageRequest.of(0, 10));
+                "%CHASIS0003%", "CHASIS0003*", false, null, org.springframework.data.domain.PageRequest.of(0, 10));
         assertThat(search3.getContent()).hasSize(1);
 
         repository.deleteAll();

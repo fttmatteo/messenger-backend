@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 /**
  * Servicio principal del bot de WhatsApp.
- * Maneja autenticación por PIN y consultas de placas.
+ * Maneja autenticación por PIN y consultas de chasis.
  * Usa ports para desacoplarse de la infraestructura (arquitectura hexagonal).
  */
 @Service
@@ -65,7 +65,6 @@ public class WhatsAppBotService {
     public void processMessage(String from, String messageBody) {
         String text = messageBody.trim();
 
-        // Verificar sesión
         Optional<WhatsAppSession> sessionOpt = sessionPort.findActiveSession(from);
         WhatsAppConversationState currentState = sessionOpt.map(WhatsAppSession::getConversationState)
                 .orElse(WhatsAppConversationState.AWAITING_PIN);
@@ -77,12 +76,10 @@ public class WhatsAppBotService {
 
         if (sessionOpt.isPresent()) {
             WhatsAppSession session = sessionOpt.get();
-            // Verificar si venimos de un estado de inactividad
             if (session.isTimeoutNotified()) {
                 messagePort.sendTextMessage(from, "¡Hola de nuevo! 👋");
                 session.setTimeoutNotified(false);
             }
-            // Actualizar actividad
             session.setLastActivityAt(java.time.LocalDateTime.now());
             sessionPort.updateSession(session);
 
@@ -104,7 +101,6 @@ public class WhatsAppBotService {
             Optional<Dealership> dealershipOpt = sessionPort.findDealershipByPin(text);
 
             if (dealershipOpt.isPresent()) {
-                // Éxito: Resetear intentos y crear sesión
                 rateLimitPort.clearFailedAttempts(from);
                 Dealership dealership = dealershipOpt.get();
                 WhatsAppSession session = sessionPort.createSession(from, dealership,
@@ -113,7 +109,6 @@ public class WhatsAppBotService {
                 sessionPort.updateSession(session);
                 sendMenu(from, dealership.getName());
             } else {
-                // Fallo: Registrar intento y aplicar delay progresivo
                 int remaining = rateLimitPort.recordFailedAttempt(from);
                 int attemptsDone = 3 - remaining;
 
@@ -127,7 +122,7 @@ public class WhatsAppBotService {
             }
         } else {
             messagePort.sendTextMessage(from,
-                    "🚦 *Tránsito de Sabaneta - Matrículas Iniciales* 🚦\n_Área de Mensajería_\n\n¡Hola! 👋🏼. Aquí podrás consultar el estado de las placas.\n"
+                    "🚦 *PLAK* 🚦\n¡Hola! 👋🏼. Aquí podrás consultar el estado de las motos por chasis.\n"
                             + "🔔 Mantén la sesión activa para recibir notificaciones de estados.\n"
                             + "`PIN requerido cada 12h o al reiniciar sesión.`\n\n"
                             + "🔒 *Ingresa el PIN para continuar:* ");
@@ -145,8 +140,8 @@ public class WhatsAppBotService {
                         PageRequest.of(0, 5));
                 if (servicesPage.isEmpty()) {
                     messagePort.sendTextMessage(from,
-                            "⚠️ No se encontró la placa *" + text.toUpperCase() + "* en " + dealershipName + ".\n\n"
-                                    + "Por favor, verifica que la placa sea correcta o consulte más tarde.");
+                            "⚠️ No se encontró el chasis *" + text.toUpperCase() + "* en " + dealershipName + ".\n\n"
+                                    + "Por favor, verifica que el número sea correcto o consulta más tarde.");
                 } else {
                     sendPlateDetails(from, servicesPage.getContent());
                 }
@@ -178,19 +173,19 @@ public class WhatsAppBotService {
                     case "1" -> {
                         session.setConversationState(WhatsAppConversationState.AWAITING_PLATE);
                         sessionPort.updateSession(session);
-                        messagePort.sendTextMessage(from, "Escribe el número de la placa:");
+                        messagePort.sendTextMessage(from, "Escribe el número del chasis:");
                     }
                     case "2" -> {
-                        sendFilteredList(from, session, "Placa(s) asignada(s)", List.of(Status.ASSIGNED));
+                        sendFilteredList(from, session, "Chasis asignado(s)", List.of(Status.ASSIGNED));
                     }
                     case "3" -> {
-                        sendFilteredList(from, session, "Placa(s) devuelta(s)", List.of(Status.RETURNED));
+                        sendFilteredList(from, session, "Chasis devuelto(s)", List.of(Status.RETURNED));
                     }
                     case "4" -> {
-                        sendFilteredList(from, session, "Placa(s) pendiente(s)", List.of(Status.PENDING));
+                        sendFilteredList(from, session, "Chasis pendiente(s)", List.of(Status.PENDING));
                     }
                     case "5" -> {
-                        sendFilteredList(from, session, "Placa(s) entregada(s) y/o revisada(s)",
+                        sendFilteredList(from, session, "Chasis entregado(s) y/o revisado(s)",
                                 List.of(Status.DELIVERED, Status.RESOLVED));
                     }
                     case "0" -> {
@@ -201,7 +196,6 @@ public class WhatsAppBotService {
                                 "🚪 Sesión cerrada correctamente.\n\n¡Hasta pronto! 👋. Para ingresar de nuevo, solo escribe un mensaje.");
                     }
                     default -> {
-                        // Si parece una placa, buscarla directamente
                         if (looksLikePlate(text)) {
                             Page<ServiceDelivery> servicesPage = searchService.findByPlateAndDealershipPaginated(text,
                                     dealershipId, PageRequest.of(0, 5));
@@ -210,9 +204,9 @@ public class WhatsAppBotService {
                                 sendMenu(from, dealershipName);
                             } else {
                                 messagePort.sendTextMessage(from,
-                                        "⚠️ No se encontró la placa *" + text.toUpperCase() + "* en " + dealershipName
+                                        "⚠️ No se encontró el chasis *" + text.toUpperCase() + "* en " + dealershipName
                                                 + ".\n\n"
-                                                + "Por favor, verifica que la placa sea correcta o consulte más tarde.");
+                                                + "Por favor, verifica que el número sea correcto o consulta más tarde.");
                                 sendMenu(from, dealershipName);
                             }
                         } else {
@@ -232,14 +226,14 @@ public class WhatsAppBotService {
 
         List<String> rowTitles = List.of(
                 "🔍 Consulta específica",
-                "⏳ Placas asignadas",
-                "↩️ Placas devueltas",
-                "📝 Placas pendientes",
-                "✅ Placas entregadas",
+                "⏳ Chasis asignados",
+                "↩️ Chasis devueltos",
+                "📝 Chasis pendientes",
+                "✅ Chasis entregados",
                 "🚪 Cerrar sesión");
 
         List<String> rowDescriptions = List.of(
-                "Por placa",
+                "Por chasis",
                 "Para entrega",
                 "Por intento fallido",
                 "Por documentación",
@@ -253,21 +247,18 @@ public class WhatsAppBotService {
 
     private void sendPlateDetails(String from, List<ServiceDelivery> services) {
         for (ServiceDelivery s : services) {
-            // 1. Enviar foto de detección de placa si existe
             s.getPhotos().stream()
                     .filter(p -> p.getPhotoType() == app.domain.model.enums.PhotoType.PLATE_DETECTION)
                     .findFirst()
                     .ifPresent(p -> {
                         String publicUrl = storagePort.getUrl(p.getPhotoPath());
                         messagePort.sendImage(from, publicUrl, "Foto de lectura");
-                        sleep(500); // Pequeña pausa para asegurar el orden visual
+                        sleep(500);
                     });
 
-            // 2. Enviar detalle de texto
             messagePort.sendTextMessage(from, formatServiceDetail(s));
             sleep(500);
 
-            // 3. Enviar ubicación nativa si existe GPS para el estado actual
             if (s.getHistory() != null && !s.getHistory().isEmpty()) {
                 Optional<StatusHistory> lastUpdate = s.getHistory().stream()
                         .filter(h -> h.getNewStatus() == s.getCurrentStatus())
@@ -316,7 +307,6 @@ public class WhatsAppBotService {
         Long dealershipId = session.getDealership().getIdDealership();
         String dealershipName = session.getDealership().getName();
 
-        // Si es una consulta nueva (no paginación), resetear estado
         String serializedStatuses = serializeStatuses(statuses);
         if (!serializedStatuses.equals(session.getLastFilterStatuses())) {
             session.setCurrentPage(0);
@@ -344,7 +334,7 @@ public class WhatsAppBotService {
                     .append(" (").append(getStatusName(s.getCurrentStatus())).append(")\n");
         }
 
-        sb.append("\n_Escribe el número de la placa para ver detalles._");
+        sb.append("\n_Escribe el número del chasis para ver detalles._");
 
         if (resultPage.hasNext()) {
             messagePort.sendReplyButtons(from, sb.toString(),
@@ -371,14 +361,14 @@ public class WhatsAppBotService {
 
     private String getTitleForStatuses(List<Status> statuses) {
         if (statuses.contains(Status.ASSIGNED))
-            return "Placa(s) asignada(s)";
+            return "Chasis asignado(s)";
         if (statuses.contains(Status.RETURNED))
-            return "Placa(s) devuelta(s)";
+            return "Chasis devuelto(s)";
         if (statuses.contains(Status.PENDING))
-            return "Placa(s) pendiente(s)";
+            return "Chasis pendiente(s)";
         if (statuses.contains(Status.DELIVERED))
-            return "Placa(s) entregada(s) y/o revisada(s)";
-        return "Listado de placas";
+            return "Chasis entregado(s) y/o revisado(s)";
+        return "Listado de chasis";
     }
 
     private String getStatusName(Status status) {
@@ -408,8 +398,6 @@ public class WhatsAppBotService {
     }
 
     private boolean looksLikePlate(String text) {
-        return text.matches("(?i)^[A-Z]{3}-?\\d{3}$") ||
-                text.matches("(?i)^\\d{3}-?[A-Z]{3}$") ||
-                text.matches("(?i)^[A-Z]{3}-?\\d{2}[A-Z]$");
+        return text.trim().matches("^[A-Z0-9]{10,20}$");
     }
 }

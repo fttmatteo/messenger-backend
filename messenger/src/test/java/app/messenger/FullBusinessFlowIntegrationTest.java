@@ -124,11 +124,11 @@ class FullBusinessFlowIntegrationTest extends AbstractIntegrationTest {
                                 .file(imageFile)
                                 .param("dealershipId", dealershipId.toString())
                                 .param("messengerId", messengerId.toString())
-                                .param("manualPlateNumber", "XYZ789")
+                                .param("manualPlateNumber", "XYZ7890123")
                                 .with(user("999999").roles("ADMIN"))
                                 .with(csrf()))
                                 .andExpect(status().isCreated())
-                                .andExpect(jsonPath("$.plate.plateNumber", org.hamcrest.Matchers.is("XYZ789")))
+                                .andExpect(jsonPath("$.plate.plateNumber", org.hamcrest.Matchers.is("XYZ7890123")))
                                 .andReturn();
 
                 String serviceUuid = objectMapper.readTree(serviceResult.getResponse().getContentAsString())

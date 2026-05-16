@@ -63,7 +63,7 @@ public class CreateServiceDelivery {
                 org.springframework.data.domain.PageRequest.of(0, 1));
         if (existingServices.getTotalElements() > 0) {
             throw new BusinessException(
-                    "La placa " + normalizedPlate + " ya tiene un servicio registrado en el sistema.");
+                    "El chasis " + normalizedPlate + " ya tiene un servicio registrado en el sistema.");
         }
 
         Plate plate = platePort.findByPlateNumber(normalizedPlate);

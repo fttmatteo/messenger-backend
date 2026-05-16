@@ -14,24 +14,21 @@ public class SearchPlate {
     @Autowired
     private PlatePort platePort;
 
-    /**
-     * Busca una placa por su ID.
-     */
     public Plate findById(Long idPlate) {
         Plate plate = platePort.findById(idPlate);
         if (plate == null) {
-            throw new RuntimeException("El placa con ID " + idPlate + " no existe.");
+            throw new RuntimeException("El chasis con ID " + idPlate + " no existe.");
         }
         return plate;
     }
 
     /**
-     * Busca una placa por su número alfanumérico.
+     * Busca un chasis por su número alfanumérico.
      */
     public Plate findByPlateNumber(String plateNumber) {
         Plate plate = platePort.findByPlateNumber(plateNumber);
         if (plate == null) {
-            throw new RuntimeException("El placa con número " + plateNumber + " no existe.");
+            throw new RuntimeException("El chasis con número " + plateNumber + " no existe.");
         }
         return plate;
     }
