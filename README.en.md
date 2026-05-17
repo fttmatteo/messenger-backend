@@ -133,7 +133,6 @@ graph LR
 | **Security**             | JWT + BCrypt + Cloudflare Turnstile (Bot Protection) + Bucket4j (Distributed Rate Limiting with Redis) |
 | **Documentation**        | OpenAPI / Swagger UI                                                                                   |
 
-| **Speech-to-Text**       | Google Cloud Speech-to-Text                                                                            |
 | **Storage**              | Google Cloud Storage                                                                                   |
 | **Maps**                 | Google Maps Platform                                                                                   |
 | **Mobile Client**        | Capacitor (Android App Generation)                                                                     |
@@ -355,10 +354,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `POST`   | `/services/trash/restore/{uuid}` | Restore from trash (ADMIN)                                   |
 | `DELETE` | `/services/trash/empty`          | Empty trash permanently (ADMIN)                              |
 | `DELETE` | `/services/trash/{uuid}`         | Permanent delete individual item (ADMIN)                     |
-
-### Transcription (`/api/transcribe`)
-
-| `POST` | `/api/transcribe` | Transcribe audio file to text using Google Cloud STT |
 
 ### WhatsApp (`/api/whatsapp`)
 
@@ -941,7 +936,7 @@ The project implements a robust testing strategy across all layers of the hexago
 - **Environment variables** preconfigured (`baseUrl`, `token`, `refreshToken`)
 - **Automated tests** that save tokens to collection variables
 - **Payload examples** for all endpoints
-- **10 controllers** fully documented:
+- **9 controllers** fully documented:
   - Authentication (Login + Refresh)
   - Employees
   - Dealerships
@@ -951,7 +946,6 @@ The project implements a robust testing strategy across all layers of the hexago
   - Files
   - Monitoring
   - System Settings
-  - Transcription
 
 ### Usage
 

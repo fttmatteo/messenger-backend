@@ -1557,54 +1557,7 @@
                 }
             ]
         },
-        {
-            "name": "🎙️ Transcription",
-            "item": [
-                {
-                    "name": "Transcribe Audio",
-                    "request": {
-                        "auth": {
-                            "type": "bearer",
-                            "bearer": [
-                                {
-                                    "key": "token",
-                                    "value": "{{token}}",
-                                    "type": "string"
-                                }
-                            ]
-                        },
-                        "method": "POST",
-                        "header": [],
-                        "body": {
-                            "mode": "formdata",
-                            "formdata": [
-                                {
-                                    "key": "audio",
-                                    "type": "file",
-                                    "src": []
-                                },
-                                {
-                                    "key": "language",
-                                    "value": "es-CO",
-                                    "type": "text"
-                                }
-                            ]
-                        },
-                        "url": {
-                            "raw": "{{baseUrl}}/api/transcribe",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "transcribe"
-                            ]
-                        }
-                    },
-                    "response": []
-                }
-            ]
-        },
+
         {
             "name": "📁 Files",
             "item": [
