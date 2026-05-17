@@ -14,11 +14,11 @@ public class WhatsAppSession {
     private Dealership dealership;
     private LocalDateTime expiresAt;
     private LocalDateTime createdAt;
-    private Integer currentPage; // Nueva página actual para paginación
-    private String lastFilterStatuses; // Últimos estados filtrados (serializados)
-    private LocalDateTime lastActivityAt; // Última actividad detectada
-    private boolean timeoutNotified; // Si ya se notificó el timeout
-    private WhatsAppConversationState conversationState; // Estado actual del flujo
+    private Integer currentPage;
+    private String lastFilterStatuses;
+    private LocalDateTime lastActivityAt;
+    private boolean timeoutNotified;
+    private WhatsAppConversationState conversationState;
 
     public Long getId() {
         return id;

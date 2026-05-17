@@ -40,7 +40,6 @@ public class WhatsAppBotService {
     private final WhatsAppSessionPort sessionPort;
     private final SearchServiceDelivery searchService;
     private final LocationPort locationPort;
-    private final StoragePort storagePort;
     private final WhatsAppRateLimitPort rateLimitPort;
 
     public WhatsAppBotService(
@@ -54,7 +53,6 @@ public class WhatsAppBotService {
         this.sessionPort = sessionPort;
         this.searchService = searchService;
         this.locationPort = locationPort;
-        this.storagePort = storagePort;
         this.rateLimitPort = rateLimitPort;
     }
 
@@ -98,26 +96,38 @@ public class WhatsAppBotService {
         }
 
         if (text.matches("\\d{4}")) {
-            Optional<Dealership> dealershipOpt = sessionPort.findDealershipByPin(text);
-
-            if (dealershipOpt.isPresent()) {
+            if (sessionPort.isMasterPin(text)) {
                 rateLimitPort.clearFailedAttempts(from);
-                Dealership dealership = dealershipOpt.get();
+                Dealership dealership = new Dealership();
+                dealership.setIdDealership(null);
+                dealership.setName("PLAK Corporativo");
                 WhatsAppSession session = sessionPort.createSession(from, dealership,
                         sessionPort.getSessionExpirationHours());
                 session.setConversationState(WhatsAppConversationState.MENU);
                 sessionPort.updateSession(session);
                 sendMenu(from, dealership.getName());
             } else {
-                int remaining = rateLimitPort.recordFailedAttempt(from);
-                int attemptsDone = 3 - remaining;
+                Optional<Dealership> dealershipOpt = sessionPort.findDealershipByPin(text);
 
-                if (remaining == 0) {
-                    messagePort.sendTextMessage(from,
-                            "❌ PIN incorrecto. Has alcanzado el máximo de intentos permitidos. Por seguridad, tu acceso se ha bloqueado por 15 minutos.");
+                if (dealershipOpt.isPresent()) {
+                    rateLimitPort.clearFailedAttempts(from);
+                    Dealership dealership = dealershipOpt.get();
+                    WhatsAppSession session = sessionPort.createSession(from, dealership,
+                            sessionPort.getSessionExpirationHours());
+                    session.setConversationState(WhatsAppConversationState.MENU);
+                    sessionPort.updateSession(session);
+                    sendMenu(from, dealership.getName());
                 } else {
-                    messagePort.sendTextMessage(from,
-                            "❌ PIN incorrecto. Intenta de nuevo (Intento " + attemptsDone + " de 3):");
+                    int remaining = rateLimitPort.recordFailedAttempt(from);
+                    int attemptsDone = 3 - remaining;
+
+                    if (remaining == 0) {
+                        messagePort.sendTextMessage(from,
+                                "❌ PIN incorrecto. Has alcanzado el máximo de intentos permitidos. Por seguridad, tu acceso se ha bloqueado por 15 minutos.");
+                    } else {
+                        messagePort.sendTextMessage(from,
+                                "❌ PIN incorrecto. Intenta de nuevo (Intento " + attemptsDone + " de 3):");
+                    }
                 }
             }
         } else {
@@ -247,14 +257,7 @@ public class WhatsAppBotService {
 
     private void sendPlateDetails(String from, List<ServiceDelivery> services) {
         for (ServiceDelivery s : services) {
-            s.getPhotos().stream()
-                    .filter(p -> p.getPhotoType() == app.domain.model.enums.PhotoType.PLATE_DETECTION)
-                    .findFirst()
-                    .ifPresent(p -> {
-                        String publicUrl = storagePort.getUrl(p.getPhotoPath());
-                        messagePort.sendImage(from, publicUrl, "Foto de lectura");
-                        sleep(500);
-                    });
+
 
             messagePort.sendTextMessage(from, formatServiceDetail(s));
             sleep(500);

@@ -16,7 +16,6 @@ import app.domain.model.enums.Status;
 import app.infrastructure.helper.FileHelper;
 import app.infrastructure.helper.SecurityHelper;
 import app.domain.services.FileValidationService;
-import app.domain.ports.OcrResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,7 +26,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.mock.web.MockMultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ServiceDeliveryController Unit Tests")
@@ -141,51 +139,4 @@ class ServiceDeliveryControllerTest {
         }
     }
 
-    @Nested
-    @DisplayName("Endpoint POST /services/extractPlate")
-    class ExtractPlateTests {
-
-        @Test
-        @DisplayName("Debe extraer placa exitosamente")
-        /**
-         * Verifica que el endpoint de extracción de placa retorne 200.
-         */
-        void shouldExtractPlate() throws Exception {
-            MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "test".getBytes());
-
-            doNothing().when(fileValidationService).validateImageFile(any());
-            when(fileHelper.withTempFile(any(), any())).thenAnswer(invocation -> {
-                FileHelper.FileOperation<?> operation = invocation.getArgument(1);
-                return operation.execute(new java.io.File("test.jpg"));
-            });
-            when(serviceDeliveryUseCase.extractPlateFromImage(any())).thenReturn(new OcrResult("ABC1234567", 0.95));
-
-            mockMvc.perform(multipart("/services/extractPlate").file(file))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.plate").value("ABC1234567"))
-                    .andExpect(jsonPath("$.score").value(0.95))
-                    .andExpect(jsonPath("$.success").value(true));
-        }
-
-        @Test
-        @DisplayName("Debe retornar fallo si OCR no detecta nada")
-        /**
-         * Verifica que el endpoint de extracción de placa retorne 200.
-         */
-        void shouldReturnFailureIfOcrFails() throws Exception {
-            MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "test".getBytes());
-
-            doNothing().when(fileValidationService).validateImageFile(any());
-            when(fileHelper.withTempFile(any(), any())).thenAnswer(invocation -> {
-                FileHelper.FileOperation<?> operation = invocation.getArgument(1);
-                return operation.execute(new java.io.File("test.jpg"));
-            });
-            when(serviceDeliveryUseCase.extractPlateFromImage(any())).thenReturn(OcrResult.empty());
-
-            mockMvc.perform(multipart("/services/extractPlate").file(file))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(jsonPath("$.message").value("No se pudo detectar el chasis. Por favor ingresalo manualmente."));
-        }
-    }
 }

@@ -13,7 +13,7 @@
 [![Google Cloud](https://img.shields.io/badge/Google_Cloud-1.0+-4479A1?style=for-the-badge&logo=google&logoColor=white)](https://cloud.google.com/)
 [![License](https://img.shields.io/badge/License-Propietario-red.svg?style=for-the-badge)](LICENSE)
 
-**Sistema de entregas con reconocimiento automático de placas vehiculares mediante OCR.**
+**Sistema de entregas y gestión logística.**
 
 [🇺🇸 English Version](./README.en.md)
 
@@ -54,7 +54,7 @@ graph LR
     MAPS{{G-Maps}}
     GCS{{GCS}}
     WAPP{{WhatsApp}}
-    OCR_EXT{{OCR API}}
+
     DB[(MySQL)]
     REDIS[(Redis)]
 
@@ -81,7 +81,7 @@ graph LR
         PERS[Persistencia]
         CLD[Servicios Cloud]
         WABA[WhatsApp]
-        VIS[Visión/OCR]
+
         SEC[Seguridad]
     end
 
@@ -105,7 +105,7 @@ graph LR
     PERS --> DB
     CLD --> GCS & MAPS
     WABA --> WAPP
-    VIS --> OCR_EXT
+
     SEC --> REDIS
 
     %% Estilos
@@ -116,7 +116,7 @@ graph LR
     style OUT fill:#2d1a05,stroke:#f0883e,color:#c9d1d9
 
     classDef actor fill:#21262d,stroke:#8b949e,color:#c9d1d9
-    class USER,MAPS,GCS,WAPP,OCR_EXT,DB,REDIS actor
+    class USER,MAPS,GCS,WAPP,DB,REDIS actor
 ```
 
 ---
@@ -132,7 +132,7 @@ graph LR
 | **Cache/Streaming**       | Redis                                                                                                         |
 | **Seguridad**             | JWT + BCrypt + Cloudflare Turnstile (Protección contra Bots) + Bucket4j (Rate Limiting Distribuido con Redis) |
 | **Documentación**         | OpenAPI / Swagger UI                                                                                          |
-| **OCR**                   | Plate Recognizer API                                                                                          |
+
 | **Speech-to-Text**        | Google Cloud Speech-to-Text                                                                                   |
 | **Almacenamiento**        | Google Cloud Storage                                                                                          |
 | **Mapas**                 | Google Maps Platform                                                                                          |
@@ -165,7 +165,7 @@ messenger/
 │   │   │   └── websocket/               # Tracking en tiempo real
 │   │   └── out/                         # Adaptadores de salida
 │   │       ├── maps/                    # Google Maps Integration
-│   │       ├── ocr/                     # Plate Recognizer OCR
+
 │   │       ├── persistence/             # Adaptadores JPA
 │   │       ├── security/                # JWT Adapter
 │   │       ├── storage/                 # Google Cloud Storage
@@ -247,7 +247,7 @@ docker-compose -f docker-compose.dev.yml up --build
 - Base de datos MySQL Local (Dockerizada)
 - **Zero-Config**: Perfil pre-configurado con llaves de prueba y Mocks
 - **Carga de Datos**: Inicialización automática de usuarios (Admin/Messenger) via `DataInitializer`
-- OCR simulado (MockOcrAdapter)
+
 - Almacenamiento local (LocalStorageAdapter)
 - Logs detallados
 - Perfecto para demostraciones rápidas y desarrollo offline
@@ -343,7 +343,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Método   | Endpoint                         | Descripción                                                          |
 | -------- | -------------------------------- | -------------------------------------------------------------------- |
-| `POST`   | `/services/extractPlate`         | Extraer placa de imagen usando OCR (preview antes de crear)          |
+
 | `POST`   | `/services/createService`        | Crear servicio (multipart: imagen + datos)                           |
 | `PUT`    | `/services/updateService/{uuid}` | Actualizar estado (multipart: estado + evidencias)                 |
 | `PUT`    | `/services/reassign/{uuid}`      | Reasignar a otro mensajero (ADMIN/CANCELED)                          |
@@ -773,7 +773,7 @@ El sistema incluye múltiples capas de optimización para garantizar un alto ren
 ### Optimización de Imágenes
 
 - **Pipeline WebP Dual**: El frontend realiza una pre-compresión a WebP (calidad 0.85) antes de la subida para ahorrar ancho de banda móvil. El backend recibe, valida y aplica un segundo paso de optimización y saneamiento de metadatos.
-- **Calidades Diferenciadas**: Calidad de **0.85** para fotos (optimizado para OCR de placas) y **0.95** para firmas digitales (máxima nitidez).
+- **Calidades Diferenciadas**: Calidad de **0.85** para fotos (optimizado para tamaño) y **0.95** para firmas digitales (máxima nitidez).
 - **Eliminación de Metadatos**: Limpieza automática de metadatos EXIF durante la re-codificación para mejorar la privacidad y reducir el peso del archivo.
 
 ### Tuning del Pool de Conexiones (HikariCP)
@@ -983,7 +983,7 @@ El sistema incluye una aplicación nativa para Android construida con **Capacito
 La aplicación requiere los siguientes permisos para su correcto funcionamiento:
 
 - **Ubicación**: `ACCESS_FINE_LOCATION` y `ACCESS_BACKGROUND_LOCATION` para el seguimiento en tiempo real incluso cuando la app está minimizada.
-- **Cámara**: `CAMERA` para el reconocimiento de placas (OCR) y evidencias de entrega.
+- **Cámara**: `CAMERA` para las evidencias de entrega.
 - **Notificaciones**: `POST_NOTIFICATIONS` para actualizaciones de servicios.
 - **Servicio de Primer Plano**: Garantiza la persistencia del tracking durante las entregas.
 

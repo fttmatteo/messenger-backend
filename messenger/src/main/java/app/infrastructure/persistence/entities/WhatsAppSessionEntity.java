@@ -19,7 +19,7 @@ public class WhatsAppSessionEntity {
     private String phoneNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dealership_id", nullable = false)
+    @JoinColumn(name = "dealership_id", nullable = true)
     private DealershipEntity dealership;
 
     @Column(name = "expires_at", nullable = false)

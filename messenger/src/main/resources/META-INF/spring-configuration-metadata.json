@@ -27,23 +27,7 @@
             "type": "java.lang.String",
             "description": "Ruta local donde se guardan archivos cuando app.storage.type=local."
         },
-        {
-            "name": "app.ocr.mode",
-            "type": "java.lang.String",
-            "description": "Modo de operación del OCR. Valores: 'mock' (acepta todo), 'plate-recognizer' (especializado en placas).",
-            "defaultValue": "mock"
-        },
-        {
-            "name": "app.plate-recognizer.token",
-            "type": "java.lang.String",
-            "description": "Token de API de Plate Recognizer. Obtener en: https://platerecognizer.com/"
-        },
-        {
-            "name": "app.plate-recognizer.region",
-            "type": "java.lang.String",
-            "description": "Código de región para Plate Recognizer (ej: 'co' para Colombia).",
-            "defaultValue": "co"
-        },
+
         {
             "name": "spring.flyway.enabled",
             "type": "java.lang.Boolean",
@@ -174,19 +158,7 @@
                 }
             ]
         },
-        {
-            "name": "app.ocr.mode",
-            "values": [
-                {
-                    "value": "mock",
-                    "description": "Simulación de OCR (acepta cualquier imagen)."
-                },
-                {
-                    "value": "plate-recognizer",
-                    "description": "Plate Recognizer - API especializada en placas vehiculares (recomendado)."
-                }
-            ]
-        },
+
         {
             "name": "spring.profiles.active",
             "values": [

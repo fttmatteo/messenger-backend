@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import app.domain.exception.BusinessException;
 import app.domain.model.Dealership;
 import app.domain.model.Employee;
-import app.domain.model.Photo;
 import app.domain.model.Plate;
 import app.domain.model.ServiceDelivery;
 import app.domain.model.StatusHistory;
@@ -43,7 +42,7 @@ public class CreateServiceDelivery {
      * Crea un nuevo servicio de entrega, asocia la placa (creándola si no existe)
      * y asigna el servicio al mensajero y concesionario indicados.
      */
-    public ServiceDelivery create(String plateNumber, String photoPath, Long dealershipId, Long messengerId,
+    public ServiceDelivery create(String plateNumber, Long dealershipId, Long messengerId,
             Double latitude, Double longitude)
             throws Exception {
 
@@ -81,14 +80,6 @@ public class CreateServiceDelivery {
         service.setMessenger(messenger);
         service.setCurrentStatus(Status.ASSIGNED);
         service.setObservation(null);
-
-        if (photoPath != null) {
-            Photo detectionPhoto = new Photo();
-            detectionPhoto.setPhotoPath(photoPath);
-            detectionPhoto.setPhotoType(app.domain.model.enums.PhotoType.PLATE_DETECTION);
-            detectionPhoto.setUploadDate(LocalDateTime.now());
-            service.addPhoto(detectionPhoto);
-        }
 
         StatusHistory history = new StatusHistory();
         history.setPreviousStatus(null);

@@ -51,8 +51,11 @@ public class WhatsAppSessionAdapter implements WhatsAppSessionPort {
     public WhatsAppSession createSession(String phoneNumber, Dealership dealership, int expirationHours) {
         sessionRepository.deleteByPhoneNumber(phoneNumber);
 
-        DealershipEntity dealershipEntity = dealershipRepository.findById(dealership.getIdDealership())
-                .orElseThrow(() -> new IllegalArgumentException("Dealership not found"));
+        DealershipEntity dealershipEntity = null;
+        if (dealership.getIdDealership() != null) {
+            dealershipEntity = dealershipRepository.findById(dealership.getIdDealership())
+                    .orElseThrow(() -> new IllegalArgumentException("Dealership not found"));
+        }
 
         WhatsAppSessionEntity entity = new WhatsAppSessionEntity();
         entity.setPhoneNumber(phoneNumber);
@@ -107,6 +110,11 @@ public class WhatsAppSessionAdapter implements WhatsAppSessionPort {
     }
 
     @Override
+    public boolean isMasterPin(String pin) {
+        return config.getMasterPin() != null && config.getMasterPin().equals(pin);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<WhatsAppSession> findActiveSessionsByDealership(Long dealershipId) {
         return sessionRepository
@@ -148,6 +156,12 @@ public class WhatsAppSessionAdapter implements WhatsAppSessionPort {
     }
 
     private Dealership dealershipToDomain(DealershipEntity entity) {
+        if (entity == null) {
+            Dealership d = new Dealership();
+            d.setIdDealership(null);
+            d.setName("PLAK Corporativo");
+            return d;
+        }
         Dealership d = new Dealership();
         d.setIdDealership(entity.getIdDealership());
         d.setName(entity.getName());

@@ -228,4 +228,18 @@ public interface ServiceDeliveryRepository extends JpaRepository<ServiceDelivery
   @EntityGraph(attributePaths = { "plate", "dealership", "messenger", "history" })
   Page<ServiceDeliveryEntity> findByDealership_IdDealershipAndCurrentStatusInAndDeletedFalse(
       Long dealershipId, List<Status> statuses, Pageable pageable);
+
+  /**
+   * Encuentra servicios por placa (no eliminados) con paginación de manera global.
+   */
+  @EntityGraph(attributePaths = { "plate", "dealership", "messenger", "history" })
+  Page<ServiceDeliveryEntity> findByPlate_PlateNumberAndDeletedFalse(
+      String plateNumber, Pageable pageable);
+
+  /**
+   * Encuentra servicios por estados (no eliminados) con paginación de manera global.
+   */
+  @EntityGraph(attributePaths = { "plate", "dealership", "messenger", "history" })
+  Page<ServiceDeliveryEntity> findByCurrentStatusInAndDeletedFalse(
+      List<Status> statuses, Pageable pageable);
 }

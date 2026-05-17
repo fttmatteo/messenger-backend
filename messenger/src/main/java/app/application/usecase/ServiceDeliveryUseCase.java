@@ -24,8 +24,7 @@ import app.domain.model.ServiceDelivery;
 import app.domain.model.Signature;
 import app.domain.model.enums.Status;
 import app.domain.util.LogSanitizer;
-import app.domain.ports.OcrResult;
-import app.domain.ports.OcrPort;
+
 import app.domain.ports.StoragePort;
 import app.domain.services.CreateServiceDelivery;
 import app.domain.services.DeleteServiceDelivery;
@@ -53,71 +52,21 @@ public class ServiceDeliveryUseCase {
     private final SearchServiceDelivery searchService;
     private final DeleteServiceDelivery deleteService;
     private final StoragePort storagePort;
-    private final OcrPort ocrPort;
 
     public ServiceDeliveryUseCase(
             CreateServiceDelivery createService,
             UpdateServiceDelivery updateService,
             SearchServiceDelivery searchService,
             DeleteServiceDelivery deleteService,
-            StoragePort storagePort,
-            OcrPort ocrPort) {
+            StoragePort storagePort) {
         this.createService = createService;
         this.updateService = updateService;
         this.searchService = searchService;
         this.deleteService = deleteService;
         this.storagePort = storagePort;
-        this.ocrPort = ocrPort;
     }
 
 
-
-    /**
-     * Extrae el chasis de una imagen sin crear el servicio.
-     * Permite previsualizar el chasis detectado y corregirlo si es necesario.
-     */
-    public OcrResult extractPlateFromImage(File imageFile) {
-        try {
-            OcrResult result = ocrPort.extractText(imageFile);
-            logger.info("Chasis extraído para preview: {} (confianza: {})", 
-                LogSanitizer.maskPlate(result.text()), result.score());
-            return result;
-        } catch (Exception e) {
-            logger.error("Error extrayendo chasis para preview: {}", e.getMessage(), e);
-            return OcrResult.empty();
-        }
-    }
-
-    /**
-     * Crea un servicio a partir de una imagen de placa procesada por OCR.
-     */
-    @Caching(evict = {
-        @CacheEvict(value = "services", allEntries = true),
-        @CacheEvict(value = "service-details", allEntries = true)
-    })
-    @Transactional(rollbackFor = Exception.class)
-
-    public ServiceDelivery createServiceFromImage(File imageFile, Long dealershipId, Long messengerId, Double latitude,
-            Double longitude)
-            throws Exception {
-        OcrResult result = ocrPort.extractText(imageFile);
-        String extractedText = result.text();
-        String timestamp = LocalDateTime.now().format(DATE_FORMAT);
-        String fileName = extractedText + "_ASSIGNED_" + timestamp;
-
-        String savedPath = storagePort.save(imageFile, "detections", fileName);
-
-        try {
-            ServiceDelivery service = createService.create(extractedText, savedPath, dealershipId, messengerId,
-                    latitude, longitude);
-            logger.info("Servicio creado exitosamente vía OCR - ID: {} | Placa: {} | Mensajero: {}",
-                    service.getIdServiceDelivery(), LogSanitizer.maskPlate(extractedText), messengerId);
-            return service;
-        } catch (Exception e) {
-            cleanupFiles(savedPath);
-            throw e;
-        }
-    }
 
     /**
      * Crea un servicio utilizando un número de placa ingresado manualmente.
@@ -128,21 +77,16 @@ public class ServiceDeliveryUseCase {
     })
     @Transactional(rollbackFor = Exception.class)
 
-    public ServiceDelivery createServiceWithManualPlate(File imageFile, String manualPlateNumber, Long dealershipId,
+    public ServiceDelivery createServiceWithManualPlate(String manualPlateNumber, Long dealershipId,
             Long messengerId, Double latitude, Double longitude) throws Exception {
-        String timestamp = LocalDateTime.now().format(DATE_FORMAT);
-        String fileName = manualPlateNumber + "_ASSIGNED_" + timestamp;
-
-        String savedPath = storagePort.save(imageFile, "detections", fileName);
-
+        
         try {
-            ServiceDelivery service = createService.create(manualPlateNumber, savedPath, dealershipId, messengerId,
+            ServiceDelivery service = createService.create(manualPlateNumber, dealershipId, messengerId,
                     latitude, longitude);
             logger.info("Servicio creado exitosamente vía manual - ID: {} | Placa: {} | Mensajero: {}",
                     service.getIdServiceDelivery(), LogSanitizer.maskPlate(manualPlateNumber), messengerId);
             return service;
         } catch (Exception e) {
-            cleanupFiles(savedPath);
             throw e;
         }
     }
