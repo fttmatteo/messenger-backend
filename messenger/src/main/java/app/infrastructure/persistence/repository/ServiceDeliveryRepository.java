@@ -18,74 +18,33 @@ import java.util.Optional;
  */
 @Repository
 public interface ServiceDeliveryRepository extends JpaRepository<ServiceDeliveryEntity, Long> {
-
-  /**
-   * Encuentra un servicio por su ID y estado de eliminación.
-   * Usa EntityGraph para cargar relaciones y evitar N+1.
-   */
   @EntityGraph(attributePaths = { "plate", "dealership", "messenger", "signature" })
   Optional<ServiceDeliveryEntity> findByIdServiceDeliveryAndDeletedFalse(Long id);
 
-  /**
-   * Encuentra servicios eliminados.
-   * Usa EntityGraph para cargar relaciones y evitar N+1.
-   */
   @EntityGraph(attributePaths = { "plate", "dealership", "messenger" })
   List<ServiceDeliveryEntity> findByDeletedTrue();
 
-  /**
-   * Encuentra un servicio por su UUID público y que no esté eliminado.
-   * Usa EntityGraph para cargar relaciones y evitar N+1.
-   */
   @EntityGraph(attributePaths = { "plate", "dealership", "messenger", "signature" })
   Optional<ServiceDeliveryEntity> findByUuidAndDeletedFalse(String uuid);
 
-  /**
-   * Encuentra un servicio por su UUID público incluyendo eliminados.
-   * Usa EntityGraph para cargar relaciones y evitar N+1.
-   */
   @EntityGraph(attributePaths = { "plate", "dealership", "messenger", "signature" })
   Optional<ServiceDeliveryEntity> findByUuid(String uuid);
 
-  /**
-   * Encuentra servicios con paginación filtrado por estado de eliminación.
-   * Usa EntityGraph para cargar relaciones y evitar N+1.
-   */
   @EntityGraph(attributePaths = { "plate", "dealership", "messenger" })
   Page<ServiceDeliveryEntity> findByDeleted(Boolean deleted, Pageable pageable);
 
-  /**
-   * Encuentra servicios de un mensajero específico con paginación.
-   * Usa EntityGraph para cargar relaciones y evitar N+1.
-   */
   @EntityGraph(attributePaths = { "plate", "dealership", "messenger" })
   Page<ServiceDeliveryEntity> findByMessenger_IdEmployeeAndDeleted(Long messengerId, Boolean deleted,
       Pageable pageable);
 
-  /**
-   * Encuentra servicios por estado de eliminación y lista de estados con
-   * paginación.
-   * Usa EntityGraph para cargar relaciones y evitar N+1.
-   */
   @EntityGraph(attributePaths = { "plate", "dealership", "messenger" })
   Page<ServiceDeliveryEntity> findByDeletedAndCurrentStatusIn(Boolean deleted, List<Status> statuses,
       Pageable pageable);
 
-  /**
-   * Encuentra servicios de un mensajero específico por estado de eliminación y
-   * lista de estados con
-   * paginación.
-   * Usa EntityGraph para cargar relaciones y evitar N+1.
-   */
   @EntityGraph(attributePaths = { "plate", "dealership", "messenger" })
   Page<ServiceDeliveryEntity> findByMessenger_IdEmployeeAndDeletedAndCurrentStatusIn(Long messengerId,
       Boolean deleted, List<Status> statuses, Pageable pageable);
 
-  /**
-   * Busca servicios por keyword en múltiples campos usando FULLTEXT MATCH
-   * AGAINST.
-   * Más eficiente que LIKE %keyword% para grandes volúmenes de datos.
-   */
   @Query(value = """
       -- noinspection SqlDialectInspection
       -- noinspection SqlNoDataSourceInspection
@@ -124,10 +83,6 @@ public interface ServiceDeliveryRepository extends JpaRepository<ServiceDelivery
       @Param("statuses") List<String> statuses,
       Pageable pageable);
 
-  /**
-   * Busca servicios de un mensajero específico por keyword usando FULLTEXT MATCH
-   * AGAINST.
-   */
   @Query(value = """
       -- noinspection SqlDialectInspection
       -- noinspection SqlNoDataSourceInspection
@@ -165,14 +120,8 @@ public interface ServiceDeliveryRepository extends JpaRepository<ServiceDelivery
       @Param("statuses") List<String> statuses,
       Pageable pageable);
 
-  /**
-   * Encuentra servicios eliminados antes de una fecha específica
-   */
   List<ServiceDeliveryEntity> findByDeletedTrueAndDeletedAtBefore(LocalDateTime date);
 
-  /**
-   * Busca estadísticas diarias de servicios por mensajero
-   */
   @Query(value = """
       -- noinspection SqlDialectInspection
       -- noinspection SqlNoDataSourceInspection
@@ -195,10 +144,6 @@ public interface ServiceDeliveryRepository extends JpaRepository<ServiceDelivery
       @Param("fromDate") LocalDateTime fromDate,
       @Param("toDate") LocalDateTime toDate);
 
-  /**
-   * Busca servicios de un mensajero que tengan actividad en una fecha específica.
-   * Usa EntityGraph para cargar relaciones y evitar N+1.
-   */
   @EntityGraph(attributePaths = { "plate", "dealership", "messenger", "history", "history.changedBy" })
   @Query("SELECT DISTINCT s FROM ServiceDeliveryEntity s LEFT JOIN s.history h " +
       "WHERE s.messenger.idEmployee = :messengerId " +
@@ -214,31 +159,18 @@ public interface ServiceDeliveryRepository extends JpaRepository<ServiceDelivery
       @Param("endOfDay") LocalDateTime endOfDay,
       Pageable pageable);
 
-  /**
-   * Encuentra servicios por placa y concesionario (no eliminados) con paginación.
-   */
   @EntityGraph(attributePaths = { "plate", "dealership", "messenger", "history" })
   Page<ServiceDeliveryEntity> findByPlate_PlateNumberAndDealership_IdDealershipAndDeletedFalse(
       String plateNumber, Long dealershipId, Pageable pageable);
 
-  /**
-   * Encuentra servicios por concesionario y estados (no eliminados) con
-   * paginación.
-   */
   @EntityGraph(attributePaths = { "plate", "dealership", "messenger", "history" })
   Page<ServiceDeliveryEntity> findByDealership_IdDealershipAndCurrentStatusInAndDeletedFalse(
       Long dealershipId, List<Status> statuses, Pageable pageable);
 
-  /**
-   * Encuentra servicios por placa (no eliminados) con paginación de manera global.
-   */
   @EntityGraph(attributePaths = { "plate", "dealership", "messenger", "history" })
   Page<ServiceDeliveryEntity> findByPlate_PlateNumberAndDeletedFalse(
       String plateNumber, Pageable pageable);
 
-  /**
-   * Encuentra servicios por estados (no eliminados) con paginación de manera global.
-   */
   @EntityGraph(attributePaths = { "plate", "dealership", "messenger", "history" })
   Page<ServiceDeliveryEntity> findByCurrentStatusInAndDeletedFalse(
       List<Status> statuses, Pageable pageable);

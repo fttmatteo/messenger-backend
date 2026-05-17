@@ -18,9 +18,6 @@ class ImageOptimizerTest {
     }
 
     @Test
-    /**
-     * Verifica que el optimizador no optimice archivos AVIF (Passthrough).
-     */
     void shouldNotOptimizeAvif() throws IOException {
         byte[] avifContent = "fake-avif-content".getBytes();
         InputStream inputStream = new ByteArrayInputStream(avifContent);
@@ -31,9 +28,6 @@ class ImageOptimizerTest {
     }
 
     @Test
-    /**
-     * Verifica que el optimizador no optimice archivos WebP (Passthrough para evitar doble compresión).
-     */
     void shouldNotOptimizeWebp() throws IOException {
         byte[] webpContent = "fake-webp-content".getBytes();
         InputStream inputStream = new ByteArrayInputStream(webpContent);
@@ -44,10 +38,6 @@ class ImageOptimizerTest {
     }
 
     @Test
-    /**
-     * Verifica que el optimizador maneje errores de formato correctamente.
-     * En caso de error de lectura, debe intentar devolver el stream original o lanzar excepción controlada.
-     */
     void shouldHandleInvalidFormatsGracefully() throws IOException {
         byte[] invalidContent = new byte[10];
         InputStream inputStream = new ByteArrayInputStream(invalidContent);

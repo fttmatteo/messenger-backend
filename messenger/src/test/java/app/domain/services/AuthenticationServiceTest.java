@@ -64,9 +64,6 @@ class AuthenticationServiceTest {
 
         @Test
         @DisplayName("Debe autenticar con credenciales válidas")
-        /**
-         * Verifica la autenticación exitosa cuando las credenciales son correctas.
-         */
         void shouldAuthenticateWithValidCredentials() throws Exception {
             when(employeePort.findByDocument(123456789L)).thenReturn(sampleEmployee);
             when(passwordEncoder.matches("correctPassword", sampleEmployee.getPassword())).thenReturn(true);
@@ -82,9 +79,6 @@ class AuthenticationServiceTest {
 
         @Test
         @DisplayName("Debe incluir rol correcto en token")
-        /**
-         * Verifica que el token generado contenga el rol del usuario autenticado.
-         */
         void shouldIncludeCorrectRoleInToken() throws Exception {
             sampleEmployee.setRole(Role.ADMIN);
             TokenResponse adminToken = new TokenResponse();
@@ -108,9 +102,6 @@ class AuthenticationServiceTest {
 
         @Test
         @DisplayName("Debe lanzar excepción si usuario no existe")
-        /**
-         * Verifica que se lance excepción si el usuario no es encontrado.
-         */
         void shouldThrowExceptionIfUserNotFound() {
             when(employeePort.findByDocument(999999999L)).thenReturn(null);
 
@@ -126,9 +117,6 @@ class AuthenticationServiceTest {
 
         @Test
         @DisplayName("Debe lanzar excepción si contraseña incorrecta")
-        /**
-         * Verifica que se lance excepción si la contraseña es incorrecta.
-         */
         void shouldThrowExceptionIfPasswordIncorrect() {
             when(employeePort.findByDocument(123456789L)).thenReturn(sampleEmployee);
             when(passwordEncoder.matches("wrongPassword", sampleEmployee.getPassword())).thenReturn(false);
@@ -150,10 +138,6 @@ class AuthenticationServiceTest {
 
         @Test
         @DisplayName("Debe migrar contraseña plana a BCrypt")
-        /**
-         * Verifica la migración automática de contraseñas de texto plano a hash seguro
-         * al autenticarse.
-         */
         void shouldMigratePlainPasswordToBcrypt() throws Exception {
             sampleEmployee.setPassword("plainTextPassword");
 
@@ -179,9 +163,6 @@ class AuthenticationServiceTest {
 
         @Test
         @DisplayName("Debe manejar documento no encontrado")
-        /**
-         * Verifica que se maneje la excepción si el documento no es encontrado.
-         */
         void shouldHandleDocumentNotFound() {
             when(employeePort.findByDocument(111111111L)).thenReturn(null);
 

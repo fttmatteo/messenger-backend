@@ -38,10 +38,6 @@ class DeleteServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe mover servicio a papelera (soft delete)")
-    /**
-     * Verifica que el servicio se marque como eliminado (soft delete) y se registre
-     * la fecha.
-     */
     void shouldSoftDeleteService() throws Exception {
         ServiceDelivery service = new ServiceDelivery();
         service.setIdServiceDelivery(1L);
@@ -60,9 +56,6 @@ class DeleteServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si servicio no existe o ya está en papelera")
-    /**
-     * Verifica que se lance excepción si el servicio no existe o ya está en la papelera.
-     */
     void shouldThrowExceptionIfServiceNotFoundOrAlreadyDeleted() {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(null);
 
@@ -74,9 +67,6 @@ class DeleteServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe restaurar servicio desde papelera solo por ADMIN")
-    /**
-     * Verifica que un administrador pueda restaurar un servicio eliminado.
-     */
     void shouldRestoreServiceFromTrashByAdmin() throws Exception {
         ServiceDelivery service = new ServiceDelivery();
         service.setIdServiceDelivery(1L);
@@ -99,9 +89,6 @@ class DeleteServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe impedir restaurar servicio si no es ADMIN")
-    /**
-     * Verifica que se impida restaurar un servicio eliminado si el usuario no es administrador.
-     */
     void shouldForbidRestoreByNonAdmin() {
         ServiceDelivery service = new ServiceDelivery();
         service.setIdServiceDelivery(1L);
@@ -122,9 +109,6 @@ class DeleteServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si servicio no está en papelera al restaurar")
-    /**
-     * Verifica que se lance excepción si el servicio no está en la papelera al restaurar.
-     */
     void shouldThrowExceptionIfServiceNotInTrash() {
         ServiceDelivery service = new ServiceDelivery();
         service.setIdServiceDelivery(1L);
@@ -140,10 +124,6 @@ class DeleteServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe archivar permanentemente servicio en papelera")
-    /**
-     * Verifica que se pueda archivar físicamente un servicio que ya está en la
-     * papelera.
-     */
     void shouldArchiveServiceInTrash() throws Exception {
         ServiceDelivery service = new ServiceDelivery();
         service.setIdServiceDelivery(1L);
@@ -157,9 +137,6 @@ class DeleteServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe impedir archivado si servicio no está en papelera")
-    /**
-     * Verifica que se impida archivar un servicio que no está en la papelera.
-     */
     void shouldForbidArchiveIfNotInTrash() {
         ServiceDelivery service = new ServiceDelivery();
         service.setIdServiceDelivery(1L);

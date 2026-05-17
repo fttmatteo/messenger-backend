@@ -9,9 +9,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface PlateRepository extends JpaRepository<PlateEntity, Long> {
-
-    /**
-     * Busca una placa por su número.
-     */
     PlateEntity findByPlateNumber(String plateNumber);
 }

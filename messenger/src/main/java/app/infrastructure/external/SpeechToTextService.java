@@ -72,17 +72,13 @@ public class SpeechToTextService {
                     .setContent(ByteString.copyFrom(audioBytes))
                     .build();
 
-            // Determinar codificación basada en el MIME type
             RecognitionConfig.AudioEncoding encoding = RecognitionConfig.AudioEncoding.WEBM_OPUS;
             int sampleRate = 48000;
 
             if (mimeType != null) {
                 if (mimeType.contains("mp4") || mimeType.contains("aac") || mimeType.contains("m4a")) {
-                    // Para MP4/AAC a menudo es mejor dejar que Google detecte o usar v1p1beta1
-                    // Pero en v1, ENCODING_UNSPECIFIED suele funcionar si el contenedor es
-                    // reconocido
                     encoding = RecognitionConfig.AudioEncoding.ENCODING_UNSPECIFIED;
-                    sampleRate = 0; // Dejar que se detecte
+                    sampleRate = 0;
                 } else if (mimeType.contains("ogg")) {
                     encoding = RecognitionConfig.AudioEncoding.OGG_OPUS;
                     sampleRate = 16000;

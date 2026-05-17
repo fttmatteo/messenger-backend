@@ -47,10 +47,6 @@ class ServiceDeliveryControllerIntegrationTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("GET /services/stats/daily should return 200 and correct JSON structure")
     @WithMockUser
-    /**
-     * Verifica que el endpoint de estadísticas diarias retorne datos correctos y
-     * completos.
-     */
     void shouldReturnDailyStats() throws Exception {
         EmployeeEntity messenger = createEmployee("888888", "Integration Messenger");
         entityManager.persist(messenger);
@@ -81,9 +77,6 @@ class ServiceDeliveryControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("GET /services/stats/daily should return 401 if unauthenticated")
-    /**
-     * Verifica que se requiera autenticación para acceder a las estadísticas.
-     */
     void shouldReturn401IfUnauthenticated() throws Exception {
         String dateStr = "2025-12-29";
         mockMvc.perform(get("/services/stats/daily")

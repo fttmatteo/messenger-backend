@@ -20,12 +20,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import java.time.LocalDateTime;
 
-/**
- * Pruebas de integración para verificar la correcta configuración de Redis:
- * - Pooling de conexiones (Lettuce y Redisson).
- * - Sincronización de propiedades (max-active=4).
- * - Funcionalidad básica con Testcontainers.
- */
 @DisplayName("Redis Configuration Integration Tests")
 class RedisConfigurationIntegrationTest extends AbstractIntegrationTest {
 

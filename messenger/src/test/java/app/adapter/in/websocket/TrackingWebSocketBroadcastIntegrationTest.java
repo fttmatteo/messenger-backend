@@ -13,10 +13,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-/**
- * Pruebas de integración para el bridge Redis Pub/Sub -> WebSocket.
- * Verifica que los mensajes publicados en Redis lleguen a los tópicos de WebSocket.
- */
 @DisplayName("Tracking WebSocket Broadcast Integration Tests")
 class TrackingWebSocketBroadcastIntegrationTest extends AbstractIntegrationTest {
 
@@ -29,7 +25,6 @@ class TrackingWebSocketBroadcastIntegrationTest extends AbstractIntegrationTest 
     @Test
     @DisplayName("Should broadcast Redis message to WebSocket topics")
     void shouldBroadcastToWebSockets() {
-        // 1. Preparar mensaje JSON (LiveTrackingResponse)
         String jsonMessage = """
             {
                 "messengerId": 999,
@@ -41,12 +36,8 @@ class TrackingWebSocketBroadcastIntegrationTest extends AbstractIntegrationTest 
             }
             """;
 
-        // 2. Publicar en el topic de Redis que escucha la aplicación
         redisTemplate.convertAndSend("tracking:updates", jsonMessage);
 
-        // 3. Verificar que el RedisTrackingSubscriber capturó el mensaje
-        // y lo retransmitió vía SimpMessagingTemplate.
-        // Usamos timeout por ser asíncrono.
         verify(messagingTemplate, timeout(5000)).convertAndSend(
                 eq("/topic/tracking/999"),
                 org.mockito.ArgumentMatchers.any(LiveTrackingResponse.class)

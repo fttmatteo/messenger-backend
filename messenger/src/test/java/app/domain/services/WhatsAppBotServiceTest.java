@@ -38,9 +38,6 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
-    /**
-     * Verifica que el bot procese el mensaje y espere el PIN.
-     */
     void testProcessMessage_AwaitingPin_Success() {
         String from = "123456789";
         String pin = "1234";
@@ -63,9 +60,6 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
-    /**
-     * Verifica que el bot procese el mensaje y espere el PIN.
-     */
     void testProcessMessage_AwaitingPin_Failure_NotBlocked() {
         String from = "123456789";
         String wrongPin = "0000";
@@ -83,9 +77,6 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
-    /**
-     * Verifica que el bot procese el mensaje y espere el PIN.
-     */
     void testProcessMessage_AwaitingPin_Failure_FinalAttemptBlocks() {
         String from = "123456789";
         String wrongPin = "0000";
@@ -102,9 +93,6 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
-    /**
-     * Verifica que el bot cambie al estado AWAITING_PLATE al seleccionar la opción 1.
-     */
     void testProcessMessage_MenuOption1_SwitchToAwaitingPlate() {
         String from = "123456789";
         Dealership dealership = new Dealership();
@@ -124,9 +112,6 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
-    /**
-     * Verifica que el bot busque una placa directamente si el mensaje parece una placa.
-     */
     void testProcessMessage_Menu_LooksLikePlate_DirectSearch() {
         String from = "123456789";
         String chasis = "ABC12345674567";
@@ -149,9 +134,6 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
-    /**
-     * Verifica que el bot cierre la sesión al seleccionar la opción 0.
-     */
     void testProcessMessage_MenuOption0_CloseSession() {
         String from = "123456789";
         Dealership dealership = new Dealership();
@@ -170,9 +152,6 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
-    /**
-     * Verifica que el bot maneje la paginación de listas.
-     */
     void testProcessMessage_Menu_NextPage() {
         String from = "123456789";
         Dealership dealership = new Dealership();
@@ -193,9 +172,6 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
-    /**
-     * Verifica que el bot responda correctamente cuando ya está bloqueado.
-     */
     void testProcessMessage_AlreadyBlocked() {
         String from = "123456789";
 

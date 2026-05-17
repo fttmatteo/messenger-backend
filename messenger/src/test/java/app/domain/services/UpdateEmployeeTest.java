@@ -21,9 +21,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UpdateEmployee Unit Tests")
-/**
- * Clase de pruebas unitarias para UpdateEmployee.
- */
 class UpdateEmployeeTest {
 
     @Mock
@@ -49,10 +46,6 @@ class UpdateEmployeeTest {
 
     @Test
     @DisplayName("Debe actualizar campos y contraseña")
-    /**
-     * Verifica la actualización exitosa de datos del empleado, incluyendo
-     * encriptación de contraseña.
-     */
     void shouldUpdateFieldsAndPassword() throws Exception {
         Employee income = new Employee();
         income.setDocument(999L);
@@ -75,10 +68,6 @@ class UpdateEmployeeTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si Documento ya existe")
-    /**
-     * Verifica que no se pueda actualizar el documento a uno que ya pertenece a
-     * otro empleado.
-     */
     void shouldThrowExceptionIfDocumentExists() {
         Employee income = new Employee();
         income.setDocument(999L);

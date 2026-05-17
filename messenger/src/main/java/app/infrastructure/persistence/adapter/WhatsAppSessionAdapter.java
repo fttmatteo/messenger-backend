@@ -159,7 +159,7 @@ public class WhatsAppSessionAdapter implements WhatsAppSessionPort {
         if (entity == null) {
             Dealership d = new Dealership();
             d.setIdDealership(null);
-            d.setName("PLAK Corporativo");
+            d.setName("Llave Maestra");
             return d;
         }
         Dealership d = new Dealership();

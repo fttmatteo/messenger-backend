@@ -23,7 +23,6 @@ public class SpringRedissonRegionFactory extends RedissonRegionFactory {
 
     @Override
     protected void prepareForUse(SessionFactoryOptions settings, Map properties) {
-        // Leer propiedades de Hibernate que vienen de Spring application.properties
         String host = getProperty(properties, "hibernate.cache.redisson.host", "localhost");
         String portStr = getProperty(properties, "hibernate.cache.redisson.port", "6379");
         String password = getProperty(properties, "hibernate.cache.redisson.password", null);
@@ -45,7 +44,6 @@ public class SpringRedissonRegionFactory extends RedissonRegionFactory {
 
         RedissonClient redissonClient = Redisson.create(config);
 
-        // Usar reflexión para establecer el campo 'redisson' del padre
         try {
             Field redissonField = RedissonRegionFactory.class.getDeclaredField("redisson");
             redissonField.setAccessible(true);

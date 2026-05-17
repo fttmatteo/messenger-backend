@@ -22,9 +22,6 @@ import org.springframework.data.domain.Pageable;
 @ConditionalOnProperty(name = "redis.enabled", havingValue = "false")
 public class NoOpTrackingAdapter implements TrackingPort {
 
-    /**
-     * Implementación vacía (No-Op) para cuando Redis está deshabilitado.
-     */
     @Override
     public void saveLiveLocation(LiveTracking tracking) {
     }

@@ -37,13 +37,10 @@ class CreateServiceDeliveryTest {
     private EmployeePort employeePort;
     @Mock
     private PlateRecognition plateRecognition;
-
     @Mock
     private app.domain.ports.TrackingPort trackingPort;
-
     @Mock
     private ApplicationEventPublisher eventPublisher;
-
     @InjectMocks
     private CreateServiceDelivery createServiceDelivery;
 
@@ -67,16 +64,12 @@ class CreateServiceDeliveryTest {
         plate.setPlateNumber("ABC1234567");
         plate.setPlateType(PlateType.MOTORCYCLE);
 
-        // Default mock for duplicate check (not found)
         lenient().when(serviceDeliveryPort.findAllPaginated(anyString(), anyBoolean(), isNull(), any()))
                 .thenReturn(org.springframework.data.domain.Page.empty());
     }
 
     @Test
     @DisplayName("Debe lanzar excepción si la placa ya tiene un servicio registrado")
-    /**
-     * Verifica validación de servicio duplicado para una misma placa.
-     */
     void shouldThrowExceptionIfPlateAlreadyExists() {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
@@ -93,10 +86,6 @@ class CreateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe crear servicio y nueva placa cuando placa no existe")
-    /**
-     * Verifica que se cree una nueva placa y el servicio asociado si la placa es
-     * nueva.
-     */
     void shouldCreateServiceAndNewPlateWhenPlateDoesNotExist() throws Exception {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
@@ -124,9 +113,6 @@ class CreateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si mensajero no existe")
-    /**
-     * Verifica validación de existencia del mensajero.
-     */
     void shouldThrowExceptionIfMessengerNotFound() {
         when(employeePort.findById(anyLong())).thenReturn(null);
 
@@ -139,9 +125,6 @@ class CreateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si concesionario no existe")
-    /**
-     * Verifica validación de existencia del concesionario.
-     */
     void shouldThrowExceptionIfDealershipNotFound() {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(999L)).thenReturn(null);
@@ -155,9 +138,6 @@ class CreateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe normalizar la placa a mayúsculas")
-    /**
-     * Verifica que la placa se normalice a mayúsculas antes de guardar.
-     */
     void shouldNormalizePlateToUpperCase() throws Exception {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
@@ -176,9 +156,6 @@ class CreateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe guardar historial de rastreo inicial si se proporciona ubicación")
-    /**
-     * Verifica que se guarde el historial de rastreo inicial si se proporciona ubicación.
-     */
     void shouldSaveTrackingHistoryWhenLocationIsProvided() throws Exception {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);

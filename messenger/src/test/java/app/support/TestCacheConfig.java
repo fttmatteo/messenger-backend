@@ -6,11 +6,6 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
-/**
- * Configuración de caché para tests.
- * Usa ConcurrentMapCacheManager en lugar de Redis para evitar
- * dependencia de infraestructura externa durante los tests.
- */
 @TestConfiguration
 public class TestCacheConfig {
 

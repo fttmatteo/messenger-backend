@@ -12,34 +12,18 @@ import java.util.List;
  */
 @Repository
 public interface TrackingHistoryRepository extends CrudRepository<TrackingHistoryEntity, Long> {
-
-        /**
-         * Busca el historial de tracking por mensajero y rango de fechas con paginación
-         */
         org.springframework.data.domain.Page<TrackingHistoryEntity> findByMessengerIdAndRecordedAtBetween(
                         Long messengerId,
                         LocalDateTime start,
                         LocalDateTime end,
                         org.springframework.data.domain.Pageable pageable);
 
-        /**
-         * Busca el historial de tracking por ID de servicio de entrega
-         */
         List<TrackingHistoryEntity> findByServiceDeliveryId(Long serviceDeliveryId);
 
-        /**
-         * Busca los 10 últimos registros de tracking por mensajero, ordenados por fecha
-         */
         List<TrackingHistoryEntity> findTop10ByMessengerIdOrderByRecordedAtDesc(Long messengerId);
 
-        /**
-         * Busca el primer registro de tracking por mensajero, ordenado por fecha
-         */
         TrackingHistoryEntity findFirstByMessengerIdOrderByRecordedAtDesc(Long messengerId);
-
-        /**
-         * Cuenta el número de registros de tracking por mensajero y rango de fechas
-         */
+        
         long countByMessengerIdAndRecordedAtBetween(
                         Long messengerId,
                         LocalDateTime start,

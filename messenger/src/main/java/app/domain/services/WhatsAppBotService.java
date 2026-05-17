@@ -242,17 +242,9 @@ public class WhatsAppBotService {
                 "✅ Chasis entregados",
                 "🚪 Cerrar sesión");
 
-        List<String> rowDescriptions = List.of(
-                "Por chasis",
-                "Para entrega",
-                "Por intento fallido",
-                "Por documentación",
-                "Consolidado final",
-                "Finalizar sesión actual");
-
         List<String> rowIds = List.of("1", "2", "3", "4", "5", "0");
 
-        messagePort.sendListMessage(from, bodyText, buttonText, listTitle, rowTitles, rowDescriptions, rowIds);
+        messagePort.sendListMessage(from, bodyText, buttonText, listTitle, rowTitles, null, rowIds);
     }
 
     private void sendPlateDetails(String from, List<ServiceDelivery> services) {

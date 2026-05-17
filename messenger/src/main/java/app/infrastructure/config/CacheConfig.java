@@ -35,7 +35,6 @@ public class CacheConfig implements CachingConfigurer {
 
         @Bean
         public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
-                // ObjectMapper configurado para manejar LocalDateTime y otros tipos Java 8
                 ObjectMapper objectMapper = new ObjectMapper();
                 objectMapper.registerModule(new JavaTimeModule());
                 objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -47,7 +46,6 @@ public class CacheConfig implements CachingConfigurer {
                 GenericJackson2JsonRedisSerializer jsonSerializer = new GenericJackson2JsonRedisSerializer(
                                 objectMapper);
 
-                // Configuración por defecto: TTL de 10 minutos
                 RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
                                 .entryTtl(Duration.ofMinutes(10))
                                 .serializeKeysWith(RedisSerializationContext.SerializationPair
@@ -58,7 +56,6 @@ public class CacheConfig implements CachingConfigurer {
 
                 return RedisCacheManager.builder(connectionFactory)
                                 .cacheDefaults(defaultConfig)
-                                // Configuraciones específicas por caché
                                 .withCacheConfiguration("dealerships",
                                                 defaultConfig.entryTtl(Duration.ofMinutes(30)))
                                 .withCacheConfiguration("employees",

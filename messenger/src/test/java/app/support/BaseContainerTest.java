@@ -7,17 +7,6 @@ import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 import com.redis.testcontainers.RedisContainer;
 
-/**
- * Clase base para todos los tests que requieran infraestructura (MySQL, Redis).
- * Implementa el patrón Singleton para asegurar que los contenedores se inicien
- * una sola vez por JVM, mejorando drásticamente la estabilidad y velocidad.
- * 
- * Funciona igual en entorno local y CI (GitHub Actions) eliminando la necesidad
- * de docker-compose para tests. Testcontainers gestiona todo automáticamente.
- * 
- * Esta clase NO tiene anotaciones de Spring para permitir que sea extendida
- * tanto por @SpringBootTest como por @DataJpaTest sin conflictos de bootstrap.
- */
 @SuppressWarnings("resource")
 public abstract class BaseContainerTest {
 

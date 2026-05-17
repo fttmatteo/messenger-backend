@@ -26,7 +26,6 @@ public class DataInitializer {
         return args -> {
             logger.info("Iniciando carga de datos para perfil local y dev...");
 
-            // 1. Crear Administrador (123456 / admin123)
             if (employeeRepository.findByDocument(123456L) == null) {
                 EmployeeEntity admin = new EmployeeEntity();
                 admin.setDocument(123456L);
@@ -37,7 +36,6 @@ public class DataInitializer {
                 employeeRepository.save(admin);
             }
 
-            // 2. Crear Mensajero (654321 / password123)
             if (employeeRepository.findByDocument(654321L) == null) {
                 EmployeeEntity messenger = new EmployeeEntity();
                 messenger.setDocument(654321L);

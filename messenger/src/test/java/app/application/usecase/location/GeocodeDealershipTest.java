@@ -18,9 +18,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("GeocodeDealershipUseCase Unit Tests")
-/**
- * Clase de pruebas unitarias para el caso de uso de geocodificación de concesionarios.
- */
 class GeocodeDealershipUseCaseTest {
 
     @Mock
@@ -33,10 +30,6 @@ class GeocodeDealershipUseCaseTest {
 
     @Test
     @DisplayName("Debe geocodificar y actualizar concesionario")
-    /**
-     * Verifica que se actualicen las coordenadas del concesionario usando el
-     * servicio de geocodificación.
-     */
     void shouldGeocodeAndUpdateDealership() {
         Dealership d = new Dealership();
         d.setIdDealership(1L);
@@ -60,9 +53,6 @@ class GeocodeDealershipUseCaseTest {
 
     @Test
     @DisplayName("Debe geocodificar dirección arbitraria")
-    /**
-     * Verifica geocodificación de una dirección libre sin persistencia.
-     */
     void shouldGeocodeArbitraryAddress() {
         Location loc = new Location(5.0, -75.0);
         when(locationPort.geocodeAddress("Some address")).thenReturn(loc);

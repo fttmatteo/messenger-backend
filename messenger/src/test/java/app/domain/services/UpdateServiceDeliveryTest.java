@@ -28,9 +28,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UpdateServiceDelivery Unit Tests")
-/**
- * Clase de pruebas unitarias para UpdateServiceDelivery.
- */
 class UpdateServiceDeliveryTest {
 
     @Mock

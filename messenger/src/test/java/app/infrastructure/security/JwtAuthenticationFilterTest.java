@@ -44,9 +44,6 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
-    /**
-     * Verifica que el filtro autentique correctamente cuando hay un token válido en la cookie.
-     */
     void shouldAuthenticateWhenValidTokenInCookie() throws ServletException, IOException {
         Cookie authCookie = new Cookie("accessToken", "valid-token");
         when(request.getCookies()).thenReturn(new Cookie[] { authCookie });
@@ -65,9 +62,6 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
-    /**
-     * Verifica que el filtro autentique correctamente cuando hay un token válido en el header.
-     */
     void shouldAuthenticateWhenValidTokenInHeader() throws ServletException, IOException {
         when(request.getCookies()).thenReturn(null);
         when(request.getHeader("Authorization")).thenReturn("Bearer valid-token");
@@ -86,9 +80,6 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
-    /**
-     * Verifica que el filtro no autentique cuando el token es inválido.
-     */
     void shouldNotAuthenticateWhenTokenInvalid() throws ServletException, IOException {
         when(request.getHeader("Authorization")).thenReturn("Bearer invalid-token");
         when(request.getRequestURI()).thenReturn("/api/messages");
@@ -100,9 +91,6 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
-    /**
-     * Verifica que el filtro no autentique en rutas públicas sin token.
-     */
     void shouldNotAuthenticateOnPublicRouteWithoutToken() throws ServletException, IOException {
         when(request.getRequestURI()).thenReturn("/auth/login");
         when(request.getCookies()).thenReturn(null);

@@ -122,7 +122,7 @@ public class WhatsAppWebhookController {
         }
 
         try {
-            String signature = signatureWithPrefix.substring(7); // Quitar "sha256="
+            String signature = signatureWithPrefix.substring(7);
 
             javax.crypto.spec.SecretKeySpec signingKey = new javax.crypto.spec.SecretKeySpec(
                     appSecret.getBytes(java.nio.charset.StandardCharsets.UTF_8),

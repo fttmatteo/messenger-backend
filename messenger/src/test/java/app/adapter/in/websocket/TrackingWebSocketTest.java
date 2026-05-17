@@ -26,9 +26,6 @@ import app.support.AbstractIntegrationTest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DisplayName("Tracking WebSocket Integration Tests")
-/**
- * Clase de pruebas integración para el WebSocket de seguimiento.
- */
 class TrackingWebSocketTest extends AbstractIntegrationTest {
 
     @LocalServerPort
@@ -54,10 +51,6 @@ class TrackingWebSocketTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("Should successfully connect to WebSocket and subscribe to tracking topic")
-    /**
-     * Verifica que el WebSocket se conecte correctamente y se suscriba al topic de
-     * seguimiento.
-     */
     void shouldConnectAndSubscribeSuccessfully() throws Exception {
         app.domain.model.auth.AuthCredentials credentials = new app.domain.model.auth.AuthCredentials();
         credentials.setDocument(12345678L);

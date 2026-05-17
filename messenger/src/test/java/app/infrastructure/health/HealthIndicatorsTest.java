@@ -22,23 +22,16 @@ class HealthIndicatorsTest {
 
     @Mock
     private RedisConnectionFactory redisConnectionFactory;
-
     @Mock
     private RedisConnection redisConnection;
-
     @Mock
     private GeoApiContext geoApiContext;
-
     @InjectMocks
     private RedisHealthIndicator redisHealthIndicator;
-
     @InjectMocks
     private GoogleMapsHealthIndicator googleMapsHealthIndicator;
 
     @Test
-    /**
-     * Verifica que Redis esté disponible.
-     */
     void redisHealthShouldBeUpWhenPingReturnsPong() {
         when(redisConnectionFactory.getConnection()).thenReturn(redisConnection);
         when(redisConnection.ping()).thenReturn("PONG");
@@ -50,9 +43,6 @@ class HealthIndicatorsTest {
     }
 
     @Test
-    /**
-     * Verifica que Redis no esté disponible.
-     */
     void redisHealthShouldBeDownOnException() {
         when(redisConnectionFactory.getConnection()).thenThrow(new RuntimeException("Redis down"));
 
@@ -63,9 +53,6 @@ class HealthIndicatorsTest {
     }
 
     @Test
-    /**
-     * Verifica que Google Maps esté disponible.
-     */
     void googleMapsHealthShouldBeUpWhenApiResponds() throws Exception {
         try (MockedStatic<GeocodingApi> mockedGeocodingApi = mockStatic(GeocodingApi.class)) {
             GeocodingResult[] results = new GeocodingResult[] { new GeocodingResult() };

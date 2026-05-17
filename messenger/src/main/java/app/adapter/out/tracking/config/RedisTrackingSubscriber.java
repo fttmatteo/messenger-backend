@@ -30,7 +30,6 @@ public class RedisTrackingSubscriber {
         try {
             LiveTrackingResponse response = objectMapper.readValue(message, LiveTrackingResponse.class);
 
-            // Retransmitir a los suscriptores locales de esta instancia
             messagingTemplate.convertAndSend(
                     "/topic/tracking/" + response.getMessengerId(),
                     response);

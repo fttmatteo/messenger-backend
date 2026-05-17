@@ -36,9 +36,6 @@ class EmployeeAdapterTest {
 
     @Test
     @DisplayName("Debe guardar y recuperar un empleado")
-    /**
-     * Verifica persistencia y recuperación de empleados mediante el adaptador.
-     */
     void shouldSaveAndRetrieveEmployee() {
         Employee employee = new Employee();
         employee.setFullName("John Doe");
@@ -70,9 +67,6 @@ class EmployeeAdapterTest {
 
     @Test
     @DisplayName("Debe buscar por documento")
-    /**
-     * Verifica búsqueda de empleado por documento de identidad.
-     */
     void shouldFindByDocument() {
         EmployeeEntity entity = new EmployeeEntity();
         entity.setDocument(123456789L);
@@ -92,9 +86,6 @@ class EmployeeAdapterTest {
 
     @Test
     @DisplayName("Debe listar todos")
-    /**
-     * Verifica listado completo de empleados.
-     */
     void shouldFindAll() {
         EmployeeEntity e1 = new EmployeeEntity();
         e1.setFullName("E1");

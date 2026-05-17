@@ -31,9 +31,6 @@ import app.support.AbstractIntegrationTest;
 
 @Transactional
 @DisplayName("TrackingController Integration Tests")
-/**
- * Clase de pruebas integración para el controlador de seguimiento.
- */
 class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Autowired
@@ -60,9 +57,6 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
         @Test
         @WithMockUser(roles = "MESSENGER")
         @DisplayName("POST /tracking/update should return 200 and save location")
-        /**
-         * Verifica que el endpoint de actualización de ubicación retorne 200.
-         */
         void shouldUpdateLocationSuccessfully() throws Exception {
                 EmployeeEntity messenger = new EmployeeEntity();
                 messenger.setDocument(77766655L);
@@ -96,9 +90,6 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
         @Test
         @WithMockUser(roles = "ADMIN")
         @DisplayName("GET /tracking/messenger/{id} should return location for admin")
-        /**
-         * Verifica que el endpoint de ubicación retorne 200.
-         */
         void shouldGetLastLocationForAdmin() throws Exception {
                 EmployeeEntity messenger = new EmployeeEntity();
                 messenger.setDocument(55544433L);
@@ -136,9 +127,6 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
         @Test
         @WithMockUser(roles = "MESSENGER")
         @DisplayName("GET /tracking/messenger/{id} should return 403 for non-admin")
-        /**
-         * Verifica que el endpoint de ubicación retorne 403.
-         */
         void shouldReturnForbiddenForNonAdmin() throws Exception {
                 mockMvc.perform(get("/tracking/messenger/550e8400-e29b-41d4-a716-446655440000"))
                                 .andExpect(status().isForbidden());
@@ -147,9 +135,6 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
         @Test
         @WithMockUser(roles = "ADMIN")
         @DisplayName("GET /tracking/history/{id} should return historical data")
-        /**
-         * Verifica que el endpoint de historial retorne 200.
-         */
         void shouldGetTrackingHistory() throws Exception {
                 EmployeeEntity messenger = new EmployeeEntity();
                 messenger.setDocument(44455566L);
@@ -179,9 +164,6 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
         @Test
         @WithMockUser(roles = "MESSENGER")
         @DisplayName("POST /tracking/update should return 400 if coordinates are null")
-        /**
-         * Verifica que el endpoint de actualización retorne 400 si faltan coordenadas.
-         */
         void shouldReturnBadRequestForNullCoordinates() throws Exception {
                 LiveTrackingRequest request = new LiveTrackingRequest();
                 request.setMessengerId(1L);
@@ -198,9 +180,6 @@ class TrackingControllerIntegrationTest extends AbstractIntegrationTest {
         @Test
         @WithMockUser(roles = "ADMIN")
         @DisplayName("POST /tracking/messengers/bulk-locations should return locations map")
-        /**
-         * Verifica que el endpoint de ubicaciones en bulk retorne 200 y el mapa.
-         */
         void shouldGetBulkLastLocationsForAdmin() throws Exception {
                 EmployeeEntity messenger1 = new EmployeeEntity();
                 messenger1.setDocument(100100100L);

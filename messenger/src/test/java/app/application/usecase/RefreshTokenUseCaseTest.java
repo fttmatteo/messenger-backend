@@ -16,9 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("RefreshTokenUseCase Unit Tests")
-/**
- * Clase de pruebas unitarias para el caso de uso de refresco de token.
- */
 class RefreshTokenUseCaseTest {
 
     @Mock
@@ -29,10 +26,6 @@ class RefreshTokenUseCaseTest {
 
     @Test
     @DisplayName("Debe delegar refresh al servicio")
-    /**
-     * Verifica que la solicitud de refresco de token se pase al servicio de
-     * autenticación.
-     */
     void shouldDelegateRefresh() throws Exception {
         RefreshTokenRequest request = new RefreshTokenRequest();
         request.setRefreshToken("oldRefresh");
@@ -50,9 +43,6 @@ class RefreshTokenUseCaseTest {
 
     @Test
     @DisplayName("Debe propagar excepciones")
-    /**
-     * Verifica que se propague la excepción si el servicio de autenticación lanza una excepción.
-     */
     void shouldPropagateExceptions() throws Exception {
         RefreshTokenRequest request = new RefreshTokenRequest();
         request.setRefreshToken("bad");

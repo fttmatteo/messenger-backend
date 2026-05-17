@@ -59,10 +59,6 @@ class ServiceDeliveryMapperTest {
 
     @Test
     @DisplayName("Debe mapear la misma instancia de SignatureEntity cuando el objeto de dominio es el mismo")
-    /**
-     * Verifica que la misma instancia de SignatureEntity se mapee cuando el objeto
-     * de dominio es el mismo.
-     */
     void shouldMapSameSignatureInstanceWhenDomainSignatureIsShared() {
         ServiceDeliveryEntity entity = serviceDeliveryMapper.toEntity(service);
 

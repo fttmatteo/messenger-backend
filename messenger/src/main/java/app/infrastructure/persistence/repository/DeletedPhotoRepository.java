@@ -11,9 +11,5 @@ import java.util.List;
  */
 @Repository
 public interface DeletedPhotoRepository extends JpaRepository<DeletedPhotoEntity, Long> {
-
-    /**
-     * Encuentra todas las fotos de un servicio archivado
-     */
     List<DeletedPhotoEntity> findByServiceDeliveryId(Long serviceDeliveryId);
 }

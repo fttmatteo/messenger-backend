@@ -9,10 +9,6 @@ import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 
 @AnalyzeClasses(packages = "app", importOptions = ImportOption.DoNotIncludeTests.class)
-/**
- * Verifica el cumplimiento de las reglas de Arquitectura Hexagonal usando
- * ArchUnit.
- */
 public class HexagonalArchitectureTest {
 
         @ArchTest

@@ -56,9 +56,6 @@ class WhatsAppWebhookControllerTest {
                 when(valueOperations.setIfAbsent(anyString(), anyString(), any())).thenReturn(true);
         }
 
-        /**
-         * Calcula la firma HMAC-SHA256 del payload con el secreto de prueba.
-         */
         private String computeSignature(String payload) throws Exception {
                 SecretKeySpec signingKey = new SecretKeySpec(
                                 TEST_APP_SECRET.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
@@ -73,9 +70,6 @@ class WhatsAppWebhookControllerTest {
         }
 
         @Test
-        /**
-         * Verifica que el webhook procese mensajes de texto cuando la firma es válida.
-         */
         void shouldProcessTextMessage() throws Exception {
                 String json = "{" +
                                 "\"object\":\"whatsapp_business_account\"," +
@@ -109,9 +103,6 @@ class WhatsAppWebhookControllerTest {
         }
 
         @Test
-        /**
-         * Verifica que el webhook procese respuestas de botón cuando la firma es válida.
-         */
         void shouldProcessButtonReply() throws Exception {
                 String json = "{" +
                                 "\"object\":\"whatsapp_business_account\"," +
@@ -144,9 +135,6 @@ class WhatsAppWebhookControllerTest {
         }
 
         @Test
-        /**
-         * Verifica que el webhook procese respuestas de lista cuando la firma es válida.
-         */
         void shouldProcessListReply() throws Exception {
                 String json = "{" +
                                 "\"object\":\"whatsapp_business_account\"," +
@@ -179,9 +167,6 @@ class WhatsAppWebhookControllerTest {
         }
 
         @Test
-        /**
-         * Verifica que el webhook ignore mensajes duplicados.
-         */
         void shouldIgnoreDuplicateMessage() throws Exception {
                 when(valueOperations.setIfAbsent(anyString(), anyString(), any())).thenReturn(false);
 
@@ -215,10 +200,6 @@ class WhatsAppWebhookControllerTest {
         }
 
         @Test
-        /**
-         * Verifica que el webhook rechace peticiones cuando el App Secret no está
-         * configurado (fail-closed).
-         */
         void shouldRejectWhenAppSecretNotConfigured() throws Exception {
                 when(config.getAppSecret()).thenReturn("");
 
@@ -233,9 +214,6 @@ class WhatsAppWebhookControllerTest {
         }
 
         @Test
-        /**
-         * Verifica que el webhook rechace peticiones con firma inválida.
-         */
         void shouldRejectInvalidSignature() throws Exception {
                 String json = "{\"object\":\"whatsapp_business_account\",\"entry\":[]}";
 
@@ -249,9 +227,6 @@ class WhatsAppWebhookControllerTest {
         }
 
         @Test
-        /**
-         * Verifica que el webhook rechace peticiones sin cabecera de firma.
-         */
         void shouldRejectMissingSignature() throws Exception {
                 String json = "{\"object\":\"whatsapp_business_account\",\"entry\":[]}";
 

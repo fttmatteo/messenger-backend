@@ -29,9 +29,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ServiceDeliveryController Unit Tests")
-/**
- * Clase de pruebas unitarias para el controlador de entregas de servicios.
- */
 class ServiceDeliveryControllerTest {
 
     private MockMvc mockMvc;
@@ -94,9 +91,6 @@ class ServiceDeliveryControllerTest {
 
         @Test
         @DisplayName("Debe retornar 200 al eliminar lógicamente")
-        /**
-         * Verifica que el endpoint de eliminación lógica retorne 200.
-         */
         void shouldSoftDelete() throws Exception {
             Employee admin = new Employee();
             admin.setIdEmployee(1L);
@@ -119,9 +113,6 @@ class ServiceDeliveryControllerTest {
 
         @Test
         @DisplayName("Debe restaurar servicio desde papelera")
-        /**
-         * Verifica que el endpoint de restauración retorne 200.
-         */
         void shouldRestoreFromTrash() throws Exception {
             Employee admin = new Employee();
             admin.setIdEmployee(1L);

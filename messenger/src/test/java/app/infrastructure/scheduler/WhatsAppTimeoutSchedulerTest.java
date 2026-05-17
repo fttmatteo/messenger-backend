@@ -31,10 +31,6 @@ class WhatsAppTimeoutSchedulerTest {
     }
 
     @Test
-    /**
-     * Verifica que el planificador envíe mensajes y actualice las sesiones
-     * correctamente.
-     */
     void testCheckInactivityTimeouts_SendsMessagesAndUpdatesSessions() {
         WhatsAppSession session1 = new WhatsAppSession();
         session1.setPhoneNumber("123456789");
@@ -62,10 +58,6 @@ class WhatsAppTimeoutSchedulerTest {
     }
 
     @Test
-    /**
-     * Verifica que el planificador no realice ninguna acción cuando no hay
-     * sesiones inactivas.
-     */
     void testCheckInactivityTimeouts_NoSessions_DoesNothing() {
 
         when(sessionPort.findInactiveSessions(any(LocalDateTime.class)))
@@ -78,9 +70,6 @@ class WhatsAppTimeoutSchedulerTest {
     }
 
     @Test
-    /**
-     * Verifica que el planificador elimine correctamente las sesiones expiradas.
-     */
     void testCleanupExpiredSessions_DeletesSessions() {
         when(sessionRepository.deleteExpiredSessions(any(LocalDateTime.class)))
                 .thenReturn(5);
@@ -91,10 +80,6 @@ class WhatsAppTimeoutSchedulerTest {
     }
 
     @Test
-    /**
-     * Verifica que el planificador no realice ninguna acción cuando no hay
-     * sesiones expiradas para eliminar.
-     */
     void testCleanupExpiredSessions_NothingToDelete() {
         when(sessionRepository.deleteExpiredSessions(any(LocalDateTime.class)))
                 .thenReturn(0);

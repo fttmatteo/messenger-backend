@@ -7,17 +7,10 @@ import app.domain.exception.InputsException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-/**
- * Pruebas unitarias de Caja Negra para EmployeeValidator.
- * Cubre las clases de equivalencia inválidas y valores límite
- * para phoneValidator y passwordValidator.
- */
 @DisplayName("EmployeeValidator - Pruebas de Caja Negra")
 class EmployeeValidatorTest {
 
     private final EmployeeValidator employeeValidator = new EmployeeValidator();
-
-    // phoneValidator
 
     @Test
     @DisplayName("Teléfono válido de 10 dígitos no lanza excepción")
@@ -67,8 +60,6 @@ class EmployeeValidatorTest {
                 () -> employeeValidator.phoneValidator(""));
     }
 
-    // passwordValidator
-
     @Test
     @DisplayName("Contraseña válida no lanza excepción")
     void testPasswordValid() {
@@ -117,8 +108,6 @@ class EmployeeValidatorTest {
                 () -> employeeValidator.passwordValidator(""));
     }
 
-    // documentValidator
-
     @Test
     @DisplayName("Documento válido no lanza excepción")
     void testDocumentValid() {
@@ -146,8 +135,6 @@ class EmployeeValidatorTest {
                 () -> employeeValidator.documentValidator(null));
     }
 
-    // fullNameValidator 
-
     @Test
     @DisplayName("Nombre completo válido no lanza excepción")
     void testFullNameValid() {
@@ -160,8 +147,6 @@ class EmployeeValidatorTest {
         assertThrows(InputsException.class,
                 () -> employeeValidator.fullNameValidator(null));
     }
-
-    // roleValidator
 
     @Test
     @DisplayName("Rol válido ADMIN no lanza excepción")

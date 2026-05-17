@@ -53,7 +53,7 @@ class FileValidationServiceTest {
     @Test
     @DisplayName("Firma mayor a 2MB debe fallar")
     void testSignatureTooLargeShouldFail() {
-        byte[] oversizedSignature = new byte[(int) (3 * 1024 * 1024)]; // 3MB > 2MB
+        byte[] oversizedSignature = new byte[(int) (3 * 1024 * 1024)];
         MultipartFile file = new MockMultipartFile(
                 "signature",
                 "large_sig.webp",
@@ -70,7 +70,7 @@ class FileValidationServiceTest {
     @Test
     @DisplayName("Foto mayor a 10MB debe fallar")
     void testPhotoTooLargeShouldFail() {
-        byte[] oversizedPhoto = new byte[(int) (11 * 1024 * 1024)]; // 11MB > 10MB
+        byte[] oversizedPhoto = new byte[(int) (11 * 1024 * 1024)];
         MultipartFile file = new MockMultipartFile(
                 "photo",
                 "large_photo.webp",

@@ -28,9 +28,6 @@ import app.support.AbstractIntegrationTest;
 
 @Transactional
 @DisplayName("MonitoringController Integration Tests")
-/**
- * Clase de pruebas integración para el controlador de monitoreo.
- */
 class MonitoringControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -52,10 +49,6 @@ class MonitoringControllerIntegrationTest extends AbstractIntegrationTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     @DisplayName("GET /monitoring/messenger/{id}/activity should return summary and timeline")
-    /**
-     * Verifica que el endpoint de monitoreo devuelva el resumen y la línea de tiempo
-     * del mensajero.
-     */
     void shouldReturnMessengerActivitySummary() throws Exception {
         EmployeeEntity messenger = new EmployeeEntity();
         messenger.setDocument(99998888L);
@@ -112,9 +105,6 @@ class MonitoringControllerIntegrationTest extends AbstractIntegrationTest {
     @Test
     @WithMockUser(roles = "MESSENGER")
     @DisplayName("GET /monitoring/messenger/{id}/activity should return 403 for messenger role")
-    /**
-     * Verifica que el endpoint de monitoreo devuelva 403 para el rol de mensajero.
-     */
     void shouldReturnForbiddenForMessenger() throws Exception {
         mockMvc.perform(get("/monitoring/messenger/550e8400-e29b-41d4-a716-446655440000/activity")
                 .param("date", "2024-01-05"))

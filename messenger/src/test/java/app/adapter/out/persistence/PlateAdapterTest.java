@@ -23,9 +23,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("PlateAdapter Unit Tests")
-/**
- * Clase de pruebas unitarias para el adaptador de placas.
- */
 class PlateAdapterTest {
 
     @Mock
@@ -39,9 +36,6 @@ class PlateAdapterTest {
 
     @Test
     @DisplayName("Debe guardar y recuperar una placa")
-    /**
-     * Verifica persistencia de placas.
-     */
     void shouldSaveAndRetrievePlate() {
         Plate plate = new Plate();
         plate.setPlateNumber("ABC-123");
@@ -68,9 +62,6 @@ class PlateAdapterTest {
 
     @Test
     @DisplayName("Debe buscar por número de placa")
-    /**
-     * Verifica búsqueda exacta por número de placa de vehículo.
-     */
     void shouldFindByPlateNumber() {
         PlateEntity entity = new PlateEntity();
         entity.setPlateNumber("XYZ-789");
@@ -91,9 +82,6 @@ class PlateAdapterTest {
 
     @Test
     @DisplayName("Debe listar todas las placas")
-    /**
-     * Verifica recuperación de todas las placas registradas.
-     */
     void shouldFindAll() {
         PlateEntity e1 = new PlateEntity();
         e1.setPlateNumber("P1");

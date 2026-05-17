@@ -31,10 +31,6 @@ class ServiceDeliveryBuilderTest {
 
         @Test
         @DisplayName("Debe construir datos de creación válidos")
-        /**
-         * Verifica que el builder transforme correctamente un request de creación
-         * validado.
-         */
         void shouldBuildValidCreateData() throws Exception {
             ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest();
             request.setDealershipId("1");
@@ -52,10 +48,6 @@ class ServiceDeliveryBuilderTest {
 
         @Test
         @DisplayName("Debe propagar excepción si ID es inválido")
-        /**
-         * Verifica que el builder lance una excepción cuando el ID del concesionario
-         * no es válido.
-         */
         void shouldPropagateExceptionForInvalidId() throws Exception {
             ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest();
             request.setDealershipId("invalid");
@@ -69,10 +61,6 @@ class ServiceDeliveryBuilderTest {
 
         @Test
         @DisplayName("Debe propagar excepción si messengerId es inválido")
-        /**
-         * Verifica que el builder lance una excepción cuando el ID del mensajero no es
-         * válido.
-         */
         void shouldPropagateExceptionForInvalidMessengerId() throws Exception {
             ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest();
             request.setDealershipId("1");
@@ -92,9 +80,6 @@ class ServiceDeliveryBuilderTest {
 
         @Test
         @DisplayName("Debe construir datos de actualización válidos")
-        /**
-         * Verifica la construcción de datos para actualización de estado.
-         */
         void shouldBuildValidUpdateData() throws Exception {
             ServiceDeliveryUpdateStatusRequest request = new ServiceDeliveryUpdateStatusRequest();
             request.setStatus("DELIVERED");
@@ -115,9 +100,6 @@ class ServiceDeliveryBuilderTest {
 
         @Test
         @DisplayName("Debe propagar excepción si estado es inválido")
-        /**
-         * Verifica que el builder lance una excepción cuando el estado no es válido.
-         */
         void shouldPropagateExceptionForInvalidStatus() throws Exception {
             ServiceDeliveryUpdateStatusRequest request = new ServiceDeliveryUpdateStatusRequest();
             request.setStatus("INVALID");
@@ -137,9 +119,6 @@ class ServiceDeliveryBuilderTest {
 
         @Test
         @DisplayName("ServiceDeliveryCreateData debe ser inmutable")
-        /**
-         * Verifica que la clase interna ServiceDeliveryCreateData sea inmutable.
-         */
         void createDataShouldBeImmutable() {
             ServiceDeliveryBuilder.ServiceDeliveryCreateData data = new ServiceDeliveryBuilder.ServiceDeliveryCreateData(
                     1L, 100L);
@@ -150,9 +129,6 @@ class ServiceDeliveryBuilderTest {
 
         @Test
         @DisplayName("ServiceDeliveryUpdateData debe ser inmutable")
-        /**
-         * Verifica que la clase interna ServiceDeliveryUpdateData sea inmutable.
-         */
         void updateDataShouldBeImmutable() {
             ServiceDeliveryBuilder.ServiceDeliveryUpdateData data = new ServiceDeliveryBuilder.ServiceDeliveryUpdateData(
                     Status.DELIVERED, "Obs", 100L);

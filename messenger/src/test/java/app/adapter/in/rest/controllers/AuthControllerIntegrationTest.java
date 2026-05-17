@@ -56,10 +56,6 @@ class AuthControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Test
         @DisplayName("POST /auth/login should return 200 and tokens for valid credentials")
-        /**
-         * Verifica que el endpoint de login retorne tokens (access y refresh) cuando
-         * las credenciales son correctas.
-         */
         void shouldLoginSuccessfully() throws Exception {
                 EmployeeEntity admin = new EmployeeEntity();
                 admin.setDocument(12345678L);
@@ -88,9 +84,6 @@ class AuthControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Test
         @DisplayName("POST /auth/login should return 400 or 401 for invalid password")
-        /**
-         * Verifica que el endpoint rechace el login con contraseña incorrecta.
-         */
         void shouldReturnUnauthorizedForInvalidPassword() throws Exception {
                 EmployeeEntity admin = new EmployeeEntity();
                 admin.setDocument(87654321L);
@@ -114,9 +107,6 @@ class AuthControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Test
         @DisplayName("POST /auth/refresh should return new tokens for valid refresh token")
-        /**
-         * Verifica la rotación de tokens mediante el refreshToken.
-         */
         void shouldRefreshTokenSuccessfully() throws Exception {
                 EmployeeEntity admin = new EmployeeEntity();
                 admin.setDocument(11112222L);
@@ -154,9 +144,6 @@ class AuthControllerIntegrationTest extends AbstractIntegrationTest {
 
         @Test
         @DisplayName("POST /auth/login should return 400 when turnstileToken is empty")
-        /**
-         * Verifica que el endpoint rechace el login cuando el turnstileToken está vacío.
-         */
         void shouldReturnBadRequestWhenTurnstileTokenIsEmpty() throws Exception {
                 AuthCredentials credentials = new AuthCredentials();
                 credentials.setDocument(12345678L);

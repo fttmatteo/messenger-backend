@@ -11,9 +11,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("PlateRecognition Unit Tests")
-/**
- * Clase de pruebas unitarias para PlateRecognition.
- */
 class PlateRecognitionTest {
 
     private PlateRecognition plateRecognition;
@@ -62,7 +59,7 @@ class PlateRecognitionTest {
         }
 
         @ParameterizedTest
-        @ValueSource(strings = { "ABC123", "12345", "ABCDE1234567890123456" }) // Cortos o muy largos
+        @ValueSource(strings = { "ABC123", "12345", "ABCDE1234567890123456" })
         @DisplayName("Debe lanzar excepción para formatos inválidos")
         void shouldThrowExceptionForInvalidFormats(String chasis) {
             BusinessException exception = assertThrows(

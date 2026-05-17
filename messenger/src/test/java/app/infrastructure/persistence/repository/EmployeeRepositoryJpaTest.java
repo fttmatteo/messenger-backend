@@ -17,9 +17,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(TestCacheConfig.class)
 @DisplayName("EmployeeRepository DataJpaTest")
-/**
- * Clase de pruebas integración para el repositorio de empleados.
- */
 class EmployeeRepositoryJpaTest extends BaseContainerTest {
 
     @Autowired
@@ -27,9 +24,6 @@ class EmployeeRepositoryJpaTest extends BaseContainerTest {
 
     @Test
     @DisplayName("Debe encontrar empleado por documento")
-    /**
-     * Verifica que el repositorio encuentre un empleado por su documento.
-     */
     void shouldFindByDocument() {
         EmployeeEntity employee = new EmployeeEntity();
         employee.setDocument(987654321L);

@@ -61,10 +61,6 @@ class SecurityHelperTest {
 
     @Test
     @DisplayName("getCurrentUser - Debe retornar empleado cuando autenticación es válida")
-    /**
-     * Verifica recuperación del usuario actual autenticado desde el contexto de
-     * seguridad.
-     */
     void getCurrentUser_shouldReturnEmployeeWhenAuthIsValid() {
         mockAuthenticatedUser("123456");
         when(employeePort.findByDocument(123456L)).thenReturn(adminUser);
@@ -78,9 +74,6 @@ class SecurityHelperTest {
 
     @Test
     @DisplayName("getCurrentUser - Debe lanzar excepción cuando no hay autenticación")
-    /**
-     * Verifica manejo de error cuando no existe sesión activa.
-     */
     void getCurrentUser_shouldThrowWhenNoAuthentication() {
         UnauthorizedException ex = assertThrows(UnauthorizedException.class,
                 () -> securityHelper.getCurrentUser());
@@ -90,9 +83,6 @@ class SecurityHelperTest {
 
     @Test
     @DisplayName("getCurrentUser - Debe lanzar excepción cuando usuario es anonymousUser")
-    /**
-     * Verifica manejo de error cuando el usuario autenticado es anónimo.
-     */
     void getCurrentUser_shouldThrowWhenAnonymousUser() {
         mockAuthenticatedUser("anonymousUser");
 
@@ -104,10 +94,6 @@ class SecurityHelperTest {
 
     @Test
     @DisplayName("getCurrentUser - Debe lanzar excepción cuando documento tiene formato inválido")
-    /**
-     * Verifica manejo de error cuando el documento del usuario tiene formato
-     * inválido.
-     */
     void getCurrentUser_shouldThrowWhenInvalidDocumentFormat() {
         mockAuthenticatedUser("not-a-number");
 
@@ -119,10 +105,6 @@ class SecurityHelperTest {
 
     @Test
     @DisplayName("getCurrentUser - Debe lanzar excepción cuando usuario no existe en BD")
-    /**
-     * Verifica manejo de error cuando el usuario autenticado no existe en la base de
-     * datos.
-     */
     void getCurrentUser_shouldThrowWhenUserNotFoundInDb() {
         mockAuthenticatedUser("999999");
         when(employeePort.findByDocument(999999L)).thenReturn(null);
@@ -135,9 +117,6 @@ class SecurityHelperTest {
 
     @Test
     @DisplayName("getCurrentUserId - Debe retornar ID del empleado autenticado")
-    /**
-     * Verifica la recuperación del ID del usuario autenticado.
-     */
     void getCurrentUserId_shouldReturnEmployeeId() {
         mockAuthenticatedUser("123456");
         when(employeePort.findByDocument(123456L)).thenReturn(adminUser);
@@ -149,9 +128,6 @@ class SecurityHelperTest {
 
     @Test
     @DisplayName("isCurrentUserAdmin - Debe retornar true para usuario ADMIN")
-    /**
-     * Verifica utilidad de chequeo de rol de administrador.
-     */
     void isCurrentUserAdmin_shouldReturnTrueForAdmin() {
         mockAuthenticatedUser("123456");
         when(employeePort.findByDocument(123456L)).thenReturn(adminUser);
@@ -163,10 +139,6 @@ class SecurityHelperTest {
 
     @Test
     @DisplayName("isCurrentUserAdmin - Debe retornar false para usuario MESSENGER")
-    /**
-     * Verifica que el método identifique correctamente a usuarios que no son
-     * administradores.
-     */
     void isCurrentUserAdmin_shouldReturnFalseForMessenger() {
         mockAuthenticatedUser("789012");
         when(employeePort.findByDocument(789012L)).thenReturn(messengerUser);
@@ -178,9 +150,6 @@ class SecurityHelperTest {
 
     @Test
     @DisplayName("isCurrentUserMessenger - Debe retornar true para usuario MESSENGER")
-    /**
-     * Verifica que el método identifique correctamente a usuarios mensajeros.
-     */
     void isCurrentUserMessenger_shouldReturnTrueForMessenger() {
         mockAuthenticatedUser("789012");
         when(employeePort.findByDocument(789012L)).thenReturn(messengerUser);
@@ -192,10 +161,6 @@ class SecurityHelperTest {
 
     @Test
     @DisplayName("isCurrentUserMessenger - Debe retornar false para usuario ADMIN")
-    /**
-     * Verifica que el método identifique correctamente a usuarios que no son
-     * mensajeros.
-     */
     void isCurrentUserMessenger_shouldReturnFalseForAdmin() {
         mockAuthenticatedUser("123456");
         when(employeePort.findByDocument(123456L)).thenReturn(adminUser);

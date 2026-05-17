@@ -42,9 +42,6 @@ class SearchEmployeeTest {
 
         @Test
         @DisplayName("Debe retornar lista de empleados")
-        /**
-         * Verifica que se retorne la lista completa de empleados.
-         */
         void shouldReturnListOfEmployees() {
             Employee employee2 = new Employee();
             employee2.setDocument(987654321L);
@@ -59,9 +56,6 @@ class SearchEmployeeTest {
 
         @Test
         @DisplayName("Debe retornar lista vacía si no hay empleados")
-        /**
-         * Verifica que se retorne lista vacía cuando no hay empleados.
-         */
         void shouldReturnEmptyListIfNoEmployees() {
             when(employeePort.findAll()).thenReturn(List.of());
 
@@ -77,9 +71,6 @@ class SearchEmployeeTest {
 
         @Test
         @DisplayName("Debe retornar empleado para ID existente")
-        /**
-         * Verifica búsqueda exitosa por ID de empleado.
-         */
         void shouldReturnEmployeeForExistingId() {
             when(employeePort.findById(1L)).thenReturn(sampleEmployee);
 
@@ -91,9 +82,6 @@ class SearchEmployeeTest {
 
         @Test
         @DisplayName("Debe lanzar excepción para ID no existente")
-        /**
-         * Verifica que se lance excepción cuando el ID no existe.
-         */
         void shouldThrowExceptionForNonExistingId() {
             when(employeePort.findById(999L)).thenReturn(null);
 
@@ -110,9 +98,6 @@ class SearchEmployeeTest {
 
         @Test
         @DisplayName("Debe retornar empleado para documento existente")
-        /**
-         * Verifica búsqueda exitosa por documento de identidad.
-         */
         void shouldReturnEmployeeForExistingDocument() throws Exception {
             when(employeePort.findByDocument(123456789L)).thenReturn(sampleEmployee);
 
@@ -124,9 +109,6 @@ class SearchEmployeeTest {
 
         @Test
         @DisplayName("Debe lanzar excepción para documento no existente")
-        /**
-         * Verifica que se lance excepción cuando el documento no existe.
-         */
         void shouldThrowExceptionForNonExistingDocument() {
             when(employeePort.findByDocument(999999999L)).thenReturn(null);
 

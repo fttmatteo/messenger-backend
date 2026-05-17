@@ -90,7 +90,6 @@ public class TrackingWebSocketController {
             LiveTracking tracking = updateLiveTracking.execute(domainTracking);
             LiveTrackingResponse response = mapToResponse(tracking);
 
-            // Publicar en Redis para que todas las instancias reciban y broadcasten
             String jsonResponse = objectMapper.writeValueAsString(response);
             redisTemplate.convertAndSend(RedisPubSubConfig.TRACKING_TOPIC, jsonResponse);
 
