@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 
 /**
  * Representa una fotografía asociada a un servicio de entrega.
- * Puede ser foto de detección de placa o evidencia de entrega.
  */
 public class Photo {
     private Long idPhoto;

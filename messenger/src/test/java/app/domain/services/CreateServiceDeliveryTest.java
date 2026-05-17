@@ -8,7 +8,6 @@ import app.domain.exception.BusinessException;
 import app.domain.model.Dealership;
 import app.domain.model.Employee;
 import app.domain.model.Plate;
-import app.domain.model.enums.PhotoType;
 import app.domain.model.enums.PlateType;
 import app.domain.model.enums.Status;
 import app.domain.ports.DealershipPort;
@@ -86,7 +85,7 @@ class CreateServiceDeliveryTest {
                         java.util.List.of(new app.domain.model.ServiceDelivery())));
 
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> createServiceDelivery.create("ABC1234567", "path/to/photo.jpg", 1L, 12345678L, null, null));
+                () -> createServiceDelivery.create("ABC1234567", 1L, 12345678L, null, null));
 
         assertEquals("El chasis ABC1234567 ya tiene un servicio registrado en el sistema.", exception.getMessage());
         verify(serviceDeliveryPort, never()).save(any());
@@ -112,7 +111,7 @@ class CreateServiceDeliveryTest {
 
         when(serviceDeliveryPort.save(any())).thenReturn(savedService);
 
-        createServiceDelivery.create("NNN999", null, 1L, 12345678L, null, null);
+        createServiceDelivery.create("NNN999", 1L, 12345678L, null, null);
 
         verify(platePort).save(argThat(newPlate -> newPlate.getPlateNumber().equals("NNN999") &&
                 newPlate.getPlateType() == PlateType.MOTORCYCLE));
@@ -132,7 +131,7 @@ class CreateServiceDeliveryTest {
         when(employeePort.findById(anyLong())).thenReturn(null);
 
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> createServiceDelivery.create("ABC1234567", null, 1L, 99999L, null, null));
+                () -> createServiceDelivery.create("ABC1234567", 1L, 99999L, null, null));
 
         assertEquals("El mensajero no existe.", exception.getMessage());
         verify(serviceDeliveryPort, never()).save(any());
@@ -148,7 +147,7 @@ class CreateServiceDeliveryTest {
         when(dealershipPort.findById(999L)).thenReturn(null);
 
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> createServiceDelivery.create("ABC1234567", null, 999L, 12345678L, null, null));
+                () -> createServiceDelivery.create("ABC1234567", 999L, 12345678L, null, null));
 
         assertEquals("El concesionario indicado no existe.", exception.getMessage());
         verify(serviceDeliveryPort, never()).save(any());
@@ -168,31 +167,12 @@ class CreateServiceDeliveryTest {
         savedService.setIdServiceDelivery(100L);
         when(serviceDeliveryPort.save(any())).thenReturn(savedService);
 
-        createServiceDelivery.create("abc1234567", null, 1L, 12345678L, null, null);
+        createServiceDelivery.create("abc1234567", 1L, 12345678L, null, null);
 
         verify(platePort).findByPlateNumber("ABC1234567");
     }
 
-    @Test
-    @DisplayName("Debe agregar foto de detección si se proporciona path")
-    /**
-     * Verifica que si se provee path de foto, esta se adjunte al servicio inicial.
-     */
-    void shouldAddDetectionPhotoIfPathProvided() throws Exception {
-        when(employeePort.findById(12345678L)).thenReturn(messenger);
-        when(dealershipPort.findById(1L)).thenReturn(dealership);
-        when(platePort.findByPlateNumber("ABC1234567")).thenReturn(plate);
 
-        app.domain.model.ServiceDelivery savedService = new app.domain.model.ServiceDelivery();
-        savedService.setIdServiceDelivery(100L);
-        when(serviceDeliveryPort.save(any())).thenReturn(savedService);
-
-        createServiceDelivery.create("ABC1234567", "uploads/plate.jpg", 1L, 12345678L, null, null);
-
-        verify(serviceDeliveryPort)
-                .save(argThat(service -> service.getPhotos().get(0).getPhotoPath().equals("uploads/plate.jpg") &&
-                        service.getPhotos().get(0).getPhotoType() == PhotoType.PLATE_DETECTION));
-    }
 
     @Test
     @DisplayName("Debe guardar historial de rastreo inicial si se proporciona ubicación")
@@ -208,7 +188,7 @@ class CreateServiceDeliveryTest {
         savedService.setIdServiceDelivery(100L);
         when(serviceDeliveryPort.save(any())).thenReturn(savedService);
 
-        createServiceDelivery.create("ABC1234567", null, 1L, 12345678L, 6.2442, -75.5812);
+        createServiceDelivery.create("ABC1234567", 1L, 12345678L, 6.2442, -75.5812);
 
         verify(trackingPort).saveTrackingHistory(argThat(tracking -> tracking.getMessengerId().equals(1L) &&
                 tracking.getServiceDeliveryId().equals(100L) &&

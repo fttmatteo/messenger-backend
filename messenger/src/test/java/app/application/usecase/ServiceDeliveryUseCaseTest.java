@@ -5,8 +5,7 @@ import app.domain.model.Plate;
 import app.domain.model.ServiceDelivery;
 import app.domain.model.Signature;
 import app.domain.model.enums.Status;
-import app.domain.ports.OcrPort;
-import app.domain.ports.OcrResult;
+
 import app.domain.ports.StoragePort;
 import app.domain.services.CreateServiceDelivery;
 import app.domain.services.DeleteServiceDelivery;
@@ -20,7 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import java.io.File;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -45,14 +43,11 @@ class ServiceDeliveryUseCaseTest {
     @Mock
     private StoragePort storagePort;
 
-    @Mock
-    private OcrPort ocrPort;
 
     @InjectMocks
     private ServiceDeliveryUseCase serviceDeliveryUseCase;
 
     private ServiceDelivery sampleService;
-    private File mockImageFile;
 
     @BeforeEach
     void setUp() {
@@ -64,66 +59,8 @@ class ServiceDeliveryUseCaseTest {
         sampleService.setPlate(plate);
         sampleService.setCurrentStatus(Status.ASSIGNED);
 
-        mockImageFile = mock(File.class);
     }
 
-    @Nested
-    @DisplayName("Crear Servicio desde Imagen (OCR)")
-    class CreateFromImageTests {
-
-        @Test
-        @DisplayName("Debe crear servicio con placa detectada por OCR")
-        /**
-         * Verifica el flujo completo de creación usando una imagen: OCR -> Guardar
-         * imagen -> Crear servicio.
-         */
-        void shouldCreateServiceFromOcrDetection() throws Exception {
-            when(ocrPort.extractText(mockImageFile)).thenReturn(new OcrResult("ABC1234567", 0.95));
-            when(storagePort.save(eq(mockImageFile), eq("detections"), anyString()))
-                    .thenReturn("/path/to/saved/image.png");
-
-            when(createService.create(eq("ABC1234567"), anyString(), eq(1L), eq(123456L), isNull(), isNull()))
-                    .thenReturn(sampleService);
-
-            serviceDeliveryUseCase.createServiceFromImage(mockImageFile, 1L, 123456L, null, null);
-
-            verify(ocrPort).extractText(mockImageFile);
-            verify(storagePort).save(eq(mockImageFile), eq("detections"), contains("ABC1234567"));
-            verify(createService).create(eq("ABC1234567"), anyString(), eq(1L), eq(123456L), isNull(), isNull());
-        }
-
-        @Test
-        @DisplayName("Debe propagar excepción si OCR falla")
-        void shouldPropagateExceptionIfOcrFails() throws Exception {
-            when(ocrPort.extractText(mockImageFile)).thenThrow(new RuntimeException("Error en OCR"));
-
-            assertThrows(RuntimeException.class,
-                    () -> serviceDeliveryUseCase.createServiceFromImage(mockImageFile, 1L, 123456L, null, null));
-
-            verify(createService, never()).create(anyString(), anyString(), anyLong(), anyLong(), any(), any());
-        }
-
-        void shouldExtractPlateForPreview() throws Exception {
-            when(ocrPort.extractText(mockImageFile)).thenReturn(new OcrResult("ABC1234567", 0.95));
-
-            OcrResult result = serviceDeliveryUseCase.extractPlateFromImage(mockImageFile);
-
-            assertEquals("ABC1234567", result.text());
-            assertEquals(0.95, result.score());
-            verify(ocrPort).extractText(mockImageFile);
-        }
-
-        @Test
-        void shouldReturnEmptyStringIfOcrFailsInPreview() throws Exception {
-            when(ocrPort.extractText(mockImageFile)).thenThrow(new RuntimeException("OCR Error"));
-
-            OcrResult result = serviceDeliveryUseCase.extractPlateFromImage(mockImageFile);
-
-            assertTrue(result.text().isEmpty());
-            assertEquals(0.0, result.score());
-            verify(ocrPort).extractText(mockImageFile);
-        }
-    }
 
     @Nested
     @DisplayName("Crear Servicio con Placa Manual")
@@ -132,21 +69,15 @@ class ServiceDeliveryUseCaseTest {
         @Test
         @DisplayName("Debe crear servicio con placa manual")
         /**
-         * Verifica la creación de servicio cuando la placa se ingresa manualmente
-         * (bypass OCR).
+         * Verifica la creación de servicio cuando la placa se ingresa manualmente.
          */
         void shouldCreateServiceWithManualPlate() throws Exception {
-            when(storagePort.save(eq(mockImageFile), eq("detections"), anyString()))
-                    .thenReturn("/path/to/saved/image.png");
-
-            when(createService.create(eq("XYZ789"), anyString(), eq(1L), eq(123456L), isNull(), isNull()))
+            when(createService.create(eq("XYZ789"), eq(1L), eq(123456L), isNull(), isNull()))
                     .thenReturn(sampleService);
 
-            serviceDeliveryUseCase.createServiceWithManualPlate(mockImageFile, "XYZ789", 1L, 123456L, null, null);
+            serviceDeliveryUseCase.createServiceWithManualPlate("XYZ789", 1L, 123456L, null, null);
 
-            verify(ocrPort, never()).extractText(any());
-            verify(storagePort).save(eq(mockImageFile), eq("detections"), contains("XYZ789"));
-            verify(createService).create(eq("XYZ789"), anyString(), eq(1L), eq(123456L), isNull(), isNull());
+            verify(createService).create(eq("XYZ789"), eq(1L), eq(123456L), isNull(), isNull());
         }
     }
 

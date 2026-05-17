@@ -141,14 +141,12 @@
         <appender-ref ref="CONSOLE_DEV"/>
     </logger>
 
-    <!-- Logger para servicios externos (Google Maps, Plate Recognizer, Cloud Storage) -->
+    <!-- Logger para servicios externos (Google Maps, Cloud Storage) -->
     <logger name="app.adapter.out.maps" level="INFO" additivity="false">
         <appender-ref ref="CONSOLE_DEV"/>
     </logger>
 
-    <logger name="app.adapter.out.ocr" level="INFO" additivity="false">
-        <appender-ref ref="CONSOLE_DEV"/>
-    </logger>
+
 
     <logger name="app.adapter.out.storage" level="INFO" additivity="false">
         <appender-ref ref="CONSOLE_DEV"/>

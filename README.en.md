@@ -13,7 +13,7 @@
 [![Google Cloud](https://img.shields.io/badge/Google_Cloud-1.0+-4479A1?style=for-the-badge&logo=google&logoColor=white)](https://cloud.google.com/)
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg?style=for-the-badge)](LICENSE)
 
-**Delivery management system with automatic license plate recognition via OCR.**
+**Delivery management system and logistics.**
 
 [🇪🇸 Versión en Español](./README.md)
 
@@ -54,7 +54,7 @@ graph LR
     MAPS{{G-Maps}}
     GCS{{GCS}}
     WAPP{{WhatsApp}}
-    OCR_EXT{{OCR API}}
+
     DB[(MySQL)]
     REDIS[(Redis)]
 
@@ -81,7 +81,7 @@ graph LR
         PERS[Persistence]
         CLD[Cloud Services]
         WABA[WhatsApp]
-        VIS[Vision/OCR]
+
         SEC[Security]
     end
 
@@ -105,7 +105,7 @@ graph LR
     PERS --> DB
     CLD --> GCS & MAPS
     WABA --> WAPP
-    VIS --> OCR_EXT
+
     SEC --> REDIS
 
     %% Styling
@@ -116,7 +116,7 @@ graph LR
     style OUT fill:#2d1a05,stroke:#f0883e,color:#c9d1d9
 
     classDef actor fill:#21262d,stroke:#8b949e,color:#c9d1d9
-    class USER,MAPS,GCS,WAPP,OCR_EXT,DB,REDIS actor
+    class USER,MAPS,GCS,WAPP,DB,REDIS actor
 ```
 
 ---
@@ -132,7 +132,7 @@ graph LR
 | **Cache/Streaming**      | Redis                                                                                                  |
 | **Security**             | JWT + BCrypt + Cloudflare Turnstile (Bot Protection) + Bucket4j (Distributed Rate Limiting with Redis) |
 | **Documentation**        | OpenAPI / Swagger UI                                                                                   |
-| **OCR**                  | Plate Recognizer API                                                                                   |
+
 | **Speech-to-Text**       | Google Cloud Speech-to-Text                                                                            |
 | **Storage**              | Google Cloud Storage                                                                                   |
 | **Maps**                 | Google Maps Platform                                                                                   |
@@ -165,7 +165,7 @@ messenger/
 │   │   │   └── websocket/               # Real-time tracking
 │   │   └── out/                         # Output Adapters
 │   │       ├── maps/                    # Google Maps Integration
-│   │       ├── ocr/                     # Plate Recognizer OCR
+
 │   │       ├── persistence/             # JPA Adapters
 │   │       ├── security/                # JWT Adapter
 │   │       ├── storage/                 # Google Cloud Storage
@@ -247,7 +247,7 @@ docker-compose -f docker-compose.dev.yml up --build
 - MySQL Local database (Dockerized)
 - **Zero-Config**: Pre-configured with test keys and Mocks
 - **Data Seeding**: Automatic user initialization (Admin/Messenger) via `DataInitializer`
-- Simulated OCR (MockOcrAdapter)
+
 - Local file storage (LocalStorageAdapter)
 - Detailed logging
 - Perfect for quick demos and offline development
@@ -343,7 +343,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Method   | Endpoint                         | Description                                                  |
 | -------- | -------------------------------- | ------------------------------------------------------------ |
-| `POST`   | `/services/extractPlate`         | Extract plate from image using OCR (preview before creating) |
+
 | `POST`   | `/services/createService`        | Create service (multipart: image + data)                     |
 | `PUT`    | `/services/updateService/{uuid}` | Update status (multipart: status + evidence)                 |
 | `PUT`    | `/services/reassign/{uuid}`      | Reassign to another messenger (ADMIN/CANCELED)               |
@@ -772,7 +772,7 @@ The system includes multiple optimization layers to ensure high performance and 
 ### Image Optimization
 
 - **Dual WebP Pipeline**: The frontend performs WebP pre-compression (0.85 quality) before upload to save mobile bandwidth. The backend receives, validates, and applies a second optimization and metadata sanitization step.
-- **Differentiated Qualities**: **0.85** quality for photos (optimized for plate OCR) and **0.95** for digital signatures (maximum sharpness).
+- **Differentiated Qualities**: **0.85** quality for photos (optimized for size) and **0.95** for digital signatures (maximum sharpness).
 - **Metadata Removal**: Automatic EXIF metadata cleaning during re-encoding to improve privacy and reduce file size.
 
 ### Connection Pool Tuning (HikariCP)
@@ -981,7 +981,7 @@ The system includes a native Android application built with **Capacitor**, provi
 The app requests the following permissions to function correctly:
 
 - **Location**: `ACCESS_FINE_LOCATION` & `ACCESS_BACKGROUND_LOCATION` for real-time tracking even when the app is minimized.
-- **Camera**: `CAMERA` for OCR license plate recognition and delivery evidence.
+- **Camera**: `CAMERA` for delivery evidence.
 - **Notifications**: `POST_NOTIFICATIONS` for delivery updates.
 - **Foreground Service**: Ensures tracking persistence during deliveries.
 

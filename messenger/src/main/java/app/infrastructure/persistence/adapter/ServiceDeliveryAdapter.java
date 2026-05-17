@@ -210,6 +210,10 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     @Override
     public Page<ServiceDelivery> findByPlateAndDealershipPaginated(String plateNumber, Long dealershipId,
             Pageable pageable) {
+        if (dealershipId == null) {
+            return repository.findByPlate_PlateNumberAndDeletedFalse(plateNumber, pageable)
+                    .map(mapper::toDomain);
+        }
         return repository.findByPlate_PlateNumberAndDealership_IdDealershipAndDeletedFalse(plateNumber, dealershipId,
                 pageable).map(mapper::toDomain);
     }
@@ -221,8 +225,12 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     @Override
     public Page<ServiceDelivery> findByDealershipIdAndStatusesPaginated(Long dealershipId,
             List<app.domain.model.enums.Status> statuses, Pageable pageable) {
+        if (dealershipId == null) {
+            return repository.findByCurrentStatusInAndDeletedFalse(statuses, pageable)
+                    .map(mapper::toDomain);
+        }
         return repository
-                .findByDealership_IdDealershipAndCurrentStatusInAndDeletedFalse(dealershipId, statuses, pageable)
-                .map(mapper::toDomain);
+            .findByDealership_IdDealershipAndCurrentStatusInAndDeletedFalse(dealershipId, statuses, pageable)
+            .map(mapper::toDomain);
     }
 }

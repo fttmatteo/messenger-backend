@@ -13,9 +13,6 @@ public class SystemSetting {
     public SystemSetting() {
     }
 
-    /**
-     * Constructor con clave y valor.
-     */
     public SystemSetting(String key, String value) {
         this.key = key;
         this.value = value;

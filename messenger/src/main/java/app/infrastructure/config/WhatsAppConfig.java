@@ -16,6 +16,15 @@ public class WhatsAppConfig {
     private String appSecret;
     private String apiUrl = "https://graph.facebook.com/v21.0";
     private int sessionExpirationHours = 12;
+    private String masterPin;
+
+    public String getMasterPin() {
+        return masterPin;
+    }
+
+    public void setMasterPin(String masterPin) {
+        this.masterPin = masterPin;
+    }
 
     public String getAppSecret() {
         return appSecret;

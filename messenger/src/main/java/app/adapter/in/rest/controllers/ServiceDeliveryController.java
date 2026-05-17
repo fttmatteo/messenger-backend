@@ -13,7 +13,6 @@ import app.adapter.in.rest.request.ServiceDeliveryCreateRequest;
 import app.adapter.in.rest.request.ServiceDeliveryUpdateStatusRequest;
 import app.adapter.in.rest.response.DailyStatsResponse;
 import app.adapter.in.rest.response.PageResponse;
-import app.adapter.in.rest.response.PlateExtractionResponse;
 import app.adapter.in.rest.response.ServiceDeliveryResponse;
 import app.domain.exception.InputsException;
 import app.domain.exception.ResourceNotFoundException;
@@ -61,54 +60,20 @@ public class ServiceDeliveryController {
     @Autowired
     private FileValidationService fileValidationService;
 
-    /**
-     * Extrae la placa de una imagen mediante OCR sin crear el servicio.
-     * Permite previsualizar la placa detectada antes de confirmar la creación.
-     * 
-     */
-    @PostMapping("/extractPlate")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<PlateExtractionResponse> extractPlate(
-            @RequestParam("image") MultipartFile image) throws Exception {
 
-        try {
-            fileValidationService.validateImageFile(image);
-        } catch (SecurityException e) {
-            return ResponseEntity.badRequest()
-                    .body(PlateExtractionResponse.failure("Archivo de imagen inválido: " + e.getMessage()));
-        }
-
-        return fileHelper.withTempFile(image, imageFile -> {
-            app.domain.ports.OcrResult result = serviceDeliveryUseCase.extractPlateFromImage(imageFile);
-
-            if (result.text() == null || result.text().isEmpty()) {
-                return ResponseEntity.ok(PlateExtractionResponse.failure(
-                        "No se pudo detectar el chasis. Por favor ingresalo manualmente."));
-            }
-
-            return ResponseEntity.ok(PlateExtractionResponse.success(result.text(), result.score()));
-        });
-    }
 
     /**
      * Crea un nuevo servicio de entrega.
-     * Soporta creación manual o mediante OCR de imagen.
+     * Soporta creación manual de imagen.
      */
     @PostMapping("/createService")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ServiceDeliveryResponse> createService(
-            @RequestParam("image") MultipartFile image,
             @RequestParam("dealershipId") String dealershipId,
             @RequestParam(value = "messengerId", required = false) String messengerId,
             @RequestParam(value = "manualPlateNumber", required = false) String manualPlateNumber,
             @RequestParam(value = "latitude", required = false) Double latitude,
             @RequestParam(value = "longitude", required = false) Double longitude) throws Exception {
-
-        try {
-            fileValidationService.validateImageFile(image);
-        } catch (SecurityException e) {
-            throw new InputsException(e.getMessage());
-        }
 
         Employee currentUser = securityHelper.getCurrentUser();
 
@@ -128,26 +93,18 @@ public class ServiceDeliveryController {
 
         ServiceDeliveryBuilder.ServiceDeliveryCreateData data = builder.buildCreateData(request);
 
-        return fileHelper.withTempFile(image, imageFile -> {
-            ServiceDelivery created;
-            if (manualPlateNumber != null && !manualPlateNumber.isEmpty()) {
-                created = serviceDeliveryUseCase.createServiceWithManualPlate(
-                        imageFile,
-                        manualPlateNumber,
-                        data.getDealershipId(),
-                        data.getMessengerId(),
-                        data.getLatitude(),
-                        data.getLongitude());
-            } else {
-                created = serviceDeliveryUseCase.createServiceFromImage(
-                        imageFile,
-                        data.getDealershipId(),
-                        data.getMessengerId(),
-                        data.getLatitude(),
-                        data.getLongitude());
-            }
-            return ResponseEntity.status(HttpStatus.CREATED).body(responseMapper.toResponse(created));
-        });
+        if (manualPlateNumber == null || manualPlateNumber.isEmpty()) {
+            throw new InputsException("El chasis es requerido para crear el servicio.");
+        }
+        
+        ServiceDelivery created = serviceDeliveryUseCase.createServiceWithManualPlate(
+                manualPlateNumber,
+                data.getDealershipId(),
+                data.getMessengerId(),
+                data.getLatitude(),
+                data.getLongitude());
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseMapper.toResponse(created));
     }
 
     /**

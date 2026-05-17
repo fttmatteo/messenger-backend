@@ -62,7 +62,7 @@ Utiliza estas credenciales para entrar al sistema en perfil **local**:
 > [!NOTE]
 > **Simulaciones (Mocks)**:
 >
-> - El **OCR** aceptará cualquier imagen y devolverá la placa `ABC123`.
+
 > - Las **Imágenes** se guardarán dentro del contenedor (carpeta `uploads`).
 > - No se requiere configuración de Google Cloud para esta demostración.
 
