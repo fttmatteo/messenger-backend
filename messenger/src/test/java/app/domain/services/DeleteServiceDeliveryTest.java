@@ -21,7 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("DeleteServiceDelivery Unit Tests (Soft Delete)")
+@DisplayName("Pruebas unitarias de DeleteServiceDelivery")
 class DeleteServiceDeliveryTest {
 
     @Mock
@@ -37,7 +37,8 @@ class DeleteServiceDeliveryTest {
     private DeleteServiceDelivery deleteServiceDelivery;
 
     @Test
-    @DisplayName("Debe mover servicio a papelera (soft delete)")
+    @DisplayName("Debe realizar borrado lógico del servicio")
+
     void shouldSoftDeleteService() throws Exception {
         ServiceDelivery service = new ServiceDelivery();
         service.setIdServiceDelivery(1L);
@@ -55,7 +56,8 @@ class DeleteServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si servicio no existe o ya está en papelera")
+    @DisplayName("Debe lanzar excepción si el servicio no existe o ya fue eliminado")
+
     void shouldThrowExceptionIfServiceNotFoundOrAlreadyDeleted() {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(null);
 
@@ -66,7 +68,8 @@ class DeleteServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe restaurar servicio desde papelera solo por ADMIN")
+    @DisplayName("Debe restaurar servicio de la papelera por el administrador")
+
     void shouldRestoreServiceFromTrashByAdmin() throws Exception {
         ServiceDelivery service = new ServiceDelivery();
         service.setIdServiceDelivery(1L);
@@ -88,7 +91,8 @@ class DeleteServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe impedir restaurar servicio si no es ADMIN")
+    @DisplayName("Debe prohibir restauración a no administradores")
+
     void shouldForbidRestoreByNonAdmin() {
         ServiceDelivery service = new ServiceDelivery();
         service.setIdServiceDelivery(1L);
@@ -108,7 +112,8 @@ class DeleteServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si servicio no está en papelera al restaurar")
+    @DisplayName("Debe lanzar excepción si el servicio no está en la papelera")
+
     void shouldThrowExceptionIfServiceNotInTrash() {
         ServiceDelivery service = new ServiceDelivery();
         service.setIdServiceDelivery(1L);
@@ -123,7 +128,8 @@ class DeleteServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe archivar permanentemente servicio en papelera")
+    @DisplayName("Debe archivar servicio en la papelera")
+
     void shouldArchiveServiceInTrash() throws Exception {
         ServiceDelivery service = new ServiceDelivery();
         service.setIdServiceDelivery(1L);
@@ -136,7 +142,8 @@ class DeleteServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe impedir archivado si servicio no está en papelera")
+    @DisplayName("Debe prohibir archivar si no está en la papelera")
+
     void shouldForbidArchiveIfNotInTrash() {
         ServiceDelivery service = new ServiceDelivery();
         service.setIdServiceDelivery(1L);

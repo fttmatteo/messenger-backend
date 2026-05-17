@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("DeleteDealership Unit Tests")
+@DisplayName("Pruebas unitarias de DeleteDealership")
 class DeleteDealershipTest {
 
     @Mock

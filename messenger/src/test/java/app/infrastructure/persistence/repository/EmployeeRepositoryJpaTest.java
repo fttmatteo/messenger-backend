@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(TestCacheConfig.class)
-@DisplayName("EmployeeRepository DataJpaTest")
+@DisplayName("Pruebas unitarias de EmployeeRepositoryJpa")
 class EmployeeRepositoryJpaTest extends BaseContainerTest {
 
     @Autowired

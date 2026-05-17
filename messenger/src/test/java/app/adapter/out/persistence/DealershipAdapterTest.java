@@ -21,7 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("DealershipAdapter Unit Tests")
+@DisplayName("Pruebas unitarias de DealershipAdapter")
 class DealershipAdapterTest {
 
     @Mock
@@ -64,6 +64,7 @@ class DealershipAdapterTest {
 
     @Test
     @DisplayName("Debe buscar por nombre")
+
     void shouldFindByName() {
         DealershipEntity entity = new DealershipEntity();
         entity.setName("Unique Name");
@@ -82,7 +83,8 @@ class DealershipAdapterTest {
     }
 
     @Test
-    @DisplayName("Debe listar todos")
+    @DisplayName("Debe buscar todos")
+
     void shouldFindAll() {
         DealershipEntity e1 = new DealershipEntity();
         e1.setName("D1");

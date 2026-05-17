@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("GoogleMapsAdapter Unit Tests")
+@DisplayName("Pruebas unitarias de GoogleMapsAdapter")
 class GoogleMapsAdapterTest {
 
     @Mock

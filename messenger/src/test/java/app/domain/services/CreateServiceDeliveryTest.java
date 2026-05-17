@@ -24,7 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("CreateServiceDelivery Unit Tests")
+@DisplayName("Pruebas unitarias de CreateServiceDelivery")
 class CreateServiceDeliveryTest {
 
     @Mock
@@ -69,7 +69,8 @@ class CreateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si la placa ya tiene un servicio registrado")
+    @DisplayName("Debe lanzar excepción si el chasis o placa ya existe")
+
     void shouldThrowExceptionIfPlateAlreadyExists() {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
@@ -85,7 +86,8 @@ class CreateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe crear servicio y nueva placa cuando placa no existe")
+    @DisplayName("Debe crear servicio y chasis cuando no existe")
+
     void shouldCreateServiceAndNewPlateWhenPlateDoesNotExist() throws Exception {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
@@ -112,7 +114,8 @@ class CreateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si mensajero no existe")
+    @DisplayName("Debe lanzar excepción si el mensajero no se encuentra")
+
     void shouldThrowExceptionIfMessengerNotFound() {
         when(employeePort.findById(anyLong())).thenReturn(null);
 
@@ -124,7 +127,8 @@ class CreateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si concesionario no existe")
+    @DisplayName("Debe lanzar excepción si el concesionario no se encuentra")
+
     void shouldThrowExceptionIfDealershipNotFound() {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(999L)).thenReturn(null);
@@ -137,7 +141,8 @@ class CreateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe normalizar la placa a mayúsculas")
+    @DisplayName("Debe normalizar placa o chasis a mayúsculas")
+
     void shouldNormalizePlateToUpperCase() throws Exception {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
@@ -155,7 +160,8 @@ class CreateServiceDeliveryTest {
 
 
     @Test
-    @DisplayName("Debe guardar historial de rastreo inicial si se proporciona ubicación")
+    @DisplayName("Debe guardar historial de rastreo cuando se proporciona la ubicación")
+
     void shouldSaveTrackingHistoryWhenLocationIsProvided() throws Exception {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);

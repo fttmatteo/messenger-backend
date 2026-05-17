@@ -25,7 +25,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import app.support.AbstractIntegrationTest;
 
 @Transactional
-@DisplayName("ServiceDeliveryController Integration Tests")
+@DisplayName("Pruebas unitarias de ServiceDeliveryController Integration")
 class ServiceDeliveryControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -45,7 +45,8 @@ class ServiceDeliveryControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("GET /services/stats/daily should return 200 and correct JSON structure")
+    @DisplayName("Debe retornar estadísticas diarias")
+
     @WithMockUser
     void shouldReturnDailyStats() throws Exception {
         EmployeeEntity messenger = createEmployee("888888", "Integration Messenger");
@@ -76,7 +77,8 @@ class ServiceDeliveryControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("GET /services/stats/daily should return 401 if unauthenticated")
+    @DisplayName("Debe retornar 401 si no está autenticado")
+
     void shouldReturn401IfUnauthenticated() throws Exception {
         String dateStr = "2025-12-29";
         mockMvc.perform(get("/services/stats/daily")

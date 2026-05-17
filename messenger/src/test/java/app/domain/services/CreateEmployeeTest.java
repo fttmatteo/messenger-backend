@@ -18,7 +18,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("CreateEmployee Unit Tests")
+@DisplayName("Pruebas unitarias de CreateEmployee")
 class CreateEmployeeTest {
 
     @Mock
@@ -59,7 +59,8 @@ class CreateEmployeeTest {
         }
 
         @Test
-        @DisplayName("Debe guardar empleado en el puerto")
+        @DisplayName("Debe guardar el empleado en el puerto")
+
         void shouldSaveEmployeeToPort() throws Exception {
             when(employeePort.findByDocument(anyLong())).thenReturn(null);
             when(passwordEncoder.encode(anyString())).thenReturn("encoded");
@@ -71,7 +72,8 @@ class CreateEmployeeTest {
         }
 
         @Test
-        @DisplayName("Debe permitir crear empleado sin contraseña")
+        @DisplayName("Debe crear el empleado sin contraseña")
+
         void shouldCreateEmployeeWithoutPassword() throws Exception {
             newEmployee.setPassword(null);
             when(employeePort.findByDocument(anyLong())).thenReturn(null);

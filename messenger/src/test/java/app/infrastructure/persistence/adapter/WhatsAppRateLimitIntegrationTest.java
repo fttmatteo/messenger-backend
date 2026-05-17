@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 
-@DisplayName("WhatsApp Rate Limit Integration Tests")
+@DisplayName("Pruebas unitarias de WhatsAppRateLimit Integration")
 class WhatsAppRateLimitIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -29,7 +29,8 @@ class WhatsAppRateLimitIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should block phone number after 3 failed attempts")
+    @DisplayName("Debe bloquear después de los intentos máximos")
+
     void shouldBlockAfterMaxAttempts() {
         assertFalse(rateLimitAdapter.isBlocked(PHONE_NUMBER), "No debe estar bloqueado al inicio");
 
@@ -47,7 +48,8 @@ class WhatsAppRateLimitIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should clear failed attempts successfully")
+    @DisplayName("Debe limpiar intentos")
+
     void shouldClearAttempts() {
         rateLimitAdapter.recordFailedAttempt(PHONE_NUMBER);
         rateLimitAdapter.recordFailedAttempt(PHONE_NUMBER);
@@ -59,7 +61,8 @@ class WhatsAppRateLimitIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should respect block TTL (verification of Redis key existence)")
+    @DisplayName("Debe verificar la clave de bloqueo en Redis")
+
     void shouldVerifyRedisBlockKey() {
         for (int i = 0; i < 3; i++) {
             rateLimitAdapter.recordFailedAttempt(PHONE_NUMBER);

@@ -3,11 +3,13 @@ package app.infrastructure.storage;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+@DisplayName("Pruebas unitarias de ImageOptimizer")
 class ImageOptimizerTest {
 
     private ImageOptimizer imageOptimizer;
@@ -18,6 +20,7 @@ class ImageOptimizerTest {
     }
 
     @Test
+    @DisplayName("No debe optimizar AVIF")
     void shouldNotOptimizeAvif() throws IOException {
         byte[] avifContent = "fake-avif-content".getBytes();
         InputStream inputStream = new ByteArrayInputStream(avifContent);
@@ -28,6 +31,7 @@ class ImageOptimizerTest {
     }
 
     @Test
+    @DisplayName("No debe optimizar WebP")
     void shouldNotOptimizeWebp() throws IOException {
         byte[] webpContent = "fake-webp-content".getBytes();
         InputStream inputStream = new ByteArrayInputStream(webpContent);
@@ -38,6 +42,7 @@ class ImageOptimizerTest {
     }
 
     @Test
+    @DisplayName("Debe manejar formatos inválidos elegantemente")
     void shouldHandleInvalidFormatsGracefully() throws IOException {
         byte[] invalidContent = new byte[10];
         InputStream inputStream = new ByteArrayInputStream(invalidContent);

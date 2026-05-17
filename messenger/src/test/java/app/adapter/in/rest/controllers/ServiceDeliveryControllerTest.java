@@ -28,7 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ServiceDeliveryController Unit Tests")
+@DisplayName("Pruebas unitarias de ServiceDeliveryController")
 class ServiceDeliveryControllerTest {
 
     private MockMvc mockMvc;
@@ -86,7 +86,7 @@ class ServiceDeliveryControllerTest {
     }
 
     @Nested
-    @DisplayName("Endpoint DELETE /services/deleteService/{id}")
+    @DisplayName("Debe realizar borrado lógico")
     class DeleteTests {
 
         @Test
@@ -108,7 +108,7 @@ class ServiceDeliveryControllerTest {
     }
 
     @Nested
-    @DisplayName("Endpoint POST /services/trash/restore/{id}")
+    @DisplayName("Debe restaurar desde la papelera")
     class RestoreTests {
 
         @Test

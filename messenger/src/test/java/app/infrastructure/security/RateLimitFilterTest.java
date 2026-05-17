@@ -7,6 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Pruebas unitarias de RateLimitFilter")
 class RateLimitFilterTest {
 
     @Mock
@@ -45,6 +47,7 @@ class RateLimitFilterTest {
     }
 
     @Test
+    @DisplayName("Debe permitir solicitud cuando hay tokens disponibles")
     void shouldAllowRequestWhenTokensAvailable() throws Exception {
         when(request.getRequestURI()).thenReturn("/api/test");
         when(request.getRemoteAddr()).thenReturn("127.0.0.1");
@@ -56,6 +59,7 @@ class RateLimitFilterTest {
     }
 
     @Test
+    @DisplayName("Debe bloquear solicitud cuando se agotan los tokens")
     void shouldBlockRequestWhenTokensExhausted() throws Exception {
         when(request.getRequestURI()).thenReturn("/auth/login");
         when(request.getRemoteAddr()).thenReturn("127.0.0.1");

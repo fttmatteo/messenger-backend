@@ -14,14 +14,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.hamcrest.Matchers.containsString;
 
 @AutoConfigureMockMvc
-@DisplayName("Security Headers Audit Integration Tests")
+@DisplayName("Pruebas unitarias de SecurityHeaders Integration")
 class SecurityHeadersIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
-    @DisplayName("Should contain standard security headers on performance monitoring endpoint")
+    @DisplayName("Debe contener cabeceras de seguridad")
     void shouldContainSecurityHeaders() throws Exception {
         mockMvc.perform(get("/settings/status-colors"))
                 .andExpect(status().isOk())

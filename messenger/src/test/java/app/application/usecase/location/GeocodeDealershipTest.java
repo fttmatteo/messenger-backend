@@ -17,7 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("GeocodeDealershipUseCase Unit Tests")
+@DisplayName("Debe geocodificar y actualizar el concesionario")
 class GeocodeDealershipUseCaseTest {
 
     @Mock
@@ -52,7 +52,8 @@ class GeocodeDealershipUseCaseTest {
     }
 
     @Test
-    @DisplayName("Debe geocodificar dirección arbitraria")
+    @DisplayName("Debe geocodificar una dirección arbitraria")
+
     void shouldGeocodeArbitraryAddress() {
         Location loc = new Location(5.0, -75.0);
         when(locationPort.geocodeAddress("Some address")).thenReturn(loc);

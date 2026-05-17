@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("AuthenticationService Unit Tests")
+@DisplayName("Pruebas unitarias de AuthenticationService")
 class AuthenticationServiceTest {
 
     @Mock
@@ -78,7 +78,8 @@ class AuthenticationServiceTest {
         }
 
         @Test
-        @DisplayName("Debe incluir rol correcto en token")
+        @DisplayName("Debe incluir el rol correcto en el token")
+
         void shouldIncludeCorrectRoleInToken() throws Exception {
             sampleEmployee.setRole(Role.ADMIN);
             TokenResponse adminToken = new TokenResponse();
@@ -116,7 +117,8 @@ class AuthenticationServiceTest {
         }
 
         @Test
-        @DisplayName("Debe lanzar excepción si contraseña incorrecta")
+        @DisplayName("Debe lanzar excepción si la contraseña es incorrecta")
+
         void shouldThrowExceptionIfPasswordIncorrect() {
             when(employeePort.findByDocument(123456789L)).thenReturn(sampleEmployee);
             when(passwordEncoder.matches("wrongPassword", sampleEmployee.getPassword())).thenReturn(false);
@@ -158,7 +160,7 @@ class AuthenticationServiceTest {
     }
 
     @Nested
-    @DisplayName("Validaciones de Entrada")
+    @DisplayName("Debe manejar documento no encontrado")
     class InputValidationTests {
 
         @Test

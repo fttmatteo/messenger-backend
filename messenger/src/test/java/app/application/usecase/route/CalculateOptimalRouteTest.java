@@ -20,7 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("CalculateOptimalRouteUseCase Unit Tests")
+@DisplayName("Debe calcular el caso de uso de ruta óptima")
 class CalculateOptimalRouteUseCaseTest {
 
     @Mock
@@ -55,6 +55,7 @@ class CalculateOptimalRouteUseCaseTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si no hay destinos válidos")
+
     void shouldThrowExceptionIfNoValidDestinations() {
         Dealership d1 = new Dealership();
         d1.setIsGeolocated(false);
@@ -65,7 +66,8 @@ class CalculateOptimalRouteUseCaseTest {
     }
 
     @Test
-    @DisplayName("Debe calcular ruta simple")
+    @DisplayName("Debe calcular una ruta simple")
+
     void shouldCalculateSimpleRoute() {
         Location origin = new Location(0.0, 0.0);
         Location dest = new Location(1.0, 1.0);
@@ -79,7 +81,8 @@ class CalculateOptimalRouteUseCaseTest {
     }
 
     @Test
-    @DisplayName("Debe calcular distancia")
+    @DisplayName("Debe calcular la distancia")
+
     void shouldCalculateDistance() {
         Location origin = new Location(0.0, 0.0);
         Location dest = new Location(1.0, 1.0);

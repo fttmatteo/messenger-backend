@@ -22,7 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("EmployeeAdapter Unit Tests")
+@DisplayName("Pruebas unitarias de EmployeeAdapter")
 class EmployeeAdapterTest {
 
     @Mock
@@ -67,6 +67,7 @@ class EmployeeAdapterTest {
 
     @Test
     @DisplayName("Debe buscar por documento")
+
     void shouldFindByDocument() {
         EmployeeEntity entity = new EmployeeEntity();
         entity.setDocument(123456789L);
@@ -85,7 +86,8 @@ class EmployeeAdapterTest {
     }
 
     @Test
-    @DisplayName("Debe listar todos")
+    @DisplayName("Debe buscar todos")
+
     void shouldFindAll() {
         EmployeeEntity e1 = new EmployeeEntity();
         e1.setFullName("E1");

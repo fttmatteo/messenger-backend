@@ -24,7 +24,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import app.support.AbstractIntegrationTest;
 
 @Transactional
-@DisplayName("DealershipController Integration Tests")
+@DisplayName("Pruebas unitarias de DealershipController Integration")
 class DealershipControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -46,7 +46,8 @@ class DealershipControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("GET /dealerships/allDealerships should return 200 for authenticated user")
+    @DisplayName("Debe retornar todos los concesionarios")
+
     @WithMockUser(roles = "MESSENGER")
     void shouldReturnAllDealerships() throws Exception {
         DealershipEntity d = new DealershipEntity();
@@ -64,7 +65,8 @@ class DealershipControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("POST /dealerships/createDealership should return 403 for MESSENGER")
+    @DisplayName("Debe denegar la creación para el mensajero")
+
     @WithMockUser(roles = "MESSENGER")
     void shouldDenyCreateForMessenger() throws Exception {
         DealershipRequest request = new DealershipRequest();
@@ -78,7 +80,8 @@ class DealershipControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("POST /dealerships/createDealership should return 201 for ADMIN")
+    @DisplayName("Debe crear concesionario para el administrador")
+
     @WithMockUser(roles = "ADMIN")
     void shouldCreateDealershipForAdmin() throws Exception {
         DealershipRequest request = new DealershipRequest();
@@ -96,7 +99,8 @@ class DealershipControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("DELETE /dealerships/deleteDealership/{id} should delete dealership if ADMIN")
+    @DisplayName("Debe eliminar el concesionario")
+
     @WithMockUser(roles = "ADMIN")
     void shouldDeleteDealership() throws Exception {
         DealershipEntity d = new DealershipEntity();

@@ -13,7 +13,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-@DisplayName("Tracking WebSocket Broadcast Integration Tests")
+@DisplayName("Pruebas unitarias de TrackingWebSocketBroadcast Integration")
 class TrackingWebSocketBroadcastIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -23,7 +23,8 @@ class TrackingWebSocketBroadcastIntegrationTest extends AbstractIntegrationTest 
     private SimpMessagingTemplate messagingTemplate;
 
     @Test
-    @DisplayName("Should broadcast Redis message to WebSocket topics")
+    @DisplayName("Debe transmitir a WebSockets")
+
     void shouldBroadcastToWebSockets() {
         String jsonMessage = """
             {

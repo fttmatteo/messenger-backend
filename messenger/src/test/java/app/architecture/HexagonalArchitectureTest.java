@@ -1,5 +1,7 @@
 package app.architecture;
 
+import org.junit.jupiter.api.DisplayName;
+
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
@@ -9,7 +11,9 @@ import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 
 @AnalyzeClasses(packages = "app", importOptions = ImportOption.DoNotIncludeTests.class)
-public class HexagonalArchitectureTest {
+public 
+@DisplayName("Pruebas unitarias de HexagonalArchitecture")
+class HexagonalArchitectureTest {
 
         @ArchTest
         static final ArchRule domain_should_not_depend_on_infrastructure = noClasses()

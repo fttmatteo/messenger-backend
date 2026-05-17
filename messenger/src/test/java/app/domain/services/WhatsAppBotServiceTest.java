@@ -4,6 +4,7 @@ import app.domain.model.Dealership;
 import app.domain.model.WhatsAppSession;
 import app.domain.ports.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -14,6 +15,7 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+@DisplayName("Pruebas unitarias de WhatsAppBotService")
 class WhatsAppBotServiceTest {
 
     @Mock
@@ -38,6 +40,7 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
+    @DisplayName("Debe procesar mensaje en espera de PIN exitosamente")
     void testProcessMessage_AwaitingPin_Success() {
         String from = "123456789";
         String pin = "1234";
@@ -60,6 +63,7 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
+    @DisplayName("Debe procesar mensaje en espera de PIN con falla sin bloquear")
     void testProcessMessage_AwaitingPin_Failure_NotBlocked() {
         String from = "123456789";
         String wrongPin = "0000";
@@ -77,6 +81,7 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
+    @DisplayName("Debe procesar mensaje en espera de PIN con falla y bloquear en último intento")
     void testProcessMessage_AwaitingPin_Failure_FinalAttemptBlocks() {
         String from = "123456789";
         String wrongPin = "0000";
@@ -93,6 +98,7 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
+    @DisplayName("Debe procesar opción 1 de menú cambiando a espera de chasis")
     void testProcessMessage_MenuOption1_SwitchToAwaitingPlate() {
         String from = "123456789";
         Dealership dealership = new Dealership();
@@ -112,6 +118,7 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
+    @DisplayName("Debe procesar búsqueda directa en menú cuando parece placa o chasis")
     void testProcessMessage_Menu_LooksLikePlate_DirectSearch() {
         String from = "123456789";
         String chasis = "ABC12345674567";
@@ -134,6 +141,7 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
+    @DisplayName("Debe procesar opción 0 de menú cerrando la sesión")
     void testProcessMessage_MenuOption0_CloseSession() {
         String from = "123456789";
         Dealership dealership = new Dealership();
@@ -152,6 +160,7 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
+    @DisplayName("Debe procesar siguiente página de menú")
     void testProcessMessage_Menu_NextPage() {
         String from = "123456789";
         Dealership dealership = new Dealership();
@@ -172,6 +181,7 @@ class WhatsAppBotServiceTest {
     }
 
     @Test
+    @DisplayName("Debe procesar sesión ya bloqueada")
     void testProcessMessage_AlreadyBlocked() {
         String from = "123456789";
 

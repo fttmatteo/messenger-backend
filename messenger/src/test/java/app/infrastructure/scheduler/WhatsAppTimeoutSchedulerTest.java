@@ -5,6 +5,7 @@ import app.domain.ports.WhatsAppMessagePort;
 import app.domain.ports.WhatsAppSessionPort;
 import app.infrastructure.persistence.repository.WhatsAppSessionRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -15,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@DisplayName("Pruebas unitarias de WhatsAppTimeoutScheduler")
 class WhatsAppTimeoutSchedulerTest {
 
     private WhatsAppSessionPort sessionPort;
@@ -31,6 +33,7 @@ class WhatsAppTimeoutSchedulerTest {
     }
 
     @Test
+    @DisplayName("Debe verificar tiempos de espera por inactividad enviando mensajes y actualizando sesiones")
     void testCheckInactivityTimeouts_SendsMessagesAndUpdatesSessions() {
         WhatsAppSession session1 = new WhatsAppSession();
         session1.setPhoneNumber("123456789");
@@ -58,6 +61,7 @@ class WhatsAppTimeoutSchedulerTest {
     }
 
     @Test
+    @DisplayName("No debe hacer nada si no hay sesiones por inactividad")
     void testCheckInactivityTimeouts_NoSessions_DoesNothing() {
 
         when(sessionPort.findInactiveSessions(any(LocalDateTime.class)))
@@ -70,6 +74,7 @@ class WhatsAppTimeoutSchedulerTest {
     }
 
     @Test
+    @DisplayName("Debe limpiar sesiones expiradas eliminándolas")
     void testCleanupExpiredSessions_DeletesSessions() {
         when(sessionRepository.deleteExpiredSessions(any(LocalDateTime.class)))
                 .thenReturn(5);
@@ -80,6 +85,7 @@ class WhatsAppTimeoutSchedulerTest {
     }
 
     @Test
+    @DisplayName("No debe hacer nada si no hay sesiones expiradas que limpiar")
     void testCleanupExpiredSessions_NothingToDelete() {
         when(sessionRepository.deleteExpiredSessions(any(LocalDateTime.class)))
                 .thenReturn(0);

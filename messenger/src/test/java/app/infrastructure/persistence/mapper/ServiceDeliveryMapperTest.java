@@ -21,7 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ServiceDeliveryMapper Unit Tests")
+@DisplayName("Pruebas unitarias de ServiceDeliveryMapper")
 class ServiceDeliveryMapperTest {
 
     @Mock
@@ -58,7 +58,8 @@ class ServiceDeliveryMapperTest {
     }
 
     @Test
-    @DisplayName("Debe mapear la misma instancia de SignatureEntity cuando el objeto de dominio es el mismo")
+    @DisplayName("Debe mapear la misma instancia de firma cuando se comparte la firma de dominio")
+
     void shouldMapSameSignatureInstanceWhenDomainSignatureIsShared() {
         ServiceDeliveryEntity entity = serviceDeliveryMapper.toEntity(service);
 

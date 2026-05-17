@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("EmployeeUseCase Unit Tests")
+@DisplayName("Pruebas unitarias de EmployeeUseCase")
 class EmployeeUseCaseTest {
 
     @Mock
@@ -66,7 +66,8 @@ class EmployeeUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe propagar excepción si documento duplicado")
+        @DisplayName("Debe propagar excepción ante documento duplicado")
+
         void shouldPropagateExceptionOnDuplicateDocument() throws Exception {
             doThrow(new BusinessException("Documento ya registrado"))
                     .when(createEmployee).create(any());
@@ -98,6 +99,7 @@ class EmployeeUseCaseTest {
 
         @Test
         @DisplayName("Debe buscar empleado por ID")
+
         void shouldFindEmployeeById() {
             when(searchEmployee.findById(1L)).thenReturn(sampleEmployee);
 
@@ -109,6 +111,7 @@ class EmployeeUseCaseTest {
 
         @Test
         @DisplayName("Debe buscar empleado por documento")
+
         void shouldFindEmployeeByDocument() throws Exception {
             when(searchEmployee.findByDocument(123456789L)).thenReturn(sampleEmployee);
 
@@ -134,7 +137,8 @@ class EmployeeUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe propagar excepción si empleado no existe")
+        @DisplayName("Debe propagar excepción si no se encuentra")
+
         void shouldPropagateExceptionIfNotFound() throws Exception {
             doThrow(new ResourceNotFoundException("Empleado no encontrado"))
                     .when(updateEmployee).update(anyLong(), any());
@@ -168,7 +172,7 @@ class EmployeeUseCaseTest {
     }
 
     @Nested
-    @DisplayName("Validaciones de Rol")
+    @DisplayName("Debe aceptar el rol de mensajero")
     class RoleValidationTests {
 
         @Test
@@ -183,7 +187,8 @@ class EmployeeUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe aceptar rol ADMIN")
+        @DisplayName("Debe aceptar el rol de administrador")
+
         void shouldAcceptAdminRole() throws Exception {
             sampleEmployee.setRole(Role.ADMIN);
             when(createEmployee.create(any(Employee.class))).thenReturn(sampleEmployee);

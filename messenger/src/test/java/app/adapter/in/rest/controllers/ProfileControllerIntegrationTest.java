@@ -29,7 +29,7 @@ import app.domain.ports.EmployeePort;
 import app.support.AbstractIntegrationTest;
 
 @Transactional
-@DisplayName("ProfileController Integration Tests")
+@DisplayName("Pruebas unitarias de ProfileController Integration")
 class ProfileControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -70,11 +70,11 @@ class ProfileControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Nested
-    @DisplayName("GET /profile/me")
+    @DisplayName("Debe retornar el perfil de administrador")
     class GetProfile {
 
         @Test
-        @DisplayName("should return admin profile when authenticated as admin")
+        @DisplayName("Debe retornar el perfil de administrador")
         @WithMockUser(username = "1234567890", roles = "ADMIN")
         void shouldReturnAdminProfile() throws Exception {
             mockMvc.perform(get("/profile/me"))
@@ -84,7 +84,8 @@ class ProfileControllerIntegrationTest extends AbstractIntegrationTest {
         }
 
         @Test
-        @DisplayName("should return messenger profile when authenticated as messenger")
+        @DisplayName("Debe retornar el perfil de mensajero")
+
         @WithMockUser(username = "9876543210", roles = "MESSENGER")
         void shouldReturnMessengerProfile() throws Exception {
             mockMvc.perform(get("/profile/me"))
@@ -94,7 +95,8 @@ class ProfileControllerIntegrationTest extends AbstractIntegrationTest {
         }
 
         @Test
-        @DisplayName("should return 401 when not authenticated")
+        @DisplayName("Debe retornar 401 cuando no está autenticado")
+
         void shouldReturn401WhenNotAuthenticated() throws Exception {
             mockMvc.perform(get("/profile/me"))
                     .andExpect(status().isUnauthorized());
@@ -102,11 +104,11 @@ class ProfileControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Nested
-    @DisplayName("PUT /profile/me")
+    @DisplayName("Debe actualizar el propio perfil")
     class UpdateProfile {
 
         @Test
-        @DisplayName("should update own profile")
+        @DisplayName("Debe actualizar el propio perfil")
         @WithMockUser(username = "1234567890", roles = "ADMIN")
         void shouldUpdateOwnProfile() throws Exception {
             ProfileRequest request = new ProfileRequest();
@@ -126,7 +128,8 @@ class ProfileControllerIntegrationTest extends AbstractIntegrationTest {
         }
 
         @Test
-        @DisplayName("should reject update with invalid data")
+        @DisplayName("Debe rechazar datos inválidos")
+
         @WithMockUser(username = "1234567890", roles = "ADMIN")
         void shouldRejectInvalidData() throws Exception {
             ProfileRequest request = new ProfileRequest();

@@ -1,5 +1,7 @@
 package app.support;
 
+import org.junit.jupiter.api.DisplayName;
+
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MySQLContainer;
@@ -8,7 +10,9 @@ import org.testcontainers.utility.DockerImageName;
 import com.redis.testcontainers.RedisContainer;
 
 @SuppressWarnings("resource")
-public abstract class BaseContainerTest {
+public abstract 
+@DisplayName("Pruebas unitarias de BaseContainer")
+class BaseContainerTest {
 
     protected static final MySQLContainer<?> mysql;
     protected static final RedisContainer redis;

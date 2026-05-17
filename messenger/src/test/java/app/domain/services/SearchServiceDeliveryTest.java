@@ -19,7 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("SearchServiceDelivery Unit Tests")
+@DisplayName("Pruebas unitarias de SearchServiceDelivery")
 class SearchServiceDeliveryTest {
 
     @Mock
@@ -41,7 +41,8 @@ class SearchServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si servicio no existe o está en papelera")
+    @DisplayName("Debe lanzar excepción si el servicio no existe o está eliminado")
+
     void shouldThrowExceptionIfServiceNotFoundOrDeleted() {
         when(serviceDeliveryPort.findByIdActive(99L)).thenReturn(null);
 
@@ -52,7 +53,8 @@ class SearchServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe buscar servicio incluyendo eliminados por UUID")
+    @DisplayName("Debe buscar incluyendo eliminados por UUID")
+
     void shouldFindIncludingDeletedByUuid() throws BusinessException {
         ServiceDelivery s = new ServiceDelivery();
         s.setUuid("uuid-123");
@@ -66,7 +68,8 @@ class SearchServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe buscar servicios por placa y concesionario con paginación")
+    @DisplayName("Debe buscar por placa/chasis y concesionario de forma paginada")
+
     void shouldFindByPlateAndDealershipPaginated() {
         when(serviceDeliveryPort.findByPlateAndDealershipPaginated(eq("ABC-123"), eq(1L), any()))
                 .thenReturn(new PageImpl<>(Arrays.asList(new ServiceDelivery())));
@@ -78,7 +81,8 @@ class SearchServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe retornar servicios eliminados (papelera)")
+    @DisplayName("Debe buscar eliminados")
+
     void shouldFindDeleted() {
         ServiceDelivery deleted = new ServiceDelivery();
         deleted.setIdServiceDelivery(1L);
@@ -94,7 +98,8 @@ class SearchServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe retornar lista vacía si no hay servicios en papelera")
+    @DisplayName("Debe retornar página vacía si no hay servicios eliminados")
+
     void shouldReturnEmptyPageIfNoDeletedServices() {
         when(serviceDeliveryPort.findDeleted(any(Pageable.class))).thenReturn(Page.empty());
 

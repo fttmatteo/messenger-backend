@@ -3,6 +3,7 @@ package app.adapter.in.rest.controllers;
 import app.domain.services.WhatsAppBotService;
 import app.infrastructure.config.WhatsAppConfig;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -25,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(WhatsAppWebhookController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@DisplayName("Pruebas unitarias de WhatsAppWebhookController")
 class WhatsAppWebhookControllerTest {
 
         private static final String TEST_APP_SECRET = "test-app-secret-for-unit-tests";
@@ -70,6 +72,7 @@ class WhatsAppWebhookControllerTest {
         }
 
         @Test
+        @DisplayName("Debe procesar mensaje de texto")
         void shouldProcessTextMessage() throws Exception {
                 String json = "{" +
                                 "\"object\":\"whatsapp_business_account\"," +
@@ -103,6 +106,7 @@ class WhatsAppWebhookControllerTest {
         }
 
         @Test
+        @DisplayName("Debe procesar respuesta de botón")
         void shouldProcessButtonReply() throws Exception {
                 String json = "{" +
                                 "\"object\":\"whatsapp_business_account\"," +
@@ -135,6 +139,7 @@ class WhatsAppWebhookControllerTest {
         }
 
         @Test
+        @DisplayName("Debe procesar respuesta de lista")
         void shouldProcessListReply() throws Exception {
                 String json = "{" +
                                 "\"object\":\"whatsapp_business_account\"," +
@@ -167,6 +172,7 @@ class WhatsAppWebhookControllerTest {
         }
 
         @Test
+        @DisplayName("Debe ignorar mensaje duplicado")
         void shouldIgnoreDuplicateMessage() throws Exception {
                 when(valueOperations.setIfAbsent(anyString(), anyString(), any())).thenReturn(false);
 
@@ -200,6 +206,7 @@ class WhatsAppWebhookControllerTest {
         }
 
         @Test
+        @DisplayName("Debe rechazar cuando el secreto de la app no está configurado")
         void shouldRejectWhenAppSecretNotConfigured() throws Exception {
                 when(config.getAppSecret()).thenReturn("");
 
@@ -214,6 +221,7 @@ class WhatsAppWebhookControllerTest {
         }
 
         @Test
+        @DisplayName("Debe rechazar firma inválida")
         void shouldRejectInvalidSignature() throws Exception {
                 String json = "{\"object\":\"whatsapp_business_account\",\"entry\":[]}";
 
@@ -227,6 +235,7 @@ class WhatsAppWebhookControllerTest {
         }
 
         @Test
+        @DisplayName("Debe rechazar firma faltante")
         void shouldRejectMissingSignature() throws Exception {
                 String json = "{\"object\":\"whatsapp_business_account\",\"entry\":[]}";
 

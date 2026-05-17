@@ -6,10 +6,11 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+@DisplayName("Pruebas unitarias de DailyStatistics")
 class DailyStatisticsTest {
 
     @Test
-    @DisplayName("Should create DailyStatistics from raw Object array with sql.Date")
+    @DisplayName("Debe crear desde fecha SQL bruta")
     void shouldCreateFromRawSqlDate() {
         java.sql.Date sqlDate = java.sql.Date.valueOf("2023-10-05");
         Object[] row = {
@@ -32,7 +33,8 @@ class DailyStatisticsTest {
     }
 
     @Test
-    @DisplayName("Should create DailyStatistics from raw Object array with LocalDate")
+    @DisplayName("Debe crear desde fecha local bruta")
+
     void shouldCreateFromRawLocalDate() {
         LocalDate localDate = LocalDate.of(2023, 10, 5);
         Object[] row = {

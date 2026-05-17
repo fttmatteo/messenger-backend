@@ -10,7 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("PlateRecognition Unit Tests")
+@DisplayName("Pruebas unitarias de PlateRecognition")
 class PlateRecognitionTest {
 
     private PlateRecognition plateRecognition;
@@ -59,8 +59,9 @@ class PlateRecognitionTest {
         }
 
         @ParameterizedTest
-        @ValueSource(strings = { "ABC123", "12345", "ABCDE1234567890123456" })
         @DisplayName("Debe lanzar excepción para formatos inválidos")
+@ValueSource(strings = { "ABC123", "12345", "ABCDE1234567890123456" })
+        
         void shouldThrowExceptionForInvalidFormats(String chasis) {
             BusinessException exception = assertThrows(
                     BusinessException.class,
@@ -70,7 +71,7 @@ class PlateRecognitionTest {
     }
 
     @Nested
-    @DisplayName("Formateo de Chasis")
+    @DisplayName("Debe dar formato al chasis")
     class ChasisFormattingTests {
 
         @Test

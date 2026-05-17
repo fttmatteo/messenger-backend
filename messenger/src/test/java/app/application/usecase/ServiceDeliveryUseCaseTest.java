@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ServiceDeliveryUseCase Unit Tests")
+@DisplayName("Pruebas unitarias de ServiceDeliveryUseCase")
 class ServiceDeliveryUseCaseTest {
 
     @Mock
@@ -94,7 +94,8 @@ class ServiceDeliveryUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe actualizar estado sin evidencias")
+        @DisplayName("Debe actualizar el estado sin evidencia")
+
         void shouldUpdateStatusWithoutEvidence() throws Exception {
             serviceDeliveryUseCase.updateStatus(1L, Status.CANCELED, "Cancelado por cliente",
                     null, null, 123456L);
@@ -121,7 +122,8 @@ class ServiceDeliveryUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe mapear campos de ordenamiento correctamente en paginación")
+        @DisplayName("Debe mapear los campos de ordenación en la paginación")
+
         void shouldMapSortFieldsInPagination() {
             serviceDeliveryUseCase.findAllPaginated(0, 10, "messengerName", "asc", null, null);
             verify(searchService).findAllPaginated(isNull(), eq(false), isNull(),
@@ -162,7 +164,7 @@ class ServiceDeliveryUseCaseTest {
     }
 
     @Nested
-    @DisplayName("Papelera (Trash)")
+    @DisplayName("Debe buscar eliminados")
     class TrashTests {
 
         @Test
@@ -182,7 +184,8 @@ class ServiceDeliveryUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe restaurar servicio desde papelera")
+        @DisplayName("Debe restaurar desde la papelera")
+
         void shouldRestoreFromTrash() throws Exception {
             ServiceDelivery restoredService = new ServiceDelivery();
             restoredService.setIdServiceDelivery(1L);

@@ -15,7 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("RefreshTokenUseCase Unit Tests")
+@DisplayName("Pruebas unitarias de RefreshTokenUseCase")
 class RefreshTokenUseCaseTest {
 
     @Mock
@@ -43,6 +43,7 @@ class RefreshTokenUseCaseTest {
 
     @Test
     @DisplayName("Debe propagar excepciones")
+
     void shouldPropagateExceptions() throws Exception {
         RefreshTokenRequest request = new RefreshTokenRequest();
         request.setRefreshToken("bad");

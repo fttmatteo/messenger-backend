@@ -26,7 +26,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("TrackingAdapter Unit Tests")
+@DisplayName("Pruebas unitarias de TrackingAdapter")
 class TrackingAdapterTest {
 
     @Mock
@@ -45,7 +45,8 @@ class TrackingAdapterTest {
     private TrackingAdapter trackingAdapter;
 
     @Test
-    @DisplayName("Debe guardar ubicación en vivo en Redis")
+    @DisplayName("Debe guardar ubicación en vivo")
+
     void shouldSaveLiveLocation() {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
@@ -61,7 +62,8 @@ class TrackingAdapterTest {
     }
 
     @Test
-    @DisplayName("Debe obtener última ubicación de Redis")
+    @DisplayName("Debe obtener la última ubicación")
+
     void shouldGetLastLocation() {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
@@ -77,7 +79,8 @@ class TrackingAdapterTest {
     }
 
     @Test
-    @DisplayName("Debe guardar historial de tracking")
+    @DisplayName("Debe guardar historial de rastreo")
+
     void shouldSaveTrackingHistory() {
         Location location = new Location(4.6097, -74.0817);
         TrackingHistory history = new TrackingHistory(1L, location, TrackingSource.GPS);

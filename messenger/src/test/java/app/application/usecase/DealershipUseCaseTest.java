@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("DealershipUseCase Unit Tests")
+@DisplayName("Pruebas unitarias de DealershipUseCase")
 class DealershipUseCaseTest {
 
     @Mock
@@ -63,7 +63,8 @@ class DealershipUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe propagar excepción si creación falla")
+        @DisplayName("Debe propagar excepción ante falla al crear")
+
         void shouldPropagateExceptionOnCreateFailure() throws Exception {
             doThrow(new BusinessException("Nombre duplicado"))
                     .when(createDealership).create(any());
@@ -94,6 +95,7 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe retornar lista vacía si no hay concesionarios")
+
         void shouldReturnEmptyListIfNoDealerships() {
             when(searchDealership.findAll()).thenReturn(List.of());
 
@@ -104,6 +106,7 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe buscar concesionario por ID")
+
         void shouldFindDealershipById() throws Exception {
             when(searchDealership.findById(1L)).thenReturn(sampleDealership);
 
@@ -114,7 +117,8 @@ class DealershipUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe lanzar excepción si ID no existe")
+        @DisplayName("Debe lanzar excepción si el ID no se encuentra")
+
         void shouldThrowExceptionIfIdNotFound() {
             when(searchDealership.findById(999L))
                     .thenThrow(new ResourceNotFoundException("No encontrado"));
@@ -125,6 +129,7 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe buscar concesionario por nombre")
+
         void shouldFindDealershipByName() throws Exception {
             when(searchDealership.findByName("Concesionario Test")).thenReturn(sampleDealership);
 
@@ -150,7 +155,8 @@ class DealershipUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe propagar excepción si actualización falla")
+        @DisplayName("Debe propagar excepción ante falla al actualizar")
+
         void shouldPropagateExceptionOnUpdateFailure() throws Exception {
             doThrow(new BusinessException("Concesionario no existe"))
                     .when(updateDealership).update(anyLong(), any());

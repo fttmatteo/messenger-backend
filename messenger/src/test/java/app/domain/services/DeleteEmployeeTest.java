@@ -19,7 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("DeleteEmployee Unit Tests")
+@DisplayName("Pruebas unitarias de DeleteEmployee")
 class DeleteEmployeeTest {
 
     @Mock
@@ -47,7 +47,8 @@ class DeleteEmployeeTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción por ID si tiene servicios")
+    @DisplayName("Debe lanzar excepción por ID si tiene servicios asociados")
+
     void shouldThrowExceptionByIdIfHasServices() {
         Employee e = new Employee();
         e.setIdEmployee(1L);

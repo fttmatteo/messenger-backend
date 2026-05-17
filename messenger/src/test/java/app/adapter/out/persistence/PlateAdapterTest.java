@@ -22,7 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("PlateAdapter Unit Tests")
+@DisplayName("Pruebas unitarias de PlateAdapter")
 class PlateAdapterTest {
 
     @Mock
@@ -62,6 +62,7 @@ class PlateAdapterTest {
 
     @Test
     @DisplayName("Debe buscar por número de placa")
+
     void shouldFindByPlateNumber() {
         PlateEntity entity = new PlateEntity();
         entity.setPlateNumber("XYZ-789");
@@ -81,7 +82,8 @@ class PlateAdapterTest {
     }
 
     @Test
-    @DisplayName("Debe listar todas las placas")
+    @DisplayName("Debe buscar todos")
+
     void shouldFindAll() {
         PlateEntity e1 = new PlateEntity();
         e1.setPlateNumber("P1");

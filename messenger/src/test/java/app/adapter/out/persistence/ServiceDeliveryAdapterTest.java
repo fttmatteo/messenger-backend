@@ -21,7 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ServiceDeliveryAdapter Unit Tests")
+@DisplayName("Pruebas unitarias de ServiceDeliveryAdapter")
 class ServiceDeliveryAdapterTest {
 
     @Mock
@@ -62,7 +62,8 @@ class ServiceDeliveryAdapterTest {
     }
 
     @Test
-    @DisplayName("Debe retornar servicios paginados correctamente")
+    @DisplayName("Debe buscar todos de forma paginada")
+
     void shouldFindAllPaginated() {
         ServiceDeliveryEntity entity = new ServiceDeliveryEntity();
         ServiceDelivery domain = new ServiceDelivery();
@@ -84,7 +85,8 @@ class ServiceDeliveryAdapterTest {
     }
 
     @Test
-    @DisplayName("Debe retornar servicios paginados por mensajero")
+    @DisplayName("Debe buscar por mensajero de forma paginada")
+
     void shouldFindByMessengerPaginated() {
         Long messengerId = 1L;
         ServiceDeliveryEntity entity = new ServiceDeliveryEntity();

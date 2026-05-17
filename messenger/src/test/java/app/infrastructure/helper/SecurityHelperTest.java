@@ -22,7 +22,7 @@ import java.util.Collections;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-@DisplayName("SecurityHelper Unit Tests")
+@DisplayName("Pruebas unitarias de SecurityHelper")
 class SecurityHelperTest {
 
     @Mock
@@ -60,7 +60,8 @@ class SecurityHelperTest {
     }
 
     @Test
-    @DisplayName("getCurrentUser - Debe retornar empleado cuando autenticación es válida")
+    @DisplayName("getCurrentUser debe retornar empleado cuando la autenticación es válida")
+
     void getCurrentUser_shouldReturnEmployeeWhenAuthIsValid() {
         mockAuthenticatedUser("123456");
         when(employeePort.findByDocument(123456L)).thenReturn(adminUser);
@@ -73,7 +74,8 @@ class SecurityHelperTest {
     }
 
     @Test
-    @DisplayName("getCurrentUser - Debe lanzar excepción cuando no hay autenticación")
+    @DisplayName("getCurrentUser debe lanzar excepción cuando no hay autenticación")
+
     void getCurrentUser_shouldThrowWhenNoAuthentication() {
         UnauthorizedException ex = assertThrows(UnauthorizedException.class,
                 () -> securityHelper.getCurrentUser());
@@ -82,7 +84,8 @@ class SecurityHelperTest {
     }
 
     @Test
-    @DisplayName("getCurrentUser - Debe lanzar excepción cuando usuario es anonymousUser")
+    @DisplayName("getCurrentUser debe lanzar excepción para usuario anónimo")
+
     void getCurrentUser_shouldThrowWhenAnonymousUser() {
         mockAuthenticatedUser("anonymousUser");
 
@@ -93,7 +96,8 @@ class SecurityHelperTest {
     }
 
     @Test
-    @DisplayName("getCurrentUser - Debe lanzar excepción cuando documento tiene formato inválido")
+    @DisplayName("getCurrentUser debe lanzar excepción ante formato de documento inválido")
+
     void getCurrentUser_shouldThrowWhenInvalidDocumentFormat() {
         mockAuthenticatedUser("not-a-number");
 
@@ -104,7 +108,8 @@ class SecurityHelperTest {
     }
 
     @Test
-    @DisplayName("getCurrentUser - Debe lanzar excepción cuando usuario no existe en BD")
+    @DisplayName("getCurrentUser debe lanzar excepción si el usuario no se encuentra en BD")
+
     void getCurrentUser_shouldThrowWhenUserNotFoundInDb() {
         mockAuthenticatedUser("999999");
         when(employeePort.findByDocument(999999L)).thenReturn(null);
@@ -116,7 +121,8 @@ class SecurityHelperTest {
     }
 
     @Test
-    @DisplayName("getCurrentUserId - Debe retornar ID del empleado autenticado")
+    @DisplayName("getCurrentUserId debe retornar el ID del empleado")
+
     void getCurrentUserId_shouldReturnEmployeeId() {
         mockAuthenticatedUser("123456");
         when(employeePort.findByDocument(123456L)).thenReturn(adminUser);
@@ -127,7 +133,8 @@ class SecurityHelperTest {
     }
 
     @Test
-    @DisplayName("isCurrentUserAdmin - Debe retornar true para usuario ADMIN")
+    @DisplayName("isCurrentUserAdmin debe retornar verdadero para administrador")
+
     void isCurrentUserAdmin_shouldReturnTrueForAdmin() {
         mockAuthenticatedUser("123456");
         when(employeePort.findByDocument(123456L)).thenReturn(adminUser);
@@ -138,7 +145,8 @@ class SecurityHelperTest {
     }
 
     @Test
-    @DisplayName("isCurrentUserAdmin - Debe retornar false para usuario MESSENGER")
+    @DisplayName("isCurrentUserAdmin debe retornar falso para mensajero")
+
     void isCurrentUserAdmin_shouldReturnFalseForMessenger() {
         mockAuthenticatedUser("789012");
         when(employeePort.findByDocument(789012L)).thenReturn(messengerUser);
@@ -149,7 +157,8 @@ class SecurityHelperTest {
     }
 
     @Test
-    @DisplayName("isCurrentUserMessenger - Debe retornar true para usuario MESSENGER")
+    @DisplayName("isCurrentUserMessenger debe retornar verdadero para mensajero")
+
     void isCurrentUserMessenger_shouldReturnTrueForMessenger() {
         mockAuthenticatedUser("789012");
         when(employeePort.findByDocument(789012L)).thenReturn(messengerUser);
@@ -160,7 +169,8 @@ class SecurityHelperTest {
     }
 
     @Test
-    @DisplayName("isCurrentUserMessenger - Debe retornar false para usuario ADMIN")
+    @DisplayName("isCurrentUserMessenger debe retornar falso para administrador")
+
     void isCurrentUserMessenger_shouldReturnFalseForAdmin() {
         mockAuthenticatedUser("123456");
         when(employeePort.findByDocument(123456L)).thenReturn(adminUser);

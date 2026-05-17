@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import app.support.AbstractIntegrationTest;
 
 @Transactional
-@DisplayName("ServiceDeliveryRepository Integration Tests")
+@DisplayName("Pruebas unitarias de ServiceDeliveryRepository")
 class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -39,7 +39,8 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
     private PlateRepository plateRepository;
 
     @Test
-    @DisplayName("Should correctly calculate daily statistics")
+    @DisplayName("Debe calcular estadísticas diarias correctamente")
+
     void shouldCalculateDailyStatsCorrectly() {
         EmployeeEntity messenger = createEmployee("999999", "Test Messenger");
         entityManager.persist(messenger);
@@ -112,7 +113,8 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should find services by messenger and date")
+    @DisplayName("Debe buscar servicios por mensajero y fecha")
+
     void shouldFindServicesByMessengerAndDate() {
         EmployeeEntity messenger = createEmployee("888888", "Target Messenger");
         entityManager.persist(messenger);
@@ -171,8 +173,9 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @org.springframework.transaction.annotation.Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
-    @DisplayName("Should search by keywords using FULLTEXT MATCH AGAINST")
+    @DisplayName("Debe buscar por palabras clave usando texto completo")
+@org.springframework.transaction.annotation.Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
+    
     void shouldSearchByKeywordsUsingFullText() {
         EmployeeEntity messenger = createEmployee("111222", "Carlos Santana");
         employeeRepository.save(messenger);

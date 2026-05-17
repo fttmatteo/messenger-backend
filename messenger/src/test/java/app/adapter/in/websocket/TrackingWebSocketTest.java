@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import app.support.AbstractIntegrationTest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DisplayName("Tracking WebSocket Integration Tests")
+@DisplayName("Pruebas unitarias de TrackingWebSocket")
 class TrackingWebSocketTest extends AbstractIntegrationTest {
 
     @LocalServerPort
@@ -50,7 +50,8 @@ class TrackingWebSocketTest extends AbstractIntegrationTest {
     private org.springframework.boot.test.web.client.TestRestTemplate restTemplate;
 
     @Test
-    @DisplayName("Should successfully connect to WebSocket and subscribe to tracking topic")
+    @DisplayName("Debe conectar y suscribirse exitosamente")
+
     void shouldConnectAndSubscribeSuccessfully() throws Exception {
         app.domain.model.auth.AuthCredentials credentials = new app.domain.model.auth.AuthCredentials();
         credentials.setDocument(12345678L);
@@ -79,7 +80,8 @@ class TrackingWebSocketTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should successfully connect to WebSocket using a cookie")
+    @DisplayName("Debe conectar con cookie exitosamente")
+
     /**
      * Verifica que el WebSocket se conecte correctamente usando una cookie.
      */
@@ -105,7 +107,8 @@ class TrackingWebSocketTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should successfully connect with WS token obtained from endpoint")
+    @DisplayName("Debe conectar con token WS desde endpoint exitosamente")
+
     /**
      * Verifica que el WebSocket se conecte correctamente usando un token WS
      * obtenido desde el endpoint.
@@ -143,7 +146,8 @@ class TrackingWebSocketTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should successfully connect with WS token in query parameter")
+    @DisplayName("Debe conectar con token WS en parámetro de consulta exitosamente")
+
     /**
      * Verifica que el WebSocket se conecte correctamente usando un token WS en el
      * parámetro de consulta.

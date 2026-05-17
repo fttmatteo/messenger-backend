@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("SearchPlate Unit Tests")
+@DisplayName("Pruebas unitarias de SearchPlate")
 class SearchPlateTest {
 
     @Mock
@@ -36,7 +36,8 @@ class SearchPlateTest {
     }
 
     @Test
-    @DisplayName("Debe buscar placa por número")
+    @DisplayName("Debe buscar por número")
+
     void shouldFindByNumber() {
         Plate p = new Plate();
         p.setPlateNumber("ABC-123");

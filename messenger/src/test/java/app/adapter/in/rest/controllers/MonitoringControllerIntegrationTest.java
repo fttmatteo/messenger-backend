@@ -27,7 +27,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import app.support.AbstractIntegrationTest;
 
 @Transactional
-@DisplayName("MonitoringController Integration Tests")
+@DisplayName("Pruebas unitarias de MonitoringController Integration")
 class MonitoringControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -47,8 +47,9 @@ class MonitoringControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
-    @DisplayName("GET /monitoring/messenger/{id}/activity should return summary and timeline")
+    @DisplayName("Debe retornar resumen de actividad del mensajero")
+@WithMockUser(roles = "ADMIN")
+    
     void shouldReturnMessengerActivitySummary() throws Exception {
         EmployeeEntity messenger = new EmployeeEntity();
         messenger.setDocument(99998888L);
@@ -103,8 +104,9 @@ class MonitoringControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = "MESSENGER")
-    @DisplayName("GET /monitoring/messenger/{id}/activity should return 403 for messenger role")
+    @DisplayName("Debe retornar prohibido para el mensajero")
+@WithMockUser(roles = "MESSENGER")
+    
     void shouldReturnForbiddenForMessenger() throws Exception {
         mockMvc.perform(get("/monitoring/messenger/550e8400-e29b-41d4-a716-446655440000/activity")
                 .param("date", "2024-01-05"))

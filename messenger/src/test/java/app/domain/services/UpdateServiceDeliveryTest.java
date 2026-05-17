@@ -27,7 +27,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UpdateServiceDelivery Unit Tests")
+@DisplayName("Pruebas unitarias de UpdateServiceDelivery")
 class UpdateServiceDeliveryTest {
 
     @Mock
@@ -74,7 +74,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe actualizar estado a PENDING con evidencias completas")
+    @DisplayName("Debe actualizar estado a pendiente cuando la evidencia esté completa")
+
     void shouldUpdateStatusToPendingWhenEvidenceComplete() throws Exception {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(1L)).thenReturn(messenger);
@@ -91,7 +92,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si servicio no existe o está en papelera")
+    @DisplayName("Debe lanzar excepción si el servicio no se encuentra")
+
     void shouldThrowExceptionIfServiceNotFound() {
         when(serviceDeliveryPort.findByIdActive(anyLong())).thenReturn(null);
 
@@ -102,7 +104,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si falta firma para estado PENDING")
+    @DisplayName("Debe lanzar excepción si falta la firma para pendiente")
+
     void shouldThrowExceptionIfSignatureMissingForPending() {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(1L)).thenReturn(messenger);
@@ -114,7 +117,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si falta foto para estado RETURNED")
+    @DisplayName("Debe lanzar excepción si falta la foto para devuelto")
+
     void shouldThrowExceptionIfPhotoMissingForReturned() {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(1L)).thenReturn(messenger);
@@ -126,7 +130,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe permitir ADMIN cambiar a CANCELED desde cualquier estado")
+    @DisplayName("Debe permitir cancelado para administrador desde cualquier estado")
+
     void shouldAllowCanceledForAdminFromAnyState() throws Exception {
         service.setCurrentStatus(Status.ASSIGNED);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -139,7 +144,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe impedir MESSENGER cambiar a CANCELED")
+    @DisplayName("Debe prohibir cancelado para el mensajero")
+
     void shouldForbidCanceledForMessenger() {
         service.setCurrentStatus(Status.ASSIGNED);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -154,7 +160,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe permitir MESSENGER actualizar desde cualquier estado no final")
+    @DisplayName("Debe permitir al mensajero actualizar desde cualquier estado no final")
+
     void shouldAllowMessengerToUpdateFromAnyNonFinalState() throws Exception {
         service.setCurrentStatus(Status.PENDING);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -167,7 +174,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe permitir ADMIN cambiar a RESOLVED desde cualquier estado")
+    @DisplayName("Debe permitir resuelto para el administrador desde cualquier estado")
+
     void shouldAllowResolvedForAdminFromAnyState() throws Exception {
         service.setCurrentStatus(Status.PENDING);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -180,7 +188,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe permitir ADMIN usar estados de mensajero (PENDING, DELIVERED, RETURNED)")
+    @DisplayName("Debe permitir al administrador usar estados del mensajero")
+
     void shouldAllowAdminToUseMessengerStates() throws Exception {
         service.setCurrentStatus(Status.ASSIGNED);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -193,7 +202,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe validar que no se actualice al mismo estado")
+    @DisplayName("Debe lanzar excepción si es el mismo estado")
+
     void shouldThrowExceptionIfSameStatus() {
         service.setCurrentStatus(Status.ASSIGNED);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -206,7 +216,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe permitir cambiar estado DELIVERED sin restricción de tiempo")
+    @DisplayName("Debe permitir actualización a entregado sin restricción de tiempo")
+
     void shouldAllowDeliveredUpdateWithoutTimeRestriction() throws Exception {
         service.setCurrentStatus(Status.DELIVERED);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -219,7 +230,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe reasignar mensajero cuando servicio está en CANCELED")
+    @DisplayName("Debe reasignar mensajero desde cancelado")
+
     void shouldReassignMessengerFromCanceled() throws Exception {
         service.setCurrentStatus(Status.CANCELED);
 
@@ -240,7 +252,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe impedir reasignación si no está en CANCELED")
+    @DisplayName("Debe prohibir reasignación si no está cancelado")
+
     void shouldForbidReassignIfNotCanceled() {
         service.setCurrentStatus(Status.PENDING);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -253,7 +266,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe impedir reasignación si no es ADMIN")
+    @DisplayName("Debe prohibir reasignación si no es administrador")
+
     void shouldForbidReassignIfNotAdmin() {
         service.setCurrentStatus(Status.CANCELED);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -268,7 +282,8 @@ class UpdateServiceDeliveryTest {
     // Tests de Caja Blanca para validateEvidence()
 
     @Test
-    @DisplayName("validateEvidence - Estado ASSIGNED retorna sin lanzar excepción")
+    @DisplayName("testValidateEvidence con estado asignado debe retornar directamente")
+
     void testValidateEvidence_AssignedStatus_ShouldReturnDirectly() {
         org.junit.jupiter.api.Assertions.assertDoesNotThrow(() ->
             updateServiceDelivery.validateEvidence(Status.ASSIGNED, null, null, null, Role.MESSENGER)
@@ -276,7 +291,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("validateEvidence - Estado DELIVERED sin firma lanza excepción")
+    @DisplayName("testValidateEvidence entregado sin firma debe lanzar excepción")
+
     void testValidateEvidence_Delivered_MissingSignature_ThrowsException() {
         BusinessException ex = assertThrows(BusinessException.class, () ->
             updateServiceDelivery.validateEvidence(Status.DELIVERED, null, null, null, Role.MESSENGER)
@@ -285,7 +301,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("validateEvidence - Estado RETURNED sin fotos (null) lanza excepción")
+    @DisplayName("testValidateEvidence devuelto con fotos nulas debe lanzar excepción")
+
     void testValidateEvidence_Returned_MissingPhotosNull_ThrowsException() {
         assertThrows(BusinessException.class, () ->
             updateServiceDelivery.validateEvidence(Status.RETURNED, new Signature(), null, "Observación válida", Role.MESSENGER)
@@ -293,7 +310,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("validateEvidence - Estado RETURNED con fotos vacías lanza excepción")
+    @DisplayName("testValidateEvidence devuelto con fotos vacías debe lanzar excepción")
+
     void testValidateEvidence_Returned_MissingPhotosEmpty_ThrowsException() {
         assertThrows(BusinessException.class, () ->
             updateServiceDelivery.validateEvidence(Status.RETURNED, new Signature(), new ArrayList<>(), "Observación válida", Role.MESSENGER)
@@ -301,7 +319,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("validateEvidence - Estado RETURNED sin observación (null) lanza excepción")
+    @DisplayName("testValidateEvidence devuelto con observación nula debe lanzar excepción")
+
     void testValidateEvidence_Returned_MissingObservationNull_ThrowsException() {
         List<Photo> photos = List.of(new Photo());
         assertThrows(BusinessException.class, () ->
@@ -310,7 +329,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("validateEvidence - Estado RETURNED con observación en blanco lanza excepción")
+    @DisplayName("testValidateEvidence devuelto con observación en blanco debe lanzar excepción")
+
     void testValidateEvidence_Returned_MissingObservationBlank_ThrowsException() {
         List<Photo> photos = List.of(new Photo());
         assertThrows(BusinessException.class, () ->
@@ -319,7 +339,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("validateEvidence - Estado RETURNED con todas las evidencias no lanza excepción")
+    @DisplayName("testValidateEvidence devuelto con todas las evidencias debe pasar")
+
     void testValidateEvidence_Returned_AllEvidences_ShouldPass() {
         List<Photo> photos = List.of(new Photo());
         org.junit.jupiter.api.Assertions.assertDoesNotThrow(() ->
@@ -328,7 +349,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("validateEvidence - Estado PENDING sin fotos lanza excepción")
+    @DisplayName("testValidateEvidence pendiente sin fotos debe lanzar excepción")
+
     void testValidateEvidence_Pending_MissingPhotos_ThrowsException() {
         assertThrows(BusinessException.class, () ->
             updateServiceDelivery.validateEvidence(Status.PENDING, new Signature(), null, "Obs", Role.MESSENGER)
@@ -336,7 +358,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("validateEvidence - Estado PENDING con fotos vacías lanza excepción")
+    @DisplayName("testValidateEvidence pendiente con fotos vacías debe lanzar excepción")
+
     void testValidateEvidence_Pending_EmptyPhotos_ThrowsException() {
         assertThrows(BusinessException.class, () ->
             updateServiceDelivery.validateEvidence(Status.PENDING, new Signature(), new ArrayList<>(), "Obs", Role.MESSENGER)
@@ -344,7 +367,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("validateEvidence - Estado PENDING sin observación lanza excepción")
+    @DisplayName("testValidateEvidence pendiente sin observación debe lanzar excepción")
+
     void testValidateEvidence_Pending_MissingObservation_ThrowsException() {
         List<Photo> photos = List.of(new Photo());
         assertThrows(BusinessException.class, () ->
@@ -353,7 +377,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("validateEvidence - Estado PENDING con observación en blanco lanza excepción")
+    @DisplayName("testValidateEvidence pendiente con observación en blanco debe lanzar excepción")
+
     void testValidateEvidence_Pending_BlankObservation_ThrowsException() {
         List<Photo> photos = List.of(new Photo());
         assertThrows(BusinessException.class, () ->
@@ -362,7 +387,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("validateEvidence - Estado PENDING con todas las evidencias no lanza excepción")
+    @DisplayName("testValidateEvidence pendiente con todas las evidencias debe pasar")
+
     void testValidateEvidence_Pending_AllEvidences_ShouldPass() {
         List<Photo> photos = List.of(new Photo());
         org.junit.jupiter.api.Assertions.assertDoesNotThrow(() ->
@@ -371,7 +397,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("validateEvidence - Estado DELIVERED con firma no lanza excepción")
+    @DisplayName("testValidateEvidence entregado con firma debe pasar")
+
     void testValidateEvidence_Delivered_WithSignature_ShouldPass() {
         org.junit.jupiter.api.Assertions.assertDoesNotThrow(() ->
             updateServiceDelivery.validateEvidence(Status.DELIVERED, new Signature(), null, null, Role.MESSENGER)
@@ -379,7 +406,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si usuario no existe")
+    @DisplayName("Debe lanzar excepción si el usuario no se encuentra")
+
     void shouldThrowExceptionIfUserNotFound() {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(99L)).thenReturn(null);
@@ -391,7 +419,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe impedir reasignación si servicio no existe")
+    @DisplayName("Debe lanzar excepción en reasignación si el servicio no se encuentra")
+
     void shouldThrowReassignIfServiceNotFound() {
         when(serviceDeliveryPort.findByIdActive(99L)).thenReturn(null);
 
@@ -402,7 +431,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe impedir reasignación si el nuevo mensajero no existe")
+    @DisplayName("Debe lanzar excepción en reasignación si el nuevo mensajero no se encuentra")
+
     void shouldThrowReassignIfNewMessengerNotFound() {
         service.setCurrentStatus(Status.CANCELED);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -416,7 +446,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe impedir reasignación si empleado seleccionado no es MESSENGER")
+    @DisplayName("Debe lanzar excepción en reasignación si no tiene rol de mensajero")
+
     void shouldThrowReassignIfNotMessengerRole() {
         service.setCurrentStatus(Status.CANCELED);
         Employee notMessenger = new Employee();
@@ -434,7 +465,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe actualizar estado a RETURNED con todas las evidencias")
+    @DisplayName("Debe actualizar estado a devuelto cuando la evidencia esté completa")
+
     void shouldUpdateStatusToReturnedWhenEvidenceComplete() throws Exception {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(1L)).thenReturn(messenger);
@@ -447,7 +479,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe guardar ubicación en tracking cuando se proporcionan coordenadas")
+    @DisplayName("Debe guardar rastreo cuando se proporcionan coordenadas")
+
     void shouldSaveTrackingWhenCoordinatesProvided() throws Exception {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(1L)).thenReturn(messenger);
@@ -459,7 +492,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe actualizar con observation nulo y sin fotos (estado CANCELED)")
+    @DisplayName("Debe actualizar con observación nula y fotos nulas")
+
     void shouldUpdateWithNullObservationAndNullPhotos() throws Exception {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(2L)).thenReturn(admin);
@@ -471,7 +505,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe actualizar con observation vacío (estado CANCELED)")
+    @DisplayName("Debe actualizar con observación vacía")
+
     void shouldUpdateWithEmptyObservation() throws Exception {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(2L)).thenReturn(admin);
@@ -483,7 +518,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe impedir reasignación si admin es null")
+    @DisplayName("Debe lanzar excepción en reasignación si el administrador es nulo")
+
     void shouldThrowReassignIfAdminIsNull() {
         service.setCurrentStatus(Status.CANCELED);
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
@@ -496,7 +532,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("validateEvidence - Estado FAILED no coincide con ninguna rama específica")
+    @DisplayName("testValidateEvidence con estado fallido debe continuar")
+
     void testValidateEvidence_FailedStatus_FallsThrough() {
         org.junit.jupiter.api.Assertions.assertDoesNotThrow(() ->
             updateServiceDelivery.validateEvidence(Status.FAILED, null, null, null, Role.MESSENGER)
@@ -504,7 +541,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("validateEvidence - Estado PENDING con observation null (no vacío)")
+    @DisplayName("testValidateEvidence pendiente con observación nula debe lanzar excepción")
+
     void testValidateEvidence_Pending_NullObservation_ThrowsException() {
         List<Photo> validPhotos = List.of(new Photo());
         assertThrows(BusinessException.class, () ->
@@ -513,7 +551,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe actualizar con fotos no nulas pero vacías y observation con contenido (CANCELED)")
+    @DisplayName("Debe manejar fotos no nulas vacías al actualizar")
+
     void shouldHandleNonNullEmptyPhotosOnUpdate() throws Exception {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(2L)).thenReturn(admin);
@@ -526,7 +565,8 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("No debe guardar tracking cuando solo latitud está presente y longitud es null")
+    @DisplayName("No debe guardar rastreo cuando solo se proporciona latitud")
+
     void shouldNotSaveTrackingWhenOnlyLatitudeProvided() throws Exception {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);
         when(employeePort.findById(1L)).thenReturn(messenger);

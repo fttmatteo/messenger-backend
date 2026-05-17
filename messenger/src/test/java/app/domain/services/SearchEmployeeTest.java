@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("SearchEmployee Unit Tests")
+@DisplayName("Pruebas unitarias de SearchEmployee")
 class SearchEmployeeTest {
 
     @Mock
@@ -56,6 +56,7 @@ class SearchEmployeeTest {
 
         @Test
         @DisplayName("Debe retornar lista vacía si no hay empleados")
+
         void shouldReturnEmptyListIfNoEmployees() {
             when(employeePort.findAll()).thenReturn(List.of());
 
@@ -82,6 +83,7 @@ class SearchEmployeeTest {
 
         @Test
         @DisplayName("Debe lanzar excepción para ID no existente")
+
         void shouldThrowExceptionForNonExistingId() {
             when(employeePort.findById(999L)).thenReturn(null);
 
@@ -109,6 +111,7 @@ class SearchEmployeeTest {
 
         @Test
         @DisplayName("Debe lanzar excepción para documento no existente")
+
         void shouldThrowExceptionForNonExistingDocument() {
             when(employeePort.findByDocument(999999999L)).thenReturn(null);
 

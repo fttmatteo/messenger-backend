@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import app.infrastructure.config.WhatsAppConfig;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -14,6 +15,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 
+@DisplayName("Pruebas unitarias de WhatsAppCloudClient")
 class WhatsAppCloudClientTest {
 
     private WhatsAppCloudClient whatsAppCloudClient;
@@ -34,6 +36,7 @@ class WhatsAppCloudClientTest {
     }
 
     @Test
+    @DisplayName("Debe enviar mensaje de texto exitosamente")
     void shouldSendTextMessageSuccessfully() {
         mockServer.expect(requestTo("https://graph.facebook.com/v21.0/test-phone-id/messages"))
                 .andExpect(method(org.springframework.http.HttpMethod.POST))
@@ -54,6 +57,7 @@ class WhatsAppCloudClientTest {
     }
 
     @Test
+    @DisplayName("Debe enviar ubicación exitosamente")
     void shouldSendLocationSuccessfully() {
         mockServer.expect(requestTo("https://graph.facebook.com/v21.0/test-phone-id/messages"))
                 .andExpect(jsonPath("$.type").value("location"))
@@ -67,6 +71,7 @@ class WhatsAppCloudClientTest {
     }
 
     @Test
+    @DisplayName("Debe enviar botones de respuesta exitosamente")
     void shouldSendReplyButtonsSuccessfully() {
         mockServer.expect(requestTo("https://graph.facebook.com/v21.0/test-phone-id/messages"))
                 .andExpect(jsonPath("$.type").value("interactive"))
@@ -82,6 +87,7 @@ class WhatsAppCloudClientTest {
     }
 
     @Test
+    @DisplayName("Debe retornar falso ante un error de API")
     void shouldReturnFalseOnApiError() {
         mockServer.expect(requestTo("https://graph.facebook.com/v21.0/test-phone-id/messages"))
                 .andRespond(withBadRequest());

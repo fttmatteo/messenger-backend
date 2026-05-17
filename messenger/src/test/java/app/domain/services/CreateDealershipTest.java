@@ -16,7 +16,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("CreateDealership Unit Tests")
+@DisplayName("Pruebas unitarias de CreateDealership")
 class CreateDealershipTest {
 
     @Mock
@@ -53,6 +53,7 @@ class CreateDealershipTest {
 
         @Test
         @DisplayName("Debe buscar por nombre antes de crear")
+
         void shouldSearchByNameBeforeCreating() throws Exception {
             when(dealershipPort.findByName(anyString())).thenReturn(null);
             when(dealershipPort.save(any())).thenReturn(newDealership);

@@ -17,7 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("LoginUseCase Unit Tests")
+@DisplayName("Pruebas unitarias de LoginUseCase")
 class LoginUseCaseTest {
 
     @Mock
@@ -56,7 +56,8 @@ class LoginUseCaseTest {
     }
 
     @Test
-    @DisplayName("Debe propagar excepciones del servicio")
+    @DisplayName("Debe propagar excepciones")
+
     void shouldPropagateExceptions() throws Exception {
         AuthCredentials credentials = new AuthCredentials();
         credentials.setDocument(123456789L);

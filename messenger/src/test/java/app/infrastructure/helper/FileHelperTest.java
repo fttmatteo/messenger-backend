@@ -15,7 +15,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("FileHelper Unit Tests")
+@DisplayName("Pruebas unitarias de FileHelper")
 class FileHelperTest {
 
     private FileHelper fileHelper;
@@ -51,7 +51,8 @@ class FileHelperTest {
         }
 
         @Test
-        @DisplayName("Debe detectar extensión por Content-Type cuando no hay nombre")
+        @DisplayName("Debe detectar extensión por tipo de contenido")
+
         void shouldDetectExtensionByContentType() throws IOException {
             MockMultipartFile multipartFile = new MockMultipartFile(
                     "file",
@@ -69,7 +70,8 @@ class FileHelperTest {
         }
 
         @Test
-        @DisplayName("Debe detectar PNG por magic bytes")
+        @DisplayName("Debe detectar PNG por bytes mágicos")
+
         void shouldDetectPngByMagicBytes() throws IOException {
             byte[] pngHeader = new byte[] { (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
             MockMultipartFile multipartFile = new MockMultipartFile(
@@ -87,7 +89,8 @@ class FileHelperTest {
         }
 
         @Test
-        @DisplayName("Debe detectar JPEG por magic bytes")
+        @DisplayName("Debe detectar JPEG por bytes mágicos")
+
         void shouldDetectJpegByMagicBytes() throws IOException {
             byte[] jpegContent = new byte[] { (byte) 0xFF, (byte) 0xD8, (byte) 0xFF, (byte) 0xE0, 0x00 };
             MockMultipartFile multipartFile = new MockMultipartFile(
@@ -105,7 +108,8 @@ class FileHelperTest {
         }
 
         @Test
-        @DisplayName("Debe detectar PDF por magic bytes")
+        @DisplayName("Debe detectar PDF por bytes mágicos")
+
         void shouldDetectPdfByMagicBytes() throws IOException {
             byte[] pdfContent = new byte[] { 0x25, 0x50, 0x44, 0x46, 0x2D };
             MockMultipartFile multipartFile = new MockMultipartFile(
@@ -123,7 +127,8 @@ class FileHelperTest {
         }
 
         @Test
-        @DisplayName("Debe usar .tmp cuando no puede detectar extensión")
+        @DisplayName("Debe usar temporal cuando no puede detectar la extensión")
+
         void shouldUseTmpWhenCannotDetectExtension() throws IOException {
             MockMultipartFile multipartFile = new MockMultipartFile(
                     "file",
@@ -141,7 +146,7 @@ class FileHelperTest {
     }
 
     @Nested
-    @DisplayName("Cleanup de Archivos Temporales")
+    @DisplayName("Debe limpiar archivos temporales")
     class CleanupTests {
 
         @Test
@@ -161,7 +166,8 @@ class FileHelperTest {
         }
 
         @Test
-        @DisplayName("Debe manejar lista nula sin error")
+        @DisplayName("Debe manejar lista nula")
+
         void shouldHandleNullList() {
             assertDoesNotThrow(() -> fileHelper.cleanupTempFiles(null));
         }
@@ -211,7 +217,8 @@ class FileHelperTest {
         }
 
         @Test
-        @DisplayName("Debe limpiar archivo incluso si operación falla")
+        @DisplayName("Debe limpiar incluso ante una excepción")
+
         void shouldCleanupEvenOnException() {
             MockMultipartFile multipartFile = new MockMultipartFile(
                     "file",
@@ -253,7 +260,8 @@ class FileHelperTest {
         }
 
         @Test
-        @DisplayName("Debe retornar lista vacía para lista nula")
+        @DisplayName("Debe retornar lista vacía para nulo")
+
         void shouldReturnEmptyListForNull() throws IOException {
             List<File> result = fileHelper.convertToFiles(null);
 

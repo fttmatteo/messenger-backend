@@ -20,7 +20,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import java.time.LocalDateTime;
 
-@DisplayName("Redis Configuration Integration Tests")
+@DisplayName("Pruebas unitarias de RedisConfiguration Integration")
 class RedisConfigurationIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -33,7 +33,8 @@ class RedisConfigurationIntegrationTest extends AbstractIntegrationTest {
     private RedisTemplate<String, LiveTracking> liveTrackingTemplate;
 
     @Test
-    @DisplayName("Should verify Lettuce connection factory is correctly pooled")
+    @DisplayName("Debe verificar la configuración de Lettuce connection pooling")
+
     void shouldVerifyLettucePoolingConfiguration() {
         assertTrue(connectionFactory instanceof LettuceConnectionFactory, 
             "Debe ser una instancia de LettuceConnectionFactory");
@@ -51,7 +52,8 @@ class RedisConfigurationIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should verify Redisson is synchronized with shared pool properties")
+    @DisplayName("Debe verificar la sincronización de la configuración de Redisson")
+
     void shouldVerifyRedissonConfigurationSync() {
         Config config = redissonClient.getConfig();
         assertNotNull(config, "Configuración de Redisson no debe ser nula");
@@ -65,7 +67,8 @@ class RedisConfigurationIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should perform basic operations successfully using connection pool")
+    @DisplayName("Debe realizar operaciones básicas en Redis")
+
     void shouldPerformBasicRedisOperations() {
         String key = "test:tracking:123";
         LiveTracking tracking = new LiveTracking();

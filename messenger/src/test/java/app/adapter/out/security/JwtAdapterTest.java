@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("JwtAdapter Unit Tests")
+@DisplayName("Pruebas unitarias de JwtAdapter")
 class JwtAdapterTest {
 
     private JwtAdapter jwtAdapter;
@@ -35,6 +35,7 @@ class JwtAdapterTest {
 
     @Test
     @DisplayName("Debe validar un token válido")
+
     void shouldValidateValidToken() {
         AuthCredentials credentials = new AuthCredentials();
         credentials.setDocument(123456789L);
@@ -47,6 +48,7 @@ class JwtAdapterTest {
 
     @Test
     @DisplayName("Debe rechazar un token inválido")
+
     void shouldRejectInvalidToken() {
         boolean isValid = jwtAdapter.validateToken("invalid.token.here");
 
@@ -67,6 +69,7 @@ class JwtAdapterTest {
 
     @Test
     @DisplayName("Debe extraer el rol del token")
+
     void shouldExtractRoleFromToken() {
         AuthCredentials credentials = new AuthCredentials();
         credentials.setDocument(123456789L);
@@ -78,7 +81,8 @@ class JwtAdapterTest {
     }
 
     @Test
-    @DisplayName("Debe generar refresh token")
+    @DisplayName("Debe generar token de refresco")
+
     void shouldGenerateRefreshToken() {
         AuthCredentials credentials = new AuthCredentials();
         credentials.setDocument(123456789L);

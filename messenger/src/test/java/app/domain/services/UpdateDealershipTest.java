@@ -18,7 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UpdateDealership Unit Tests")
+@DisplayName("Pruebas unitarias de UpdateDealership")
 
 class UpdateDealershipTest {
 
@@ -42,6 +42,7 @@ class UpdateDealershipTest {
 
     @Test
     @DisplayName("Debe actualizar campos exitosamente")
+
     void shouldUpdateFieldsSuccessfully() throws Exception {
         Dealership newData = new Dealership();
         newData.setName("New Name");
@@ -62,7 +63,8 @@ class UpdateDealershipTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si ID no existe")
+    @DisplayName("Debe lanzar excepción si el ID no se encuentra")
+
     void shouldThrowExceptionIfIdNotFound() {
         when(dealershipPort.findById(1L)).thenReturn(null);
 
@@ -73,7 +75,8 @@ class UpdateDealershipTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si nuevo nombre ya existe")
+    @DisplayName("Debe lanzar excepción si el nuevo nombre ya existe")
+
     void shouldThrowExceptionIfNewNameExists() {
         Dealership newData = new Dealership();
         newData.setName("Existing Name");
@@ -87,7 +90,8 @@ class UpdateDealershipTest {
     }
 
     @Test
-    @DisplayName("No debe validar nombre si no cambia")
+    @DisplayName("No debe validar el nombre si es el mismo")
+
     void shouldNotValidateNameIfSame() throws Exception {
         Dealership newData = new Dealership();
         newData.setName("Original Name");

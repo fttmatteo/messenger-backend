@@ -22,7 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-@DisplayName("Storage Provider Integration Tests")
+@DisplayName("Pruebas unitarias de StorageProvider Integration")
 class StorageProviderIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -48,7 +48,8 @@ class StorageProviderIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should save and delete file in LocalStorageAdapter")
+    @DisplayName("Debe guardar y eliminar localmente")
+
     void shouldSaveAndDeleteLocal() throws IOException {
         String subDir = "test-folder";
         String customName = "my-photo";
@@ -68,7 +69,8 @@ class StorageProviderIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should call GCS storage service in GoogleCloudStorageAdapter")
+    @DisplayName("Debe llamar al servicio GCS")
+
     void shouldCallGcsService() throws IOException {
     
         Storage mockStorage = mock(Storage.class);
