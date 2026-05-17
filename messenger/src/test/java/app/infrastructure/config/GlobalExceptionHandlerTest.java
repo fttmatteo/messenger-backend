@@ -4,6 +4,7 @@ import app.adapter.in.rest.response.ErrorResponse;
 import app.domain.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@DisplayName("Pruebas unitarias de GlobalExceptionHandler")
 class GlobalExceptionHandlerTest {
 
     private GlobalExceptionHandler exceptionHandler;
@@ -28,9 +30,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    /**
-     * Verifica que InputsException retorne 400 Bad Request.
-     */
+    @DisplayName("Manejador de InputsException debe retornar 400")
     void handleInputsException_ShouldReturn400() {
         InputsException exception = new InputsException("Dato inválido");
 
@@ -44,9 +44,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    /**
-     * Verifica que BusinessException retorne 409 Conflict.
-     */
+    @DisplayName("Manejador de BusinessException debe retornar 409")
     void handleBusinessException_ShouldReturn409() {
         BusinessException exception = new BusinessException("Regla de negocio violada");
 
@@ -60,9 +58,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    /**
-     * Verifica que UnauthorizedException retorne 401 Unauthorized.
-     */
+    @DisplayName("Manejador de UnauthorizedException debe retornar 401")
     void handleUnauthorizedException_ShouldReturn401() {
         UnauthorizedException exception = new UnauthorizedException("Credenciales inválidas");
 
@@ -76,9 +72,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    /**
-     * Verifica que ResourceNotFoundException retorne 404 Not Found.
-     */
+    @DisplayName("Manejador de ResourceNotFoundException debe retornar 404")
     void handleResourceNotFoundException_ShouldReturn404() {
         ResourceNotFoundException exception = new ResourceNotFoundException("Empleado no encontrado");
 
@@ -92,9 +86,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    /**
-     * Verifica que GeolocationException retorne 400 Bad Request.
-     */
+    @DisplayName("Manejador de GeolocationException debe retornar 400")
     void handleGeolocationException_ShouldReturn400() {
         GeolocationException exception = new GeolocationException("Coordenadas inválidas");
 
@@ -106,9 +98,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    /**
-     * Verifica que ExternalServiceException retorne 503 Service Unavailable.
-     */
+    @DisplayName("Manejador de ExternalServiceException debe retornar 503")
     void handleExternalServiceException_ShouldReturn503() {
         ExternalServiceException exception = new ExternalServiceException("Servicio no disponible");
 
@@ -121,9 +111,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    /**
-     * Verifica que AccessDeniedException retorne 403 Forbidden.
-     */
+    @DisplayName("Manejador de AccessDeniedException debe retornar 403")
     void handleAccessDeniedException_ShouldReturn403() {
         AccessDeniedException exception = new AccessDeniedException("Acceso denegado");
 
@@ -136,9 +124,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    /**
-     * Verifica que Exception retorne 500 Internal Server Error.
-     */
+    @DisplayName("Manejador de excepciones globales debe retornar 500")
     void handleGlobalException_ShouldReturn500() {
         Exception exception = new Exception("Error inesperado");
 
@@ -151,10 +137,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    /**
-     * Verifica el manejo de errores de validación de argumentos (@Valid),
-     * retornando detalles de campos.
-     */
+    @DisplayName("Manejador de excepciones de validación debe retornar 400 con detalles")
     void handleValidationExceptions_ShouldReturn400WithDetails() {
         BindingResult mockBindingResult = mock(BindingResult.class);
         FieldError fieldError1 = new FieldError("object", "document", "debe ser numérico");
@@ -177,9 +160,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    /**
-     * Verifica que todas las respuestas tengan timestamp.
-     */
+    @DisplayName("Todas las respuestas deben incluir marca de tiempo")
     void allResponses_ShouldHaveTimestamp() {
         InputsException exception = new InputsException("Test");
 
@@ -190,9 +171,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    /**
-     * Verifica que todas las respuestas tengan path.
-     */
+    @DisplayName("Todas las respuestas deben incluir ruta")
     void allResponses_ShouldHavePath() {
         InputsException exception = new InputsException("Test");
 

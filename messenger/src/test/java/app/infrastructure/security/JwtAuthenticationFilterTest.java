@@ -10,6 +10,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,6 +22,7 @@ import org.springframework.security.core.Authentication;
 import java.io.IOException;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Pruebas unitarias de JwtAuthenticationFilter")
 class JwtAuthenticationFilterTest {
 
     @Mock
@@ -44,9 +46,7 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
-    /**
-     * Verifica que el filtro autentique correctamente cuando hay un token válido en la cookie.
-     */
+    @DisplayName("Debe autenticar cuando hay un token válido en la cookie")
     void shouldAuthenticateWhenValidTokenInCookie() throws ServletException, IOException {
         Cookie authCookie = new Cookie("accessToken", "valid-token");
         when(request.getCookies()).thenReturn(new Cookie[] { authCookie });
@@ -65,9 +65,7 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
-    /**
-     * Verifica que el filtro autentique correctamente cuando hay un token válido en el header.
-     */
+    @DisplayName("Debe autenticar cuando hay un token válido en la cabecera")
     void shouldAuthenticateWhenValidTokenInHeader() throws ServletException, IOException {
         when(request.getCookies()).thenReturn(null);
         when(request.getHeader("Authorization")).thenReturn("Bearer valid-token");
@@ -86,9 +84,7 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
-    /**
-     * Verifica que el filtro no autentique cuando el token es inválido.
-     */
+    @DisplayName("No debe autenticar cuando el token es inválido")
     void shouldNotAuthenticateWhenTokenInvalid() throws ServletException, IOException {
         when(request.getHeader("Authorization")).thenReturn("Bearer invalid-token");
         when(request.getRequestURI()).thenReturn("/api/messages");
@@ -100,9 +96,7 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
-    /**
-     * Verifica que el filtro no autentique en rutas públicas sin token.
-     */
+    @DisplayName("No debe autenticar en ruta pública sin token")
     void shouldNotAuthenticateOnPublicRouteWithoutToken() throws ServletException, IOException {
         when(request.getRequestURI()).thenReturn("/auth/login");
         when(request.getCookies()).thenReturn(null);

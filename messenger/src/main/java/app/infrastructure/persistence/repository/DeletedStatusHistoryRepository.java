@@ -11,9 +11,5 @@ import java.util.List;
  */
 @Repository
 public interface DeletedStatusHistoryRepository extends JpaRepository<DeletedStatusHistoryEntity, Long> {
-
-    /**
-     * Encuentra el historial de estados para un servicio archivado
-     */
     List<DeletedStatusHistoryEntity> findByServiceDeliveryIdOrderByChangeDateDesc(Long serviceDeliveryId);
 }

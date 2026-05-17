@@ -73,10 +73,7 @@ public class WhatsAppConfig {
     public void setSessionExpirationHours(int sessionExpirationHours) {
         this.sessionExpirationHours = sessionExpirationHours;
     }
-
-    /**
-     * Construye la URL para enviar mensajes.
-     */
+    
     public String getMessagesUrl() {
         return apiUrl + "/" + phoneNumberId + "/messages";
     }

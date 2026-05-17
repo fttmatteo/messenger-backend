@@ -24,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Pruebas unitarias de UpdateLiveTrackingUseCase")
 class UpdateLiveTrackingUseCaseTest {
 
     @Mock
@@ -36,7 +37,7 @@ class UpdateLiveTrackingUseCaseTest {
     private UpdateLiveTrackingUseCase useCase;
 
     @Test
-    @DisplayName("Should save live location and history when location has good accuracy")
+    @DisplayName("Debe guardar ubicación en vivo e historial con buena precisión")
     void shouldSaveLiveLocationAndHistoryWithGoodAccuracy() {
         LiveTracking incoming = new LiveTracking();
         incoming.setMessengerId(10L);
@@ -52,7 +53,8 @@ class UpdateLiveTrackingUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should save only live location if accuracy is too low (> 100m)")
+    @DisplayName("No debe guardar historial si la precisión es demasiado baja")
+
     void shouldNotSaveHistoryIfAccuracyTooLow() {
         LiveTracking incoming = new LiveTracking();
         incoming.setMessengerId(10L);
@@ -64,7 +66,8 @@ class UpdateLiveTrackingUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should save only live location if location is missing (keep alive ping)")
+    @DisplayName("Debe guardar solo ubicación en vivo si falta la ubicación")
+
     void shouldSaveOnlyLiveLocationIfLocationMissing() {
         LiveTracking incoming = new LiveTracking();
         incoming.setMessengerId(10L);
@@ -77,7 +80,8 @@ class UpdateLiveTrackingUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should update only heartbeat when executeHeartbeat is called")
+    @DisplayName("Debe actualizar solo el latido con executeHeartbeat")
+
     void shouldUpdateOnlyHeartbeatWithExecuteHeartbeat() {
         LiveTracking heartbeat = new LiveTracking();
         heartbeat.setMessengerId(10L);
@@ -94,7 +98,8 @@ class UpdateLiveTrackingUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should not save history if accuracy is exactly 100m")
+    @DisplayName("No debe guardar historial si la precisión está en el límite")
+
     void shouldNotSaveHistoryOnAccuracyBorderline() {
         LiveTracking incoming = new LiveTracking();
         incoming.setMessengerId(10L);
@@ -108,7 +113,8 @@ class UpdateLiveTrackingUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should handle heartbeat with no existing location")
+    @DisplayName("Debe manejar el latido sin ubicación previa")
+
     void shouldHandleHeartbeatWithNoPriorLocation() {
         LiveTracking heartbeat = new LiveTracking();
         heartbeat.setMessengerId(10L);
@@ -122,7 +128,8 @@ class UpdateLiveTrackingUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should preserve existing location data when heartbeat is received")
+    @DisplayName("Debe preservar la ubicación existente en el latido")
+
     void shouldPreserveExistingLocationOnHeartbeat() {
         LiveTracking existing = new LiveTracking();
         existing.setMessengerId(10L);
@@ -142,7 +149,8 @@ class UpdateLiveTrackingUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should fetch name from cache and avoid DB call")
+    @DisplayName("Debe obtener nombre del caché y evitar base de datos")
+
     void shouldFetchNameFromCacheAndAvoidDb() {
         LiveTracking incoming = new LiveTracking();
         incoming.setMessengerId(10L);
@@ -157,7 +165,8 @@ class UpdateLiveTrackingUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should save name in cache when fetched from DB")
+    @DisplayName("Debe guardar nombre en el caché al obtener de la base de datos")
+
     void shouldSaveNameInCacheWhenFetchedFromDb() {
         LiveTracking incoming = new LiveTracking();
         incoming.setMessengerId(10L);

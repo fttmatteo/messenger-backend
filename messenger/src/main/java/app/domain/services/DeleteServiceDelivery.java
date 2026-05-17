@@ -156,8 +156,6 @@ public class DeleteServiceDelivery {
                     logger.error("Error archivando servicio {}: {}", service.getIdServiceDelivery(), e.getMessage());
                 }
             }
-            // Como archivePort probablemente marca el servicio como archivado o lo elimina
-            // de la papelera lógica, seguimos pidiendo la página 0.
         } while (page.hasNext());
 
         return totalArchived;

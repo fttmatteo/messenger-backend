@@ -63,7 +63,6 @@ public class AuthController {
         Long document = credentials.getDocument();
         LogSanitizer.maskDocument(document);
 
-        // Validar token de Turnstile (anti-bot)
         if (!turnstileValidationService.validateToken(credentials.getTurnstileToken())) {
             logger.warn("Login rechazado - validación de Turnstile fallida para documento: {}",
                     LogSanitizer.maskDocument(document));
@@ -122,7 +121,7 @@ public class AuthController {
             LoginResponse loginResponse = new LoginResponse(
                     tokenResponse.getRole(),
                     "Login exitoso",
-                    tokenResponse.getToken(), // Fallback para Safari y otros browsers
+                    tokenResponse.getToken(),
                     tokenResponse.getRefreshToken(),
                     userInfo);
 
@@ -161,10 +160,8 @@ public class AuthController {
     @PostMapping("/ws-token")
 
     public ResponseEntity<app.domain.model.auth.WsTokenResponse> getWsToken(HttpServletRequest request) {
-        // El usuario ya debe estar autenticado por cookie o header para llegar aquí
         String accessToken = extractTokenFromCookie(request, "accessToken");
 
-        // Fallback: Authorization Header (para Safari/Mobile)
         if (accessToken == null) {
             String header = request.getHeader("Authorization");
             if (header != null && header.startsWith("Bearer ")) {
@@ -196,7 +193,6 @@ public class AuthController {
 
         String refreshToken = extractTokenFromCookie(request, "refreshToken");
 
-        // Fallback: Si no hay cookie, intentar sacar del body
         if (refreshToken == null && requestBody != null) {
             refreshToken = requestBody.getRefreshToken();
         }
@@ -231,7 +227,7 @@ public class AuthController {
         LoginResponse loginResponse = new LoginResponse(
                 tokenResponse.getRole(),
                 "Token renovado exitosamente",
-                tokenResponse.getToken(), // Fallback
+                tokenResponse.getToken(),
                 tokenResponse.getRefreshToken(),
                 null);
 
@@ -245,15 +241,12 @@ public class AuthController {
 
     public ResponseEntity<Void> logout(HttpServletResponse response) {
 
-        // Limpiamos cookies en la ruta raíz (nueva configuración)
         Cookie accessTokenCookie = createSecureCookie("accessToken", "", 0, "/");
         response.addCookie(accessTokenCookie);
 
         Cookie refreshTokenCookie = createSecureCookie("refreshToken", "", 0, "/");
         response.addCookie(refreshTokenCookie);
 
-        // Limpiamos cookies en la ruta antigua (por si quedaran residuos en el
-        // navegador)
         Cookie oldRefreshCookie = createSecureCookie("refreshToken", "", 0, "/auth/refresh");
         response.addCookie(oldRefreshCookie);
 
@@ -287,12 +280,9 @@ public class AuthController {
                     .toList();
 
             for (String val : potentialTokens) {
-                // Para accessToken, validamos
                 if (cookieName.equals("accessToken") && loginUseCase.validateToken(val)) {
                     return val;
                 }
-                // Para refreshToken, no podemos validar aquí fácilmente,
-                // pero si hay varias, al menos devolvemos una que no esté vacía
                 if (cookieName.equals("refreshToken")) {
                     return val;
                 }

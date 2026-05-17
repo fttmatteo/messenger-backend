@@ -18,9 +18,9 @@ public class AsyncConfig {
     @Bean(name = "whatsappTaskExecutor")
     public Executor whatsappTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(5); // Mínimo de hilos activos
-        executor.setMaxPoolSize(10); // Máximo de hilos en picos de carga
-        executor.setQueueCapacity(100); // Capacidad de la cola de espera
+        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(100);
         executor.setThreadNamePrefix("WhatsApp-Async-");
         executor.initialize();
         return executor;

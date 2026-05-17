@@ -25,25 +25,19 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ServiceDeliveryUseCase Unit Tests")
+@DisplayName("Pruebas unitarias de ServiceDeliveryUseCase")
 class ServiceDeliveryUseCaseTest {
 
     @Mock
     private CreateServiceDelivery createService;
-
     @Mock
     private UpdateServiceDelivery updateService;
-
     @Mock
     private SearchServiceDelivery searchService;
-
     @Mock
     private DeleteServiceDelivery deleteService;
-
     @Mock
     private StoragePort storagePort;
-
-
     @InjectMocks
     private ServiceDeliveryUseCase serviceDeliveryUseCase;
 
@@ -68,9 +62,6 @@ class ServiceDeliveryUseCaseTest {
 
         @Test
         @DisplayName("Debe crear servicio con placa manual")
-        /**
-         * Verifica la creación de servicio cuando la placa se ingresa manualmente.
-         */
         void shouldCreateServiceWithManualPlate() throws Exception {
             when(createService.create(eq("XYZ789"), eq(1L), eq(123456L), isNull(), isNull()))
                     .thenReturn(sampleService);
@@ -87,9 +78,6 @@ class ServiceDeliveryUseCaseTest {
 
         @Test
         @DisplayName("Debe actualizar estado con firma y fotos")
-        /**
-         * Verifica la actualización de estado incluyendo evidencias (firma y fotos).
-         */
         void shouldUpdateStatusWithSignatureAndPhotos() throws Exception {
             Signature signature = new Signature();
             signature.setSignaturePath("/path/signature.png");
@@ -106,7 +94,8 @@ class ServiceDeliveryUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe actualizar estado sin evidencias")
+        @DisplayName("Debe actualizar el estado sin evidencia")
+
         void shouldUpdateStatusWithoutEvidence() throws Exception {
             serviceDeliveryUseCase.updateStatus(1L, Status.CANCELED, "Cancelado por cliente",
                     null, null, 123456L);
@@ -123,9 +112,6 @@ class ServiceDeliveryUseCaseTest {
 
         @Test
         @DisplayName("Debe buscar por ID")
-        /**
-         * Verifica la búsqueda por ID delegada al servicio de dominio.
-         */
         void shouldFindById() throws Exception {
             when(searchService.findById(1L)).thenReturn(sampleService);
 
@@ -136,7 +122,8 @@ class ServiceDeliveryUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe mapear campos de ordenamiento correctamente en paginación")
+        @DisplayName("Debe mapear los campos de ordenación en la paginación")
+
         void shouldMapSortFieldsInPagination() {
             serviceDeliveryUseCase.findAllPaginated(0, 10, "messengerName", "asc", null, null);
             verify(searchService).findAllPaginated(isNull(), eq(false), isNull(),
@@ -161,9 +148,6 @@ class ServiceDeliveryUseCaseTest {
 
         @Test
         @DisplayName("Debe mover servicio a papelera por ID")
-        /**
-         * Verifica la eliminación lógica (soft delete).
-         */
         void shouldSoftDeleteById() throws Exception {
             serviceDeliveryUseCase.deleteById(1L);
 
@@ -180,7 +164,7 @@ class ServiceDeliveryUseCaseTest {
     }
 
     @Nested
-    @DisplayName("Papelera (Trash)")
+    @DisplayName("Debe buscar eliminados")
     class TrashTests {
 
         @Test
@@ -200,10 +184,8 @@ class ServiceDeliveryUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe restaurar servicio desde papelera")
-        /**
-         * Verifica la restauración de un servicio eliminado.
-         */
+        @DisplayName("Debe restaurar desde la papelera")
+
         void shouldRestoreFromTrash() throws Exception {
             ServiceDelivery restoredService = new ServiceDelivery();
             restoredService.setIdServiceDelivery(1L);
@@ -224,9 +206,6 @@ class ServiceDeliveryUseCaseTest {
 
         @Test
         @DisplayName("Debe reasignar servicio a nuevo mensajero")
-        /**
-         * Verifica la reasignación de un servicio a otro empleado.
-         */
         void shouldReassignMessenger() throws Exception {
             ServiceDelivery reassignedService = new ServiceDelivery();
             reassignedService.setIdServiceDelivery(1L);

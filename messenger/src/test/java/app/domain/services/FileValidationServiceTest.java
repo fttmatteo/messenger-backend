@@ -11,7 +11,7 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("FileValidationService Tests")
+@DisplayName("Pruebas unitarias de FileValidationService")
 class FileValidationServiceTest {
 
     private final FileValidationService fileValidationService = new FileValidationService();
@@ -24,7 +24,8 @@ class FileValidationServiceTest {
     }
 
     @Test
-    @DisplayName("Validar imagen WebP válida debe pasar")
+    @DisplayName("Debe validar imagen WebP válida")
+
     void testValidateValidWebpImage() throws IOException {
         byte[] imageBytes = createValidImage("png", 800, 600); 
         MultipartFile file = new MockMultipartFile(
@@ -38,7 +39,8 @@ class FileValidationServiceTest {
 
 
     @Test
-    @DisplayName("Validar imagen PNG válida debe pasar")
+    @DisplayName("Debe validar imagen PNG válida")
+
     void testValidateValidPngImage() throws IOException {
         byte[] imageBytes = createValidImage("png", 800, 600);
         MultipartFile file = new MockMultipartFile(
@@ -51,9 +53,10 @@ class FileValidationServiceTest {
     }
 
     @Test
-    @DisplayName("Firma mayor a 2MB debe fallar")
+    @DisplayName("Debe fallar si la firma es demasiado grande")
+
     void testSignatureTooLargeShouldFail() {
-        byte[] oversizedSignature = new byte[(int) (3 * 1024 * 1024)]; // 3MB > 2MB
+        byte[] oversizedSignature = new byte[(int) (3 * 1024 * 1024)];
         MultipartFile file = new MockMultipartFile(
                 "signature",
                 "large_sig.webp",
@@ -68,9 +71,10 @@ class FileValidationServiceTest {
 
 
     @Test
-    @DisplayName("Foto mayor a 10MB debe fallar")
+    @DisplayName("Debe fallar si la foto es demasiado grande")
+
     void testPhotoTooLargeShouldFail() {
-        byte[] oversizedPhoto = new byte[(int) (11 * 1024 * 1024)]; // 11MB > 10MB
+        byte[] oversizedPhoto = new byte[(int) (11 * 1024 * 1024)];
         MultipartFile file = new MockMultipartFile(
                 "photo",
                 "large_photo.webp",

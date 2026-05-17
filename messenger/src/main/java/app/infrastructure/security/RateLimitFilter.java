@@ -29,14 +29,11 @@ public class RateLimitFilter extends OncePerRequestFilter {
     @Autowired(required = false)
     private ProxyManager<byte[]> proxyManager;
 
-    // Cache local para fallback en caso de que Redis no esté disponible.
-    // Limitamos el tamaño para evitar OutOfMemory si Redis falla durante un ataque
-    // masivo.
     private final Map<String, Bucket> localFallbackCache = java.util.Collections.synchronizedMap(
             new java.util.LinkedHashMap<String, Bucket>(101, 0.75f, true) {
                 @Override
                 protected boolean removeEldestEntry(Map.Entry<String, Bucket> eldest) {
-                    return size() > 1000; // Límite de 1000 IPs concurrentes en fallback local
+                    return size() > 1000; 
                 }
             });
 
@@ -67,16 +64,12 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
         Bucket bucket;
         try {
-            // Intentar obtener el bucket distribuido desde Redis si el proxyManager está
-            // presente.
             if (proxyManager != null) {
                 bucket = proxyManager.builder().build(key.getBytes(StandardCharsets.UTF_8), () -> config);
             } else {
                 throw new Exception("ProxyManager no disponible");
             }
         } catch (Exception e) {
-            // FALLBACK: Si Redis falla, usar un bucket local en memoria.
-            // Esto asegura ALTA DISPONIBILIDAD del servicio aunque Redis esté caído.
             logger.error("Redis no está disponible para Rate Limiting. Usando fallback local para IP: {}", clientIp);
             bucket = localFallbackCache.computeIfAbsent(key,
                     k -> Bucket.builder().addLimit(limit -> limit

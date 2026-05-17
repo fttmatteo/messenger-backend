@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("SystemSettingUseCase Unit Tests")
+@DisplayName("Pruebas unitarias de SystemSettingUseCase")
 class SystemSettingUseCaseTest {
 
     @Mock
@@ -38,7 +38,8 @@ class SystemSettingUseCaseTest {
     }
 
     @Test
-    @DisplayName("Debe retornar JSON vacio si no existe la configuracion")
+    @DisplayName("Debe retornar JSON vacío si falta la configuración")
+
     void shouldReturnEmptyJsonIfSettingMissing() {
         when(systemSettingPort.findByKey("STATUS_COLORS")).thenReturn(Optional.empty());
 
@@ -48,7 +49,8 @@ class SystemSettingUseCaseTest {
     }
 
     @Test
-    @DisplayName("Debe actualizar colores de estado")
+    @DisplayName("Debe actualizar los colores de estado")
+
     void shouldUpdateStatusColors() {
         String newJson = "{\"DELIVERED\":\"#FFFFFF\"}";
         when(systemSettingPort.findByKey("STATUS_COLORS")).thenReturn(Optional.empty());

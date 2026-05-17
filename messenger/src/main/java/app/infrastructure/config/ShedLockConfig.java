@@ -18,7 +18,6 @@ public class ShedLockConfig {
 
     @Bean
     public LockProvider lockProvider(RedisConnectionFactory connectionFactory) {
-        // "shedlock" es el nombre del espacio de nombres en Redis para los locks
         return new RedisLockProvider(connectionFactory, "shedlock");
     }
 }

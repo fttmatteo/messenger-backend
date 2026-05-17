@@ -11,9 +11,5 @@ import java.util.Optional;
  */
 @Repository
 public interface DeletedSignatureRepository extends JpaRepository<DeletedSignatureEntity, Long> {
-
-    /**
-     * Encuentra la firma de un servicio archivado
-     */
     Optional<DeletedSignatureEntity> findByServiceDeliveryId(Long serviceDeliveryId);
 }

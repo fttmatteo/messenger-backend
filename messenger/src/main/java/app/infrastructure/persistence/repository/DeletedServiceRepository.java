@@ -14,30 +14,13 @@ import java.util.List;
  */
 @Repository
 public interface DeletedServiceRepository extends JpaRepository<DeletedServiceEntity, Long> {
-
-    /**
-     * Encuentra todos los servicios archivados ordenados por fecha de archivo (más
-     * recientes primero)
-     */
     Page<DeletedServiceEntity> findAllByOrderByPermanentlyDeletedAtDesc(Pageable pageable);
 
-    /**
-     * Encuentra servicios archivados por mensajero
-     */
     List<DeletedServiceEntity> findByMessengerId(Long messengerId);
 
-    /**
-     * Encuentra servicios archivados por concesionario
-     */
     List<DeletedServiceEntity> findByDealershipId(Long dealershipId);
 
-    /**
-     * Encuentra servicios archivados en un rango de fechas
-     */
     List<DeletedServiceEntity> findByPermanentlyDeletedAtBetween(LocalDateTime start, LocalDateTime end);
 
-    /**
-     * Encuentra servicios archivados por número de placa
-     */
     List<DeletedServiceEntity> findByPlateNumber(String plateNumber);
 }

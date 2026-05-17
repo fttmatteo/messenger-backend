@@ -80,8 +80,6 @@ public class TurnstileValidationService {
 
         } catch (Exception e) {
             logger.error("Error al validar token de Turnstile: {}", e.getMessage());
-            // En caso de error de red, podríamos retornar true para no bloquear usuarios
-            // pero por seguridad, retornamos false
             return false;
         }
     }

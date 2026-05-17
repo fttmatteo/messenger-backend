@@ -22,11 +22,6 @@ import app.domain.events.PlateStatusChangedEvent;
 /**
  * Servicio para actualizar estado de servicios con validación de reglas de
  * negocio.
- * 
- * Reglas implementadas:
- * - Mensajero solo puede usar: PENDING, DELIVERED, RETURNED
- * - Admin solo puede usar: CANCELED, RESOLVED y reasignar mensajero (solo si
- * está en CANCELED)
  */
 @Service
 public class UpdateServiceDelivery {

@@ -24,10 +24,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import app.support.AbstractIntegrationTest;
 
 @Transactional
-@DisplayName("DealershipController Integration Tests")
-/**
- * Clase de pruebas integración para el controlador de concesionarios.
- */
+@DisplayName("Pruebas unitarias de DealershipController Integration")
 class DealershipControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -49,11 +46,9 @@ class DealershipControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("GET /dealerships/allDealerships should return 200 for authenticated user")
+    @DisplayName("Debe retornar todos los concesionarios")
+
     @WithMockUser(roles = "MESSENGER")
-    /**
-     * Verifica que un usuario autenticado pueda listar condesionarios.
-     */
     void shouldReturnAllDealerships() throws Exception {
         DealershipEntity d = new DealershipEntity();
         d.setName("Test Dealer");
@@ -70,11 +65,9 @@ class DealershipControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("POST /dealerships/createDealership should return 403 for MESSENGER")
+    @DisplayName("Debe denegar la creación para el mensajero")
+
     @WithMockUser(roles = "MESSENGER")
-    /**
-     * Verifica que un rol MESSENGER no tenga permiso para crear concesionarios.
-     */
     void shouldDenyCreateForMessenger() throws Exception {
         DealershipRequest request = new DealershipRequest();
         request.setName("Forbidden Dealer");
@@ -87,11 +80,9 @@ class DealershipControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("POST /dealerships/createDealership should return 201 for ADMIN")
+    @DisplayName("Debe crear concesionario para el administrador")
+
     @WithMockUser(roles = "ADMIN")
-    /**
-     * Verifica que un rol ADMIN pueda crear concesionarios exitosamente.
-     */
     void shouldCreateDealershipForAdmin() throws Exception {
         DealershipRequest request = new DealershipRequest();
         request.setName("New Admin Dealer");
@@ -108,11 +99,9 @@ class DealershipControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("DELETE /dealerships/deleteDealership/{id} should delete dealership if ADMIN")
+    @DisplayName("Debe eliminar el concesionario")
+
     @WithMockUser(roles = "ADMIN")
-    /**
-     * Verifica que un rol ADMIN pueda eliminar concesionarios.
-     */
     void shouldDeleteDealership() throws Exception {
         DealershipEntity d = new DealershipEntity();
         d.setName("Dealer to Delete");

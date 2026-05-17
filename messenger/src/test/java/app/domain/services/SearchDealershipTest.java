@@ -17,7 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("SearchDealership Unit Tests")
+@DisplayName("Pruebas unitarias de SearchDealership")
 class SearchDealershipTest {
 
     @Mock
@@ -28,9 +28,6 @@ class SearchDealershipTest {
 
     @Test
     @DisplayName("Debe retornar lista de todos los concesionarios")
-    /**
-     * Verifica que se recuperen todos los concesionarios registrados.
-     */
     void shouldReturnAllDealerships() {
         List<Dealership> dealerships = Arrays.asList(new Dealership(), new Dealership());
         when(dealershipPort.findAll()).thenReturn(dealerships);
@@ -42,10 +39,8 @@ class SearchDealershipTest {
     }
 
     @Test
-    @DisplayName("Debe encontrar concesionario por ID")
-    /**
-     * Verifica la búsqueda exitosa por identificador único.
-     */
+    @DisplayName("Debe buscar por ID")
+
     void shouldFindById() {
         Dealership d = new Dealership();
         d.setIdDealership(1L);
@@ -57,10 +52,8 @@ class SearchDealershipTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si ID no existe")
-    /**
-     * Verifica que se lance excepción ResourceNotFoundException si el ID no existe.
-     */
+    @DisplayName("Debe lanzar excepción si el ID no se encuentra")
+
     void shouldThrowExceptionIfIdNotFound() {
         when(dealershipPort.findById(1L)).thenReturn(null);
 
@@ -71,10 +64,8 @@ class SearchDealershipTest {
     }
 
     @Test
-    @DisplayName("Debe encontrar concesionario por Nombre")
-    /**
-     * Verifica la búsqueda por nombre exacto.
-     */
+    @DisplayName("Debe buscar por nombre")
+
     void shouldFindByName() {
         Dealership d = new Dealership();
         d.setName("Central");
@@ -86,10 +77,8 @@ class SearchDealershipTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si Nombre no existe")
-    /**
-     * Verifica que se lance excepción ResourceNotFoundException si el nombre no existe.
-     */
+    @DisplayName("Debe lanzar excepción si el nombre no se encuentra")
+
     void shouldThrowExceptionIfNameNotFound() {
         when(dealershipPort.findByName("Central")).thenReturn(null);
 

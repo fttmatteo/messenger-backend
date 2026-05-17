@@ -12,24 +12,11 @@ import java.util.Optional;
  */
 @Repository
 public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Long> {
-
-    /**
-     * Elimina un empleado por su documento.
-     */
     void deleteByDocument(Long document);
 
-    /**
-     * Busca un empleado por su documento.
-     */
     EmployeeEntity findByDocument(Long document);
 
-    /**
-     * Busca un empleado por su UUID público.
-     */
     Optional<EmployeeEntity> findByUuid(String uuid);
 
-    /**
-     * Busca empleados filtrados por rol.
-     */
     List<EmployeeEntity> findByRole(Role role);
 }

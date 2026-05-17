@@ -6,14 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("StatusHistory Unit Tests")
+@DisplayName("Pruebas unitarias de StatusHistory")
 class StatusHistoryTest {
 
     @Test
     @DisplayName("Debe convertir Lat/Lng a Location correctamente")
-    /**
-     * Verifica la conversión de coordenadas planas a objeto Location.
-     */
     void shouldConvertWhenLatLongArePresent() {
         StatusHistory history = new StatusHistory();
         history.setDeliveryLatitude(4.0);
@@ -26,10 +23,8 @@ class StatusHistoryTest {
     }
 
     @Test
-    @DisplayName("Debe retornar null cuando falla Lat o Lng")
-    /**
-     * Verifica que se retorne null cuando faltan coordenadas.
-     */
+    @DisplayName("Debe retornar nulo cuando faltan las coordenadas")
+
     void shouldReturnNullWhenCoordinatesMissing() {
         StatusHistory history = new StatusHistory();
 
@@ -40,10 +35,8 @@ class StatusHistoryTest {
     }
 
     @Test
-    @DisplayName("Debe establecer Lat/Lng desde Location")
-    /**
-     * Verifica que se establezcan las coordenadas cuando se proporciona un objeto Location.
-     */
+    @DisplayName("Debe establecer desde ubicación")
+
     void shouldSetFromLocation() {
         StatusHistory history = new StatusHistory();
         Location loc = new Location(1.0, 2.0);
@@ -55,10 +48,8 @@ class StatusHistoryTest {
     }
 
     @Test
-    @DisplayName("No debe establecer Lat/Lng si Location es null")
-    /**
-     * Verifica que no se establezcan las coordenadas cuando se proporciona un objeto Location nulo.
-     */
+    @DisplayName("No debe establecer si la ubicación es nula")
+
     void shouldNotSetIfLocationNull() {
         StatusHistory history = new StatusHistory();
         history.setDeliveryLatitude(5.0);

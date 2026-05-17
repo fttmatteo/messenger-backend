@@ -18,10 +18,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UpdateDealership Unit Tests")
-/**
- * Clase de pruebas unitarias para UpdateDealership.
- */
+@DisplayName("Pruebas unitarias de UpdateDealership")
+
 class UpdateDealershipTest {
 
     @Mock
@@ -44,10 +42,7 @@ class UpdateDealershipTest {
 
     @Test
     @DisplayName("Debe actualizar campos exitosamente")
-    /**
-     * Verifica que los campos del concesionario se actualicen correctamente si las
-     * validaciones pasan.
-     */
+
     void shouldUpdateFieldsSuccessfully() throws Exception {
         Dealership newData = new Dealership();
         newData.setName("New Name");
@@ -68,10 +63,8 @@ class UpdateDealershipTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si ID no existe")
-    /**
-     * Verifica que no se pueda actualizar un concesionario inexistente.
-     */
+    @DisplayName("Debe lanzar excepción si el ID no se encuentra")
+
     void shouldThrowExceptionIfIdNotFound() {
         when(dealershipPort.findById(1L)).thenReturn(null);
 
@@ -82,10 +75,8 @@ class UpdateDealershipTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si nuevo nombre ya existe")
-    /**
-     * Verifica la validación de nombre único durante la actualización.
-     */
+    @DisplayName("Debe lanzar excepción si el nuevo nombre ya existe")
+
     void shouldThrowExceptionIfNewNameExists() {
         Dealership newData = new Dealership();
         newData.setName("Existing Name");
@@ -99,10 +90,8 @@ class UpdateDealershipTest {
     }
 
     @Test
-    @DisplayName("No debe validar nombre si no cambia")
-    /**
-     * Verifica que no se valide el nombre si no cambia durante la actualización.
-     */
+    @DisplayName("No debe validar el nombre si es el mismo")
+
     void shouldNotValidateNameIfSame() throws Exception {
         Dealership newData = new Dealership();
         newData.setName("Original Name");

@@ -18,10 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ValidateDeliveryLocationUseCase Unit Tests")
-/**
- * Clase de pruebas unitarias para el caso de uso de validación de ubicación de entrega.
- */
+@DisplayName("Pruebas unitarias de ValidateDeliveryLocationUseCase")
 class ValidateDeliveryLocationUseCaseTest {
 
     @Mock
@@ -36,11 +33,8 @@ class ValidateDeliveryLocationUseCaseTest {
     }
 
     @Test
-    @DisplayName("Debe permitir si concesionario no está geolocalizado")
-    /**
-     * Verifica que la validación pase si el concesionario destino no tiene
-     * coordenadas.
-     */
+    @DisplayName("Debe permitir si el concesionario no está geolocalizado")
+
     void shouldAllowIfDealershipNotGeolocated() {
         Dealership d = new Dealership();
         d.setIsGeolocated(false);
@@ -53,9 +47,7 @@ class ValidateDeliveryLocationUseCaseTest {
 
     @Test
     @DisplayName("Debe permitir si está dentro del rango")
-    /**
-     * Verifica que la validación pase si la entrega está cerca del concesionario.
-     */
+
     void shouldAllowIfWithinRange() {
         Dealership d = new Dealership();
         d.setIsGeolocated(true);
@@ -70,10 +62,7 @@ class ValidateDeliveryLocationUseCaseTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si está fuera de rango")
-    /**
-     * Verifica que se lance GeolocationException si la entrega es muy lejos del
-     * destino.
-     */
+
     void shouldThrowIfOutOfRange() {
         Dealership d = new Dealership();
         d.setIsGeolocated(true);
@@ -88,10 +77,8 @@ class ValidateDeliveryLocationUseCaseTest {
     }
 
     @Test
-    @DisplayName("isWithinRange debe retornar false si está fuera de rango")
-    /**
-     * Verifica que isWithinRange retorne false si la entrega está fuera de rango.
-     */
+    @DisplayName("isWithinRange debe retornar falso si está lejos")
+
     void isWithinRangeShouldReturnFalseIfFar() {
         Dealership d = new Dealership();
         d.setIsGeolocated(true);
@@ -105,10 +92,8 @@ class ValidateDeliveryLocationUseCaseTest {
     }
 
     @Test
-    @DisplayName("isWithinRange debe retornar true si es válido")
-    /**
-     * Verifica que isWithinRange retorne true si la entrega está dentro del rango.
-     */
+    @DisplayName("isWithinRange debe retornar verdadero si es válido")
+
     void isWithinRangeShouldReturnTrueIfValid() {
         Dealership d = new Dealership();
         d.setIsGeolocated(true);

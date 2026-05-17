@@ -9,13 +9,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+@DisplayName("Pruebas unitarias de Dealership")
 class DealershipTest {
 
     @Test
-    @DisplayName("Should return null Location when lat/lon are missing")
-    /**
-     * Verifica que getLocation devuelva null si falta latitud o longitud.
-     */
+    @DisplayName("Debe retornar ubicación nula si falta")
     void shouldReturnNullLocationIfMissing() {
         Dealership dealership = new Dealership();
         dealership.setLatitude(null);
@@ -25,11 +23,8 @@ class DealershipTest {
     }
 
     @Test
-    @DisplayName("Should return correct Location when lat/lon are present")
-    /**
-     * Verifica que getLocation devuelva un objeto Location correcto si hay
-     * coordenadas.
-     */
+    @DisplayName("Debe retornar ubicación si está presente")
+
     void shouldReturnLocationIfPresent() {
         Dealership dealership = new Dealership();
         dealership.setLatitude(4.5);
@@ -42,11 +37,8 @@ class DealershipTest {
     }
 
     @Test
-    @DisplayName("Should set lat/lon/isGeolocated from Location")
-    /**
-     * Verifica que setLocation actualice latitud, longitud y flag de
-     * geolocalización.
-     */
+    @DisplayName("Debe establecer la ubicación")
+
     void shouldSetLocation() {
         Dealership dealership = new Dealership();
         assertFalse(dealership.getIsGeolocated());

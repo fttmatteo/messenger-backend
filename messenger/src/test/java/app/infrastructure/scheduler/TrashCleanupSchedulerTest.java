@@ -18,10 +18,7 @@ import app.domain.ports.ServiceDeliveryPort;
 import app.infrastructure.service.ArchiveServiceService;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("TrashCleanupScheduler Unit Tests")
-/**
- * Clase de pruebas unitarias para el planificador de limpieza de la papelera.
- */
+@DisplayName("Pruebas unitarias de TrashCleanupScheduler")
 class TrashCleanupSchedulerTest {
 
         @Mock
@@ -34,11 +31,8 @@ class TrashCleanupSchedulerTest {
         private TrashCleanupScheduler scheduler;
 
         @Test
-        @DisplayName("Should archive expired services from trash")
-        /**
-         * Verifica que el planificador archive correctamente los servicios expirados
-         * de la papelera.
-         */
+        @DisplayName("Debe archivar servicios expirados")
+
         void shouldArchiveExpiredServices() {
                 ServiceDelivery service1 = new ServiceDelivery();
                 service1.setIdServiceDelivery(1L);
@@ -62,11 +56,8 @@ class TrashCleanupSchedulerTest {
         }
 
         @Test
-        @DisplayName("Should do nothing when no expired services")
-        /**
-         * Verifica que el planificador no realice ninguna acción cuando no hay
-         * servicios expirados.
-         */
+        @DisplayName("No debe hacer nada cuando no hay servicios expirados")
+
         void shouldDoNothingWhenNoExpiredServices() {
                 when(serviceDeliveryPort.findDeletedExpiredBefore(any(LocalDateTime.class)))
                                 .thenReturn(Collections.emptyList());
@@ -77,11 +68,8 @@ class TrashCleanupSchedulerTest {
         }
 
         @Test
-        @DisplayName("Should continue archiving if one fails")
-        /**
-         * Verifica que el planificador continúe con el proceso de archivado incluso si
-         * ocurre un error con uno de los servicios.
-         */
+        @DisplayName("Debe continuar si uno falla")
+
         void shouldContinueIfOneFails() {
                 ServiceDelivery service1 = new ServiceDelivery();
                 service1.setIdServiceDelivery(1L);

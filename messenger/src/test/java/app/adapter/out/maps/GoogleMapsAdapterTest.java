@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("GoogleMapsAdapter Unit Tests")
+@DisplayName("Pruebas unitarias de GoogleMapsAdapter")
 class GoogleMapsAdapterTest {
 
     @Mock
@@ -21,18 +21,12 @@ class GoogleMapsAdapterTest {
 
     @Test
     @DisplayName("Debe geocodificar una dirección válida")
-    /**
-     * Verifica que el servicio de mapas geocodifique correctamente una dirección.
-     */
     void shouldGeocodeAddress() throws Exception {
         assertNotNull(googleMapsAdapter);
     }
 
     @Test
     @DisplayName("Debe calcular distancia entre dos puntos")
-    /**
-     * Verifica el cálculo de distancia usando la API de mapas.
-     */
     void shouldCalculateDistance() throws Exception {
         assertNotNull(googleMapsAdapter);
     }

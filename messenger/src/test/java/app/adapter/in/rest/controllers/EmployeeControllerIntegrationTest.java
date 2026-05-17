@@ -26,7 +26,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import app.support.AbstractIntegrationTest;
 
 @Transactional
-@DisplayName("EmployeeController Integration Tests")
+@DisplayName("Pruebas unitarias de EmployeeController Integration")
 class EmployeeControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -59,7 +59,7 @@ class EmployeeControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Nested
-    @DisplayName("GET /employees/allEmployees")
+    @DisplayName("Debe retornar solo mensajeros para el administrador")
     class FindAll {
 
         @Test
@@ -91,7 +91,8 @@ class EmployeeControllerIntegrationTest extends AbstractIntegrationTest {
         }
 
         @Test
-        @DisplayName("should return 403 for MESSENGER role")
+        @DisplayName("Debe denegar el acceso al mensajero")
+
         @WithMockUser(roles = "MESSENGER")
         void shouldDenyAccessToMessenger() throws Exception {
             mockMvc.perform(get("/employees/allEmployees"))
@@ -100,11 +101,11 @@ class EmployeeControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Nested
-    @DisplayName("POST /employees/createEmployee")
+    @DisplayName("Debe crear empleado mensajero")
     class Create {
 
         @Test
-        @DisplayName("should create MESSENGER employee")
+        @DisplayName("Debe crear empleado mensajero")
         @WithMockUser(username = ADMIN_DOCUMENT, roles = "ADMIN")
         void shouldCreateMessengerEmployee() throws Exception {
             EmployeeRequest request = new EmployeeRequest();
@@ -124,7 +125,8 @@ class EmployeeControllerIntegrationTest extends AbstractIntegrationTest {
         }
 
         @Test
-        @DisplayName("should reject creation of ADMIN employees")
+        @DisplayName("Debe rechazar la creación de administrador")
+
         @WithMockUser(username = ADMIN_DOCUMENT, roles = "ADMIN")
         void shouldRejectAdminCreation() throws Exception {
             EmployeeRequest request = new EmployeeRequest();
@@ -143,11 +145,11 @@ class EmployeeControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Nested
-    @DisplayName("DELETE /employees/deleteEmployee")
+    @DisplayName("Debe eliminar empleado mensajero")
     class Delete {
 
         @Test
-        @DisplayName("should delete MESSENGER employee")
+        @DisplayName("Debe eliminar empleado mensajero")
         @WithMockUser(username = ADMIN_DOCUMENT, roles = "ADMIN")
         void shouldDeleteMessengerEmployee() throws Exception {
             EmployeeEntity emp = new EmployeeEntity();
@@ -168,7 +170,8 @@ class EmployeeControllerIntegrationTest extends AbstractIntegrationTest {
         }
 
         @Test
-        @DisplayName("should reject deletion of another ADMIN")
+        @DisplayName("Debe rechazar la eliminación de otro administrador")
+
         @WithMockUser(username = ADMIN_DOCUMENT, roles = "ADMIN")
         void shouldRejectDeletionOfOtherAdmin() throws Exception {
             EmployeeEntity otherAdmin = new EmployeeEntity();
@@ -186,7 +189,8 @@ class EmployeeControllerIntegrationTest extends AbstractIntegrationTest {
         }
 
         @Test
-        @DisplayName("should reject self-deletion")
+        @DisplayName("Debe rechazar la auto-eliminación")
+
         @WithMockUser(username = ADMIN_DOCUMENT, roles = "ADMIN")
         void shouldRejectSelfDeletion() throws Exception {
             EmployeeEntity selfAdmin = entityManager
@@ -201,11 +205,11 @@ class EmployeeControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Nested
-    @DisplayName("GET /employees/findByEmployeeId")
+    @DisplayName("Debe retornar 404 para el perfil de otro administrador")
     class FindByUuid {
 
         @Test
-        @DisplayName("should return 404 when accessing another admin's profile")
+        @DisplayName("Debe retornar 404 para el perfil de otro administrador")
         @WithMockUser(username = ADMIN_DOCUMENT, roles = "ADMIN")
         void shouldReturn404ForOtherAdminProfile() throws Exception {
             EmployeeEntity otherAdmin = new EmployeeEntity();
@@ -222,7 +226,8 @@ class EmployeeControllerIntegrationTest extends AbstractIntegrationTest {
         }
 
         @Test
-        @DisplayName("should allow access to a MESSENGER profile")
+        @DisplayName("Debe permitir acceso al perfil del mensajero")
+
         @WithMockUser(username = ADMIN_DOCUMENT, roles = "ADMIN")
         void shouldAllowAccessToMessengerProfile() throws Exception {
             EmployeeEntity messenger = new EmployeeEntity();

@@ -20,10 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("DealershipUseCase Unit Tests")
-/**
- * Clase de pruebas unitarias para el caso de uso de concesionarios.
- */
+@DisplayName("Pruebas unitarias de DealershipUseCase")
 class DealershipUseCaseTest {
 
     @Mock
@@ -58,10 +55,6 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe crear concesionario exitosamente")
-        /**
-         * Verifica que el caso de uso delegue correctamente la creación al servicio de
-         * dominio.
-         */
         void shouldCreateDealershipSuccessfully() throws Exception {
             when(createDealership.create(sampleDealership)).thenReturn(sampleDealership);
             dealershipUseCase.create(sampleDealership);
@@ -70,10 +63,8 @@ class DealershipUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe propagar excepción si creación falla")
-        /**
-         * Verifica que se propague la excepción si la creación falla.
-         */
+        @DisplayName("Debe propagar excepción ante falla al crear")
+
         void shouldPropagateExceptionOnCreateFailure() throws Exception {
             doThrow(new BusinessException("Nombre duplicado"))
                     .when(createDealership).create(any());
@@ -89,10 +80,6 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe retornar todos los concesionarios")
-        /**
-         * Verifica que se listen todos los concesionarios utilizando el servicio de
-         * búsqueda.
-         */
         void shouldReturnAllDealerships() {
             Dealership dealership2 = new Dealership();
             dealership2.setIdDealership(2L);
@@ -108,9 +95,7 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe retornar lista vacía si no hay concesionarios")
-        /**
-         * Verifica que se retorne una lista vacía si no hay concesionarios.
-         */
+
         void shouldReturnEmptyListIfNoDealerships() {
             when(searchDealership.findAll()).thenReturn(List.of());
 
@@ -121,9 +106,7 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe buscar concesionario por ID")
-        /**
-         * Verifica que se pueda buscar un concesionario por ID.
-         */
+
         void shouldFindDealershipById() throws Exception {
             when(searchDealership.findById(1L)).thenReturn(sampleDealership);
 
@@ -134,10 +117,8 @@ class DealershipUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe lanzar excepción si ID no existe")
-        /**
-         * Verifica que se lance una excepción si el ID no existe.
-         */
+        @DisplayName("Debe lanzar excepción si el ID no se encuentra")
+
         void shouldThrowExceptionIfIdNotFound() {
             when(searchDealership.findById(999L))
                     .thenThrow(new ResourceNotFoundException("No encontrado"));
@@ -148,9 +129,7 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe buscar concesionario por nombre")
-        /**
-         * Verifica que se pueda buscar un concesionario por nombre.
-         */
+
         void shouldFindDealershipByName() throws Exception {
             when(searchDealership.findByName("Concesionario Test")).thenReturn(sampleDealership);
 
@@ -167,9 +146,6 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe actualizar concesionario exitosamente")
-        /**
-         * Verifica la delegación de actualización al servicio correspondiente.
-         */
         void shouldUpdateDealershipSuccessfully() throws Exception {
             sampleDealership.setAddress("Nueva dirección");
 
@@ -179,10 +155,8 @@ class DealershipUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe propagar excepción si actualización falla")
-        /**
-         * Verifica que se propague la excepción si la actualización falla.
-         */
+        @DisplayName("Debe propagar excepción ante falla al actualizar")
+
         void shouldPropagateExceptionOnUpdateFailure() throws Exception {
             doThrow(new BusinessException("Concesionario no existe"))
                     .when(updateDealership).update(anyLong(), any());
@@ -198,9 +172,6 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe eliminar concesionario por ID sin servicios")
-        /**
-         * Verifica la eliminación lógica o física delegada al servicio de dominio.
-         */
         void shouldDeleteDealershipByIdWithoutServices() throws Exception {
             dealershipUseCase.deleteById(1L);
 
@@ -209,10 +180,6 @@ class DealershipUseCaseTest {
 
         @Test
         @DisplayName("Debe lanzar excepción si tiene servicios activos")
-        /**
-         * Verifica que se lance una excepción si el concesionario tiene servicios
-         * activos.
-         */
         void shouldThrowExceptionIfHasActiveServices() throws Exception {
             doThrow(new BusinessException("Tiene servicios activos"))
                     .when(deleteDealership).deleteById(1L);

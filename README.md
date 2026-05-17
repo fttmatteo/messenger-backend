@@ -133,7 +133,6 @@ graph LR
 | **Seguridad**             | JWT + BCrypt + Cloudflare Turnstile (Protección contra Bots) + Bucket4j (Rate Limiting Distribuido con Redis) |
 | **Documentación**         | OpenAPI / Swagger UI                                                                                          |
 
-| **Speech-to-Text**        | Google Cloud Speech-to-Text                                                                                   |
 | **Almacenamiento**        | Google Cloud Storage                                                                                          |
 | **Mapas**                 | Google Maps Platform                                                                                          |
 | **Cliente Móvil**         | Capacitor (Generación de App Android)                                                                         |
@@ -355,10 +354,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `POST`   | `/services/trash/restore/{uuid}` | Restaurar desde papelera (ADMIN)                                     |
 | `DELETE` | `/services/trash/empty`          | Vaciar papelera permanentemente (ADMIN)                              |
 | `DELETE` | `/services/trash/{uuid}`         | Eliminación individual permanente (ADMIN)                            |
-
-### Transcripción (`/api/transcribe`)
-
-| `POST` | `/api/transcribe` | Transcribir archivo de audio a texto usando Google Cloud STT |
 
 ### WhatsApp (`/api/whatsapp`)
 
@@ -943,7 +938,7 @@ El proyecto implementa una estrategia de pruebas robusta en todas las capas de l
 - **Variables de entorno** preconfiguradas (`baseUrl`, `token`, `refreshToken`)
 - **Tests automáticos** que guardan tokens en variables de colección
 - **Ejemplos de payloads** para todos los endpoints
-- **10 controladores** completamente documentados:
+- **9 controladores** completamente documentados:
   - Authentication (Login + Refresh)
   - Employees
   - Dealerships
@@ -953,7 +948,6 @@ El proyecto implementa una estrategia de pruebas robusta en todas las capas de l
   - Files
   - Monitoring
   - System Settings
-  - Transcription
 
 ### Uso
 

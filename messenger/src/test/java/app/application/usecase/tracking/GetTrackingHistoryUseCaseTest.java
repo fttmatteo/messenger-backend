@@ -21,7 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("GetTrackingHistoryUseCase Unit Tests")
+@DisplayName("Pruebas unitarias de GetTrackingHistoryUseCase")
 class GetTrackingHistoryUseCaseTest {
 
     @Mock
@@ -47,7 +47,8 @@ class GetTrackingHistoryUseCaseTest {
     }
 
     @Test
-    @DisplayName("Debe consultar por servicio")
+    @DisplayName("Debe obtener por servicio")
+
     void shouldGetByService() {
         Long serviceId = 100L;
         List<TrackingHistory> expected = Collections.emptyList();

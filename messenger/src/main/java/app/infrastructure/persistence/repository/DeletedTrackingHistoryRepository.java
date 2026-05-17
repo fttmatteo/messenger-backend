@@ -11,9 +11,5 @@ import java.util.List;
  */
 @Repository
 public interface DeletedTrackingHistoryRepository extends JpaRepository<DeletedTrackingHistoryEntity, Long> {
-
-    /**
-     * Encuentra el tracking history para un servicio archivado
-     */
     List<DeletedTrackingHistoryEntity> findByServiceDeliveryIdOrderByRecordedAtAsc(Long serviceDeliveryId);
 }

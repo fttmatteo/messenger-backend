@@ -26,7 +26,6 @@ public class RedisPubSubConfig {
         container.setConnectionFactory(connectionFactory);
         container.addMessageListener(listenerAdapter, new ChannelTopic(TRACKING_TOPIC));
 
-        // Usar un TaskExecutor dedicado para evitar que se creen hilos sin control
         container.setTaskExecutor(redisPubSubExecutor());
 
         return container;
@@ -45,7 +44,6 @@ public class RedisPubSubConfig {
 
     @Bean
     public MessageListenerAdapter listenerAdapter(RedisTrackingSubscriber subscriber) {
-        // "onMessage" es el método que se llamará en el suscriptor
         return new MessageListenerAdapter(subscriber, "onMessage");
     }
 }

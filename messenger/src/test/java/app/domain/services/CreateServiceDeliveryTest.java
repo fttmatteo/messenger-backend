@@ -24,7 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("CreateServiceDelivery Unit Tests")
+@DisplayName("Pruebas unitarias de CreateServiceDelivery")
 class CreateServiceDeliveryTest {
 
     @Mock
@@ -37,13 +37,10 @@ class CreateServiceDeliveryTest {
     private EmployeePort employeePort;
     @Mock
     private PlateRecognition plateRecognition;
-
     @Mock
     private app.domain.ports.TrackingPort trackingPort;
-
     @Mock
     private ApplicationEventPublisher eventPublisher;
-
     @InjectMocks
     private CreateServiceDelivery createServiceDelivery;
 
@@ -67,16 +64,13 @@ class CreateServiceDeliveryTest {
         plate.setPlateNumber("ABC1234567");
         plate.setPlateType(PlateType.MOTORCYCLE);
 
-        // Default mock for duplicate check (not found)
         lenient().when(serviceDeliveryPort.findAllPaginated(anyString(), anyBoolean(), isNull(), any()))
                 .thenReturn(org.springframework.data.domain.Page.empty());
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si la placa ya tiene un servicio registrado")
-    /**
-     * Verifica validación de servicio duplicado para una misma placa.
-     */
+    @DisplayName("Debe lanzar excepción si el chasis o placa ya existe")
+
     void shouldThrowExceptionIfPlateAlreadyExists() {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
@@ -92,11 +86,8 @@ class CreateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe crear servicio y nueva placa cuando placa no existe")
-    /**
-     * Verifica que se cree una nueva placa y el servicio asociado si la placa es
-     * nueva.
-     */
+    @DisplayName("Debe crear servicio y chasis cuando no existe")
+
     void shouldCreateServiceAndNewPlateWhenPlateDoesNotExist() throws Exception {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
@@ -123,10 +114,8 @@ class CreateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si mensajero no existe")
-    /**
-     * Verifica validación de existencia del mensajero.
-     */
+    @DisplayName("Debe lanzar excepción si el mensajero no se encuentra")
+
     void shouldThrowExceptionIfMessengerNotFound() {
         when(employeePort.findById(anyLong())).thenReturn(null);
 
@@ -138,10 +127,8 @@ class CreateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si concesionario no existe")
-    /**
-     * Verifica validación de existencia del concesionario.
-     */
+    @DisplayName("Debe lanzar excepción si el concesionario no se encuentra")
+
     void shouldThrowExceptionIfDealershipNotFound() {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(999L)).thenReturn(null);
@@ -154,10 +141,8 @@ class CreateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("Debe normalizar la placa a mayúsculas")
-    /**
-     * Verifica que la placa se normalice a mayúsculas antes de guardar.
-     */
+    @DisplayName("Debe normalizar placa o chasis a mayúsculas")
+
     void shouldNormalizePlateToUpperCase() throws Exception {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
@@ -175,10 +160,8 @@ class CreateServiceDeliveryTest {
 
 
     @Test
-    @DisplayName("Debe guardar historial de rastreo inicial si se proporciona ubicación")
-    /**
-     * Verifica que se guarde el historial de rastreo inicial si se proporciona ubicación.
-     */
+    @DisplayName("Debe guardar historial de rastreo cuando se proporciona la ubicación")
+
     void shouldSaveTrackingHistoryWhenLocationIsProvided() throws Exception {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);

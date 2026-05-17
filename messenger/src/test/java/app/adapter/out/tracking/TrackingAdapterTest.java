@@ -26,10 +26,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("TrackingAdapter Unit Tests")
-/**
- * Clase de pruebas unitarias para el adaptador de seguimiento.
- */
+@DisplayName("Pruebas unitarias de TrackingAdapter")
 class TrackingAdapterTest {
 
     @Mock
@@ -48,10 +45,8 @@ class TrackingAdapterTest {
     private TrackingAdapter trackingAdapter;
 
     @Test
-    @DisplayName("Debe guardar ubicación en vivo en Redis")
-    /**
-     * Verifica que la ubicación en tiempo real se guarde en caché (Redis).
-     */
+    @DisplayName("Debe guardar ubicación en vivo")
+
     void shouldSaveLiveLocation() {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
@@ -67,10 +62,8 @@ class TrackingAdapterTest {
     }
 
     @Test
-    @DisplayName("Debe obtener última ubicación de Redis")
-    /**
-     * Verifica la recuperación de la última ubicación conocida desde caché.
-     */
+    @DisplayName("Debe obtener la última ubicación")
+
     void shouldGetLastLocation() {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
@@ -86,10 +79,8 @@ class TrackingAdapterTest {
     }
 
     @Test
-    @DisplayName("Debe guardar historial de tracking")
-    /**
-     * Verifica la persistencia histórica de ubicaciones en base de datos.
-     */
+    @DisplayName("Debe guardar historial de rastreo")
+
     void shouldSaveTrackingHistory() {
         Location location = new Location(4.6097, -74.0817);
         TrackingHistory history = new TrackingHistory(1L, location, TrackingSource.GPS);

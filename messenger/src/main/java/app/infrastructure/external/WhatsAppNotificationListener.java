@@ -52,13 +52,13 @@ public class WhatsAppNotificationListener {
     private String getFriendlyStatusName(app.domain.model.enums.Status status) {
         switch (status) {
             case ASSIGNED:
-                return "ASIGNADA PARA ENTREGA";
+                return "ASIGNADA";
             case PENDING:
-                return "PENDIENTE POR DOCUMENTACIÓN";
+                return "PENDIENTE";
             case DELIVERED:
                 return "ENTREGADA";
             case RETURNED:
-                return "DEVUELTA POR INTENTO FALLIDO";
+                return "DEVUELTA";
             case RESOLVED:
                 return "REVISADA";
             case CANCELED:

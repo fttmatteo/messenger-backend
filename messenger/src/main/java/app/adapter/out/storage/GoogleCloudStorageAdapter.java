@@ -143,8 +143,6 @@ public class GoogleCloudStorageAdapter implements StoragePort {
 
         String newUrl = generateSignedUrlInternal(objectName, expirationHours, this.credentials);
 
-        // Cacheamos por (expirationHours - margen) para asegurar que no expire antes de
-        // ser usada
         long ttlSeconds = (expirationHours - CACHE_EXPIRATION_MARGIN_HOURS) * 3600L;
         cachePort.cacheUrl(objectName, newUrl, ttlSeconds);
 

@@ -22,11 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-/**
- * Pruebas de integración para proveedores de almacenamiento.
- * Verifica LocalStorageAdapter (real) y GoogleCloudStorageAdapter (mockeado).
- */
-@DisplayName("Storage Provider Integration Tests")
+@DisplayName("Pruebas unitarias de StorageProvider Integration")
 class StorageProviderIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -48,38 +44,35 @@ class StorageProviderIntegrationTest extends AbstractIntegrationTest {
         if (tempFile != null && tempFile.exists()) {
             tempFile.delete();
         }
-        // Limpiar directorio de uploads de test
         FileSystemUtils.deleteRecursively(localStorageAdapter.getStoragePath().toFile());
     }
 
     @Test
-    @DisplayName("Should save and delete file in LocalStorageAdapter")
+    @DisplayName("Debe guardar y eliminar localmente")
+
     void shouldSaveAndDeleteLocal() throws IOException {
         String subDir = "test-folder";
         String customName = "my-photo";
 
-        // Guardar
         String savedPath = localStorageAdapter.save(tempFile, subDir, customName);
         assertNotNull(savedPath);
         assertTrue(savedPath.contains(subDir));
         assertTrue(savedPath.contains(customName));
 
-        // Verificar existencia física
         File physicalFile = localStorageAdapter.get(savedPath);
         assertNotNull(physicalFile);
         assertTrue(physicalFile.exists());
 
-        // Eliminar
         boolean deleted = localStorageAdapter.delete(savedPath);
         assertTrue(deleted);
         assertTrue(!physicalFile.exists());
     }
 
     @Test
-    @DisplayName("Should call GCS storage service in GoogleCloudStorageAdapter")
+    @DisplayName("Debe llamar al servicio GCS")
+
     void shouldCallGcsService() throws IOException {
-        // Dado que GCS requiere credenciales reales, usamos un Mock del servicio Storage
-        // para validar que el adaptador llama a los métodos correctos de la SDK de Google.
+    
         Storage mockStorage = mock(Storage.class);
         StorageCachePort mockCache = mock(StorageCachePort.class);
         
@@ -89,7 +82,6 @@ class StorageProviderIntegrationTest extends AbstractIntegrationTest {
                 "test-bucket", 24, imageOptimizer, mockCache, mockStorage, mockCredentials
         );
 
-        // Al guardar, debe llamar a storage.create
         gcsAdapter.save(tempFile, "avatars", "user-1");
         
         verify(mockStorage).create(any(), any(byte[].class));

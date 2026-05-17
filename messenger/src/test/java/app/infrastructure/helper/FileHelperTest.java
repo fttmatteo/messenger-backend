@@ -15,7 +15,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("FileHelper Unit Tests")
+@DisplayName("Pruebas unitarias de FileHelper")
 class FileHelperTest {
 
     private FileHelper fileHelper;
@@ -34,10 +34,6 @@ class FileHelperTest {
 
         @Test
         @DisplayName("Debe convertir MultipartFile con extensión en nombre original")
-        /**
-         * Verifica la conversión preservando la extensión si está presente en el nombre
-         * original.
-         */
         void shouldConvertWithOriginalExtension() throws IOException {
             MockMultipartFile multipartFile = new MockMultipartFile(
                     "file",
@@ -55,10 +51,8 @@ class FileHelperTest {
         }
 
         @Test
-        @DisplayName("Debe detectar extensión por Content-Type cuando no hay nombre")
-        /**
-         * Verifica la deducción de extensión basada en el tipo MIME.
-         */
+        @DisplayName("Debe detectar extensión por tipo de contenido")
+
         void shouldDetectExtensionByContentType() throws IOException {
             MockMultipartFile multipartFile = new MockMultipartFile(
                     "file",
@@ -76,11 +70,8 @@ class FileHelperTest {
         }
 
         @Test
-        @DisplayName("Debe detectar PNG por magic bytes")
-        /**
-         * Verifica detección de contenido real (PNG) inspeccionando bytes si metadatos
-         * faltan.
-         */
+        @DisplayName("Debe detectar PNG por bytes mágicos")
+
         void shouldDetectPngByMagicBytes() throws IOException {
             byte[] pngHeader = new byte[] { (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
             MockMultipartFile multipartFile = new MockMultipartFile(
@@ -98,11 +89,8 @@ class FileHelperTest {
         }
 
         @Test
-        @DisplayName("Debe detectar JPEG por magic bytes")
-        /**
-         * Verifica detección de contenido real (JPEG) inspeccionando bytes si metadatos
-         * faltan.
-         */
+        @DisplayName("Debe detectar JPEG por bytes mágicos")
+
         void shouldDetectJpegByMagicBytes() throws IOException {
             byte[] jpegContent = new byte[] { (byte) 0xFF, (byte) 0xD8, (byte) 0xFF, (byte) 0xE0, 0x00 };
             MockMultipartFile multipartFile = new MockMultipartFile(
@@ -120,11 +108,8 @@ class FileHelperTest {
         }
 
         @Test
-        @DisplayName("Debe detectar PDF por magic bytes")
-        /**
-         * Verifica detección de contenido real (PDF) inspeccionando bytes si metadatos
-         * faltan.
-         */
+        @DisplayName("Debe detectar PDF por bytes mágicos")
+
         void shouldDetectPdfByMagicBytes() throws IOException {
             byte[] pdfContent = new byte[] { 0x25, 0x50, 0x44, 0x46, 0x2D };
             MockMultipartFile multipartFile = new MockMultipartFile(
@@ -142,11 +127,8 @@ class FileHelperTest {
         }
 
         @Test
-        @DisplayName("Debe usar .tmp cuando no puede detectar extensión")
-        /**
-         * Verifica el uso de extensión por defecto (.tmp) cuando no se puede determinar
-         * la extensión del archivo.
-         */
+        @DisplayName("Debe usar temporal cuando no puede detectar la extensión")
+
         void shouldUseTmpWhenCannotDetectExtension() throws IOException {
             MockMultipartFile multipartFile = new MockMultipartFile(
                     "file",
@@ -164,14 +146,11 @@ class FileHelperTest {
     }
 
     @Nested
-    @DisplayName("Cleanup de Archivos Temporales")
+    @DisplayName("Debe limpiar archivos temporales")
     class CleanupTests {
 
         @Test
         @DisplayName("Debe eliminar lista de archivos temporales")
-        /**
-         * Verifica la limpieza correcta de múltiples archivos temporales.
-         */
         void shouldCleanupTempFiles() throws IOException {
             File file1 = File.createTempFile("test1-", ".tmp");
             File file2 = File.createTempFile("test2-", ".tmp");
@@ -187,28 +166,20 @@ class FileHelperTest {
         }
 
         @Test
-        @DisplayName("Debe manejar lista nula sin error")
-        /**
-         * Verifica que la limpieza maneje listas nulas sin lanzar excepciones.
-         */
+        @DisplayName("Debe manejar lista nula")
+
         void shouldHandleNullList() {
             assertDoesNotThrow(() -> fileHelper.cleanupTempFiles(null));
         }
 
         @Test
         @DisplayName("Debe manejar lista vacía sin error")
-        /**
-         * Verifica que la limpieza maneje listas vacías sin lanzar excepciones.
-         */
         void shouldHandleEmptyList() {
             assertDoesNotThrow(() -> fileHelper.cleanupTempFiles(new ArrayList<>()));
         }
 
         @Test
         @DisplayName("Debe ignorar archivos nulos en la lista")
-        /**
-         * Verifica que la limpieza ignore archivos nulos en la lista.
-         */
         void shouldIgnoreNullFilesInList() throws IOException {
             File validFile = File.createTempFile("test-", ".tmp");
             List<File> files = new ArrayList<>();
@@ -226,10 +197,6 @@ class FileHelperTest {
 
         @Test
         @DisplayName("Debe ejecutar operación y limpiar archivo")
-        /**
-         * Verifica que el archivo temporal se cree, se use en la operación y se
-         * elimine automáticamente.
-         */
         void shouldExecuteAndCleanup() throws IOException {
             MockMultipartFile multipartFile = new MockMultipartFile(
                     "file",
@@ -250,11 +217,8 @@ class FileHelperTest {
         }
 
         @Test
-        @DisplayName("Debe limpiar archivo incluso si operación falla")
-        /**
-         * Verifica que el archivo temporal se elimine automáticamente incluso si la
-         * operación lanza una excepción.
-         */
+        @DisplayName("Debe limpiar incluso ante una excepción")
+
         void shouldCleanupEvenOnException() {
             MockMultipartFile multipartFile = new MockMultipartFile(
                     "file",
@@ -281,9 +245,6 @@ class FileHelperTest {
 
         @Test
         @DisplayName("Debe convertir lista de MultipartFiles")
-        /**
-         * Verifica la conversión de múltiples archivos MultipartFile a File.
-         */
         void shouldConvertMultipleFiles() throws IOException {
             MockMultipartFile file1 = new MockMultipartFile("file1", "a.png", "image/png", "content1".getBytes());
             MockMultipartFile file2 = new MockMultipartFile("file2", "b.png", "image/png", "content2".getBytes());
@@ -299,10 +260,8 @@ class FileHelperTest {
         }
 
         @Test
-        @DisplayName("Debe retornar lista vacía para lista nula")
-        /**
-         * Verifica que la conversión retorne lista vacía para lista nula.
-         */
+        @DisplayName("Debe retornar lista vacía para nulo")
+
         void shouldReturnEmptyListForNull() throws IOException {
             List<File> result = fileHelper.convertToFiles(null);
 
@@ -312,9 +271,6 @@ class FileHelperTest {
 
         @Test
         @DisplayName("Debe ignorar archivos vacíos")
-        /**
-         * Verifica que la conversión ignore archivos vacíos.
-         */
         void shouldIgnoreEmptyFiles() throws IOException {
             MockMultipartFile validFile = new MockMultipartFile("file1", "a.png", "image/png", "content".getBytes());
             MockMultipartFile emptyFile = new MockMultipartFile("file2", "b.png", "image/png", new byte[0]);

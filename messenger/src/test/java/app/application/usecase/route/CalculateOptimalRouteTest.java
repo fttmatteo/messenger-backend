@@ -20,10 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("CalculateOptimalRouteUseCase Unit Tests")
-/**
- * Clase de pruebas unitarias para el caso de uso de cálculo de ruta óptima.
- */
+@DisplayName("Debe calcular el caso de uso de ruta óptima")
 class CalculateOptimalRouteUseCaseTest {
 
     @Mock
@@ -36,9 +33,6 @@ class CalculateOptimalRouteUseCaseTest {
 
     @Test
     @DisplayName("Debe calcular ruta óptima con destinos válidos")
-    /**
-     * Verifica el cálculo de ruta óptima delegando al puerto de localización.
-     */
     void shouldCalculateOptimalRouteUseCase() {
         Dealership d1 = new Dealership();
         d1.setIdDealership(1L);
@@ -61,9 +55,7 @@ class CalculateOptimalRouteUseCaseTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si no hay destinos válidos")
-    /**
-     * Verifica validación de destinos geolocalizados antes de calcular ruta.
-     */
+
     void shouldThrowExceptionIfNoValidDestinations() {
         Dealership d1 = new Dealership();
         d1.setIsGeolocated(false);
@@ -74,10 +66,8 @@ class CalculateOptimalRouteUseCaseTest {
     }
 
     @Test
-    @DisplayName("Debe calcular ruta simple")
-    /**
-     * Verifica cálculo de ruta directa entre dos puntos.
-     */
+    @DisplayName("Debe calcular una ruta simple")
+
     void shouldCalculateSimpleRoute() {
         Location origin = new Location(0.0, 0.0);
         Location dest = new Location(1.0, 1.0);
@@ -91,10 +81,8 @@ class CalculateOptimalRouteUseCaseTest {
     }
 
     @Test
-    @DisplayName("Debe calcular distancia")
-    /**
-     * Verifica el cálculo de distancia entre dos puntos.
-     */
+    @DisplayName("Debe calcular la distancia")
+
     void shouldCalculateDistance() {
         Location origin = new Location(0.0, 0.0);
         Location dest = new Location(1.0, 1.0);

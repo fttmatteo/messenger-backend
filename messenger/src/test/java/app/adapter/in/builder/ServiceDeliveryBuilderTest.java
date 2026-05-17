@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ServiceDeliveryBuilder Unit Tests")
+@DisplayName("Pruebas unitarias de ServiceDeliveryBuilder")
 class ServiceDeliveryBuilderTest {
 
     @Mock
@@ -26,15 +26,11 @@ class ServiceDeliveryBuilderTest {
     private ServiceDeliveryBuilder builder;
 
     @Nested
-    @DisplayName("buildCreateData")
+    @DisplayName("Debe construir datos de creación válidos")
     class BuildCreateDataTests {
 
         @Test
         @DisplayName("Debe construir datos de creación válidos")
-        /**
-         * Verifica que el builder transforme correctamente un request de creación
-         * validado.
-         */
         void shouldBuildValidCreateData() throws Exception {
             ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest();
             request.setDealershipId("1");
@@ -51,11 +47,8 @@ class ServiceDeliveryBuilderTest {
         }
 
         @Test
-        @DisplayName("Debe propagar excepción si ID es inválido")
-        /**
-         * Verifica que el builder lance una excepción cuando el ID del concesionario
-         * no es válido.
-         */
+        @DisplayName("Debe propagar excepción para ID inválido")
+
         void shouldPropagateExceptionForInvalidId() throws Exception {
             ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest();
             request.setDealershipId("invalid");
@@ -68,11 +61,8 @@ class ServiceDeliveryBuilderTest {
         }
 
         @Test
-        @DisplayName("Debe propagar excepción si messengerId es inválido")
-        /**
-         * Verifica que el builder lance una excepción cuando el ID del mensajero no es
-         * válido.
-         */
+        @DisplayName("Debe propagar excepción para ID de mensajero inválido")
+
         void shouldPropagateExceptionForInvalidMessengerId() throws Exception {
             ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest();
             request.setDealershipId("1");
@@ -87,14 +77,11 @@ class ServiceDeliveryBuilderTest {
     }
 
     @Nested
-    @DisplayName("buildUpdateStatusData")
+    @DisplayName("Debe construir datos de actualización válidos")
     class BuildUpdateStatusDataTests {
 
         @Test
         @DisplayName("Debe construir datos de actualización válidos")
-        /**
-         * Verifica la construcción de datos para actualización de estado.
-         */
         void shouldBuildValidUpdateData() throws Exception {
             ServiceDeliveryUpdateStatusRequest request = new ServiceDeliveryUpdateStatusRequest();
             request.setStatus("DELIVERED");
@@ -114,10 +101,8 @@ class ServiceDeliveryBuilderTest {
         }
 
         @Test
-        @DisplayName("Debe propagar excepción si estado es inválido")
-        /**
-         * Verifica que el builder lance una excepción cuando el estado no es válido.
-         */
+        @DisplayName("Debe propagar excepción para estado inválido")
+
         void shouldPropagateExceptionForInvalidStatus() throws Exception {
             ServiceDeliveryUpdateStatusRequest request = new ServiceDeliveryUpdateStatusRequest();
             request.setStatus("INVALID");
@@ -132,14 +117,11 @@ class ServiceDeliveryBuilderTest {
     }
 
     @Nested
-    @DisplayName("Data Classes")
+    @DisplayName("Los datos de creación deben ser inmutables")
     class DataClassesTests {
 
         @Test
         @DisplayName("ServiceDeliveryCreateData debe ser inmutable")
-        /**
-         * Verifica que la clase interna ServiceDeliveryCreateData sea inmutable.
-         */
         void createDataShouldBeImmutable() {
             ServiceDeliveryBuilder.ServiceDeliveryCreateData data = new ServiceDeliveryBuilder.ServiceDeliveryCreateData(
                     1L, 100L);
@@ -149,10 +131,8 @@ class ServiceDeliveryBuilderTest {
         }
 
         @Test
-        @DisplayName("ServiceDeliveryUpdateData debe ser inmutable")
-        /**
-         * Verifica que la clase interna ServiceDeliveryUpdateData sea inmutable.
-         */
+        @DisplayName("Los datos de actualización deben ser inmutables")
+
         void updateDataShouldBeImmutable() {
             ServiceDeliveryBuilder.ServiceDeliveryUpdateData data = new ServiceDeliveryBuilder.ServiceDeliveryUpdateData(
                     Status.DELIVERED, "Obs", 100L);

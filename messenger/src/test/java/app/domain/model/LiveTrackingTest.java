@@ -10,14 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+@DisplayName("Pruebas unitarias de LiveTracking")
 class LiveTrackingTest {
 
     @Test
-    @DisplayName("Should be active if updated recently")
-    /**
-     * Verifica que el tracking se considere activo si la última actualización fue
-     * reciente.
-     */
+    @DisplayName("Debe estar inactivo si es antiguo")
     void shouldBeActiveIfRecent() {
         LiveTracking tracking = new LiveTracking();
         tracking.setLastUpdate(LocalDateTime.now().minusMinutes(2));
@@ -26,7 +23,7 @@ class LiveTrackingTest {
     }
 
     @Test
-    @DisplayName("Should be inactive if updated long ago")
+    @DisplayName("Debe retornar la dirección cardinal")
     void shouldBeInactiveIfOld() {
         LiveTracking tracking = new LiveTracking();
         tracking.setLastUpdate(LocalDateTime.now().minusMinutes(10));
@@ -47,10 +44,7 @@ class LiveTrackingTest {
             "270, Oeste",
             "315, Noroeste"
     })
-    @DisplayName("Should return correct cardinal direction")
-    /**
-     * Prueba la conversión de grados (heading) a dirección cardinal.
-     */
+    @DisplayName("Debe retornar la dirección cardinal")
     void shouldReturnCardinalDirection(double heading, String expectedDirection) {
         LiveTracking tracking = new LiveTracking();
         tracking.setHeading(heading);
@@ -59,10 +53,8 @@ class LiveTrackingTest {
     }
 
     @Test
-    @DisplayName("Should return 'Desconocido' for null heading")
-    /**
-     * Verifica que se devuelva 'Desconocido' cuando el heading es nulo.
-     */
+    @DisplayName("Debe retornar desconocido para rumbo nulo")
+
     void shouldReturnUnknownForNullHeading() {
         LiveTracking tracking = new LiveTracking();
         tracking.setHeading(null);

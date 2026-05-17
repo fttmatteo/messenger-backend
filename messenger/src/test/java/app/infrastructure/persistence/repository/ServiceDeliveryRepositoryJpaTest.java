@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(TestCacheConfig.class)
-@DisplayName("ServiceDeliveryRepository DataJpaTest")
+@DisplayName("Pruebas unitarias de ServiceDeliveryRepositoryJpa")
 class ServiceDeliveryRepositoryJpaTest extends BaseContainerTest {
 
     @Autowired
@@ -42,8 +42,9 @@ class ServiceDeliveryRepositoryJpaTest extends BaseContainerTest {
     private PlateRepository plateRepository;
 
     @Test
-    @org.springframework.transaction.annotation.Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
-    @DisplayName("Debe buscar servicios por keyword complejas")
+    @DisplayName("Debe buscar por palabra clave")
+@org.springframework.transaction.annotation.Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
+    
     void shouldSearchByKeyword() {
         EmployeeEntity messenger = new EmployeeEntity();
         messenger.setDocument(123L);
@@ -91,7 +92,8 @@ class ServiceDeliveryRepositoryJpaTest extends BaseContainerTest {
     }
 
     @Test
-    @DisplayName("Debe obtener estadísticas diarias correctamente")
+    @DisplayName("Debe obtener estadísticas diarias")
+
     void shouldGetDailyStats() {
         EmployeeEntity messenger = new EmployeeEntity();
         messenger.setDocument(456L);

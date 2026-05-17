@@ -32,10 +32,7 @@ import java.io.IOException;
 import app.support.AbstractIntegrationTest;
 
 @Transactional
-@DisplayName("Full Business Flow E2E Integration Test")
-/**
- * Clase que implementa el flujo completo de entrega de servicios.
- */
+@DisplayName("Pruebas unitarias de FullBusinessFlow Integration")
 class FullBusinessFlowIntegrationTest extends AbstractIntegrationTest {
 
         @Autowired
@@ -67,10 +64,8 @@ class FullBusinessFlowIntegrationTest extends AbstractIntegrationTest {
         }
 
         @Test
-        @DisplayName("Complete happy path for a service delivery cycle")
-        /**
-         * Verifica que el flujo completo de entrega de servicios funcione correctamente.
-         */
+        @DisplayName("Debe completar el ciclo de negocio completo")
+
         void shouldCompleteFullBusinessCycle() throws Exception {
                 EmployeeEntity adminEntity = new EmployeeEntity();
                 adminEntity.setDocument(999999L);

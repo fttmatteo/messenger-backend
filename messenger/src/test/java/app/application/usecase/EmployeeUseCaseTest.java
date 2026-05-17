@@ -21,10 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("EmployeeUseCase Unit Tests")
-/**
- * Clase de pruebas unitarias para el caso de uso de empleados.
- */
+@DisplayName("Pruebas unitarias de EmployeeUseCase")
 class EmployeeUseCaseTest {
 
     @Mock
@@ -60,9 +57,6 @@ class EmployeeUseCaseTest {
 
         @Test
         @DisplayName("Debe crear empleado exitosamente")
-        /**
-         * Verifica la orquestación para crear un nuevo empleado.
-         */
         void shouldCreateEmployeeSuccessfully() throws Exception {
             when(createEmployee.create(sampleEmployee)).thenReturn(sampleEmployee);
 
@@ -72,10 +66,8 @@ class EmployeeUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe propagar excepción si documento duplicado")
-        /**
-         * Verifica que se propague la excepción si el documento está duplicado.
-         */
+        @DisplayName("Debe propagar excepción ante documento duplicado")
+
         void shouldPropagateExceptionOnDuplicateDocument() throws Exception {
             doThrow(new BusinessException("Documento ya registrado"))
                     .when(createEmployee).create(any());
@@ -91,9 +83,6 @@ class EmployeeUseCaseTest {
 
         @Test
         @DisplayName("Debe retornar todos los empleados")
-        /**
-         * Verifica que se listen todos los empleados utilizando el servicio de búsqueda.
-         */
         void shouldReturnAllEmployees() {
             Employee employee2 = new Employee();
             employee2.setDocument(987654321L);
@@ -110,9 +99,7 @@ class EmployeeUseCaseTest {
 
         @Test
         @DisplayName("Debe buscar empleado por ID")
-        /**
-         * Verifica que se pueda buscar un empleado por ID.
-         */
+
         void shouldFindEmployeeById() {
             when(searchEmployee.findById(1L)).thenReturn(sampleEmployee);
 
@@ -124,9 +111,7 @@ class EmployeeUseCaseTest {
 
         @Test
         @DisplayName("Debe buscar empleado por documento")
-        /**
-         * Verifica que se pueda buscar un empleado por documento.
-         */
+
         void shouldFindEmployeeByDocument() throws Exception {
             when(searchEmployee.findByDocument(123456789L)).thenReturn(sampleEmployee);
 
@@ -143,9 +128,6 @@ class EmployeeUseCaseTest {
 
         @Test
         @DisplayName("Debe actualizar empleado exitosamente")
-        /**
-         * Verifica la actualización de datos del empleado a través del caso de uso.
-         */
         void shouldUpdateEmployeeSuccessfully() throws Exception {
             sampleEmployee.setFullName("Juan García");
 
@@ -155,10 +137,8 @@ class EmployeeUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe propagar excepción si empleado no existe")
-        /**
-         * Verifica que se propague la excepción si el empleado no existe.
-         */
+        @DisplayName("Debe propagar excepción si no se encuentra")
+
         void shouldPropagateExceptionIfNotFound() throws Exception {
             doThrow(new ResourceNotFoundException("Empleado no encontrado"))
                     .when(updateEmployee).update(anyLong(), any());
@@ -174,10 +154,6 @@ class EmployeeUseCaseTest {
 
         @Test
         @DisplayName("Debe eliminar empleado por ID sin servicios activos")
-        /**
-         * Verifica que se permita eliminar empleado si cumple las condiciones del
-         * negocio.
-         */
         void shouldDeleteEmployeeByIdWithoutActiveServices() throws Exception {
             employeeUseCase.deleteById(1L);
 
@@ -186,9 +162,6 @@ class EmployeeUseCaseTest {
 
         @Test
         @DisplayName("Debe lanzar excepción si tiene servicios activos")
-        /**
-         * Verifica que se lance la excepción si el empleado tiene servicios activos.
-         */
         void shouldThrowExceptionIfHasActiveServices() throws Exception {
             doThrow(new BusinessException("Empleado tiene servicios asignados"))
                     .when(deleteEmployee).deleteById(1L);
@@ -199,14 +172,11 @@ class EmployeeUseCaseTest {
     }
 
     @Nested
-    @DisplayName("Validaciones de Rol")
+    @DisplayName("Debe aceptar el rol de mensajero")
     class RoleValidationTests {
 
         @Test
         @DisplayName("Debe aceptar rol MESSENGER")
-        /**
-         * Verifica que se acepte el rol MESSENGER.
-         */
         void shouldAcceptMessengerRole() throws Exception {
             sampleEmployee.setRole(Role.MESSENGER);
             when(createEmployee.create(any(Employee.class))).thenReturn(sampleEmployee);
@@ -217,10 +187,8 @@ class EmployeeUseCaseTest {
         }
 
         @Test
-        @DisplayName("Debe aceptar rol ADMIN")
-        /**
-         * Verifica que se acepte el rol ADMIN.
-         */
+        @DisplayName("Debe aceptar el rol de administrador")
+
         void shouldAcceptAdminRole() throws Exception {
             sampleEmployee.setRole(Role.ADMIN);
             when(createEmployee.create(any(Employee.class))).thenReturn(sampleEmployee);

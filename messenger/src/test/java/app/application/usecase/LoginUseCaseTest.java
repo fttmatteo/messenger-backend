@@ -17,10 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("LoginUseCase Unit Tests")
-/**
- * Clase de pruebas unitarias para el caso de uso de login.
- */
+@DisplayName("Pruebas unitarias de LoginUseCase")
 class LoginUseCaseTest {
 
     @Mock
@@ -34,10 +31,6 @@ class LoginUseCaseTest {
 
     @Test
     @DisplayName("Debe delegar login al servicio de autenticación")
-    /**
-     * Verifica que el caso de uso llame correctamente al servicio de autenticación
-     * y retorne LoginResult con token y datos del empleado.
-     */
     void shouldDelegateLogin() throws Exception {
         AuthCredentials credentials = new AuthCredentials();
         credentials.setDocument(123456789L);
@@ -63,10 +56,8 @@ class LoginUseCaseTest {
     }
 
     @Test
-    @DisplayName("Debe propagar excepciones del servicio")
-    /**
-     * Verifica que se propague la excepción si el servicio de autenticación lanza una excepción.
-     */
+    @DisplayName("Debe propagar excepciones")
+
     void shouldPropagateExceptions() throws Exception {
         AuthCredentials credentials = new AuthCredentials();
         credentials.setDocument(123456789L);

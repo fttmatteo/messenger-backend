@@ -7,6 +7,7 @@ import com.google.maps.GeoApiContext;
 import com.google.maps.GeocodingApi;
 import com.google.maps.model.GeocodingResult;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -18,27 +19,22 @@ import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Pruebas unitarias de HealthIndicators")
 class HealthIndicatorsTest {
 
     @Mock
     private RedisConnectionFactory redisConnectionFactory;
-
     @Mock
     private RedisConnection redisConnection;
-
     @Mock
     private GeoApiContext geoApiContext;
-
     @InjectMocks
     private RedisHealthIndicator redisHealthIndicator;
-
     @InjectMocks
     private GoogleMapsHealthIndicator googleMapsHealthIndicator;
 
     @Test
-    /**
-     * Verifica que Redis esté disponible.
-     */
+    @DisplayName("La salud de Redis debe estar activa cuando ping retorna pong")
     void redisHealthShouldBeUpWhenPingReturnsPong() {
         when(redisConnectionFactory.getConnection()).thenReturn(redisConnection);
         when(redisConnection.ping()).thenReturn("PONG");
@@ -50,9 +46,7 @@ class HealthIndicatorsTest {
     }
 
     @Test
-    /**
-     * Verifica que Redis no esté disponible.
-     */
+    @DisplayName("La salud de Redis debe estar caída ante una excepción")
     void redisHealthShouldBeDownOnException() {
         when(redisConnectionFactory.getConnection()).thenThrow(new RuntimeException("Redis down"));
 
@@ -63,9 +57,7 @@ class HealthIndicatorsTest {
     }
 
     @Test
-    /**
-     * Verifica que Google Maps esté disponible.
-     */
+    @DisplayName("La salud de Google Maps debe estar activa cuando la API responde")
     void googleMapsHealthShouldBeUpWhenApiResponds() throws Exception {
         try (MockedStatic<GeocodingApi> mockedGeocodingApi = mockStatic(GeocodingApi.class)) {
             GeocodingResult[] results = new GeocodingResult[] { new GeocodingResult() };
