@@ -4,7 +4,7 @@
 
 # Messenger Backend API
 
-<img src="https://img.shields.io/badge/Version-1.14.0-blue.svg" alt="Version">
+<img src="https://img.shields.io/badge/Version-1.14.1-blue.svg" alt="Version">
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.14-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
@@ -128,11 +128,9 @@ graph LR
 | **Framework**            | Spring Boot 3.5.10                                                                                     |
 | **Language**             | Java 17                                                                                                |
 | **Database**             | MySQL 8.0+                                                                                             |
-| **Migrations**           | Flyway                                                                                                 |
 | **Cache/Streaming**      | Redis                                                                                                  |
 | **Security**             | JWT + BCrypt + Cloudflare Turnstile (Bot Protection) + Bucket4j (Distributed Rate Limiting with Redis) |
 | **Documentation**        | OpenAPI / Swagger UI                                                                                   |
-
 | **Storage**              | Google Cloud Storage                                                                                   |
 | **Maps**                 | Google Maps Platform                                                                                   |
 | **Mobile Client**        | Capacitor (Android App Generation)                                                                     |
@@ -342,7 +340,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Method   | Endpoint                         | Description                                                  |
 | -------- | -------------------------------- | ------------------------------------------------------------ |
-
 | `POST`   | `/services/createService`        | Create service (multipart: image + data)                     |
 | `PUT`    | `/services/updateService/{uuid}` | Update status (multipart: status + evidence)                 |
 | `PUT`    | `/services/reassign/{uuid}`      | Reassign to another messenger (ADMIN/CANCELED)               |

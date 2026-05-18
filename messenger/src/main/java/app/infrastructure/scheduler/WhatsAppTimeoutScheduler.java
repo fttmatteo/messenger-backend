@@ -3,6 +3,7 @@ package app.infrastructure.scheduler;
 import app.domain.model.WhatsAppSession;
 import app.domain.ports.WhatsAppMessagePort;
 import app.domain.ports.WhatsAppSessionPort;
+import app.domain.model.enums.WhatsAppConversationState;
 import app.infrastructure.persistence.repository.WhatsAppSessionRepository;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.slf4j.Logger;
@@ -26,13 +27,11 @@ public class WhatsAppTimeoutScheduler {
     private static final int TIMEOUT_MINUTES = 5;
 
     private final WhatsAppSessionPort sessionPort;
-    private final WhatsAppMessagePort messagePort;
     private final WhatsAppSessionRepository sessionRepository;
 
     public WhatsAppTimeoutScheduler(WhatsAppSessionPort sessionPort, WhatsAppMessagePort messagePort,
             WhatsAppSessionRepository sessionRepository) {
         this.sessionPort = sessionPort;
-        this.messagePort = messagePort;
         this.sessionRepository = sessionRepository;
     }
 
@@ -48,20 +47,19 @@ public class WhatsAppTimeoutScheduler {
         if (inactiveSessions.isEmpty()) {
             return;
         }
-
-        logger.info("[Scheduler] Procesando {} sesiones inactivas para timeout.", inactiveSessions.size());
+        
 
         for (WhatsAppSession session : inactiveSessions) {
             try {
-                messagePort.sendTextMessage(session.getPhoneNumber(),
-                        "⏰ Por inactividad, hemos finalizado el chat. Si necesitas realizar una nueva consulta, ¡escríbeme! 👋");
-
+                session.setConversationState(WhatsAppConversationState.MENU);
+                session.setCurrentPage(0);
+                session.setLastFilterStatuses(null);
                 session.setTimeoutNotified(true);
                 sessionPort.updateSession(session);
 
-                logger.debug("[Scheduler] Timeout enviado a {}", maskPhone(session.getPhoneNumber()));
+                logger.debug("[Scheduler] Sesión de {} reseteada silenciosamente por inactividad.", maskPhone(session.getPhoneNumber()));
             } catch (Exception e) {
-                logger.error("[Scheduler] Error procesando timeout para sessionId={} phone={}: {}",
+                logger.error("[Scheduler] Error procesando timeout silencioso para sessionId={} phone={}: {}",
                         session.getId(), maskPhone(session.getPhoneNumber()), e.getMessage(), e);
             }
         }

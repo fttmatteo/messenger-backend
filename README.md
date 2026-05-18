@@ -4,7 +4,7 @@
 
 # Messenger Backend API
 
-<img src="https://img.shields.io/badge/Version-1.14.0-blue.svg" alt="Version">
+<img src="https://img.shields.io/badge/Version-1.14.1-blue.svg" alt="Version">
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.14-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
@@ -128,11 +128,9 @@ graph LR
 | **Framework**             | Spring Boot 3.5.10                                                                                            |
 | **Lenguaje**              | Java 17                                                                                                       |
 | **Base de Datos**         | MySQL 8.0+                                                                                                    |
-| **Migraciones**           | Flyway                                                                                                        |
 | **Cache/Streaming**       | Redis                                                                                                         |
 | **Seguridad**             | JWT + BCrypt + Cloudflare Turnstile (Protección contra Bots) + Bucket4j (Rate Limiting Distribuido con Redis) |
 | **Documentación**         | OpenAPI / Swagger UI                                                                                          |
-
 | **Almacenamiento**        | Google Cloud Storage                                                                                          |
 | **Mapas**                 | Google Maps Platform                                                                                          |
 | **Cliente Móvil**         | Capacitor (Generación de App Android)                                                                         |
@@ -342,7 +340,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Método   | Endpoint                         | Descripción                                                          |
 | -------- | -------------------------------- | -------------------------------------------------------------------- |
-
 | `POST`   | `/services/createService`        | Crear servicio (multipart: imagen + datos)                           |
 | `PUT`    | `/services/updateService/{uuid}` | Actualizar estado (multipart: estado + evidencias)                 |
 | `PUT`    | `/services/reassign/{uuid}`      | Reasignar a otro mensajero (ADMIN/CANCELED)                          |

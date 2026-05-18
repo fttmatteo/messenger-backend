@@ -118,7 +118,7 @@ public class WhatsAppSessionAdapter implements WhatsAppSessionPort {
     @Transactional(readOnly = true)
     public List<WhatsAppSession> findActiveSessionsByDealership(Long dealershipId) {
         return sessionRepository
-                .findByDealership_IdDealershipAndExpiresAtAfter(dealershipId, LocalDateTime.now())
+                .findActiveSessionsByDealershipOrMaster(dealershipId, LocalDateTime.now())
                 .stream()
                 .map(this::toDomain)
                 .collect(Collectors.toList());
