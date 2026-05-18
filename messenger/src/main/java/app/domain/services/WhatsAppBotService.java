@@ -2,7 +2,6 @@ package app.domain.services;
 
 import app.domain.model.Dealership;
 import app.domain.model.ServiceDelivery;
-import app.domain.model.StatusHistory;
 import app.domain.model.Location;
 import app.domain.util.LogSanitizer;
 import org.slf4j.Logger;
@@ -75,7 +74,6 @@ public class WhatsAppBotService {
         if (sessionOpt.isPresent()) {
             WhatsAppSession session = sessionOpt.get();
             if (session.isTimeoutNotified()) {
-                messagePort.sendTextMessage(from, "¡Hola de nuevo! 👋");
                 session.setTimeoutNotified(false);
             }
             session.setLastActivityAt(java.time.LocalDateTime.now());
@@ -100,11 +98,12 @@ public class WhatsAppBotService {
                 rateLimitPort.clearFailedAttempts(from);
                 Dealership dealership = new Dealership();
                 dealership.setIdDealership(null);
-                dealership.setName("PLAK Corporativo");
+                dealership.setName("Llave Maestra");
                 WhatsAppSession session = sessionPort.createSession(from, dealership,
                         sessionPort.getSessionExpirationHours());
                 session.setConversationState(WhatsAppConversationState.MENU);
                 sessionPort.updateSession(session);
+                logger.info("[Autenticación] Sesión llave maestra iniciada por el número {}", LogSanitizer.maskGeneric(from, 4));
                 sendMenu(from, dealership.getName());
             } else {
                 Optional<Dealership> dealershipOpt = sessionPort.findDealershipByPin(text);
@@ -116,15 +115,18 @@ public class WhatsAppBotService {
                             sessionPort.getSessionExpirationHours());
                     session.setConversationState(WhatsAppConversationState.MENU);
                     sessionPort.updateSession(session);
+                    logger.info("[Autenticación] Sesión iniciada por el número {} (Concesionario: {})", LogSanitizer.maskGeneric(from, 4), dealership.getName());
                     sendMenu(from, dealership.getName());
                 } else {
                     int remaining = rateLimitPort.recordFailedAttempt(from);
                     int attemptsDone = 3 - remaining;
 
                     if (remaining == 0) {
+                        logger.warn("[Autenticación] Intento fallido de PIN ({}/3) para {}. Cuenta bloqueada por 15 minutos.", attemptsDone, LogSanitizer.maskGeneric(from, 4));
                         messagePort.sendTextMessage(from,
                                 "❌ PIN incorrecto. Has alcanzado el máximo de intentos permitidos. Por seguridad, tu acceso se ha bloqueado por 15 minutos.");
                     } else {
+                        logger.warn("[Autenticación] Intento fallido de PIN ({}/3) para {}", attemptsDone, LogSanitizer.maskGeneric(from, 4));
                         messagePort.sendTextMessage(from,
                                 "❌ PIN incorrecto. Intenta de nuevo (Intento " + attemptsDone + " de 3):");
                     }
@@ -254,24 +256,20 @@ public class WhatsAppBotService {
             messagePort.sendTextMessage(from, formatServiceDetail(s));
             sleep(500);
 
-            if (s.getHistory() != null && !s.getHistory().isEmpty()) {
-                Optional<StatusHistory> lastUpdate = s.getHistory().stream()
-                        .filter(h -> h.getNewStatus() == s.getCurrentStatus())
-                        .max((h1, h2) -> h1.getChangeDate().compareTo(h2.getChangeDate()));
-
-                if (lastUpdate.isPresent() && lastUpdate.get().getDeliveryLatitude() != null
-                        && lastUpdate.get().getDeliveryLongitude() != null) {
-
-                    double lat = lastUpdate.get().getDeliveryLatitude();
-                    double lon = lastUpdate.get().getDeliveryLongitude();
-                    String address = locationPort.reverseGeocode(new Location(lat, lon));
-
-                    messagePort.sendLocation(from,
-                            lat,
-                            lon,
-                            "Ubicación del estado",
-                            address != null ? address : s.getPlate().getPlateNumber());
+            Dealership dealership = s.getDealership();
+            if (dealership != null && dealership.getLatitude() != null && dealership.getLongitude() != null) {
+                double lat = dealership.getLatitude();
+                double lon = dealership.getLongitude();
+                String address = dealership.getAddress();
+                if (address == null || address.trim().isEmpty()) {
+                    address = locationPort.reverseGeocode(new Location(lat, lon));
                 }
+
+                messagePort.sendLocation(from,
+                        lat,
+                        lon,
+                        "Ubicación de destino",
+                        address != null && !address.trim().isEmpty() ? address : dealership.getName());
             }
         }
     }
@@ -289,7 +287,7 @@ public class WhatsAppBotService {
         String statusName = getStatusName(s.getCurrentStatus());
 
         return String.format(
-                "🟡 *%s*\n\n✏️ *Estado:* %s %s\n📅 *Fecha de asignación:* %s\n🛵 *Mensajero:* %s\n🛞 *Concesionario:* %s",
+                "🛵 *%s*\n\n*ESTADO:* %s %s\n📅 *Fecha de asignación:* %s\n🚚 *Transportista:* %s\n🛞 *Concesionario destino:* %s",
                 s.getPlate().getPlateNumber(),
                 statusEmoji,
                 statusName,

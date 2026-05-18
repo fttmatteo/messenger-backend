@@ -128,11 +128,9 @@ graph LR
 | **Framework**             | Spring Boot 3.5.10                                                                                            |
 | **Lenguaje**              | Java 17                                                                                                       |
 | **Base de Datos**         | MySQL 8.0+                                                                                                    |
-| **Migraciones**           | Flyway                                                                                                        |
 | **Cache/Streaming**       | Redis                                                                                                         |
 | **Seguridad**             | JWT + BCrypt + Cloudflare Turnstile (Protección contra Bots) + Bucket4j (Rate Limiting Distribuido con Redis) |
 | **Documentación**         | OpenAPI / Swagger UI                                                                                          |
-
 | **Almacenamiento**        | Google Cloud Storage                                                                                          |
 | **Mapas**                 | Google Maps Platform                                                                                          |
 | **Cliente Móvil**         | Capacitor (Generación de App Android)                                                                         |
@@ -342,7 +340,6 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Método   | Endpoint                         | Descripción                                                          |
 | -------- | -------------------------------- | -------------------------------------------------------------------- |
-
 | `POST`   | `/services/createService`        | Crear servicio (multipart: imagen + datos)                           |
 | `PUT`    | `/services/updateService/{uuid}` | Actualizar estado (multipart: estado + evidencias)                 |
 | `PUT`    | `/services/reassign/{uuid}`      | Reasignar a otro mensajero (ADMIN/CANCELED)                          |

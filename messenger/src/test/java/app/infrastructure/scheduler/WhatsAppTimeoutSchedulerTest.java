@@ -4,6 +4,7 @@ import app.domain.model.WhatsAppSession;
 import app.domain.ports.WhatsAppMessagePort;
 import app.domain.ports.WhatsAppSessionPort;
 import app.infrastructure.persistence.repository.WhatsAppSessionRepository;
+import app.domain.model.enums.WhatsAppConversationState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,30 +34,40 @@ class WhatsAppTimeoutSchedulerTest {
     }
 
     @Test
-    @DisplayName("Debe verificar tiempos de espera por inactividad enviando mensajes y actualizando sesiones")
-    void testCheckInactivityTimeouts_SendsMessagesAndUpdatesSessions() {
+    @DisplayName("Debe verificar tiempos de espera por inactividad reiniciando sesiones de forma silenciosa")
+    void testCheckInactivityTimeouts_ResetsSessionsSilently() {
         WhatsAppSession session1 = new WhatsAppSession();
         session1.setPhoneNumber("123456789");
         session1.setTimeoutNotified(false);
+        session1.setConversationState(WhatsAppConversationState.AWAITING_PLATE);
+        session1.setCurrentPage(3);
+        session1.setLastFilterStatuses("ASSIGNED");
 
         WhatsAppSession session2 = new WhatsAppSession();
         session2.setPhoneNumber("987654321");
         session2.setTimeoutNotified(false);
+        session2.setConversationState(WhatsAppConversationState.MENU);
+        session2.setCurrentPage(0);
 
         when(sessionPort.findInactiveSessions(any(LocalDateTime.class)))
                 .thenReturn(List.of(session1, session2));
 
         scheduler.checkInactivityTimeouts();
 
-        verify(messagePort, times(2)).sendTextMessage(anyString(), contains("inactividad"));
-        verify(messagePort).sendTextMessage(eq("123456789"), anyString());
-        verify(messagePort).sendTextMessage(eq("987654321"), anyString());
+        verify(messagePort, never()).sendTextMessage(anyString(), anyString());
 
         ArgumentCaptor<WhatsAppSession> sessionCaptor = ArgumentCaptor.forClass(WhatsAppSession.class);
         verify(sessionPort, times(2)).updateSession(sessionCaptor.capture());
 
         List<WhatsAppSession> updatedSessions = sessionCaptor.getAllValues();
+
+        assertEquals(WhatsAppConversationState.MENU, updatedSessions.get(0).getConversationState());
+        assertEquals(0, updatedSessions.get(0).getCurrentPage());
+        assertNull(updatedSessions.get(0).getLastFilterStatuses());
         assertTrue(updatedSessions.get(0).isTimeoutNotified());
+
+        assertEquals(WhatsAppConversationState.MENU, updatedSessions.get(1).getConversationState());
+        assertEquals(0, updatedSessions.get(1).getCurrentPage());
         assertTrue(updatedSessions.get(1).isTimeoutNotified());
     }
 
