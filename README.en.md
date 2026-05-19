@@ -13,7 +13,12 @@
 [![Google Cloud](https://img.shields.io/badge/Google_Cloud-1.0+-4479A1?style=for-the-badge&logo=google&logoColor=white)](https://cloud.google.com/)
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg?style=for-the-badge)](LICENSE)
 
-**Delivery management system and logistics.**
+**Motorcycle delivery management system by chassis and carrier monitoring.**
+Intelligent platform for logistic control and distribution of motorcycles identified by chassis number, integrated with continuous satellite tracking of carriers on route.
+
+**Chassis Identification:** Inventory control and registration of motorcycles based on their unique chassis.
+**Satellite Monitoring (GPS):** Real-time geographic tracking of carriers during their delivery day.
+**Evidence of Delivery:** Validation through touch signatures and photographic captures.
 
 [🇪🇸 Versión en Español](./README.md)
 
@@ -162,7 +167,6 @@ messenger/
 │   │   │   └── websocket/               # Real-time tracking
 │   │   └── out/                         # Output Adapters
 │   │       ├── maps/                    # Google Maps Integration
-
 │   │       ├── persistence/             # JPA Adapters
 │   │       ├── security/                # JWT Adapter
 │   │       ├── storage/                 # Google Cloud Storage
@@ -209,32 +213,6 @@ messenger/
 | `dev`   | Development with real services         | MySQL                        | Enabled       | 8 hours  |
 | `test`  | Automated testing (CI/CD)              | Testcontainers (MySQL/Redis) | Mock          | 1 hour   |
 | `prod`  | Production (Cloud Run)                 | Cloud SQL (MySQL 8)          | Enabled       | 30 min   |
-
-### Quick Start (Docker Zero-Config)
-
-For a quick demonstration without manual setup, use Docker Compose. This will spin up the frontend, backend, database, and redis automatically.
-
-1. Navigate to backend root: `cd messenger-backend`
-2. Run: `docker-compose -f docker-compose.local.yml up --build`
-3. Access: `http://localhost`
-
-### Development with Hot Reloading
-
-For active development with automatic code reloading (no need to restart containers when making changes):
-
-```bash
-docker-compose -f docker-compose.dev.yml up --build
-```
-
-| Service             | URL                     | Description                      |
-| ------------------- | ----------------------- | -------------------------------- |
-| Frontend (Vite HMR) | `http://localhost:5173` | Auto-reloads on file save        |
-| Backend API         | `http://localhost:8080` | Auto-restarts on recompile       |
-| PHPMyAdmin          | `http://localhost:8081` | Database management              |
-| Remote Debug        | Port `5005`             | Attach IntelliJ/VS Code debugger |
-
-> [!TIP]
-> Check the **[Quick Start Guide](./GUIA_RAPIDA.md)** (Spanish) for more details on test credentials and phpMyAdmin access.
 
 ### Profiles
 
@@ -290,13 +268,13 @@ docker-compose -f docker-compose.dev.yml up --build
 
 ```bash
 # Environment variable (recommended)
-export SPRING_PROFILES_ACTIVE=dev
+export SPRING_PROFILES_ACTIVE=local
 
 # Command line
-./mvnw spring-boot:run -Dspring.profiles.active=dev
+./mvnw spring-boot:run -Dspring.profiles.active=local
 
 # Docker
-docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
+docker run -e SPRING_PROFILES_ACTIVE=local
 ```
 
 ---
@@ -309,32 +287,32 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | ------ | ---------------- | --------------------------------------------------------------------- |
 | `POST` | `/auth/login`    | Login and receive access + refresh tokens (Requires `turnstileToken`) |
 | `POST` | `/auth/refresh`  | Renew access token with refresh token                                 |
-| `GET`  | `/auth/ws-token` | Get temporary token for WebSocket connection                          |
+| `POST` | `/auth/ws-token` | Get temporary token for WebSocket connection                          |
 | `POST` | `/auth/logout`   | Logout and clear authentication cookies                               |
 | `GET`  | `/profile/me`    | Get authenticated user profile (ADMIN/MESSENGER)                      |
 | `PUT`  | `/profile/me`    | Update profile (name, phone, password - min 6 chars)                  |
 
 ### Employees (`/employees`) - ADMIN only
 
-| Method   | Endpoint                           | Description              |
-| -------- | ---------------------------------- | ------------------------ |
-| `POST`   | `/employees/createEmployee`        | Create new employee      |
-| `GET`    | `/employees/allEmployees`          | List all employees       |
-| `GET`    | `/employees/findByEmployeeId/{id}` | Get employee by ID       |
-| `PUT`    | `/employees/updateEmployee/{id}`   | Update existing employee |
-| `DELETE` | `/employees/deleteEmployee/{id}`   | Delete employee          |
+| Method   | Endpoint                             | Description              |
+| -------- | ------------------------------------ | ------------------------ |
+| `POST`   | `/employees/createEmployee`          | Create new employee      |
+| `GET`    | `/employees/allEmployees`            | List all employees       |
+| `GET`    | `/employees/findByEmployeeId/{uuid}` | Get employee by UUID     |
+| `PUT`    | `/employees/updateEmployee/{uuid}`   | Update existing employee |
+| `DELETE` | `/employees/deleteEmployee/{uuid}`   | Delete employee          |
 
 ### Dealerships (`/dealerships`)
 
-| Method   | Endpoint                                   | Description                        |
-| -------- | ------------------------------------------ | ---------------------------------- |
-| `POST`   | `/dealerships/createDealership`            | Create dealership (ADMIN)          |
-| `GET`    | `/dealerships/allDealerships`              | List all dealerships               |
-| `GET`    | `/dealerships/findByDealershipId/{id}`     | Get by ID                          |
-| `GET`    | `/dealerships/findByDealershipName/{name}` | Get by Name                        |
-| `PUT`    | `/dealerships/updateDealership/{id}`       | Update dealership (ADMIN)          |
-| `DELETE` | `/dealerships/deleteDealership/{id}`       | Delete dealership (ADMIN)          |
-| `POST`   | `/dealerships/geocodeDealership/{id}`      | Geocode dealership address (ADMIN) |
+| Method   | Endpoint                                     | Description                        |
+| -------- | -------------------------------------------- | ---------------------------------- |
+| `POST`   | `/dealerships/createDealership`              | Create dealership (ADMIN)          |
+| `GET`    | `/dealerships/allDealerships`                | List all dealerships               |
+| `GET`    | `/dealerships/findByDealershipId/{uuid}`     | Get by UUID                        |
+| `GET`    | `/dealerships/findByDealershipName/{name}`   | Get by Name                        |
+| `PUT`    | `/dealerships/updateDealership/{uuid}`       | Update dealership (ADMIN)          |
+| `DELETE` | `/dealerships/deleteDealership/{uuid}`       | Delete dealership (ADMIN)          |
+| `POST`   | `/dealerships/geocodeDealership/{uuid}`      | Geocode dealership address (ADMIN) |
 
 ### Service Deliveries (`/services`)
 
@@ -342,15 +320,9 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | -------- | -------------------------------- | ------------------------------------------------------------ |
 | `POST`   | `/services/createService`        | Create service (multipart: image + data)                     |
 | `PUT`    | `/services/updateService/{uuid}` | Update status (multipart: status + evidence)                 |
-| `PUT`    | `/services/reassign/{uuid}`      | Reassign to another messenger (ADMIN/CANCELED)               |
+| `PUT`    | `/services/reassign/{uuid}`      | Reassign to another carrier (ADMIN/CANCELED)               |
 | `GET`    | `/services/findByServiceId/{uuid}`| Get service by UUID                                         |
 | `GET`    | `/services/allServicesPageable`  | List services with **pagination, search & sorting**          |
-| `GET`    | `/services/stats/daily`          | DISABLED - Daily stats (requires messengerId, from, to)      |
-| `DELETE` | `/services/deleteService/{uuid}` | Move to trash (ADMIN)                                        |
-| `GET`    | `/services/trash`                | List deleted services with **pagination** (ADMIN)            |
-| `POST`   | `/services/trash/restore/{uuid}` | Restore from trash (ADMIN)                                   |
-| `DELETE` | `/services/trash/empty`          | Empty trash permanently (ADMIN)                              |
-| `DELETE` | `/services/trash/{uuid}`         | Permanent delete individual item (ADMIN)                     |
 
 ### WhatsApp (`/api/whatsapp`)
 
@@ -363,14 +335,16 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 > **WhatsApp Bot Workflow**:
 >
 > 1. User sends a message.
-> 2. Bot requests a 4-digit PIN (requested every 12 hours).
-> 3. After authentication, the user can query plate status or list pending deliveries.
+> 2. Bot requests a 4-digit PIN (requested every 12 hours or upon logout).
+> 3. After authentication, the user can query chassis status or list pending deliveries belonging to the dealership associated with the PIN.
+> 4. **Master PIN (Llave Maestra)**: Entering the global master PIN authenticates the user as a **"Master Key"** session (not tied to any specific dealership), allowing them to search and view chassis status and events across **all dealerships** without restrictions.
 
 > [!IMPORTANT]
 > **Bot Security**:
 >
 > - **Webhook Validation**: Uses HMAC-SHA256 with Meta's App Secret to verify request origin.
 > - **PIN Protection**: 4-digit PIN required to access dealership data (expires every 12 hours).
+> - **Master PIN**: Global access via a master PIN for unified viewing of all dealerships.
 > - **Brute Force Protection**: Bot access is blocked for 15 minutes after 3 failed PIN attempts, managed via Redis.
 
 > [!CAUTION]
@@ -405,11 +379,11 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Method | Endpoint                   | Description                                      |
 | ------ | -------------------------- | ------------------------------------------------ |
-| `WS`   | `/ws/tracking/update`             | Update location via WebSocket (with Heartbeat)    |
-| `POST` | `/tracking/update`         | DISABLED - REST alternative for location updates |
-| `GET`  | `/tracking/messenger/{uuid}`      | Get last known location (ADMIN)                   |
-| `POST` | `/tracking/messengers/bulk-locations`| Get last location of multiple messengers (ADMIN)  |
-| `GET`  | `/tracking/active`                | Get all active messengers (ADMIN)                 |
+| `WS`   | `/ws/tracking/update`             | Update location via WebSocket (with Heartbeat) - Used by Web App (React) |
+| `POST` | `/tracking/update`         | Update location via REST POST - Used by Mobile App in background (Foreground Service) |
+| `GET`  | `/tracking/messenger/{uuid}`      | Get last known location of a carrier (ADMIN)      |
+| `POST` | `/tracking/messengers/bulk-locations`| Get last location of multiple carriers (ADMIN)  |
+| `GET`  | `/tracking/active`                | Get all active carriers (ADMIN)                 |
 | `GET`  | `/tracking/history/pageable/{uuid}`| Get location history with **pagination**          |
 | `GET`  | `/tracking/service/{uuid}`        | Get history for a specific service                |
 
@@ -417,7 +391,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Method | Endpoint                              | Description                                         |
 | ------ | ------------------------------------- | --------------------------------------------------- |
-| `GET`  | `/monitoring/messenger/{id}/activity` | Get daily activity timeline + stats for a messenger |
+| `GET`  | `/monitoring/messenger/{uuid}/activity` | Get daily activity timeline + stats for a carrier |
 
 ---
 
@@ -568,9 +542,9 @@ erDiagram
 | Enum               | Values                                                                                                |
 | ------------------ | ----------------------------------------------------------------------------------------------------- |
 | **Role**           | `ADMIN`, `MESSENGER`                                                                                  |
-| **PlateType**      | `CAR` (ABC 123), `MOTORCYCLE` (ABC 12A), `MOTORCAR` (123 ABC)                                         |
-| **Status**         | `ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED`, `FAILED`(DISABLED), `DELETED` |
-| **PhotoType**      | `PLATE_DETECTION`, `EVIDENCE`                                                                         |
+| **PlateType**      | `MOTORCYCLE`                                                                                          |
+| **Status**         | `ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED`, `DELETED`                     |
+| **PhotoType**      | `EVIDENCE`                                                                                            |
 | **TrackingStatus** | `ACTIVE`, `INACTIVE`, `OFFLINE`                                                                       |
 | **TrackingSource** | `GPS`, `NETWORK`, `MANUAL`                                                                            |
 
@@ -578,7 +552,11 @@ erDiagram
 
 ## Real-Time Tracking
 
-GPS tracking system using **Redis** + **WebSocket** for messenger monitoring.
+Hybrid GPS tracking system for real-time carrier monitoring, tailored by client and state:
+*   **Web Application (React)**: Uses a two-way **WebSocket** connection to send the location and keep-alive (`heartbeat`) signal when the carrier's interface is active in the foreground.
+*   **Mobile Application (Android)**: Uses the **REST POST** (`/tracking/update`) endpoint via a background service (`Foreground Service`) to report location periodically, reducing battery consumption and preventing connection dropouts.
+
+Locations are processed with low latency using **Redis** for active status and are permanently archived in MySQL.
 
 ### Features
 
@@ -589,7 +567,7 @@ GPS tracking system using **Redis** + **WebSocket** for messenger monitoring.
 | **Technical accuracy**  | < 100m GPS error filtered for history           |
 | **Complete history**    | Permanent retention (Historical Archive)        |
 | **Low latency**         | Redis for location caching                      |
-| **WebSocket**           | Real-time data updates (Server Push)            |
+| **WebSocket**           | Real-time data updates (Server Push to the admin panel) |
 
 ### WebSocket API
 
@@ -597,10 +575,10 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 
 | Type   | Destination               | Description                                |
 | ------ | ------------------------- | ------------------------------------------ |
-| `SEND` | `/app/tracking/update`    | Send GPS location update                   |
-| `SEND` | `/app/tracking/heartbeat` | Send keep-alive signal (no GPS)            |
-| `SUB`  | `/topic/tracking/{id}`    | Receive updates for specific messenger     |
-| `SUB`  | `/topic/tracking/all`     | Receive updates for all messengers (Admin) |
+| `SEND` | `/app/tracking/update`    | Send GPS location update (Web Client / React) |
+| `SEND` | `/app/tracking/heartbeat` | Send keep-alive signal (no GPS, Web Client / React) |
+| `SUB`  | `/topic/tracking/{id}`    | Receive updates for specific carrier (ADMIN Panel in React) |
+| `SUB`  | `/topic/tracking/all`     | Receive updates for all carriers (ADMIN Panel in React) |
 
 ### Google Maps Integration
 
@@ -614,10 +592,10 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 > [!IMPORTANT]
 > **Role-Based Status Transitions**
 >
-> - **MESSENGER** can only use: `PENDING`, `DELIVERED`, `RETURNED`.
-> - **ADMIN** can only use: `CANCELED`, `RESOLVED`.
+> - **CARRIER** can only change to: `PENDING`, `DELIVERED`, `RETURNED` statuses.
+> - **ADMIN** can change to all allowed statuses (`ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED`).
 > - Services can be modified at any time regardless of their current state.
-> - Admins can reassign **CANCELED** services to another messenger.
+> - Admins can reassign **CANCELED** services to another carrier.
 
 > [!NOTE]
 > **Evidence Requirements**
@@ -634,40 +612,34 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 
 ### State Rules
 
-| State       | Messenger                            | Admin                               | Delete   |
+| State       | Carrier                              | Admin                               | Delete   |
 | ----------- | ------------------------------------ | ----------------------------------- | -------- |
-| `ASSIGNED`  | → `PENDING`, `DELIVERED`, `RETURNED` | → `CANCELED`, `RESOLVED`            | ✅ Trash |
-| `RETURNED`  | → `PENDING`, `DELIVERED`             | → `CANCELED`, `RESOLVED`            | ✅ Trash |
-| `PENDING`   | → `DELIVERED`, `RETURNED`            | → `CANCELED`, `RESOLVED`            | ✅ Trash |
-| `DELIVERED` | → `PENDING`, `RETURNED`              | → `CANCELED`, `RESOLVED`            | ✅ Trash |
-| `CANCELED`  | -                                    | Admin can **reassign** → `ASSIGNED` | ✅ Trash |
-| `RESOLVED`  | -                                    | -                                   | ✅ Trash |
-
-### Permissions Summary
-
-| Role          | Available States                   | Special Actions                               | Notes                                                      |
-| ------------- | ---------------------------------- | --------------------------------------------- | ---------------------------------------------------------- |
-| **MESSENGER** | `PENDING`, `DELIVERED`, `RETURNED` | -                                             | Can change services to any allowed state at any time       |
-| **ADMIN**     | `CANCELED`, `RESOLVED`             | **Reassign messenger** (from `CANCELED` only) | Can change services to admin states from any current state |
+| `ASSIGNED`  | → `PENDING`, `DELIVERED`, `RETURNED` | → `Any state`                       | ✅ Trash |
+| `RETURNED`  | → `PENDING`, `DELIVERED`             | → `Any state`                       | ✅ Trash |
+| `PENDING`   | → `DELIVERED`, `RETURNED`            | → `Any state`                       | ✅ Trash |
+| `DELIVERED` | → `PENDING`, `RETURNED`              | → `Any state`                       | ✅ Trash |
+| `CANCELED`  | -                                    | → `Any state` (Reassign → `ASSIGNED`) | ✅ Trash |
+| `RESOLVED`  | -                                    | → `Any state`                       | ✅ Trash |
 
 ### Reassignment Flow
 
 ```mermaid
 flowchart LR
     A[Service in CANCELED] --> B{Admin reassigns}
-    B --> C[New messenger assigned]
+    B --> C[New carrier assigned]
     C --> D[Status → ASSIGNED]
 ```
 
 ### Trash Management (Soft Delete & Archive)
 
-| Action         | Endpoint                            | Description                      |
-| -------------- | ----------------------------------- | -------------------------------- |
-| Delete → Trash | `DELETE /services/{id}`             | Moves to trash (soft delete)     |
-| View Trash     | `GET /services/trash`               | Lists deleted services (ADMIN)   |
-| Restore        | `POST /services/trash/restore/{id}` | Restores from trash (ADMIN)      |
-| Empty Trash    | `POST /services/trash/empty`        | Archives all trash items (ADMIN) |
-| Auto-Archive   | Scheduled job (3 AM daily)          | Archives services after 60 days  |
+| Action         | Endpoint                              | Description                      |
+| -------------- | ------------------------------------- | -------------------------------- |
+| Delete → Trash | `DELETE /services/deleteService/{uuid}` | Moves to trash (soft delete)     |
+| View Trash     | `GET /services/trash`                 | Lists deleted services (ADMIN)   |
+| Restore        | `POST /services/trash/restore/{uuid}` | Restores from trash (ADMIN)      |
+| Empty Trash       | `DELETE /services/trash/empty`        | Archives all trash items (ADMIN) |
+| Permanent Delete  | `DELETE /services/trash/{uuid}`       | Permanent delete individual item (ADMIN) |
+| Auto-Archive      | Scheduled job (3 AM daily)          | Archives services after 60 days  |
 
 **Archive System**: Services are permanently archived to dedicated tables (`deleted_services`, `deleted_status_history`, `deleted_photos`, `deleted_tracking_history`, `deleted_signatures`) instead of being deleted. All historical data is preserved for auditing and analytics.
 
@@ -681,6 +653,7 @@ The system implements an IP-based rate limiting filter to prevent abuse and brut
 - **Persistence**: Counters are maintained in **Redis** (shared across nodes).
 - **Fallback**: If Redis fails, the system automatically switches to a local in-memory cache to maintain protection.
 - **Header**: In case of blockage (HTTP 429), the `Retry-After` header is included with the required wait time in seconds.
+- **Proxy / Cloudflare Compatibility**: Detects the client's real IP address using `CF-Connecting-IP` and `X-Forwarded-For` headers, preventing accidental rate limiting of Cloudflare proxy servers.
 
 ### Roles & Permissions
 
@@ -787,73 +760,33 @@ The system includes multiple optimization layers to ensure high performance and 
 
 ### Environment Variables Required
 
-| Variable                   | Description              | Default/Example           |
-| -------------------------- | ------------------------ | ------------------------- |
-| `DB_NAME`                  | MySQL Database Name      | `messenger_db`            |
-| `DB_USERNAME`              | Database User            | `root`                    |
-| `DB_PASSWORD`              | Database Password        | `******`                  |
-| `REDIS_HOST`               | Redis Server Host        | `localhost`               |
-| `JWT_SECRET`               | 256-bit Key for Tokens   | `openssl rand -base64 64` |
-| `GOOGLE_MAPS_API_KEY`      | Google Maps Platform Key | `AIza...`                 |
-| `GCS_BUCKET_NAME`          | Bucket for evidence      | `plak-evidence`           |
-| `TURNSTILE_SECRET_KEY`     | Cloudflare Secret Key    | `0x4AAAAAA...`            |
-| `CORS_ALLOWED_ORIGINS`     | Allowed Frontend URLs    | `http://localhost:5173`   |
-| `WHATSAPP_PHONE_NUMBER_ID` | WhatsApp Phone ID        | `123456789...`            |
-| `WHATSAPP_ACCESS_TOKEN`    | Meta Permanent Token     | `EAAG...`                 |
-| `WHATSAPP_VERIFY_TOKEN`    | Custom Webhook Token     | `my_secret_token`         |
-| `WHATSAPP_APP_SECRET`      | Meta App Secret          | `abc123...`               |
+The system requires the following environment variables for proper operation. For detailed configuration instructions and guides by environment (CI/CD vs. Production), see the **[Secrets Management](./.github/SECRETS.md)** document.
 
-### Quick Start (Docker) - Recommended
+### Quick Start (Docker Zero-Config)
 
-Run the full stack locally with one command.
+For a quick demonstration without manual setup, use Docker Compose. This will spin up the frontend, backend, database, and redis automatically.
 
-#### Prerequisites
+1. Navigate to backend root: `cd messenger-backend`
+2. Run: `docker-compose -f docker-compose.local.yml up --build`
+3. Access: `http://localhost`
 
-- Docker & Docker Compose
-- Git
+### Development with Hot Reloading
 
-#### Steps
-
-1. **Clone the repository**
-
-   ```bash
-   git clone https://github.com/StartApp-FTT/messenger-backend.git
-   cd messenger-backend
-   ```
-
-2. **Configure Environment**
-
-   ```bash
-   cd messenger
-   cp .env.example .env
-   # Edit .env with your Google Maps Key & Credentials
-   ```
-
-3. **Run with Docker**
-   ```bash
-   cd ..
-   docker-compose -f docker-compose.local.yml up --build
-   ```
-
-The API will be available at `http://localhost:8080`.
-
-### Manual Quick Start
+For active development with automatic code reloading (no need to restart containers when making changes):
 
 ```bash
-# 1. Clone
-git clone <repository-url>
-cd messenger-backend/messenger
-
-# 2. Configure variables (see above section)
-
-# 3. Start Redis
-redis-server
-
-# 4. Run
-./mvnw spring-boot:run -Dspring.profiles.active=dev
+docker-compose -f docker-compose.dev.yml up --build
 ```
 
-API available at `http://localhost:8080`
+| Service             | URL                     | Description                      |
+| ------------------- | ----------------------- | -------------------------------- |
+| Frontend (Vite HMR) | `http://localhost:5173` | Auto-reloads on file save        |
+| Backend API         | `http://localhost:8080` | Auto-restarts on recompile       |
+| PHPMyAdmin          | `http://localhost:8081` | Database management              |
+| Remote Debug        | Port `5005`             | Attach IntelliJ/VS Code debugger |
+
+> [!TIP]
+> Check the **[Quick Start Guide](./GUIA_RAPIDA.md)** (Spanish) for more details on test credentials and phpMyAdmin access.
 
 ---
 
@@ -881,12 +814,8 @@ on:
 
 ### Required GitHub Secrets
 
-```
-GOOGLE_APPLICATION_CREDENTIALS_JSON
-```
-
-> [!NOTE]
-> The CI pipeline uses an ephemeral **Docker** environment (MySQL + Redis) for integration tests, ensuring maximum parity with production. No external DB secrets are required.
+> [!TIP]
+> To view the complete list and learn how to configure the necessary secrets for CI/CD, please refer to the [Secrets Management](./.github/SECRETS.md) guide.
 
 ---
 
@@ -933,16 +862,7 @@ The project implements a robust testing strategy across all layers of the hexago
 - **Environment variables** preconfigured (`baseUrl`, `token`, `refreshToken`)
 - **Automated tests** that save tokens to collection variables
 - **Payload examples** for all endpoints
-- **9 controllers** fully documented:
-  - Authentication (Login + Refresh)
-  - Employees
-  - Dealerships
-  - Locations
-  - Tracking
-  - Service Deliveries
-  - Files
-  - Monitoring
-  - System Settings
+- **9 controllers** fully documented.
 
 ### Usage
 
@@ -957,7 +877,7 @@ The project implements a robust testing strategy across all layers of the hexago
 
 ## Android Integration
 
-The system includes a native Android application built with **Capacitor**, providing a seamless mobile experience for messengers.
+The system includes a native Android application built with **Capacitor**, providing a seamless mobile experience for carriers.
 
 ### Technical Details
 
@@ -1007,7 +927,18 @@ npx cap open android
 
 **Documentation:**
 
-- [**GitHub Secrets**](./.github/SECRETS.md)
+- [**Secrets Management**](./.github/SECRETS.md)
+- [**Quick Start Guide**](./GUIA_RAPIDA.md)
+- [**Postman Collection**](./Messenger_API.postman_collection.json)
+- [**Contribution Guide**](./COLABORACION.md)
+- [**Versioning (v1.0.0)**](./VERSIONING.md)
+
+**Scripts:**
+
+- [**Start Test Services**](./scripts/start-test-services.sh): Starts MySQL and Redis containers for local integration tests.
+- [**Flyway Verification**](./messenger/verify_flyway.sh): Validates database connection and status of Flyway migrations.
+- [**Security Headers Test**](./test-security-headers.sh): Performs automated audit of CSP, CORS, and HTTP security headers.
+- [**Rate Limiting Test**](./test-rate-limiting.sh): Simulates request bursts to validate the effectiveness of Rate Limiting.
 
 **Project Specific:**
 

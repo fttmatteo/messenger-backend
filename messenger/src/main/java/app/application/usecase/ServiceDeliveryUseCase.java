@@ -18,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import app.domain.model.DailyStatistics;
 import app.domain.model.Photo;
 import app.domain.model.ServiceDelivery;
 import app.domain.model.Signature;
@@ -337,17 +336,5 @@ public class ServiceDeliveryUseCase {
 
     private void cleanupFiles(List<String> paths) {
         cleanupFiles(paths.toArray(new String[0]));
-    }
-
-    /**
-     * Genera estadísticas diarias de entregas para un mensajero en un rango de
-     * fechas.
-     */
-    @Transactional(readOnly = true)
-    public List<DailyStatistics> getDailyStats(
-            Long messengerId,
-            java.time.LocalDate from,
-            java.time.LocalDate to) {
-        return searchService.findDailyStatsByMessenger(messengerId, from, to);
     }
 }

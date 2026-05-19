@@ -89,15 +89,6 @@ public class SearchServiceDelivery {
         return serviceDeliveryPort.findDeleted(pageable);
     }
 
-    /**
-     * Retorna estadísticas diarias de servicios para un mensajero.
-     */
-    public List<app.domain.model.DailyStatistics> findDailyStatsByMessenger(
-            Long messengerId,
-            java.time.LocalDate from,
-            java.time.LocalDate to) {
-        return serviceDeliveryPort.findDailyStatsByMessenger(messengerId, from, to);
-    }
 
     /**
      * Busca servicios por número de chasis filtrado por concesionario con paginación.

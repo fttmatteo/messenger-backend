@@ -170,27 +170,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
         return count;
     }
 
-    /**
-     * Obtiene estadísticas diarias delegando a la consulta nativa del repositorio.
-     */
-    @Override
-    public List<app.domain.model.DailyStatistics> findDailyStatsByMessenger(
-            Long messengerId,
-            java.time.LocalDate from,
-            java.time.LocalDate to) {
-        /**
-         * Obtiene estadísticas diarias delegando a la consulta nativa del repositorio.
-         */
-        LocalDateTime fromDateTime = from.atStartOfDay();
-        LocalDateTime toDateTime = to.plusDays(1).atStartOfDay();
 
-        List<Object[]> rawResults = repository.findDailyStatsByMessenger(
-                messengerId, fromDateTime, toDateTime);
-
-        return rawResults.stream()
-                .map(app.domain.model.DailyStatistics::fromRaw)
-                .collect(Collectors.toList());
-    }
 
     /**
      * Busca servicios de un mensajero que tengan actividad en una fecha específica con paginación.
