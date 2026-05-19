@@ -122,27 +122,7 @@ public interface ServiceDeliveryRepository extends JpaRepository<ServiceDelivery
 
   List<ServiceDeliveryEntity> findByDeletedTrueAndDeletedAtBefore(LocalDateTime date);
 
-  @Query(value = """
-      -- noinspection SqlDialectInspection
-      -- noinspection SqlNoDataSourceInspection
-      SELECT DATE(created_at) as date,
-             SUM(CASE WHEN current_status = 'ASSIGNED' THEN 1 ELSE 0 END) as assigned,
-             SUM(CASE WHEN current_status = 'DELIVERED' THEN 1 ELSE 0 END) as delivered,
-             SUM(CASE WHEN current_status = 'RETURNED' THEN 1 ELSE 0 END) as returned,
-             SUM(CASE WHEN current_status = 'CANCELED' THEN 1 ELSE 0 END) as canceled,
-             COUNT(*) as total
-      FROM service_deliveries
-      WHERE messenger_id = :messengerId
-        AND created_at >= :fromDate
-        AND created_at < :toDate
-        AND deleted = false
-      GROUP BY DATE(created_at)
-      ORDER BY date DESC
-      """, nativeQuery = true)
-  List<Object[]> findDailyStatsByMessenger(
-      @Param("messengerId") Long messengerId,
-      @Param("fromDate") LocalDateTime fromDate,
-      @Param("toDate") LocalDateTime toDate);
+
 
   @EntityGraph(attributePaths = { "plate", "dealership", "messenger", "history", "history.changedBy" })
   @Query("SELECT DISTINCT s FROM ServiceDeliveryEntity s LEFT JOIN s.history h " +

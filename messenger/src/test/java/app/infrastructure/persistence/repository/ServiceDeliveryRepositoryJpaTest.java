@@ -19,7 +19,6 @@ import org.springframework.context.annotation.Import;
 import app.support.TestCacheConfig;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -91,56 +90,4 @@ class ServiceDeliveryRepositoryJpaTest extends BaseContainerTest {
         employeeRepository.deleteAll();
     }
 
-    @Test
-    @DisplayName("Debe obtener estadísticas diarias")
-
-    void shouldGetDailyStats() {
-        EmployeeEntity messenger = new EmployeeEntity();
-        messenger.setDocument(456L);
-        messenger.setFullName("Pedro Messenger");
-        messenger.setRole(Role.MESSENGER);
-        messenger.setPassword("pass");
-        employeeRepository.save(messenger);
-
-        DealershipEntity dealership = new DealershipEntity();
-        dealership.setName("Dealership Stats");
-        dealership.setAddress("Av Siempre Viva");
-        dealership.setPhone("3007654321");
-        dealership.setZone("Sur");
-        dealershipRepository.save(dealership);
-
-        PlateEntity plate = new PlateEntity();
-        plate.setPlateNumber("XYZ000");
-        plate.setPlateType(PlateType.MOTORCYCLE);
-        plateRepository.save(plate);
-
-        ServiceDeliveryEntity s1 = new ServiceDeliveryEntity();
-        s1.setMessenger(messenger);
-        s1.setDealership(dealership);
-        s1.setPlate(plate);
-        s1.setCurrentStatus(Status.DELIVERED);
-        s1.setDeleted(false);
-        s1.setCreatedAt(LocalDateTime.now());
-        serviceDeliveryRepository.save(s1);
-
-        ServiceDeliveryEntity s2 = new ServiceDeliveryEntity();
-        s2.setMessenger(messenger);
-        s2.setDealership(dealership);
-        s2.setPlate(plate);
-        s2.setCurrentStatus(Status.CANCELED);
-        s2.setDeleted(false);
-        s2.setCreatedAt(LocalDateTime.now());
-        serviceDeliveryRepository.save(s2);
-
-        LocalDateTime start = LocalDateTime.now().minusDays(1);
-        LocalDateTime end = LocalDateTime.now().plusDays(1);
-        List<Object[]> stats = serviceDeliveryRepository.findDailyStatsByMessenger(messenger.getIdEmployee(), start,
-                end);
-
-        assertFalse(stats.isEmpty());
-        Object[] dayStat = stats.get(0);
-        assertEquals(1L, ((Number) dayStat[2]).longValue());
-        assertEquals(1L, ((Number) dayStat[4]).longValue());
-        assertEquals(2L, ((Number) dayStat[5]).longValue());
-    }
 }

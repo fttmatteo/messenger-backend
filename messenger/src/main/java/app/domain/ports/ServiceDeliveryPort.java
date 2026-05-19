@@ -35,12 +35,6 @@ public interface ServiceDeliveryPort {
         void hardDeleteById(Long idServiceDelivery);
 
         int hardDeleteAllDeleted();
-
-        List<app.domain.model.DailyStatistics> findDailyStatsByMessenger(
-                        Long messengerId,
-                        java.time.LocalDate from,
-                        java.time.LocalDate to);
-
         Page<ServiceDelivery> findByMessengerAndDate(Long messengerId, java.time.LocalDate date, Pageable pageable);
 
         Page<ServiceDelivery> findByPlateAndDealershipPaginated(String plateNumber, Long dealershipId, Pageable pageable);

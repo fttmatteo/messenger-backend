@@ -13,7 +13,12 @@
 [![Google Cloud](https://img.shields.io/badge/Google_Cloud-1.0+-4479A1?style=for-the-badge&logo=google&logoColor=white)](https://cloud.google.com/)
 [![License](https://img.shields.io/badge/License-Propietario-red.svg?style=for-the-badge)](LICENSE)
 
-**Sistema de entregas y gestión logística.**
+**Sistema de gestión de entregas de motocicletas por chasis y monitoreo de transportistas.**
+Plataforma inteligente para el control logístico y distribución de motocicletas identificadas por número de chasis, integrada con rastreo satelital continuo de los transportistas en ruta.
+
+**Identificación por Chasis:** Registro y control de inventario de motocicletas basado en su chasis único.
+**Monitoreo Satelital (GPS):** Rastreo geográfico en tiempo real de los transportistas durante su jornada de entrega.
+**Evidencia de Entrega:** Validación mediante firmas táctiles y capturas fotográficas.
 
 [🇺🇸 English Version](./README.en.md)
 
@@ -162,7 +167,6 @@ messenger/
 │   │   │   └── websocket/               # Tracking en tiempo real
 │   │   └── out/                         # Adaptadores de salida
 │   │       ├── maps/                    # Google Maps Integration
-
 │   │       ├── persistence/             # Adaptadores JPA
 │   │       ├── security/                # JWT Adapter
 │   │       ├── storage/                 # Google Cloud Storage
@@ -290,13 +294,13 @@ docker-compose -f docker-compose.dev.yml up --build
 
 ```bash
 # Variable de entorno (recomendado)
-export SPRING_PROFILES_ACTIVE=dev
+export SPRING_PROFILES_ACTIVE=local
 
 # Línea de comandos
-./mvnw spring-boot:run -Dspring.profiles.active=dev
+./mvnw spring-boot:run -Dspring.profiles.active=local
 
 # Docker
-docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
+docker run -e SPRING_PROFILES_ACTIVE=local
 ```
 
 ---
@@ -309,48 +313,42 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | ------ | ---------------- | ------------------------------------------------------------------------------- |
 | `POST` | `/auth/login`    | Iniciar sesión y obtener tokens de acceso + refresh (Requiere `turnstileToken`) |
 | `POST` | `/auth/refresh`  | Renovar token de acceso con refresh token                                       |
-| `GET`  | `/auth/ws-token` | Obtener token temporal para conexión WebSocket                                  |
+| `POST` | `/auth/ws-token` | Obtener token temporal para conexión WebSocket                                  |
 | `POST` | `/auth/logout`   | Cerrar sesión y limpiar cookies de autenticación                                |
 | `GET`  | `/profile/me`    | Obtener perfil del usuario autenticado (ADMIN/MESSENGER)                        |
 | `PUT`  | `/profile/me`    | Actualizar perfil (nombre, teléfono, contraseña - mín. 6 caracteres)            |
 
 ### Empleados (`/employees`) - Solo ADMIN
 
-| Método   | Endpoint                           | Descripción                   |
-| -------- | ---------------------------------- | ----------------------------- |
-| `POST`   | `/employees/createEmployee`        | Crear nuevo empleado          |
-| `GET`    | `/employees/allEmployees`          | Listar todos los empleados    |
-| `GET`    | `/employees/findByEmployeeId/{id}` | Obtener empleado por ID       |
-| `PUT`    | `/employees/updateEmployee/{id}`   | Actualizar empleado existente |
-| `DELETE` | `/employees/deleteEmployee/{id}`   | Eliminar empleado             |
+| Método   | Endpoint                             | Descripción                   |
+| -------- | ------------------------------------ | ----------------------------- |
+| `POST`   | `/employees/createEmployee`          | Crear nuevo empleado          |
+| `GET`    | `/employees/allEmployees`            | Listar todos los empleados    |
+| `GET`    | `/employees/findByEmployeeId/{uuid}` | Obtener empleado por UUID     |
+| `PUT`    | `/employees/updateEmployee/{uuid}`   | Actualizar empleado existente |
+| `DELETE` | `/employees/deleteEmployee/{uuid}`   | Eliminar empleado             |
 
 ### Concesionarios (`/dealerships`)
 
-| Método   | Endpoint                                   | Descripción                                     |
-| -------- | ------------------------------------------ | ----------------------------------------------- |
-| `POST`   | `/dealerships/createDealership`            | Crear concesionario (ADMIN)                     |
-| `GET`    | `/dealerships/allDealerships`              | Listar todos los concesionarios                 |
-| `GET`    | `/dealerships/findByDealershipId/{id}`     | Obtener por ID                                  |
-| `GET`    | `/dealerships/findByDealershipName/{name}` | Obtener por Nombre                              |
-| `PUT`    | `/dealerships/updateDealership/{id}`       | Actualizar concesionario (ADMIN)                |
-| `DELETE` | `/dealerships/deleteDealership/{id}`       | Eliminar concesionario (ADMIN)                  |
-| `POST`   | `/dealerships/geocodeDealership/{id}`      | Geocodificar dirección de concesionario (ADMIN) |
+| Método   | Endpoint                                     | Descripción                                     |
+| -------- | -------------------------------------------- | ----------------------------------------------- |
+| `POST`   | `/dealerships/createDealership`              | Crear concesionario (ADMIN)                     |
+| `GET`    | `/dealerships/allDealerships`                | Listar todos los concesionarios                 |
+| `GET`    | `/dealerships/findByDealershipId/{uuid}`     | Obtener por UUID                                |
+| `GET`    | `/dealerships/findByDealershipName/{name}`   | Obtener por Nombre                              |
+| `PUT`    | `/dealerships/updateDealership/{uuid}`       | Actualizar concesionario (ADMIN)                |
+| `DELETE` | `/dealerships/deleteDealership/{uuid}`       | Eliminar concesionario (ADMIN)                  |
+| `POST`   | `/dealerships/geocodeDealership/{uuid}`      | Geocodificar dirección de concesionario (ADMIN) |
 
 ### Servicios de Entrega (`/services`)
 
 | Método   | Endpoint                         | Descripción                                                          |
 | -------- | -------------------------------- | -------------------------------------------------------------------- |
-| `POST`   | `/services/createService`        | Crear servicio (multipart: imagen + datos)                           |
-| `PUT`    | `/services/updateService/{uuid}` | Actualizar estado (multipart: estado + evidencias)                 |
-| `PUT`    | `/services/reassign/{uuid}`      | Reasignar a otro mensajero (ADMIN/CANCELED)                          |
+| `POST`   | `/services/createService`        | Crear servicio                                                       |
+| `PUT`    | `/services/updateService/{uuid}` | Actualizar estado (multipart: estado + evidencias)                   |
+| `PUT`    | `/services/reassign/{uuid}`      | Reasignar a otro transportista (ADMIN/CANCELED)                          |
 | `GET`    | `/services/findByServiceId/{uuid}`| Obtener servicio por UUID                                            |
 | `GET`    | `/services/allServicesPageable`  | Listar servicios con **paginación, búsqueda y ordenamiento**         |
-| `GET`    | `/services/stats/daily`          | INHABILITADO - Estadísticas diarias (requiere messengerId, from, to) |
-| `DELETE` | `/services/deleteService/{uuid}` | Mover a papelera (ADMIN)                                             |
-| `GET`    | `/services/trash`                | Listar servicios eliminados con **paginación** (ADMIN)               |
-| `POST`   | `/services/trash/restore/{uuid}` | Restaurar desde papelera (ADMIN)                                     |
-| `DELETE` | `/services/trash/empty`          | Vaciar papelera permanentemente (ADMIN)                              |
-| `DELETE` | `/services/trash/{uuid}`         | Eliminación individual permanente (ADMIN)                            |
 
 ### WhatsApp (`/api/whatsapp`)
 
@@ -364,7 +362,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 >
 > 1. El usuario envía un mensaje.
 > 2. El bot solicita un PIN de acceso de 4 dígitos (se solicita cada 12 horas).
-> 3. Tras la autenticación, el usuario puede consultar estados de placas o listar entregas pendientes.
+> 3. Tras la autenticación, el usuario puede consultar estados de chasis o listar entregas pendientes.
 
 > [!IMPORTANT]
 > **Bot Security**:
@@ -385,6 +383,13 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | ------ | ------------------------- | ---------------------------------------------- |
 | `GET`  | `/settings/status-colors` | Obtener configuración de colores de estados    |
 | `PUT`  | `/settings/status-colors` | Actualizar configuración de colores de estados |
+
+### Políticas (`/policies`)
+
+| Método | Endpoint             | Descripción                                                 |
+| ------ | -------------------- | ----------------------------------------------------------- |
+| `GET`  | `/policies/cookies`  | Obtener la política de cookies actual                       |
+| `GET`  | `/policies/privacy`  | Obtener la política de privacidad actual                    |
 
 ### Ubicaciones y Rutas (`/locations`)
 
@@ -408,8 +413,8 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | `WS`   | `/ws/tracking/update`             | Actualizar ubicación vía WebSocket (con Heartbeat)         |
 | `POST` | `/tracking/update`         | INHABILITADO - Alternativa REST para actualizar ubicación |
 | `GET`  | `/tracking/messenger/{uuid}`      | Obtener última ubicación conocida (ADMIN)                  |
-| `POST` | `/tracking/messengers/bulk-locations`| Obtener última ubicación de varios mensajeros (ADMIN)  |
-| `GET`  | `/tracking/active`                | Listar todos los mensajeros activos (ADMIN)                |
+| `POST` | `/tracking/messengers/bulk-locations`| Obtener última ubicación de varios transportistas (ADMIN)  |
+| `GET`  | `/tracking/active`                | Listar todos los transportistas activos (ADMIN)            |
 | `GET`  | `/tracking/history/pageable/{uuid}`| Obtener historial de ubicaciones con **paginación**       |
 | `GET`  | `/tracking/service/{uuid}`        | Obtener historial para un servicio específico              |
 
@@ -417,7 +422,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Método | Endpoint                              | Descripción                                            |
 | ------ | ------------------------------------- | ------------------------------------------------------ |
-| `GET`  | `/monitoring/messenger/{id}/activity` | Línea de tiempo y estadísticas diarias de un mensajero |
+| `GET`  | `/monitoring/messenger/{id}/activity` | Línea de tiempo y estadísticas diarias de un transportista |
 
 ---
 
@@ -578,7 +583,7 @@ erDiagram
 
 ## Tracking en Tiempo Real
 
-Sistema de tracking GPS usando **Redis** + **WebSocket** para monitoreo de mensajeros.
+Sistema de tracking GPS usando **Redis** + **WebSocket** para monitoreo de transportistas.
 
 ### Características
 
@@ -599,7 +604,7 @@ URL de conexión: `ws://localhost:8080/ws/tracking`
 | ------ | ------------------------- | ---------------------------------------- |
 | `SEND` | `/app/tracking/update`    | Enviar actualización de GPS              |
 | `SEND` | `/app/tracking/heartbeat` | Enviar señal de vida (sin GPS)           |
-| `SUB`  | `/topic/tracking/{id}`    | Recibir actualizaciones de un mensajero  |
+| `SUB`  | `/topic/tracking/{id}`    | Recibir actualizaciones de un transportista |
 | `SUB`  | `/topic/tracking/all`     | Recibir actualizaciones de todos (Admin) |
 
 ### Integración Google Maps
@@ -614,10 +619,10 @@ URL de conexión: `ws://localhost:8080/ws/tracking`
 > [!IMPORTANT]
 > **Transiciones de Estado por Rol**
 >
-> - **MESSENGER** solo puede trabajar con: `PENDING`, `DELIVERED`, `RETURNED`.
+> - **TRANSPORTISTA** solo puede trabajar con: `PENDING`, `DELIVERED`, `RETURNED`.
 > - **ADMIN** solo puede trabajar con: `CANCELED`, `RESOLVED`.
 > - Los servicios pueden ser modificados en cualquier momento sin importar su estado actual.
-> - Los administradores pueden reasignar servicios en estado **CANCELED** a otro mensajero.
+> - Los administradores pueden reasignar servicios en estado **CANCELED** a otro transportista.
 
 > [!NOTE]
 > **Requisitos de Evidencia**
@@ -634,7 +639,7 @@ URL de conexión: `ws://localhost:8080/ws/tracking`
 
 ### Reglas de Estados
 
-| Estado      | Mensajero                            | Admin                    | Eliminar    |
+| Estado      | Transportista                        | Admin                    | Eliminar    |
 | ----------- | ------------------------------------ | ------------------------ | ----------- |
 | `ASSIGNED`  | → `PENDING`, `DELIVERED`, `RETURNED` | → `CANCELED`, `RESOLVED` | ✅ Papelera |
 | `RETURNED`  | → `PENDING`, `DELIVERED`             | → `CANCELED`, `RESOLVED` | ✅ Papelera |
@@ -645,28 +650,29 @@ URL de conexión: `ws://localhost:8080/ws/tracking`
 
 ### Resumen de Permisos
 
-| Rol           | Estados Disponibles                | Acciones Especiales                                   | Notas                                                                           |
-| ------------- | ---------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------- |
-| **MENSAJERO** | `PENDING`, `DELIVERED`, `RETURNED` | -                                                     | Puede cambiar servicios a cualquier estado permitido en cualquier momento       |
-| **ADMIN**     | `CANCELED`, `RESOLVED`             | **Reasignar mensajero** (desde `CANCELED` únicamente) | Puede cambiar servicios a estados administrativos desde cualquier estado actual |
+| Rol               | Estados Disponibles                | Acciones Especiales                                       | Notas                                                                           |
+| ----------------- | ---------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| **TRANSPORTISTA** | `PENDING`, `DELIVERED`, `RETURNED` | -                                                         | Puede cambiar servicios a cualquier estado permitido en cualquier momento       |
+| **ADMIN**         | `CANCELED`, `RESOLVED`             | **Reasignar transportista** (desde `CANCELED` únicamente) | Puede cambiar servicios a estados administrativos desde cualquier estado actual |
 
 ### Flujo de Reasignación
 
 ```mermaid
 flowchart LR
     A[Servicio en CANCELED] --> B{Admin reasigna}
-    B --> C[Nuevo mensajero asignado]
+    B --> C[Nuevo transportista asignado]
     C --> D[Estado → ASSIGNED]
 ```
 
 ### Gestión de Papelera (Soft Delete y Archivo)
 
-| Acción              | Endpoint                            | Descripción                                        |
-| ------------------- | ----------------------------------- | -------------------------------------------------- |
-| Eliminar → Papelera | `DELETE /services/{id}`             | Mueve a papelera (soft delete)                     |
-| Ver Papelera        | `GET /services/trash`               | Lista servicios eliminados (ADMIN)                 |
-| Restaurar           | `POST /services/trash/restore/{id}` | Restaura desde papelera (ADMIN)                    |
-| Vaciar Papelera     | `POST /services/trash/empty`        | Archiva todos los elementos de la papelera (ADMIN) |
+| Acción              | Endpoint                              | Descripción                                        |
+| ------------------- | ------------------------------------- | -------------------------------------------------- |
+| Eliminar → Papelera | `DELETE /services/deleteService/{uuid}` | Mueve a papelera (soft delete)                     |
+| Ver Papelera        | `GET /services/trash`                 | Lista servicios eliminados (ADMIN)                 |
+| Restaurar           | `POST /services/trash/restore/{uuid}` | Restaura desde papelera (ADMIN)                    |
+| Vaciar Papelera     | `DELETE /services/trash/empty`        | Archiva todos los elementos de la papelera (ADMIN) |
+| Eliminar Permanente | `DELETE /services/trash/{uuid}`        | Eliminación individual permanente (ADMIN)          |
 | Archivo Automático  | Job programado (3 AM diario)        | Archiva servicios después de 60 días               |
 
 **Sistema de Archivo**: Los servicios se archivan permanentemente en tablas dedicadas (`deleted_services`, `deleted_status_history`, `deleted_photos`, `deleted_tracking_history`, `deleted_signatures`) en lugar de ser eliminados. Todos los datos históricos se preservan para auditoría y análisis.
@@ -959,7 +965,7 @@ El proyecto implementa una estrategia de pruebas robusta en todas las capas de l
 
 ## Integración Android
 
-El sistema incluye una aplicación nativa para Android construida con **Capacitor**, proporcionando una experiencia móvil fluida para los mensajeros.
+El sistema incluye una aplicación nativa para Android construida con **Capacitor**, proporcionando una experiencia móvil fluida para los transportistas.
 
 ### Detalles Técnicos
 

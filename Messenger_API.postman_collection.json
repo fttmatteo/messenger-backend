@@ -1019,49 +1019,6 @@
                         }
                     },
                     "response": []
-                },
-                {
-                    "name": "Get Daily Stats",
-                    "request": {
-                        "auth": {
-                            "type": "bearer",
-                            "bearer": [
-                                {
-                                    "key": "token",
-                                    "value": "{{token}}",
-                                    "type": "string"
-                                }
-                            ]
-                        },
-                        "method": "GET",
-                        "header": [],
-                        "url": {
-                            "raw": "{{baseUrl}}/services/stats/daily?messengerId=1&from=2024-01-01&to=2024-01-31",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "services",
-                                "stats",
-                                "daily"
-                            ],
-                            "query": [
-                                {
-                                    "key": "messengerId",
-                                    "value": "1"
-                                },
-                                {
-                                    "key": "from",
-                                    "value": "2024-01-01"
-                                },
-                                {
-                                    "key": "to",
-                                    "value": "2024-01-31"
-                                }
-                            ]
-                        }
-                    },
-                    "response": []
                 }
             ]
         },

@@ -1,7 +1,6 @@
 package app.adapter.in.rest.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,14 +10,12 @@ import app.adapter.in.builder.ServiceDeliveryBuilder;
 import app.adapter.in.rest.mapper.ServiceDeliveryResponseMapper;
 import app.adapter.in.rest.request.ServiceDeliveryCreateRequest;
 import app.adapter.in.rest.request.ServiceDeliveryUpdateStatusRequest;
-import app.adapter.in.rest.response.DailyStatsResponse;
 import app.adapter.in.rest.response.PageResponse;
 import app.adapter.in.rest.response.ServiceDeliveryResponse;
 import app.domain.exception.InputsException;
 import app.domain.exception.ResourceNotFoundException;
 import app.domain.exception.UnauthorizedException;
 import app.application.usecase.ServiceDeliveryUseCase;
-import app.domain.model.DailyStatistics;
 import app.domain.model.Employee;
 import app.domain.model.ServiceDelivery;
 import app.domain.model.enums.Role;
@@ -350,30 +347,5 @@ public class ServiceDeliveryController {
         serviceDeliveryUseCase.permanentDeleteById(serviceForId.getIdServiceDelivery(), currentUser.getIdEmployee());
 
         return ResponseEntity.ok(Map.of("message", "Servicio eliminado permanentemente"));
-    }
-
-    /**
-     * Obtiene estadísticas diarias de servicios para un mensajero.
-     */
-    @GetMapping("/stats/daily")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<DailyStatsResponse>> getDailyStats(
-            @RequestParam Long messengerId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate from,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate to) {
-
-        List<DailyStatistics> stats = serviceDeliveryUseCase.getDailyStats(messengerId, from, to);
-
-        List<DailyStatsResponse> response = stats.stream()
-                .map(s -> new DailyStatsResponse(
-                        s.date(),
-                        s.assigned(),
-                        s.delivered(),
-                        s.returned(),
-                        s.canceled(),
-                        s.total()))
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(response);
     }
 }

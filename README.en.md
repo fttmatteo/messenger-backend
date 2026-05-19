@@ -13,7 +13,12 @@
 [![Google Cloud](https://img.shields.io/badge/Google_Cloud-1.0+-4479A1?style=for-the-badge&logo=google&logoColor=white)](https://cloud.google.com/)
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg?style=for-the-badge)](LICENSE)
 
-**Delivery management system and logistics.**
+**Motorcycle delivery management system by chassis and carrier monitoring.**
+Intelligent platform for logistic control and distribution of motorcycles identified by chassis number, integrated with continuous satellite tracking of carriers on route.
+
+**Chassis Identification:** Inventory control and registration of motorcycles based on their unique chassis.
+**Satellite Monitoring (GPS):** Real-time geographic tracking of carriers during their delivery day.
+**Evidence of Delivery:** Validation through touch signatures and photographic captures.
 
 [🇪🇸 Versión en Español](./README.md)
 
@@ -162,7 +167,6 @@ messenger/
 │   │   │   └── websocket/               # Real-time tracking
 │   │   └── out/                         # Output Adapters
 │   │       ├── maps/                    # Google Maps Integration
-
 │   │       ├── persistence/             # JPA Adapters
 │   │       ├── security/                # JWT Adapter
 │   │       ├── storage/                 # Google Cloud Storage
@@ -290,13 +294,13 @@ docker-compose -f docker-compose.dev.yml up --build
 
 ```bash
 # Environment variable (recommended)
-export SPRING_PROFILES_ACTIVE=dev
+export SPRING_PROFILES_ACTIVE=local
 
 # Command line
-./mvnw spring-boot:run -Dspring.profiles.active=dev
+./mvnw spring-boot:run -Dspring.profiles.active=local
 
 # Docker
-docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
+docker run -e SPRING_PROFILES_ACTIVE=local
 ```
 
 ---
@@ -309,32 +313,32 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | ------ | ---------------- | --------------------------------------------------------------------- |
 | `POST` | `/auth/login`    | Login and receive access + refresh tokens (Requires `turnstileToken`) |
 | `POST` | `/auth/refresh`  | Renew access token with refresh token                                 |
-| `GET`  | `/auth/ws-token` | Get temporary token for WebSocket connection                          |
+| `POST` | `/auth/ws-token` | Get temporary token for WebSocket connection                          |
 | `POST` | `/auth/logout`   | Logout and clear authentication cookies                               |
 | `GET`  | `/profile/me`    | Get authenticated user profile (ADMIN/MESSENGER)                      |
 | `PUT`  | `/profile/me`    | Update profile (name, phone, password - min 6 chars)                  |
 
 ### Employees (`/employees`) - ADMIN only
 
-| Method   | Endpoint                           | Description              |
-| -------- | ---------------------------------- | ------------------------ |
-| `POST`   | `/employees/createEmployee`        | Create new employee      |
-| `GET`    | `/employees/allEmployees`          | List all employees       |
-| `GET`    | `/employees/findByEmployeeId/{id}` | Get employee by ID       |
-| `PUT`    | `/employees/updateEmployee/{id}`   | Update existing employee |
-| `DELETE` | `/employees/deleteEmployee/{id}`   | Delete employee          |
+| Method   | Endpoint                             | Description              |
+| -------- | ------------------------------------ | ------------------------ |
+| `POST`   | `/employees/createEmployee`          | Create new employee      |
+| `GET`    | `/employees/allEmployees`            | List all employees       |
+| `GET`    | `/employees/findByEmployeeId/{uuid}` | Get employee by UUID     |
+| `PUT`    | `/employees/updateEmployee/{uuid}`   | Update existing employee |
+| `DELETE` | `/employees/deleteEmployee/{uuid}`   | Delete employee          |
 
 ### Dealerships (`/dealerships`)
 
-| Method   | Endpoint                                   | Description                        |
-| -------- | ------------------------------------------ | ---------------------------------- |
-| `POST`   | `/dealerships/createDealership`            | Create dealership (ADMIN)          |
-| `GET`    | `/dealerships/allDealerships`              | List all dealerships               |
-| `GET`    | `/dealerships/findByDealershipId/{id}`     | Get by ID                          |
-| `GET`    | `/dealerships/findByDealershipName/{name}` | Get by Name                        |
-| `PUT`    | `/dealerships/updateDealership/{id}`       | Update dealership (ADMIN)          |
-| `DELETE` | `/dealerships/deleteDealership/{id}`       | Delete dealership (ADMIN)          |
-| `POST`   | `/dealerships/geocodeDealership/{id}`      | Geocode dealership address (ADMIN) |
+| Method   | Endpoint                                     | Description                        |
+| -------- | -------------------------------------------- | ---------------------------------- |
+| `POST`   | `/dealerships/createDealership`              | Create dealership (ADMIN)          |
+| `GET`    | `/dealerships/allDealerships`                | List all dealerships               |
+| `GET`    | `/dealerships/findByDealershipId/{uuid}`     | Get by UUID                        |
+| `GET`    | `/dealerships/findByDealershipName/{name}`   | Get by Name                        |
+| `PUT`    | `/dealerships/updateDealership/{uuid}`       | Update dealership (ADMIN)          |
+| `DELETE` | `/dealerships/deleteDealership/{uuid}`       | Delete dealership (ADMIN)          |
+| `POST`   | `/dealerships/geocodeDealership/{uuid}`      | Geocode dealership address (ADMIN) |
 
 ### Service Deliveries (`/services`)
 
@@ -342,15 +346,9 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | -------- | -------------------------------- | ------------------------------------------------------------ |
 | `POST`   | `/services/createService`        | Create service (multipart: image + data)                     |
 | `PUT`    | `/services/updateService/{uuid}` | Update status (multipart: status + evidence)                 |
-| `PUT`    | `/services/reassign/{uuid}`      | Reassign to another messenger (ADMIN/CANCELED)               |
+| `PUT`    | `/services/reassign/{uuid}`      | Reassign to another carrier (ADMIN/CANCELED)               |
 | `GET`    | `/services/findByServiceId/{uuid}`| Get service by UUID                                         |
 | `GET`    | `/services/allServicesPageable`  | List services with **pagination, search & sorting**          |
-| `GET`    | `/services/stats/daily`          | DISABLED - Daily stats (requires messengerId, from, to)      |
-| `DELETE` | `/services/deleteService/{uuid}` | Move to trash (ADMIN)                                        |
-| `GET`    | `/services/trash`                | List deleted services with **pagination** (ADMIN)            |
-| `POST`   | `/services/trash/restore/{uuid}` | Restore from trash (ADMIN)                                   |
-| `DELETE` | `/services/trash/empty`          | Empty trash permanently (ADMIN)                              |
-| `DELETE` | `/services/trash/{uuid}`         | Permanent delete individual item (ADMIN)                     |
 
 ### WhatsApp (`/api/whatsapp`)
 
@@ -364,7 +362,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 >
 > 1. User sends a message.
 > 2. Bot requests a 4-digit PIN (requested every 12 hours).
-> 3. After authentication, the user can query plate status or list pending deliveries.
+> 3. After authentication, the user can query chassis status or list pending deliveries.
 
 > [!IMPORTANT]
 > **Bot Security**:
@@ -385,6 +383,13 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | ------ | ------------------------- | --------------------------------- |
 | `GET`  | `/settings/status-colors` | Get status color configuration    |
 | `PUT`  | `/settings/status-colors` | Update status color configuration |
+
+### Policies (`/policies`)
+
+| Method | Endpoint             | Description                                                 |
+| ------ | -------------------- | ----------------------------------------------------------- |
+| `GET`  | `/policies/cookies`  | Get current cookies policy                                  |
+| `GET`  | `/policies/privacy`  | Get current privacy policy                                  |
 
 ### Locations & Routes (`/locations`)
 
@@ -407,9 +412,9 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 | ------ | -------------------------- | ------------------------------------------------ |
 | `WS`   | `/ws/tracking/update`             | Update location via WebSocket (with Heartbeat)    |
 | `POST` | `/tracking/update`         | DISABLED - REST alternative for location updates |
-| `GET`  | `/tracking/messenger/{uuid}`      | Get last known location (ADMIN)                   |
-| `POST` | `/tracking/messengers/bulk-locations`| Get last location of multiple messengers (ADMIN)  |
-| `GET`  | `/tracking/active`                | Get all active messengers (ADMIN)                 |
+| `GET`  | `/tracking/messenger/{uuid}`      | Get last known location of a carrier (ADMIN)      |
+| `POST` | `/tracking/messengers/bulk-locations`| Get last location of multiple carriers (ADMIN)  |
+| `GET`  | `/tracking/active`                | Get all active carriers (ADMIN)                 |
 | `GET`  | `/tracking/history/pageable/{uuid}`| Get location history with **pagination**          |
 | `GET`  | `/tracking/service/{uuid}`        | Get history for a specific service                |
 
@@ -417,7 +422,7 @@ docker run -e SPRING_PROFILES_ACTIVE=prod messenger-api
 
 | Method | Endpoint                              | Description                                         |
 | ------ | ------------------------------------- | --------------------------------------------------- |
-| `GET`  | `/monitoring/messenger/{id}/activity` | Get daily activity timeline + stats for a messenger |
+| `GET`  | `/monitoring/messenger/{id}/activity` | Get daily activity timeline + stats for a carrier |
 
 ---
 
@@ -578,7 +583,7 @@ erDiagram
 
 ## Real-Time Tracking
 
-GPS tracking system using **Redis** + **WebSocket** for messenger monitoring.
+GPS tracking system using **Redis** + **WebSocket** for carrier monitoring.
 
 ### Features
 
@@ -599,8 +604,8 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 | ------ | ------------------------- | ------------------------------------------ |
 | `SEND` | `/app/tracking/update`    | Send GPS location update                   |
 | `SEND` | `/app/tracking/heartbeat` | Send keep-alive signal (no GPS)            |
-| `SUB`  | `/topic/tracking/{id}`    | Receive updates for specific messenger     |
-| `SUB`  | `/topic/tracking/all`     | Receive updates for all messengers (Admin) |
+| `SUB`  | `/topic/tracking/{id}`    | Receive updates for specific carrier     |
+| `SUB`  | `/topic/tracking/all`     | Receive updates for all carriers (Admin) |
 
 ### Google Maps Integration
 
@@ -614,10 +619,10 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 > [!IMPORTANT]
 > **Role-Based Status Transitions**
 >
-> - **MESSENGER** can only use: `PENDING`, `DELIVERED`, `RETURNED`.
+> - **CARRIER** can only use: `PENDING`, `DELIVERED`, `RETURNED`.
 > - **ADMIN** can only use: `CANCELED`, `RESOLVED`.
 > - Services can be modified at any time regardless of their current state.
-> - Admins can reassign **CANCELED** services to another messenger.
+> - Admins can reassign **CANCELED** services to another carrier.
 
 > [!NOTE]
 > **Evidence Requirements**
@@ -634,7 +639,7 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 
 ### State Rules
 
-| State       | Messenger                            | Admin                               | Delete   |
+| State       | Carrier                              | Admin                               | Delete   |
 | ----------- | ------------------------------------ | ----------------------------------- | -------- |
 | `ASSIGNED`  | → `PENDING`, `DELIVERED`, `RETURNED` | → `CANCELED`, `RESOLVED`            | ✅ Trash |
 | `RETURNED`  | → `PENDING`, `DELIVERED`             | → `CANCELED`, `RESOLVED`            | ✅ Trash |
@@ -647,27 +652,28 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 
 | Role          | Available States                   | Special Actions                               | Notes                                                      |
 | ------------- | ---------------------------------- | --------------------------------------------- | ---------------------------------------------------------- |
-| **MESSENGER** | `PENDING`, `DELIVERED`, `RETURNED` | -                                             | Can change services to any allowed state at any time       |
-| **ADMIN**     | `CANCELED`, `RESOLVED`             | **Reassign messenger** (from `CANCELED` only) | Can change services to admin states from any current state |
+| **CARRIER**   | `PENDING`, `DELIVERED`, `RETURNED` | -                                             | Can change services to any allowed state at any time       |
+| **ADMIN**     | `CANCELED`, `RESOLVED`             | **Reassign carrier** (from `CANCELED` only)   | Can change services to admin states from any current state |
 
 ### Reassignment Flow
 
 ```mermaid
 flowchart LR
     A[Service in CANCELED] --> B{Admin reassigns}
-    B --> C[New messenger assigned]
+    B --> C[New carrier assigned]
     C --> D[Status → ASSIGNED]
 ```
 
 ### Trash Management (Soft Delete & Archive)
 
-| Action         | Endpoint                            | Description                      |
-| -------------- | ----------------------------------- | -------------------------------- |
-| Delete → Trash | `DELETE /services/{id}`             | Moves to trash (soft delete)     |
-| View Trash     | `GET /services/trash`               | Lists deleted services (ADMIN)   |
-| Restore        | `POST /services/trash/restore/{id}` | Restores from trash (ADMIN)      |
-| Empty Trash    | `POST /services/trash/empty`        | Archives all trash items (ADMIN) |
-| Auto-Archive   | Scheduled job (3 AM daily)          | Archives services after 60 days  |
+| Action         | Endpoint                              | Description                      |
+| -------------- | ------------------------------------- | -------------------------------- |
+| Delete → Trash | `DELETE /services/deleteService/{uuid}` | Moves to trash (soft delete)     |
+| View Trash     | `GET /services/trash`                 | Lists deleted services (ADMIN)   |
+| Restore        | `POST /services/trash/restore/{uuid}` | Restores from trash (ADMIN)      |
+| Empty Trash       | `DELETE /services/trash/empty`        | Archives all trash items (ADMIN) |
+| Permanent Delete  | `DELETE /services/trash/{uuid}`       | Permanent delete individual item (ADMIN) |
+| Auto-Archive      | Scheduled job (3 AM daily)          | Archives services after 60 days  |
 
 **Archive System**: Services are permanently archived to dedicated tables (`deleted_services`, `deleted_status_history`, `deleted_photos`, `deleted_tracking_history`, `deleted_signatures`) instead of being deleted. All historical data is preserved for auditing and analytics.
 
@@ -957,7 +963,7 @@ The project implements a robust testing strategy across all layers of the hexago
 
 ## Android Integration
 
-The system includes a native Android application built with **Capacitor**, providing a seamless mobile experience for messengers.
+The system includes a native Android application built with **Capacitor**, providing a seamless mobile experience for carriers.
 
 ### Technical Details
 
