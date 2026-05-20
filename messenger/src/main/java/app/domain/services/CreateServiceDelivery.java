@@ -39,11 +39,11 @@ public class CreateServiceDelivery {
     private ApplicationEventPublisher eventPublisher;
 
     /**
-     * Crea un nuevo servicio de entrega, asocia la placa (creándola si no existe)
-     * y asigna el servicio al mensajero y concesionario indicados.
+     * Crea un nuevo servicio de entrega, asocia el chasis (creándolo si no existe)
+     * y asigna el servicio al transportista y concesionario indicados.
      */
-    public ServiceDelivery create(String plateNumber, Long dealershipId, Long messengerId,
-            Double latitude, Double longitude)
+    public ServiceDelivery create(String plateNumber, Long dealershipId, Long originDealershipId,
+            Long messengerId, Double latitude, Double longitude)
             throws Exception {
 
         Employee messenger = employeePort.findById(messengerId);
@@ -54,6 +54,17 @@ public class CreateServiceDelivery {
         Dealership dealership = dealershipPort.findById(dealershipId);
         if (dealership == null) {
             throw new BusinessException("El concesionario indicado no existe.");
+        }
+
+        if (originDealershipId == null) {
+            throw new BusinessException("El concesionario de origen es obligatorio.");
+        }
+        Dealership originDealership = dealershipPort.findById(originDealershipId);
+        if (originDealership == null) {
+            throw new BusinessException("El concesionario de origen indicado no existe.");
+        }
+        if (originDealershipId.equals(dealershipId)) {
+            throw new BusinessException("El concesionario de origen no puede ser el mismo que el destino.");
         }
 
         String normalizedPlate = plateNumber.trim().toUpperCase();
@@ -77,6 +88,7 @@ public class CreateServiceDelivery {
         ServiceDelivery service = new ServiceDelivery();
         service.setPlate(plate);
         service.setDealership(dealership);
+        service.setOriginDealership(originDealership);
         service.setMessenger(messenger);
         service.setCurrentStatus(Status.ASSIGNED);
         service.setObservation(null);

@@ -77,11 +77,11 @@ public class ServiceDeliveryUseCase {
     @Transactional(rollbackFor = Exception.class)
 
     public ServiceDelivery createServiceWithManualPlate(String manualPlateNumber, Long dealershipId,
-            Long messengerId, Double latitude, Double longitude) throws Exception {
+            Long originDealershipId, Long messengerId, Double latitude, Double longitude) throws Exception {
         
         try {
-            ServiceDelivery service = createService.create(manualPlateNumber, dealershipId, messengerId,
-                    latitude, longitude);
+            ServiceDelivery service = createService.create(manualPlateNumber, dealershipId, originDealershipId,
+                    messengerId, latitude, longitude);
             logger.info("Servicio creado exitosamente vía manual - ID: {} | Placa: {} | Mensajero: {}",
                     service.getIdServiceDelivery(), LogSanitizer.maskPlate(manualPlateNumber), messengerId);
             return service;

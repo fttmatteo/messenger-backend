@@ -29,6 +29,10 @@ public class ServiceDeliveryEntity {
     private DealershipEntity dealership;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "origin_dealership_id", nullable = false)
+    private DealershipEntity originDealership;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "messenger_id", nullable = false)
     private EmployeeEntity messenger;
 
@@ -81,6 +85,14 @@ public class ServiceDeliveryEntity {
 
     public void setDealership(DealershipEntity dealership) {
         this.dealership = dealership;
+    }
+
+    public DealershipEntity getOriginDealership() {
+        return originDealership;
+    }
+
+    public void setOriginDealership(DealershipEntity originDealership) {
+        this.originDealership = originDealership;
     }
 
     public EmployeeEntity getMessenger() {

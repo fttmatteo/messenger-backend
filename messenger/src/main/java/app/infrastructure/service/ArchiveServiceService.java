@@ -73,6 +73,13 @@ public class ArchiveServiceService implements ArchivePort {
             archivedService.setDealershipZone(service.getDealership().getZone());
         }
 
+        if (service.getOriginDealership() != null) {
+            archivedService.setOriginDealershipId(service.getOriginDealership().getIdDealership());
+            archivedService.setOriginDealershipName(service.getOriginDealership().getName());
+            archivedService.setOriginDealershipAddress(service.getOriginDealership().getAddress());
+            archivedService.setOriginDealershipZone(service.getOriginDealership().getZone());
+        }
+
         if (service.getMessenger() != null) {
             archivedService.setMessengerId(service.getMessenger().getIdEmployee());
             archivedService.setMessengerName(service.getMessenger().getFullName());

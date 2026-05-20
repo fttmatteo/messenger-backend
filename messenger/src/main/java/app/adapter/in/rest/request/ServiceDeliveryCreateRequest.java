@@ -5,6 +5,7 @@ package app.adapter.in.rest.request;
  */
 public class ServiceDeliveryCreateRequest {
     private String dealershipId;
+    private String originDealershipId;
     private String messengerId;
     private String manualPlateNumber;
 
@@ -22,6 +23,14 @@ public class ServiceDeliveryCreateRequest {
 
     public void setDealershipId(String dealershipId) {
         this.dealershipId = dealershipId;
+    }
+
+    public String getOriginDealershipId() {
+        return originDealershipId;
+    }
+
+    public void setOriginDealershipId(String originDealershipId) {
+        this.originDealershipId = originDealershipId;
     }
 
     public String getMessengerId() {

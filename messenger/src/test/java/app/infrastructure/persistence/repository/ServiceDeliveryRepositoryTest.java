@@ -39,11 +39,14 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
 
 
 
+    private DealershipEntity originDealership;
+
     private void createAndPersistService(EmployeeEntity messenger, DealershipEntity dealership, PlateEntity plate,
             Status status, LocalDateTime createdAt) {
         ServiceDeliveryEntity service = new ServiceDeliveryEntity();
         service.setMessenger(messenger);
         service.setDealership(dealership);
+        service.setOriginDealership(originDealership);
         service.setPlate(plate);
         service.setCurrentStatus(status);
         service.setCreatedAt(createdAt);
@@ -89,6 +92,9 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
         DealershipEntity dealership = createDealership("Target Dealer");
         entityManager.persist(dealership);
 
+        originDealership = createDealership("Origin Dealer");
+        entityManager.persist(originDealership);
+
         PlateEntity plate = createPlate("CHASIS0002");
         entityManager.persist(plate);
 
@@ -100,6 +106,7 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
         ServiceDeliveryEntity serviceWithHistory = new ServiceDeliveryEntity();
         serviceWithHistory.setMessenger(messenger);
         serviceWithHistory.setDealership(dealership);
+        serviceWithHistory.setOriginDealership(originDealership);
         serviceWithHistory.setPlate(plate);
         serviceWithHistory.setCurrentStatus(Status.DELIVERED);
         serviceWithHistory.setCreatedAt(otherDate);
@@ -147,12 +154,16 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
         DealershipEntity dealership = createDealership("Premium Cars Bogota");
         dealershipRepository.save(dealership);
 
+        DealershipEntity originDealer = createDealership("Origin Cars");
+        dealershipRepository.save(originDealer);
+
         PlateEntity plate = createPlate("CHASIS0003");
         plateRepository.save(plate);
 
         ServiceDeliveryEntity service = new ServiceDeliveryEntity();
         service.setMessenger(messenger);
         service.setDealership(dealership);
+        service.setOriginDealership(originDealer);
         service.setPlate(plate);
         service.setCurrentStatus(Status.ASSIGNED);
         service.setCreatedAt(LocalDateTime.now());

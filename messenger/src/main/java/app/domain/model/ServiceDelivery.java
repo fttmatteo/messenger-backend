@@ -14,6 +14,7 @@ public class ServiceDelivery {
     private String uuid;
     private Plate plate;
     private Dealership dealership;
+    private Dealership originDealership;
     private Employee messenger;
     private Status currentStatus;
     private String observation;
@@ -59,6 +60,14 @@ public class ServiceDelivery {
 
     public void setDealership(Dealership dealership) {
         this.dealership = dealership;
+    }
+
+    public Dealership getOriginDealership() {
+        return originDealership;
+    }
+
+    public void setOriginDealership(Dealership originDealership) {
+        this.originDealership = originDealership;
     }
 
     public Employee getMessenger() {

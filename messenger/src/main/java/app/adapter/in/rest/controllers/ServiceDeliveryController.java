@@ -67,6 +67,7 @@ public class ServiceDeliveryController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ServiceDeliveryResponse> createService(
             @RequestParam("dealershipId") String dealershipId,
+            @RequestParam("originDealershipId") String originDealershipId,
             @RequestParam(value = "messengerId", required = false) String messengerId,
             @RequestParam(value = "manualPlateNumber", required = false) String manualPlateNumber,
             @RequestParam(value = "latitude", required = false) Double latitude,
@@ -84,6 +85,7 @@ public class ServiceDeliveryController {
         }
 
         ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest(dealershipId, finalMessengerId);
+        request.setOriginDealershipId(originDealershipId);
         request.setManualPlateNumber(manualPlateNumber);
         request.setLatitude(latitude);
         request.setLongitude(longitude);
@@ -97,6 +99,7 @@ public class ServiceDeliveryController {
         ServiceDelivery created = serviceDeliveryUseCase.createServiceWithManualPlate(
                 manualPlateNumber,
                 data.getDealershipId(),
+                data.getOriginDealershipId(),
                 data.getMessengerId(),
                 data.getLatitude(),
                 data.getLongitude());

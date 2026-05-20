@@ -46,6 +46,7 @@ class CreateServiceDeliveryTest {
 
     private Employee messenger;
     private Dealership dealership;
+    private Dealership dealershipOrigin;
     private Plate plate;
 
     @BeforeEach
@@ -59,6 +60,10 @@ class CreateServiceDeliveryTest {
         dealership.setIdDealership(1L);
         dealership.setName("Concesionario Central");
 
+        dealershipOrigin = new Dealership();
+        dealershipOrigin.setIdDealership(2L);
+        dealershipOrigin.setName("Concesionario Origen");
+
         plate = new Plate();
         plate.setIdPlate(1L);
         plate.setPlateNumber("ABC1234567");
@@ -70,16 +75,16 @@ class CreateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si el chasis o placa ya existe")
-
     void shouldThrowExceptionIfPlateAlreadyExists() {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
+        when(dealershipPort.findById(2L)).thenReturn(dealershipOrigin);
         when(serviceDeliveryPort.findAllPaginated(eq("ABC1234567"), eq(false), isNull(), any()))
                 .thenReturn(new org.springframework.data.domain.PageImpl<>(
                         java.util.List.of(new app.domain.model.ServiceDelivery())));
 
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> createServiceDelivery.create("ABC1234567", 1L, 12345678L, null, null));
+                () -> createServiceDelivery.create("ABC1234567", 1L, 2L, 12345678L, null, null));
 
         assertEquals("El chasis ABC1234567 ya tiene un servicio registrado en el sistema.", exception.getMessage());
         verify(serviceDeliveryPort, never()).save(any());
@@ -87,10 +92,10 @@ class CreateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe crear servicio y chasis cuando no existe")
-
     void shouldCreateServiceAndNewPlateWhenPlateDoesNotExist() throws Exception {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
+        when(dealershipPort.findById(2L)).thenReturn(dealershipOrigin);
         when(platePort.findByPlateNumber("NNN999")).thenReturn(null);
         when(plateRecognition.determinePlateType("NNN999")).thenReturn(PlateType.MOTORCYCLE);
 
@@ -102,25 +107,26 @@ class CreateServiceDeliveryTest {
 
         when(serviceDeliveryPort.save(any())).thenReturn(savedService);
 
-        createServiceDelivery.create("NNN999", 1L, 12345678L, null, null);
+        createServiceDelivery.create("NNN999", 1L, 2L, 12345678L, null, null);
 
         verify(platePort).save(argThat(newPlate -> newPlate.getPlateNumber().equals("NNN999") &&
                 newPlate.getPlateType() == PlateType.MOTORCYCLE));
 
         verify(serviceDeliveryPort).save(argThat(service -> service.getPlate().getPlateNumber().equals("NNN999") &&
-                service.getCurrentStatus() == Status.ASSIGNED));
+                service.getCurrentStatus() == Status.ASSIGNED &&
+                service.getOriginDealership().getIdDealership().equals(2L) &&
+                service.getDealership().getIdDealership().equals(1L)));
 
         verify(eventPublisher).publishEvent(any(app.domain.events.PlateStatusChangedEvent.class));
     }
 
     @Test
     @DisplayName("Debe lanzar excepción si el mensajero no se encuentra")
-
     void shouldThrowExceptionIfMessengerNotFound() {
         when(employeePort.findById(anyLong())).thenReturn(null);
 
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> createServiceDelivery.create("ABC1234567", 1L, 99999L, null, null));
+                () -> createServiceDelivery.create("ABC1234567", 1L, 2L, 99999L, null, null));
 
         assertEquals("El mensajero no existe.", exception.getMessage());
         verify(serviceDeliveryPort, never()).save(any());
@@ -128,50 +134,88 @@ class CreateServiceDeliveryTest {
 
     @Test
     @DisplayName("Debe lanzar excepción si el concesionario no se encuentra")
-
     void shouldThrowExceptionIfDealershipNotFound() {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(999L)).thenReturn(null);
 
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> createServiceDelivery.create("ABC1234567", 999L, 12345678L, null, null));
+                () -> createServiceDelivery.create("ABC1234567", 999L, 2L, 12345678L, null, null));
 
         assertEquals("El concesionario indicado no existe.", exception.getMessage());
         verify(serviceDeliveryPort, never()).save(any());
     }
 
     @Test
-    @DisplayName("Debe normalizar placa o chasis a mayúsculas")
+    @DisplayName("Debe lanzar excepción si el concesionario de origen es nulo")
+    void shouldThrowExceptionIfOriginDealershipIsNull() {
+        when(employeePort.findById(12345678L)).thenReturn(messenger);
+        when(dealershipPort.findById(1L)).thenReturn(dealership);
 
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> createServiceDelivery.create("ABC1234567", 1L, null, 12345678L, null, null));
+
+        assertEquals("El concesionario de origen es obligatorio.", exception.getMessage());
+        verify(serviceDeliveryPort, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Debe lanzar excepción si el concesionario de origen no existe")
+    void shouldThrowExceptionIfOriginDealershipNotFound() {
+        when(employeePort.findById(12345678L)).thenReturn(messenger);
+        when(dealershipPort.findById(1L)).thenReturn(dealership);
+        when(dealershipPort.findById(999L)).thenReturn(null);
+
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> createServiceDelivery.create("ABC1234567", 1L, 999L, 12345678L, null, null));
+
+        assertEquals("El concesionario de origen indicado no existe.", exception.getMessage());
+        verify(serviceDeliveryPort, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Debe lanzar excepción si el concesionario de origen es el mismo que el destino")
+    void shouldThrowExceptionIfOriginDealershipEqualsDestination() {
+        when(employeePort.findById(12345678L)).thenReturn(messenger);
+        when(dealershipPort.findById(1L)).thenReturn(dealership);
+        when(dealershipPort.findById(1L)).thenReturn(dealership); // same target
+
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> createServiceDelivery.create("ABC1234567", 1L, 1L, 12345678L, null, null));
+
+        assertEquals("El concesionario de origen no puede ser el mismo que el destino.", exception.getMessage());
+        verify(serviceDeliveryPort, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Debe normalizar placa o chasis a mayúsculas")
     void shouldNormalizePlateToUpperCase() throws Exception {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
+        when(dealershipPort.findById(2L)).thenReturn(dealershipOrigin);
         when(platePort.findByPlateNumber("ABC1234567")).thenReturn(plate);
 
         app.domain.model.ServiceDelivery savedService = new app.domain.model.ServiceDelivery();
         savedService.setIdServiceDelivery(100L);
         when(serviceDeliveryPort.save(any())).thenReturn(savedService);
 
-        createServiceDelivery.create("abc1234567", 1L, 12345678L, null, null);
+        createServiceDelivery.create("abc1234567", 1L, 2L, 12345678L, null, null);
 
         verify(platePort).findByPlateNumber("ABC1234567");
     }
 
-
-
     @Test
     @DisplayName("Debe guardar historial de rastreo cuando se proporciona la ubicación")
-
     void shouldSaveTrackingHistoryWhenLocationIsProvided() throws Exception {
         when(employeePort.findById(12345678L)).thenReturn(messenger);
         when(dealershipPort.findById(1L)).thenReturn(dealership);
+        when(dealershipPort.findById(2L)).thenReturn(dealershipOrigin);
         when(platePort.findByPlateNumber("ABC1234567")).thenReturn(plate);
 
         app.domain.model.ServiceDelivery savedService = new app.domain.model.ServiceDelivery();
         savedService.setIdServiceDelivery(100L);
         when(serviceDeliveryPort.save(any())).thenReturn(savedService);
 
-        createServiceDelivery.create("ABC1234567", 1L, 12345678L, 6.2442, -75.5812);
+        createServiceDelivery.create("ABC1234567", 1L, 2L, 12345678L, 6.2442, -75.5812);
 
         verify(trackingPort).saveTrackingHistory(argThat(tracking -> tracking.getMessengerId().equals(1L) &&
                 tracking.getServiceDeliveryId().equals(100L) &&
