@@ -200,7 +200,7 @@ public class FileValidationService {
             BufferedImage image = ImageIO.read(file.getInputStream());
 
             if (image == null) {
-                logger.warn("Archivo no es una imagen válida: {}", file.getOriginalFilename());
+                logger.warn("Archivo no es una imagen válida (tamaño: {} bytes)", file.getSize());
                 throw new SecurityException("El archivo no es una imagen válida");
             }
 

@@ -4,6 +4,8 @@ import app.domain.events.PlateStatusChangedEvent;
 import app.domain.model.WhatsAppSession;
 import app.domain.ports.WhatsAppMessagePort;
 import app.domain.ports.WhatsAppSessionPort;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class WhatsAppNotificationListener {
+
+    private static final Logger logger = LoggerFactory.getLogger(WhatsAppNotificationListener.class);
 
     private final WhatsAppMessagePort messagePort;
     private final WhatsAppSessionPort sessionPort;
@@ -36,6 +40,9 @@ public class WhatsAppNotificationListener {
         if (activeSessions.isEmpty()) {
             return;
         }
+
+        logger.info("Enviando notificación de cambio de estado para chasis {} a {} sesiones activas de WhatsApp del concesionario ID: {}", 
+                app.domain.util.LogSanitizer.maskPlate(plateNumber), activeSessions.size(), dealershipId);
 
         String message = String.format(
                 "🔔 *Notificación de cambio de estado*\n\n" +

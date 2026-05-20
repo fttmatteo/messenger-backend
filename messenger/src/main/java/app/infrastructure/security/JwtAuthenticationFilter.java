@@ -71,7 +71,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (header != null && header.startsWith("Bearer")) {
             String value = header.substring(7).trim();
             if (!value.isEmpty() && authenticationPort.validateToken(value)) {
-                logger.info("Token válido encontrado en header Authorization");
+                logger.debug("Token válido encontrado en header Authorization");
                 return value;
             }
         }

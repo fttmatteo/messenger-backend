@@ -1,6 +1,7 @@
 package app.infrastructure.external;
 
 import app.domain.ports.WhatsAppMessagePort;
+import app.domain.util.LogSanitizer;
 import app.infrastructure.config.WhatsAppConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,7 +162,7 @@ public class WhatsAppCloudClient implements WhatsAppMessagePort {
                     String.class);
 
             if (response.getStatusCode().is2xxSuccessful()) {
-                logger.info("[WhatsApp] Mensaje {} enviado a {}", type, maskPhone(to));
+                logger.info("[WhatsApp] Mensaje {} enviado a {}", type, LogSanitizer.maskGeneric(to, 4));
                 return true;
             } else {
                 logger.error("[WhatsApp] Error enviando mensaje {}: {}", type, response.getBody());
@@ -173,10 +174,5 @@ public class WhatsAppCloudClient implements WhatsAppMessagePort {
         }
     }
 
-    private String maskPhone(String phone) {
-        if (phone == null || phone.length() <= 4) {
-            return phone;
-        }
-        return "****" + phone.substring(phone.length() - 4);
-    }
+
 }

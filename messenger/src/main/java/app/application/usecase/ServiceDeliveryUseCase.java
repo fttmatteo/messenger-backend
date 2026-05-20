@@ -165,8 +165,6 @@ public class ServiceDeliveryUseCase {
         try {
             ServiceDelivery updated = updateService.updateStatus(serviceId, newStatus, observation, signature, photos,
                     userId, latitude, longitude);
-            logger.info("Estado de servicio actualizado - ID: {} | Nuevo Estado: {} | Usuario: {}",
-                    serviceId, newStatus, userId);
             return updated;
         } catch (Exception e) {
             cleanupFiles(savedPaths);

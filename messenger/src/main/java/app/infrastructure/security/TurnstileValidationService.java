@@ -38,7 +38,7 @@ public class TurnstileValidationService {
      */
     public boolean validateToken(String token) {
         if ("1x00000000000000000000000000000000AA".equals(secretKey)) {
-            logger.info("Bypass de Turnstile detectado (usando clave de prueba de Cloudflare)");
+            logger.debug("Bypass de Turnstile detectado (clave de prueba)");
             return true;
         }
 

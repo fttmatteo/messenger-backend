@@ -49,6 +49,7 @@ public class DeleteServiceDelivery {
         service.setDeletedAt(LocalDateTime.now());
 
         serviceDeliveryPort.save(service);
+        logger.info("Servicio ID {} movido a la papelera (Soft Delete de sistema/automático)", id);
     }
 
     /**
@@ -78,6 +79,8 @@ public class DeleteServiceDelivery {
         service.setDeletedAt(LocalDateTime.now());
 
         serviceDeliveryPort.save(service);
+        logger.info("Servicio ID {} movido a la papelera por el usuario ID {} (Anterior estado: {})", 
+                id, userId, previousStatus);
     }
 
     /**
@@ -113,7 +116,9 @@ public class DeleteServiceDelivery {
         history.setChangedBy(user);
         service.addHistory(history);
 
-        return serviceDeliveryPort.save(service);
+        ServiceDelivery restored = serviceDeliveryPort.save(service);
+        logger.info("Servicio ID {} restaurado de la papelera por el administrador ID {}", id, userId);
+        return restored;
     }
 
     /**
@@ -131,6 +136,7 @@ public class DeleteServiceDelivery {
         }
 
         archivePort.archiveService(service, null, "Manual archive");
+        logger.info("Servicio ID {} archivado permanentemente", id);
     }
 
     /**
@@ -142,6 +148,7 @@ public class DeleteServiceDelivery {
         int pageSize = 100;
         org.springframework.data.domain.Page<ServiceDelivery> page;
 
+        logger.info("Iniciando proceso para vaciar papelera (archivado automático)...");
         do {
             page = serviceDeliveryPort.findDeleted(org.springframework.data.domain.PageRequest.of(0, pageSize));
             if (page.isEmpty()) {
@@ -158,6 +165,7 @@ public class DeleteServiceDelivery {
             }
         } while (page.hasNext());
 
+        logger.info("Proceso de vaciado de papelera terminado. Total archivados: {}", totalArchived);
         return totalArchived;
     }
 }

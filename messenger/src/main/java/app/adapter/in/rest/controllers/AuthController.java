@@ -61,7 +61,6 @@ public class AuthController {
             HttpServletResponse response) {
 
         Long document = credentials.getDocument();
-        LogSanitizer.maskDocument(document);
 
         if (!turnstileValidationService.validateToken(credentials.getTurnstileToken())) {
             logger.warn("Login rechazado - validación de Turnstile fallida para documento: {}",
@@ -102,8 +101,6 @@ public class AuthController {
                     "/");
             response.addCookie(accessTokenCookie);
 
-            logger.info("Login exitoso. Expiración configurada: {} ms ({} segundos). Cookie 'accessToken' seteada.",
-                    accessTokenExpiration, accessTokenExpiration / 1000);
 
             Cookie refreshTokenCookie = createSecureCookie(
                     "refreshToken",
@@ -130,11 +127,7 @@ public class AuthController {
         } catch (app.domain.exception.BusinessException e) {
             int remainingAttempts = rateLimitService.recordFailedAttempt(document);
 
-            logger.warn("Login fallido para documento: {}. Intentos restantes: {} - Motivo: {}",
-                    LogSanitizer.maskDocument(document),
-                    remainingAttempts,
-                    e.getMessage().contains("Contrasena incorrecta") || e.getMessage().contains("Usuario no encontrado")
-                        ? "Credenciales invalidas" : e.getMessage());
+
 
             String errorMessage = remainingAttempts > 0
                     ? String.format("Credenciales inválidas. Intentos restantes: %d", remainingAttempts)

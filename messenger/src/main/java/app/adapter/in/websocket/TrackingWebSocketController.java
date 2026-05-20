@@ -162,7 +162,7 @@ public class TrackingWebSocketController {
      */
     @MessageMapping("/tracking/subscribe/all")
     public void subscribeToAll() {
-        logger.info("Cliente suscrito a actualizaciones de todos los mensajeros");
+        logger.debug("Cliente suscrito a actualizaciones de todos los mensajeros");
     }
 
     private LiveTrackingResponse mapToResponse(LiveTracking tracking) {

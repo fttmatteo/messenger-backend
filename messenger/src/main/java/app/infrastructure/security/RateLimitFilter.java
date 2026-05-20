@@ -70,7 +70,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
                 throw new Exception("ProxyManager no disponible");
             }
         } catch (Exception e) {
-            logger.error("Redis no está disponible para Rate Limiting. Usando fallback local para IP: {}", clientIp);
+            logger.error("Redis no está disponible para Rate Limiting. Usando fallback local.");
             bucket = localFallbackCache.computeIfAbsent(key,
                     k -> Bucket.builder().addLimit(limit -> limit
                             .capacity(key.contains("auth") ? AUTH_REQUESTS_PER_MINUTE : GENERAL_REQUESTS_PER_MINUTE)
