@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import app.domain.exception.BusinessException;
@@ -25,6 +27,8 @@ import app.domain.events.PlateStatusChangedEvent;
  */
 @Service
 public class UpdateServiceDelivery {
+
+    private static final Logger logger = LoggerFactory.getLogger(UpdateServiceDelivery.class);
 
     private static final Set<Status> MESSENGER_ALLOWED_STATES = Set.of(Status.PENDING, Status.DELIVERED,
             Status.RETURNED);
@@ -56,20 +60,27 @@ public class UpdateServiceDelivery {
 
         ServiceDelivery service = serviceDeliveryPort.findByIdActive(serviceId);
         if (service == null) {
+            logger.warn("Fallo al actualizar servicio: ID {} no existe o está en la papelera", serviceId);
             throw new BusinessException("El servicio con ID " + serviceId + " no existe o está en la papelera.");
         }
 
         Employee user = employeePort.findById(userId);
         if (user == null) {
+            logger.warn("Fallo al actualizar servicio {}: Usuario ID {} no existe", serviceId, userId);
             throw new BusinessException("El usuario con ID " + userId + " no existe.");
         }
 
         Status previousStatus = service.getCurrentStatus();
         Role userRole = user.getRole();
 
-        validateStateTransitionByRole(previousStatus, newStatus, userRole);
-
-        validateEvidence(newStatus, signature, photos, observation, userRole);
+        try {
+            validateStateTransitionByRole(previousStatus, newStatus, userRole);
+            validateEvidence(newStatus, signature, photos, observation, userRole);
+        } catch (BusinessException e) {
+            logger.warn("Validación de actualización fallida para servicio ID {}: de {} a {} por usuario ID {} (Rol {}). Razón: {}", 
+                    serviceId, previousStatus, newStatus, userId, userRole, e.getMessage());
+            throw e;
+        }
 
         service.setCurrentStatus(newStatus);
 
@@ -121,6 +132,8 @@ public class UpdateServiceDelivery {
         }
 
         ServiceDelivery saved = serviceDeliveryPort.save(service);
+        logger.info("Servicio ID {} actualizado exitosamente de {} a {} por usuario ID {}", 
+                serviceId, previousStatus, newStatus, userId);
         eventPublisher.publishEvent(new PlateStatusChangedEvent(saved, previousStatus, newStatus));
         return saved;
     }
@@ -137,6 +150,7 @@ public class UpdateServiceDelivery {
 
         Employee admin = employeePort.findById(adminUserId);
         if (admin == null || admin.getRole() != Role.ADMIN) {
+            logger.warn("Intento no autorizado de reasignar servicio ID {} por usuario ID {}", serviceId, adminUserId);
             throw new BusinessException("Solo los administradores pueden reasignar servicios.");
         }
 
@@ -166,6 +180,8 @@ public class UpdateServiceDelivery {
         service.addHistory(history);
 
         ServiceDelivery saved = serviceDeliveryPort.save(service);
+        logger.info("Servicio ID {} reasignado al mensajero ID {} por administrador ID {}", 
+                serviceId, newMessengerId, adminUserId);
         eventPublisher.publishEvent(new PlateStatusChangedEvent(saved, previousStatus, Status.ASSIGNED));
         return saved;
     }

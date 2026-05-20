@@ -45,6 +45,8 @@ public class EmployeeUseCase {
 
     public Employee create(Employee employee) throws Exception {
         Employee created = createEmployee.create(employee);
+        logger.info("Empleado creado exitosamente - ID: {} | Rol: {}", 
+                created.getIdEmployee(), created.getRole());
         return created;
     }
 
@@ -55,6 +57,7 @@ public class EmployeeUseCase {
 
     public Employee update(Long id, Employee employee) throws Exception {
         Employee updated = updateEmployee.update(id, employee);
+        logger.info("Empleado ID {} actualizado exitosamente", id);
         return updated;
     }
 
@@ -103,7 +106,7 @@ public class EmployeeUseCase {
 
     public void deleteById(Long id) throws Exception {
         deleteEmployee.deleteById(id);
-        logger.warn("Eliminando empleado ID: {}", id);
+        logger.info("Empleado ID {} eliminado exitosamente", id);
     }
 
     /**
@@ -116,6 +119,8 @@ public class EmployeeUseCase {
         incomingData.setDocument(existing.getDocument());
         incomingData.setRole(existing.getRole());
 
-        return updateEmployee.update(id, incomingData);
+        Employee updated = updateEmployee.update(id, incomingData);
+        logger.info("Perfil de empleado ID {} actualizado", id);
+        return updated;
     }
 }

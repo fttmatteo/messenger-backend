@@ -54,14 +54,12 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
             boolean isProduction = activeProfiles != null && activeProfiles.contains("prod");
 
             if (token == null) {
-                logger.warn("Token no encontrado en CONNECT.");
-
                 if (isProduction) {
-                    logger.warn("WebSocket connection attempt without JWT token in PRODUCTION - rejecting. " +
-                            "Session ID: {} | User: {}", accessor.getSessionId(), accessor.getUser());
+                    logger.warn("[Seguridad] WebSocket CONNECT sin JWT en producción - rechazado. SessionID: {}",
+                            accessor.getSessionId());
                     throw new IllegalArgumentException("Token JWT requerido para conexión WebSocket");
                 } else {
-                    logger.warn("WebSocket connection without JWT token - allowed in development");
+                    logger.debug("WebSocket CONNECT sin JWT - permitido en desarrollo");
                     return message;
                 }
             }

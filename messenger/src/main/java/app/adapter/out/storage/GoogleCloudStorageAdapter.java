@@ -136,15 +136,23 @@ public class GoogleCloudStorageAdapter implements StoragePort {
      * Uses an in-memory cache to avoid repeated IAM API calls.
      */
     public String regenerateSignedUrl(String objectName, int expirationHours) {
-        Optional<String> cachedUrl = cachePort.getUrl(objectName);
-        if (cachedUrl.isPresent()) {
-            return cachedUrl.get();
+        try {
+            Optional<String> cachedUrl = cachePort.getUrl(objectName);
+            if (cachedUrl.isPresent()) {
+                return cachedUrl.get();
+            }
+        } catch (Exception e) {
+            logger.warn("Fallo al leer caché de almacenamiento en Redis. Se generará URL directamente: {}", e.getMessage());
         }
 
         String newUrl = generateSignedUrlInternal(objectName, expirationHours, this.credentials);
 
-        long ttlSeconds = (expirationHours - CACHE_EXPIRATION_MARGIN_HOURS) * 3600L;
-        cachePort.cacheUrl(objectName, newUrl, ttlSeconds);
+        try {
+            long ttlSeconds = (expirationHours - CACHE_EXPIRATION_MARGIN_HOURS) * 3600L;
+            cachePort.cacheUrl(objectName, newUrl, ttlSeconds);
+        } catch (Exception e) {
+            logger.warn("Fallo al guardar URL firmada en caché Redis: {}", e.getMessage());
+        }
 
         return newUrl;
     }
@@ -264,7 +272,11 @@ public class GoogleCloudStorageAdapter implements StoragePort {
         BlobId blobId = BlobId.of(bucketName, objectName);
         boolean deleted = storage.delete(blobId);
         if (deleted) {
-            cachePort.evictUrl(objectName);
+            try {
+                cachePort.evictUrl(objectName);
+            } catch (Exception e) {
+                logger.warn("Fallo al desalojar URL del caché Redis tras eliminación: {}", e.getMessage());
+            }
         } else {
             logger.warn("No se pudo eliminar el objeto (posiblemente no existe)");
         }

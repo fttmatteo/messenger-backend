@@ -4,6 +4,7 @@ import app.domain.model.WhatsAppSession;
 import app.domain.ports.WhatsAppMessagePort;
 import app.domain.ports.WhatsAppSessionPort;
 import app.domain.model.enums.WhatsAppConversationState;
+import app.domain.util.LogSanitizer;
 import app.infrastructure.persistence.repository.WhatsAppSessionRepository;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.slf4j.Logger;
@@ -57,10 +58,10 @@ public class WhatsAppTimeoutScheduler {
                 session.setTimeoutNotified(true);
                 sessionPort.updateSession(session);
 
-                logger.debug("[Scheduler] Sesión de {} reseteada silenciosamente por inactividad.", maskPhone(session.getPhoneNumber()));
+                logger.debug("[Scheduler] Sesión de {} reseteada silenciosamente por inactividad.", LogSanitizer.maskGeneric(session.getPhoneNumber(), 4));
             } catch (Exception e) {
                 logger.error("[Scheduler] Error procesando timeout silencioso para sessionId={} phone={}: {}",
-                        session.getId(), maskPhone(session.getPhoneNumber()), e.getMessage(), e);
+                        session.getId(), LogSanitizer.maskGeneric(session.getPhoneNumber(), 4), e.getMessage(), e);
             }
         }
     }
@@ -78,10 +79,5 @@ public class WhatsAppTimeoutScheduler {
         }
     }
 
-    private String maskPhone(String phone) {
-        if (phone == null || phone.length() <= 4) {
-            return phone;
-        }
-        return "****" + phone.substring(phone.length() - 4);
-    }
+
 }

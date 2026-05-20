@@ -4,8 +4,6 @@ import app.domain.exception.GeolocationException;
 import app.domain.model.Dealership;
 import app.domain.model.Location;
 import app.domain.ports.DealershipPort;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +12,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ValidateDeliveryLocationUseCase {
-
-    private static final Logger logger = LoggerFactory.getLogger(ValidateDeliveryLocationUseCase.class);
 
     private final DealershipPort dealershipPort;
     private final Double maxDistanceMeters;
@@ -44,9 +40,6 @@ public class ValidateDeliveryLocationUseCase {
         Double distance = deliveryLocation.distanceTo(dealershipLocation);
 
         if (distance == null || distance > maxDistanceMeters) {
-            logger.warn("Validación fallida: Distancia {}m excede máximo {}m para concesionario {}",
-                    distance, maxDistanceMeters, dealership.getName());
-
             throw new GeolocationException(
                     String.format(
                             "La entrega debe realizarse en el concesionario '%s'. " +
