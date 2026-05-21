@@ -1,17 +1,22 @@
 package app.domain.services;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import app.domain.model.Employee;
 import app.domain.model.enums.Role;
 import app.domain.ports.EmployeePort;
+import app.domain.util.LogSanitizer;
 
 /**
  * Servicio para búsqueda de empleados.
  */
 @Service
 public class SearchEmployee {
+
+    private static final Logger logger = LoggerFactory.getLogger(SearchEmployee.class);
 
     @Autowired
     private EmployeePort employeePort;
@@ -36,7 +41,8 @@ public class SearchEmployee {
     public Employee findById(Long id) {
         Employee employee = employeePort.findById(id);
         if (employee == null) {
-            throw new RuntimeException("El empleado con ID " + id + " no existe.");
+            logger.warn("Empleado no encontrado: ID {}", id);
+            throw new RuntimeException("El empleado no existe.");
         }
         return employee;
     }
@@ -47,7 +53,8 @@ public class SearchEmployee {
     public Employee findByDocument(Long document) {
         Employee employee = employeePort.findByDocument(document);
         if (employee == null) {
-            throw new RuntimeException("El empleado con documento " + document + " no existe.");
+            logger.warn("Empleado no encontrado: documento {}", LogSanitizer.maskDocument(document));
+            throw new RuntimeException("El empleado no existe.");
         }
         return employee;
     }
@@ -58,7 +65,8 @@ public class SearchEmployee {
     public Employee findByUuid(String uuid) {
         Employee employee = employeePort.findByUuid(uuid);
         if (employee == null) {
-            throw new RuntimeException("El empleado con UUID " + uuid + " no existe.");
+            logger.warn("Empleado no encontrado: UUID {}", uuid);
+            throw new RuntimeException("El empleado no existe.");
         }
         return employee;
     }

@@ -2,7 +2,6 @@ package app.domain.services;
 
 import app.domain.model.Dealership;
 import app.domain.model.ServiceDelivery;
-import app.domain.model.Location;
 import app.domain.util.LogSanitizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +37,6 @@ public class WhatsAppBotService {
     private final WhatsAppMessagePort messagePort;
     private final WhatsAppSessionPort sessionPort;
     private final SearchServiceDelivery searchService;
-    private final LocationPort locationPort;
     private final WhatsAppRateLimitPort rateLimitPort;
 
     public WhatsAppBotService(
@@ -51,7 +49,6 @@ public class WhatsAppBotService {
         this.messagePort = messagePort;
         this.sessionPort = sessionPort;
         this.searchService = searchService;
-        this.locationPort = locationPort;
         this.rateLimitPort = rateLimitPort;
     }
 
@@ -251,26 +248,8 @@ public class WhatsAppBotService {
 
     private void sendPlateDetails(String from, List<ServiceDelivery> services) {
         for (ServiceDelivery s : services) {
-
-
             messagePort.sendTextMessage(from, formatServiceDetail(s));
             sleep(500);
-
-            Dealership dealership = s.getDealership();
-            if (dealership != null && dealership.getLatitude() != null && dealership.getLongitude() != null) {
-                double lat = dealership.getLatitude();
-                double lon = dealership.getLongitude();
-                String address = dealership.getAddress();
-                if (address == null || address.trim().isEmpty()) {
-                    address = locationPort.reverseGeocode(new Location(lat, lon));
-                }
-
-                messagePort.sendLocation(from,
-                        lat,
-                        lon,
-                        "Ubicación de destino",
-                        address != null && !address.trim().isEmpty() ? address : dealership.getName());
-            }
         }
     }
 
@@ -286,13 +265,18 @@ public class WhatsAppBotService {
         String statusEmoji = getStatusEmoji(s.getCurrentStatus());
         String statusName = getStatusName(s.getCurrentStatus());
 
+        String originDealershipName = s.getOriginDealership() != null
+                ? s.getOriginDealership().getName()
+                : "No disponible";
+
         return String.format(
-                "🛵 *%s*\n\n*ESTADO:* %s %s\n📅 *Fecha de asignación:* %s\n🚚 *Transportista:* %s\n🛞 *Concesionario destino:* %s",
+                "🛵 *%s*\n\n*ESTADO:* %s %s\n⏱️ *Fecha de asignación:* %s\n🚚 *Transportista:* %s\n📍 *Concesionario origen:* %s\n🏁 *Concesionario destino:* %s",
                 s.getPlate().getPlateNumber(),
                 statusEmoji,
                 statusName,
                 s.getCreatedAt() != null ? s.getCreatedAt().format(DATE_FORMAT) : "No disponible",
                 s.getMessenger() != null ? s.getMessenger().getFullName() : "Sin asignar",
+                originDealershipName,
                 s.getDealership().getName());
     }
 

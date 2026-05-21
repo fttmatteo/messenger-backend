@@ -1,17 +1,22 @@
 package app.domain.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import app.domain.exception.BusinessException;
 import app.domain.model.Employee;
 import app.domain.ports.EmployeePort;
+import app.domain.util.LogSanitizer;
 
 /**
  * Servicio para actualizar datos de empleados.
  */
 @Service
 public class UpdateEmployee {
+
+    private static final Logger logger = LoggerFactory.getLogger(UpdateEmployee.class);
 
     @Autowired
     private EmployeePort employeePort;
@@ -25,13 +30,15 @@ public class UpdateEmployee {
     public Employee update(Long id, Employee incomingData) throws Exception {
         Employee existingEmployee = employeePort.findById(id);
         if (existingEmployee == null) {
-            throw new BusinessException("El empleado con ID " + id + " no existe.");
+            logger.warn("Intento de actualizar empleado inexistente: ID {}", id);
+            throw new BusinessException("El empleado indicado no existe.");
         }
 
         if (!existingEmployee.getDocument().equals(incomingData.getDocument())) {
             if (employeePort.findByDocument(incomingData.getDocument()) != null) {
+                logger.warn("Intento de actualizar empleado con documento duplicado: {}", LogSanitizer.maskDocument(incomingData.getDocument()));
                 throw new BusinessException(
-                        "El documento " + incomingData.getDocument() + " ya está registrado por otro empleado.");
+                        "Ese documento ya está registrado por otro empleado.");
             }
             existingEmployee.setDocument(incomingData.getDocument());
         }
@@ -46,6 +53,7 @@ public class UpdateEmployee {
         }
 
         Employee updated = employeePort.save(existingEmployee);
+        logger.info("Empleado actualizado exitosamente: {}", existingEmployee.getFullName());
         return updated;
     }
 }
