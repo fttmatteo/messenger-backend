@@ -67,8 +67,8 @@ public class WhatsAppNotificationListener {
         if (service.getHistory() != null && !service.getHistory().isEmpty()) {
             currentObservation = service.getHistory().stream()
                     .filter(h -> h.getNewStatus() == event.getNewStatus())
-                    .map(h -> h.getObservation())
                     .reduce((first, second) -> second)
+                    .map(h -> h.getObservation())
                     .orElse(null);
         }
         
