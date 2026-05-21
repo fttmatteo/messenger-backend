@@ -1,16 +1,21 @@
 package app.domain.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import app.domain.exception.BusinessException;
 import app.domain.model.Dealership;
 import app.domain.ports.DealershipPort;
+import app.domain.util.LogSanitizer;
 
 /**
  * Servicio para actualizar datos de concesionarios.
  */
 @Service
 public class UpdateDealership {
+
+    private static final Logger logger = LoggerFactory.getLogger(UpdateDealership.class);
 
     @Autowired
     private DealershipPort dealershipPort;
@@ -21,13 +26,15 @@ public class UpdateDealership {
     public Dealership update(Long id, Dealership incomingData) throws Exception {
         Dealership existingDealership = dealershipPort.findById(id);
         if (existingDealership == null) {
-            throw new BusinessException("El concesionario con ID " + id + " no existe.");
+            logger.warn("Intento de actualizar concesionario inexistente: ID {}", id);
+            throw new BusinessException("El concesionario indicado no existe.");
         }
 
         if (!existingDealership.getName().equalsIgnoreCase(incomingData.getName())) {
             Dealership other = dealershipPort.findByName(incomingData.getName());
             if (other != null) {
-                throw new BusinessException("Ya existe otro concesionario con el nombre " + incomingData.getName());
+                logger.warn("Intento de actualizar concesionario con nombre duplicado: {}", incomingData.getName());
+                throw new BusinessException("Ya existe otro concesionario con ese nombre.");
             }
             existingDealership.setName(incomingData.getName());
         }
@@ -37,7 +44,8 @@ public class UpdateDealership {
                         !existingDealership.getWhatsappPin().equals(incomingData.getWhatsappPin()))) {
             Dealership withPin = dealershipPort.findByWhatsappPin(incomingData.getWhatsappPin());
             if (withPin != null && !withPin.getIdDealership().equals(existingDealership.getIdDealership())) {
-                throw new BusinessException("El PIN de WhatsApp " + incomingData.getWhatsappPin() + " ya está en uso.");
+                logger.warn("Intento de actualizar concesionario con PIN de WhatsApp duplicado: {}", LogSanitizer.maskPin(incomingData.getWhatsappPin()));
+                throw new BusinessException("El PIN de WhatsApp ya está en uso.");
             }
         }
 
@@ -47,6 +55,7 @@ public class UpdateDealership {
         existingDealership.setWhatsappPin(incomingData.getWhatsappPin());
 
         Dealership updated = dealershipPort.save(existingDealership);
+        logger.info("Concesionario actualizado exitosamente: {}", existingDealership.getName());
         return updated;
     }
 }

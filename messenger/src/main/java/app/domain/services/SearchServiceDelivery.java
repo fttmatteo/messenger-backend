@@ -1,12 +1,15 @@
 package app.domain.services;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import app.domain.exception.BusinessException;
 import app.domain.model.ServiceDelivery;
 import app.domain.ports.ServiceDeliveryPort;
+import app.domain.util.LogSanitizer;
 
 /**
  * Servicio para búsqueda de servicios de entrega.
@@ -15,6 +18,7 @@ import app.domain.ports.ServiceDeliveryPort;
 @Service
 public class SearchServiceDelivery {
 
+    private static final Logger logger = LoggerFactory.getLogger(SearchServiceDelivery.class);
     private final ServiceDeliveryPort serviceDeliveryPort;
 
     public SearchServiceDelivery(ServiceDeliveryPort serviceDeliveryPort) {
@@ -27,7 +31,8 @@ public class SearchServiceDelivery {
     public ServiceDelivery findById(Long id) throws BusinessException {
         ServiceDelivery service = serviceDeliveryPort.findByIdActive(id);
         if (service == null) {
-            throw new BusinessException("El servicio con ID " + id + " no existe o está en la papelera.");
+            logger.warn("Servicio no encontrado: ID {}", id);
+            throw new BusinessException("El servicio no existe o está en la papelera.");
         }
         return service;
     }
@@ -38,7 +43,8 @@ public class SearchServiceDelivery {
     public ServiceDelivery findByUuid(String uuid) throws BusinessException {
         ServiceDelivery service = serviceDeliveryPort.findByUuidActive(uuid);
         if (service == null) {
-            throw new BusinessException("El servicio con UUID " + uuid + " no existe o está en la papelera.");
+            logger.warn("Servicio no encontrado: UUID {}", uuid);
+            throw new BusinessException("El servicio no existe o está en la papelera.");
         }
         return service;
     }
@@ -49,7 +55,8 @@ public class SearchServiceDelivery {
     public ServiceDelivery findByUuidIncludingDeleted(String uuid) throws BusinessException {
         ServiceDelivery service = serviceDeliveryPort.findByUuidIncludingDeleted(uuid);
         if (service == null) {
-            throw new BusinessException("El servicio con UUID " + uuid + " no existe.");
+            logger.warn("Servicio no encontrado (incluyendo eliminados): UUID {}", uuid);
+            throw new BusinessException("El servicio no existe.");
         }
         return service;
     }
@@ -60,7 +67,8 @@ public class SearchServiceDelivery {
     public ServiceDelivery findByIdIncludingDeleted(Long id) throws BusinessException {
         ServiceDelivery service = serviceDeliveryPort.findById(id);
         if (service == null) {
-            throw new BusinessException("El servicio con ID " + id + " no existe.");
+            logger.warn("Servicio no encontrado (incluyendo eliminados): ID {}", id);
+            throw new BusinessException("El servicio no existe.");
         }
         return service;
     }
