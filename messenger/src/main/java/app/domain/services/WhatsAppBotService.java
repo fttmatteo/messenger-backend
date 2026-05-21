@@ -262,22 +262,56 @@ public class WhatsAppBotService {
     }
 
     private String formatServiceDetail(ServiceDelivery s) {
-        String statusEmoji = getStatusEmoji(s.getCurrentStatus());
-        String statusName = getStatusName(s.getCurrentStatus());
+        String plateNumber = (s.getPlate() != null && s.getPlate().getPlateNumber() != null) 
+                ? s.getPlate().getPlateNumber() 
+                : "Desconocido";
+
+        String statusEmoji = (s.getCurrentStatus() != null) ? getStatusEmoji(s.getCurrentStatus()) : "❓";
+        String statusName = (s.getCurrentStatus() != null) ? getStatusName(s.getCurrentStatus()) : "DESCONOCIDO";
 
         String originDealershipName = s.getOriginDealership() != null
                 ? s.getOriginDealership().getName()
                 : "No disponible";
+                
+        String destinationName = s.getDealership() != null && s.getDealership().getName() != null
+                ? s.getDealership().getName()
+                : "No disponible";
 
-        return String.format(
-                "🛵 *%s*\n\n*ESTADO:* %s %s\n⏱️ *Fecha de asignación:* %s\n🚚 *Transportista:* %s\n📍 *Concesionario origen:* %s\n🏁 *Concesionario destino:* %s",
-                s.getPlate().getPlateNumber(),
-                statusEmoji,
-                statusName,
-                s.getCreatedAt() != null ? s.getCreatedAt().format(DATE_FORMAT) : "No disponible",
-                s.getMessenger() != null ? s.getMessenger().getFullName() : "Sin asignar",
-                originDealershipName,
-                s.getDealership().getName());
+        StringBuilder message = new StringBuilder();
+        message.append(String.format("🛵 *%s*\n\n", plateNumber));
+        message.append(String.format("*ESTADO:* %s %s\n", statusEmoji, statusName));
+        message.append(String.format("⏱️ *Fecha de asignación:* %s\n", s.getCreatedAt() != null ? s.getCreatedAt().format(DATE_FORMAT) : "No disponible"));
+
+        if (s.getCurrentStatus() == Status.DELIVERED || s.getCurrentStatus() == Status.RESOLVED) {
+            String deliveryDateStr = "No disponible";
+            if (s.getHistory() != null) {
+                deliveryDateStr = s.getHistory().stream()
+                        .filter(h -> h.getNewStatus() == Status.DELIVERED)
+                        .map(h -> h.getChangeDate().format(DATE_FORMAT))
+                        .findFirst()
+                        .orElse("No disponible");
+            }
+            message.append(String.format("📦 *Fecha de entrega:* %s\n", deliveryDateStr));
+        }
+
+        message.append(String.format("🚚 *Transportista:* %s\n", s.getMessenger() != null ? s.getMessenger().getFullName() : "Sin asignar"));
+        message.append(String.format("📍 *Origen:* %s\n", originDealershipName));
+        message.append(String.format("🏁 *Destino:* %s", destinationName));
+
+        String currentObservation = null;
+        if (s.getHistory() != null && !s.getHistory().isEmpty()) {
+            currentObservation = s.getHistory().stream()
+                    .filter(h -> h.getNewStatus() == s.getCurrentStatus())
+                    .map(h -> h.getObservation())
+                    .reduce((first, second) -> second)
+                    .orElse(null);
+        }
+
+        if (currentObservation != null && !currentObservation.trim().isEmpty()) {
+            message.append(String.format("\n💬 *Observación:* %s", currentObservation.trim()));
+        }
+
+        return message.toString();
     }
 
     private void sendFilteredList(String from, WhatsAppSession session, String title, List<Status> statuses) {
