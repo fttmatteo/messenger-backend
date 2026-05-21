@@ -52,18 +52,17 @@ public class CreateServiceDelivery {
             throws Exception {
 
         String maskedPlate = LogSanitizer.maskPlate(plateNumber);
-        logger.info("Iniciando creación de servicio de entrega para chasis: {} (Destino: {}, Origen: {}, Mensajero: {})",
-                maskedPlate, dealershipId, originDealershipId, messengerId);
+        logger.info("Iniciando creación de servicio de entrega para chasis: {}", maskedPlate);
 
         Employee messenger = employeePort.findById(messengerId);
         if (messenger == null) {
-            logger.warn("Fallo al crear servicio para chasis {}: Mensajero ID {} no existe", maskedPlate, messengerId);
+            logger.warn("Fallo al crear servicio para chasis {}: mensajero no existe.", maskedPlate);
             throw new BusinessException("El mensajero no existe.");
         }
 
         Dealership dealership = dealershipPort.findById(dealershipId);
         if (dealership == null) {
-            logger.warn("Fallo al crear servicio para chasis {}: Concesionario destino ID {} no existe", maskedPlate, dealershipId);
+            logger.warn("Fallo al crear servicio para chasis {}: concesionario destino no existe.", maskedPlate);
             throw new BusinessException("El concesionario indicado no existe.");
         }
 
@@ -73,12 +72,11 @@ public class CreateServiceDelivery {
         }
         Dealership originDealership = dealershipPort.findById(originDealershipId);
         if (originDealership == null) {
-            logger.warn("Fallo al crear servicio para chasis {}: Concesionario origen ID {} no existe", maskedPlate, originDealershipId);
+            logger.warn("Fallo al crear servicio para chasis {}: concesionario origen no existe.", maskedPlate);
             throw new BusinessException("El concesionario de origen indicado no existe.");
         }
         if (originDealershipId.equals(dealershipId)) {
-            logger.warn("Fallo al crear servicio para chasis {}: Concesionario origen {} es igual al destino {}",
-                    maskedPlate, originDealershipId, dealershipId);
+            logger.warn("Fallo al crear servicio para chasis {}: concesionario origen igual al destino.", maskedPlate);
             throw new BusinessException("El concesionario de origen no puede ser el mismo que el destino.");
         }
 
@@ -142,8 +140,7 @@ public class CreateServiceDelivery {
 
         eventPublisher.publishEvent(new PlateStatusChangedEvent(saved, null, Status.ASSIGNED));
 
-        logger.info("Servicio de entrega creado exitosamente para chasis {} (ID: {}, Origen: {}, Destino: {}, Mensajero: {})",
-                maskedPlate, saved.getIdServiceDelivery(), originDealership.getName(), dealership.getName(), messenger.getFullName());
+        logger.info("Servicio de entrega creado exitosamente para chasis {}.", maskedPlate);
 
         return saved;
     }

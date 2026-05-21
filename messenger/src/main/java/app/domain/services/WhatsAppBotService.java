@@ -112,7 +112,7 @@ public class WhatsAppBotService {
                             sessionPort.getSessionExpirationHours());
                     session.setConversationState(WhatsAppConversationState.MENU);
                     sessionPort.updateSession(session);
-                    logger.info("[Autenticación] Sesión iniciada por el número {} (Concesionario: {})", LogSanitizer.maskGeneric(from, 4), dealership.getName());
+                    logger.info("[Autenticación] Sesión iniciada por el número {}.", LogSanitizer.maskGeneric(from, 4));
                     sendMenu(from, dealership.getName());
                 } else {
                     int remaining = rateLimitPort.recordFailedAttempt(from);

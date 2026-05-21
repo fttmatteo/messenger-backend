@@ -25,10 +25,10 @@ public class DeleteDealership {
     public void deleteById(Long id) throws Exception {
         Dealership existing = dealershipPort.findById(id);
         if (existing == null) {
-            logger.warn("Intento de eliminar concesionario inexistente: ID {}", id);
+            logger.warn("Intento de eliminar concesionario inexistente.");
             throw new BusinessException("El concesionario indicado no existe.");
         }
         dealershipPort.deleteById(id);
-        logger.info("Concesionario eliminado exitosamente: {}", existing.getName());
+        logger.info("Concesionario eliminado exitosamente.");
     }
 }

@@ -52,13 +52,13 @@ public class TrackingWebSocketController {
     @MessageMapping("/tracking/update")
     public void receiveLocationUpdate(LiveTrackingRequest request, Principal principal) {
         Long messengerId = request.getMessengerId();
-        logger.debug("Recibida actualización de tracking para messengerId: {}", messengerId);
+        logger.debug("Recibida actualización de tracking de mensajero.");
 
         boolean isStatusChange = request.getStatus() != null &&
                 request.getStatus() != TrackingStatus.ACTIVE;
 
         if (!isStatusChange && !shouldProcessUpdate(messengerId)) {
-            logger.debug("Update de messengerId {} filtrado por rate limiting", messengerId);
+            logger.debug("Update de mensajero filtrado por rate limiting.");
             return;
         }
         if (request.getLatitude() != null && request.getLongitude() != null) {
@@ -93,9 +93,9 @@ public class TrackingWebSocketController {
             String jsonResponse = objectMapper.writeValueAsString(response);
             redisTemplate.convertAndSend(RedisPubSubConfig.TRACKING_TOPIC, jsonResponse);
 
-            logger.debug("Mensaje publicado en Redis Pub/Sub para messengerId: {}", messengerId);
+            logger.debug("Mensaje publicado en Redis Pub/Sub.");
         } catch (Exception e) {
-            logger.error("Error procesando tracking update para messengerId {}: {}", messengerId, e.getMessage());
+            logger.error("Error procesando tracking update: {}", e.getMessage());
             try {
                 LiveTrackingResponse fallbackResponse = new LiveTrackingResponse(
                         messengerId, null,

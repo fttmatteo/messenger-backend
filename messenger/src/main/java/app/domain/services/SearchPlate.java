@@ -22,7 +22,7 @@ public class SearchPlate {
     public Plate findById(Long idPlate) {
         Plate plate = platePort.findById(idPlate);
         if (plate == null) {
-            logger.warn("Placa no encontrada: ID {}", idPlate);
+            logger.warn("Chasis no encontrado por ID.");
             throw new RuntimeException("El chasis no existe.");
         }
         return plate;

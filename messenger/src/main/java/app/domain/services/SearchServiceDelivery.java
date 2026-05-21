@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import app.domain.exception.BusinessException;
 import app.domain.model.ServiceDelivery;
 import app.domain.ports.ServiceDeliveryPort;
-import app.domain.util.LogSanitizer;
 
 /**
  * Servicio para búsqueda de servicios de entrega.
@@ -31,7 +30,7 @@ public class SearchServiceDelivery {
     public ServiceDelivery findById(Long id) throws BusinessException {
         ServiceDelivery service = serviceDeliveryPort.findByIdActive(id);
         if (service == null) {
-            logger.warn("Servicio no encontrado: ID {}", id);
+            logger.warn("Servicio no encontrado por ID.");
             throw new BusinessException("El servicio no existe o está en la papelera.");
         }
         return service;
@@ -43,7 +42,7 @@ public class SearchServiceDelivery {
     public ServiceDelivery findByUuid(String uuid) throws BusinessException {
         ServiceDelivery service = serviceDeliveryPort.findByUuidActive(uuid);
         if (service == null) {
-            logger.warn("Servicio no encontrado: UUID {}", uuid);
+            logger.warn("Servicio no encontrado por UUID.");
             throw new BusinessException("El servicio no existe o está en la papelera.");
         }
         return service;
@@ -55,7 +54,7 @@ public class SearchServiceDelivery {
     public ServiceDelivery findByUuidIncludingDeleted(String uuid) throws BusinessException {
         ServiceDelivery service = serviceDeliveryPort.findByUuidIncludingDeleted(uuid);
         if (service == null) {
-            logger.warn("Servicio no encontrado (incluyendo eliminados): UUID {}", uuid);
+            logger.warn("Servicio no encontrado (incluyendo eliminados) por UUID.");
             throw new BusinessException("El servicio no existe.");
         }
         return service;
@@ -67,7 +66,7 @@ public class SearchServiceDelivery {
     public ServiceDelivery findByIdIncludingDeleted(Long id) throws BusinessException {
         ServiceDelivery service = serviceDeliveryPort.findById(id);
         if (service == null) {
-            logger.warn("Servicio no encontrado (incluyendo eliminados): ID {}", id);
+            logger.warn("Servicio no encontrado (incluyendo eliminados) por ID.");
             throw new BusinessException("El servicio no existe.");
         }
         return service;

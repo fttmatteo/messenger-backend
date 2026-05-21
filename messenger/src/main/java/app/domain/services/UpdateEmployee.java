@@ -30,7 +30,7 @@ public class UpdateEmployee {
     public Employee update(Long id, Employee incomingData) throws Exception {
         Employee existingEmployee = employeePort.findById(id);
         if (existingEmployee == null) {
-            logger.warn("Intento de actualizar empleado inexistente: ID {}", id);
+            logger.warn("Intento de actualizar empleado inexistente.");
             throw new BusinessException("El empleado indicado no existe.");
         }
 
@@ -53,7 +53,7 @@ public class UpdateEmployee {
         }
 
         Employee updated = employeePort.save(existingEmployee);
-        logger.info("Empleado actualizado exitosamente: {}", existingEmployee.getFullName());
+        logger.info("Empleado actualizado exitosamente.");
         return updated;
     }
 }

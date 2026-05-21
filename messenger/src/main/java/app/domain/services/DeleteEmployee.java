@@ -28,18 +28,18 @@ public class DeleteEmployee {
     public void deleteById(Long id) throws Exception {
         Employee employee = employeePort.findById(id);
         if (employee == null) {
-            logger.warn("Intento de eliminar empleado inexistente: ID {}", id);
+            logger.warn("Intento de eliminar empleado inexistente.");
             throw new BusinessException("El empleado indicado no existe.");
         }
 
         var deliveriesPage = serviceDeliveryPort.findByMessengerPaginated(id, null, null, null,
                 org.springframework.data.domain.PageRequest.of(0, 1));
         if (deliveriesPage.getTotalElements() > 0) {
-            logger.warn("Intento de eliminar empleado con servicios asignados: ID {}, cantidad: {}", id, deliveriesPage.getTotalElements());
+            logger.warn("Intento de eliminar empleado con servicios asignados.");
             throw new BusinessException("No se puede eliminar. El empleado tiene servicios de entrega asociados.");
         }
 
         employeePort.deleteById(id);
-        logger.info("Empleado eliminado exitosamente: {}", employee.getFullName());
+        logger.info("Empleado eliminado exitosamente.");
     }
 }

@@ -60,14 +60,14 @@ public class UpdateServiceDelivery {
 
         ServiceDelivery service = serviceDeliveryPort.findByIdActive(serviceId);
         if (service == null) {
-            logger.warn("Fallo al actualizar servicio: ID {} no existe o está en la papelera", serviceId);
-            throw new BusinessException("El servicio con ID " + serviceId + " no existe o está en la papelera.");
+            logger.warn("Fallo al actualizar servicio: no existe o está en la papelera.");
+            throw new BusinessException("El servicio no existe o está en la papelera.");
         }
 
         Employee user = employeePort.findById(userId);
         if (user == null) {
-            logger.warn("Fallo al actualizar servicio {}: Usuario ID {} no existe", serviceId, userId);
-            throw new BusinessException("El usuario con ID " + userId + " no existe.");
+            logger.warn("Fallo al actualizar servicio: usuario no existe.");
+            throw new BusinessException("El usuario indicado no existe.");
         }
 
         Status previousStatus = service.getCurrentStatus();
@@ -77,8 +77,8 @@ public class UpdateServiceDelivery {
             validateStateTransitionByRole(previousStatus, newStatus, userRole);
             validateEvidence(newStatus, signature, photos, observation, userRole);
         } catch (BusinessException e) {
-            logger.warn("Validación de actualización fallida para servicio ID {}: de {} a {} por usuario ID {} (Rol {}). Razón: {}", 
-                    serviceId, previousStatus, newStatus, userId, userRole, e.getMessage());
+            logger.warn("Validación de actualización fallida: de {} a {} (Rol {}). Razón: {}",
+                    previousStatus, newStatus, userRole, e.getMessage());
             throw e;
         }
 
@@ -132,8 +132,8 @@ public class UpdateServiceDelivery {
         }
 
         ServiceDelivery saved = serviceDeliveryPort.save(service);
-        logger.info("Servicio ID {} actualizado exitosamente de {} a {} por usuario ID {}", 
-                serviceId, previousStatus, newStatus, userId);
+        logger.info("Servicio actualizado exitosamente de {} a {} (Rol {}).",
+                previousStatus, newStatus, user.getRole());
         eventPublisher.publishEvent(new PlateStatusChangedEvent(saved, previousStatus, newStatus));
         return saved;
     }
@@ -145,12 +145,12 @@ public class UpdateServiceDelivery {
     public ServiceDelivery reassignMessenger(Long serviceId, Long newMessengerId, Long adminUserId) throws Exception {
         ServiceDelivery service = serviceDeliveryPort.findByIdActive(serviceId);
         if (service == null) {
-            throw new BusinessException("El servicio con ID " + serviceId + " no existe o está en la papelera.");
+            throw new BusinessException("El servicio no existe o está en la papelera.");
         }
 
         Employee admin = employeePort.findById(adminUserId);
         if (admin == null || admin.getRole() != Role.ADMIN) {
-            logger.warn("Intento no autorizado de reasignar servicio ID {} por usuario ID {}", serviceId, adminUserId);
+            logger.warn("Intento no autorizado de reasignar servicio por usuario sin rol ADMIN.");
             throw new BusinessException("Solo los administradores pueden reasignar servicios.");
         }
 
@@ -161,7 +161,7 @@ public class UpdateServiceDelivery {
 
         Employee newMessenger = employeePort.findById(newMessengerId);
         if (newMessenger == null) {
-            throw new BusinessException("El mensajero con ID " + newMessengerId + " no existe.");
+            throw new BusinessException("El mensajero indicado no existe.");
         }
 
         if (newMessenger.getRole() != Role.MESSENGER) {
@@ -180,8 +180,7 @@ public class UpdateServiceDelivery {
         service.addHistory(history);
 
         ServiceDelivery saved = serviceDeliveryPort.save(service);
-        logger.info("Servicio ID {} reasignado al mensajero ID {} por administrador ID {}", 
-                serviceId, newMessengerId, adminUserId);
+        logger.info("Servicio reasignado exitosamente al nuevo mensajero por administrador.");
         eventPublisher.publishEvent(new PlateStatusChangedEvent(saved, previousStatus, Status.ASSIGNED));
         return saved;
     }

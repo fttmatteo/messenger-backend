@@ -23,7 +23,7 @@ public class CreateDealership {
     public Dealership create(Dealership dealership) throws Exception {
         Dealership existing = dealershipPort.findByName(dealership.getName());
         if (existing != null) {
-            logger.warn("Intento de crear concesionario con nombre duplicado: {}", dealership.getName());
+            logger.warn("Intento de crear concesionario con nombre duplicado.");
             throw new BusinessException("Ya existe un concesionario con ese nombre.");
         }
 
@@ -36,7 +36,7 @@ public class CreateDealership {
         }
 
         Dealership saved = dealershipPort.save(dealership);
-        logger.info("Concesionario creado exitosamente: {}", dealership.getName());
+        logger.info("Concesionario creado exitosamente.");
         return saved;
     }
 }

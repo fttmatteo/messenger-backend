@@ -41,7 +41,7 @@ public class SearchEmployee {
     public Employee findById(Long id) {
         Employee employee = employeePort.findById(id);
         if (employee == null) {
-            logger.warn("Empleado no encontrado: ID {}", id);
+            logger.warn("Empleado no encontrado por ID.");
             throw new RuntimeException("El empleado no existe.");
         }
         return employee;
@@ -65,7 +65,7 @@ public class SearchEmployee {
     public Employee findByUuid(String uuid) {
         Employee employee = employeePort.findByUuid(uuid);
         if (employee == null) {
-            logger.warn("Empleado no encontrado: UUID {}", uuid);
+            logger.warn("Empleado no encontrado por UUID.");
             throw new RuntimeException("El empleado no existe.");
         }
         return employee;

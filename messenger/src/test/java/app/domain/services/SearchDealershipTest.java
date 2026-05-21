@@ -60,7 +60,7 @@ class SearchDealershipTest {
         ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class,
                 () -> searchDealership.findById(1L));
 
-        assertEquals("El concesionario con ID 1 no existe.", ex.getMessage());
+        assertEquals("El concesionario no existe.", ex.getMessage());
     }
 
     @Test
@@ -84,6 +84,6 @@ class SearchDealershipTest {
 
         RuntimeException ex = assertThrows(RuntimeException.class, () -> searchDealership.findByName("Central"));
 
-        assertEquals("El concesionario con nombre Central no existe.", ex.getMessage());
+        assertEquals("El concesionario no existe.", ex.getMessage());
     }
 }

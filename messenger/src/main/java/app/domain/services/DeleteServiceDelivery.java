@@ -44,7 +44,7 @@ public class DeleteServiceDelivery {
         service.setDeletedAt(LocalDateTime.now());
 
         serviceDeliveryPort.save(service);
-        logger.info("Servicio ID {} movido a la papelera (Soft Delete de sistema/automático)", id);
+        logger.info("Servicio movido a la papelera (Soft Delete automático).");
     }
 
     /**
@@ -55,7 +55,7 @@ public class DeleteServiceDelivery {
 
         Employee user = employeePort.findById(userId);
         if (user == null) {
-            logger.warn("Intento de eliminar servicio con usuario inexistente: ID {}", userId);
+            logger.warn("Intento de eliminar servicio con usuario inexistente.");
             throw new BusinessException("Usuario indicado no existe.");
         }
 
@@ -71,8 +71,7 @@ public class DeleteServiceDelivery {
         service.setDeletedAt(LocalDateTime.now());
 
         serviceDeliveryPort.save(service);
-        logger.info("Servicio ID {} movido a la papelera por el usuario ID {} (Anterior estado: {})",
-                id, userId, previousStatus);
+        logger.info("Servicio movido a la papelera por usuario (anterior estado: {}).", previousStatus);
     }
 
     /**
@@ -82,23 +81,23 @@ public class DeleteServiceDelivery {
     public ServiceDelivery restore(Long id, Long userId) throws Exception {
         ServiceDelivery service = serviceDeliveryPort.findById(id);
         if (service == null) {
-            logger.warn("Intento de restaurar servicio inexistente: ID {}", id);
+            logger.warn("Intento de restaurar servicio inexistente.");
             throw new BusinessException("El servicio no existe.");
         }
 
         if (!service.isDeleted()) {
-            logger.warn("Intento de restaurar servicio no eliminado: ID {}", id);
+            logger.warn("Intento de restaurar servicio que no está en la papelera.");
             throw new BusinessException("El servicio no está en la papelera.");
         }
 
         Employee user = employeePort.findById(userId);
         if (user == null) {
-            logger.warn("Intento de restaurar servicio con usuario inexistente: ID {}", userId);
+            logger.warn("Intento de restaurar servicio con usuario inexistente.");
             throw new BusinessException("Usuario indicado no existe.");
         }
 
         if (user.getRole() != Role.ADMIN) {
-            logger.warn("Intento de restaurar servicio por usuario sin permisos: ID {}", userId);
+            logger.warn("Intento de restaurar servicio por usuario sin permisos de administrador.");
             throw new BusinessException("Solo administradores pueden restaurar servicios.");
         }
 
@@ -113,7 +112,7 @@ public class DeleteServiceDelivery {
         service.addHistory(history);
 
         ServiceDelivery restored = serviceDeliveryPort.save(service);
-        logger.info("Servicio ID {} restaurado de la papelera por el administrador ID {}", id, userId);
+        logger.info("Servicio restaurado de la papelera por administrador.");
         return restored;
     }
 
@@ -124,17 +123,17 @@ public class DeleteServiceDelivery {
     public void archiveService(Long id) throws Exception {
         ServiceDelivery service = serviceDeliveryPort.findById(id);
         if (service == null) {
-            logger.warn("Intento de archivar servicio inexistente: ID {}", id);
+            logger.warn("Intento de archivar servicio inexistente.");
             throw new BusinessException("El servicio no existe.");
         }
 
         if (!service.isDeleted()) {
-            logger.warn("Intento de archivar servicio no eliminado: ID {}", id);
+            logger.warn("Intento de archivar servicio no eliminado.");
             throw new BusinessException("Solo se pueden archivar servicios en la papelera.");
         }
 
         archivePort.archiveService(service, null, "Manual archive");
-        logger.info("Servicio ID {} archivado permanentemente", id);
+        logger.info("Servicio archivado permanentemente.");
     }
 
     /**
@@ -158,7 +157,7 @@ public class DeleteServiceDelivery {
                     archivePort.archiveService(service, null, "Manual trash empty");
                     totalArchived++;
                 } catch (Exception e) {
-                    logger.error("Error archivando servicio {}: {}", service.getIdServiceDelivery(), e.getMessage());
+                    logger.error("Error archivando servicio en papelera: {}", e.getMessage());
                 }
             }
         } while (page.hasNext());
@@ -177,7 +176,7 @@ public class DeleteServiceDelivery {
     private ServiceDelivery validateServiceExists(Long id) throws BusinessException {
         ServiceDelivery service = serviceDeliveryPort.findByIdActive(id);
         if (service == null) {
-            logger.warn("Intento de eliminar servicio inexistente: ID {}", id);
+            logger.warn("Intento de eliminar servicio inexistente.");
             throw new BusinessException("El servicio no existe o ya está en la papelera.");
         }
         return service;
@@ -189,22 +188,22 @@ public class DeleteServiceDelivery {
     public void permanentDeleteById(Long id, Long userId) throws Exception {
         ServiceDelivery service = serviceDeliveryPort.findById(id);
         if (service == null) {
-            logger.warn("Intento de eliminar permanentemente servicio inexistente: ID {}", id);
+            logger.warn("Intento de eliminar permanentemente servicio inexistente.");
             throw new BusinessException("El servicio no existe.");
         }
 
         if (!service.isDeleted()) {
-            logger.warn("Intento de eliminar permanentemente servicio no eliminado: ID {}", id);
+            logger.warn("Intento de eliminar permanentemente servicio que no está en la papelera.");
             throw new BusinessException("Solo se pueden eliminar permanentemente servicios en la papelera.");
         }
 
         Employee user = employeePort.findById(userId);
         if (user == null) {
-            logger.warn("Intento de eliminar permanentemente con usuario inexistente: ID {}", userId);
+            logger.warn("Intento de eliminación permanente con usuario inexistente.");
             throw new BusinessException("Usuario indicado no existe.");
         }
 
         archivePort.archiveService(service, userId, "Permanent delete by user");
-        logger.info("Servicio ID {} eliminado permanentemente por usuario ID {}", id, userId);
+        logger.info("Servicio eliminado permanentemente por usuario administrador.");
     }
 }

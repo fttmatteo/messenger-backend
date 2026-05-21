@@ -86,7 +86,7 @@ class CreateServiceDeliveryTest {
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> createServiceDelivery.create("ABC1234567", 1L, 2L, 12345678L, null, null));
 
-        assertEquals("El chasis ABC1234567 ya tiene un servicio registrado en el sistema.", exception.getMessage());
+        assertEquals("El chasis ya tiene un servicio registrado en el sistema.", exception.getMessage());
         verify(serviceDeliveryPort, never()).save(any());
     }
 

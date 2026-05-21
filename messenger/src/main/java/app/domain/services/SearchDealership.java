@@ -35,7 +35,7 @@ public class SearchDealership {
     public Dealership findById(Long id) {
         Dealership dealership = dealershipPort.findById(id);
         if (dealership == null) {
-            logger.warn("Concesionario no encontrado: ID {}", id);
+            logger.warn("Concesionario no encontrado por ID.");
             throw new ResourceNotFoundException(
                     "El concesionario no existe.");
         }
@@ -48,7 +48,7 @@ public class SearchDealership {
     public Dealership findByName(String name) {
         Dealership dealership = dealershipPort.findByName(name);
         if (dealership == null) {
-            logger.warn("Concesionario no encontrado: nombre {}", name);
+            logger.warn("Concesionario no encontrado por nombre.");
             throw new RuntimeException("El concesionario no existe.");
         }
         return dealership;
@@ -60,7 +60,7 @@ public class SearchDealership {
     public Dealership findByUuid(String uuid) {
         Dealership dealership = dealershipPort.findByUuid(uuid);
         if (dealership == null) {
-            logger.warn("Concesionario no encontrado: UUID {}", uuid);
+            logger.warn("Concesionario no encontrado por UUID.");
             throw new ResourceNotFoundException("El concesionario no existe.");
         }
         return dealership;

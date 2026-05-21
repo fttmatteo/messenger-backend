@@ -36,7 +36,7 @@ public class CreateEmployee {
         }
 
         Employee saved = employeePort.save(employee);
-        logger.info("Empleado creado exitosamente: {}", employee.getFullName());
+        logger.info("Empleado creado exitosamente.");
         return saved;
     }
 

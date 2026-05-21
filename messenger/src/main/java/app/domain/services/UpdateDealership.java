@@ -26,14 +26,14 @@ public class UpdateDealership {
     public Dealership update(Long id, Dealership incomingData) throws Exception {
         Dealership existingDealership = dealershipPort.findById(id);
         if (existingDealership == null) {
-            logger.warn("Intento de actualizar concesionario inexistente: ID {}", id);
+            logger.warn("Intento de actualizar concesionario inexistente.");
             throw new BusinessException("El concesionario indicado no existe.");
         }
 
         if (!existingDealership.getName().equalsIgnoreCase(incomingData.getName())) {
             Dealership other = dealershipPort.findByName(incomingData.getName());
             if (other != null) {
-                logger.warn("Intento de actualizar concesionario con nombre duplicado: {}", incomingData.getName());
+                logger.warn("Intento de actualizar concesionario con nombre duplicado.");
                 throw new BusinessException("Ya existe otro concesionario con ese nombre.");
             }
             existingDealership.setName(incomingData.getName());
@@ -55,7 +55,7 @@ public class UpdateDealership {
         existingDealership.setWhatsappPin(incomingData.getWhatsappPin());
 
         Dealership updated = dealershipPort.save(existingDealership);
-        logger.info("Concesionario actualizado exitosamente: {}", existingDealership.getName());
+        logger.info("Concesionario actualizado exitosamente.");
         return updated;
     }
 }

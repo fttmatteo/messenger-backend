@@ -53,7 +53,7 @@ public class AuthenticationService {
         if (!passwordEncoder.matches(credentials.getPassword(), employee.getPassword())) {
             if (!isPasswordEncoded(employee.getPassword())
                     && credentials.getPassword().equals(employee.getPassword())) {
-                logger.info("[Seguridad] Actualizando contraseña a BCrypt para empleado ID: {}", employee.getIdEmployee());
+                logger.info("[Seguridad] Actualizando contraseña a BCrypt para empleado existente.");
                 String encoded = passwordEncoder.encode(credentials.getPassword());
                 employee.setPassword(encoded);
                 employeePort.save(employee);

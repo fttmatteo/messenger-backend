@@ -28,7 +28,7 @@ public class CookieHandshakeInterceptor implements HandshakeInterceptor {
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
             WebSocketHandler wsHandler, Map<String, Object> attributes) {
 
-        logger.info("Iniciando WebSocket Handshake. URI: {}", request.getURI());
+        logger.info("Iniciando WebSocket Handshake.");
 
         if (request instanceof ServletServerHttpRequest servletRequest) {
             HttpServletRequest httpRequest = servletRequest.getServletRequest();

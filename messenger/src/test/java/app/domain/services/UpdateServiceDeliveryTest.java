@@ -100,7 +100,7 @@ class UpdateServiceDeliveryTest {
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> updateServiceDelivery.updateStatus(99L, Status.PENDING, "Obs", signature, photos, 1L));
 
-        assertEquals("El servicio con ID 99 no existe o está en la papelera.", ex.getMessage());
+        assertEquals("El servicio no existe o está en la papelera.", ex.getMessage());
     }
 
     @Test
@@ -415,7 +415,7 @@ class UpdateServiceDeliveryTest {
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> updateServiceDelivery.updateStatus(1L, Status.PENDING, "Obs", signature, photos, 99L));
 
-        assertEquals("El usuario con ID 99 no existe.", ex.getMessage());
+        assertEquals("El usuario indicado no existe.", ex.getMessage());
     }
 
     @Test
@@ -427,7 +427,7 @@ class UpdateServiceDeliveryTest {
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> updateServiceDelivery.reassignMessenger(99L, 3L, 2L));
 
-        assertEquals("El servicio con ID 99 no existe o está en la papelera.", ex.getMessage());
+        assertEquals("El servicio no existe o está en la papelera.", ex.getMessage());
     }
 
     @Test
@@ -442,7 +442,7 @@ class UpdateServiceDeliveryTest {
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> updateServiceDelivery.reassignMessenger(1L, 99L, 2L));
 
-        assertEquals("El mensajero con ID 99 no existe.", ex.getMessage());
+        assertEquals("El mensajero indicado no existe.", ex.getMessage());
     }
 
     @Test

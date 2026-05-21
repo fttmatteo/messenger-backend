@@ -82,6 +82,6 @@ class UpdateEmployeeTest {
 
         BusinessException ex = assertThrows(BusinessException.class, () -> updateEmployee.update(1L, income));
 
-        assertEquals("El documento 999 ya está registrado por otro empleado.", ex.getMessage());
+        assertEquals("Ese documento ya está registrado por otro empleado.", ex.getMessage());
     }
 }
