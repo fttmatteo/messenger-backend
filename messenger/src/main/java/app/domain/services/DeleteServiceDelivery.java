@@ -38,12 +38,7 @@ public class DeleteServiceDelivery {
      * permanentemente.
      */
     public void deleteById(Long id) throws Exception {
-        ServiceDelivery service = serviceDeliveryPort.findByIdActive(id);
-        if (service == null) {
-            logger.warn("Intento de eliminar servicio inexistente: ID {}", id);
-            throw new BusinessException(
-                    "El servicio no existe o ya está en la papelera.");
-        }
+        ServiceDelivery service = validateServiceExists(id);
 
         service.setDeleted(true);
         service.setDeletedAt(LocalDateTime.now());
@@ -56,12 +51,7 @@ public class DeleteServiceDelivery {
      * Mueve un servicio a la papelera con registro de quién lo eliminó.
      */
     public void deleteById(Long id, Long userId) throws Exception {
-        ServiceDelivery service = serviceDeliveryPort.findByIdActive(id);
-        if (service == null) {
-            logger.warn("Intento de eliminar servicio inexistente: ID {}", id);
-            throw new BusinessException(
-                    "El servicio no existe o ya está en la papelera.");
-        }
+        ServiceDelivery service = validateServiceExists(id);
 
         Employee user = employeePort.findById(userId);
         if (user == null) {
@@ -178,6 +168,22 @@ public class DeleteServiceDelivery {
     }
 
     /**
+     * Valida que un servicio exista y esté activo (no eliminado).
+     * 
+     * @param id ID del servicio a validar
+     * @return El servicio si existe y está activo
+     * @throws BusinessException si el servicio no existe o está en la papelera
+     */
+    private ServiceDelivery validateServiceExists(Long id) throws BusinessException {
+        ServiceDelivery service = serviceDeliveryPort.findByIdActive(id);
+        if (service == null) {
+            logger.warn("Intento de eliminar servicio inexistente: ID {}", id);
+            throw new BusinessException("El servicio no existe o ya está en la papelera.");
+        }
+        return service;
+    }
+
+    /**
      * Elimina permanentemente un servicio de la papelera.
      */
     public void permanentDeleteById(Long id, Long userId) throws Exception {
@@ -198,7 +204,7 @@ public class DeleteServiceDelivery {
             throw new BusinessException("Usuario indicado no existe.");
         }
 
-        archivePort.archiveService(service, user, "Permanent delete by user");
+        archivePort.archiveService(service, userId, "Permanent delete by user");
         logger.info("Servicio ID {} eliminado permanentemente por usuario ID {}", id, userId);
     }
 }

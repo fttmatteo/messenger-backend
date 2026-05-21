@@ -48,22 +48,7 @@ public class UpdateLiveTrackingUseCase {
             incomingTracking.setStatus(TrackingStatus.ACTIVE);
         }
 
-        if (incomingTracking.getMessengerName() == null || incomingTracking.getMessengerName().isEmpty()) {
-            trackingPort.getMessengerName(incomingTracking.getMessengerId()).ifPresent(incomingTracking::setMessengerName);
-        }
-
-        if (incomingTracking.getMessengerName() == null || incomingTracking.getMessengerName().isEmpty()) {
-            try {
-                Employee employee = employeePort.findById(incomingTracking.getMessengerId());
-                if (employee != null && employee.getFullName() != null) {
-                    incomingTracking.setMessengerName(employee.getFullName());
-                    trackingPort.saveMessengerName(incomingTracking.getMessengerId(), employee.getFullName());
-                }
-            } catch (Exception e) {
-                logger.warn("No se pudo obtener el nombre del mensajero {}: {}",
-                        incomingTracking.getMessengerId(), e.getMessage());
-            }
-        }
+        enrichMessengerName(incomingTracking);
 
         trackingPort.saveLiveLocation(incomingTracking);
         Location location = incomingTracking.getCurrentLocation();
@@ -102,25 +87,34 @@ public class UpdateLiveTrackingUseCase {
                 : LocalDateTime.now());
         existing.setStatus(TrackingStatus.ACTIVE);
 
-        if (existing.getMessengerName() == null || existing.getMessengerName().isEmpty()) {
-            trackingPort.getMessengerName(heartbeatTracking.getMessengerId()).ifPresent(existing::setMessengerName);
-        }
-
-        if (existing.getMessengerName() == null || existing.getMessengerName().isEmpty()) {
-            try {
-                Employee employee = employeePort.findById(heartbeatTracking.getMessengerId());
-                if (employee != null && employee.getFullName() != null) {
-                    existing.setMessengerName(employee.getFullName());
-                    trackingPort.saveMessengerName(heartbeatTracking.getMessengerId(), employee.getFullName());
-                }
-            } catch (Exception e) {
-                logger.warn("No se pudo obtener el nombre del mensajero {}: {}",
-                        heartbeatTracking.getMessengerId(), e.getMessage());
-            }
-        }
+        enrichMessengerName(existing);
 
         trackingPort.saveLiveLocation(existing);
 
         return existing;
+    }
+
+    /**
+     * Enriquece el objeto de tracking con el nombre del mensajero.
+     * Primero intenta obtener desde cache (Redis), y si no está,
+     * lo obtiene de la base de datos y lo guarda en cache.
+     */
+    private void enrichMessengerName(LiveTracking tracking) {
+        if (tracking.getMessengerName() == null || tracking.getMessengerName().isEmpty()) {
+            trackingPort.getMessengerName(tracking.getMessengerId()).ifPresent(tracking::setMessengerName);
+        }
+
+        if (tracking.getMessengerName() == null || tracking.getMessengerName().isEmpty()) {
+            try {
+                Employee employee = employeePort.findById(tracking.getMessengerId());
+                if (employee != null && employee.getFullName() != null) {
+                    tracking.setMessengerName(employee.getFullName());
+                    trackingPort.saveMessengerName(tracking.getMessengerId(), employee.getFullName());
+                }
+            } catch (Exception e) {
+                logger.warn("No se pudo obtener el nombre del mensajero {}: {}",
+                        tracking.getMessengerId(), e.getMessage());
+            }
+        }
     }
 }
