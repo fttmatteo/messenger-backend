@@ -1,8 +1,6 @@
 package app.application.usecase;
 
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -17,8 +15,6 @@ import app.domain.services.UpdateDealership;
  */
 @Service
 public class DealershipUseCase {
-
-    private static final Logger logger = LoggerFactory.getLogger(DealershipUseCase.class);
 
     private final CreateDealership createDealership;
     private final UpdateDealership updateDealership;
@@ -42,8 +38,7 @@ public class DealershipUseCase {
     @CacheEvict(value = "dealerships", allEntries = true)
     public Dealership create(Dealership dealership) throws Exception {
         Dealership created = createDealership.create(dealership);
-        logger.info("Concesionario creado exitosamente - ID: {} | Nombre: {}", 
-                created.getIdDealership(), created.getName());
+
         return created;
     }
 
@@ -53,7 +48,6 @@ public class DealershipUseCase {
     @CacheEvict(value = "dealerships", allEntries = true)
     public Dealership update(Long id, Dealership dealership) throws Exception {
         Dealership updated = updateDealership.update(id, dealership);
-        logger.info("Concesionario ID {} actualizado exitosamente", id);
         return updated;
     }
 
@@ -64,7 +58,7 @@ public class DealershipUseCase {
     public Dealership findById(Long id) throws Exception {
         Dealership dealership = searchDealership.findById(id);
         if (dealership == null) {
-            throw new RuntimeException("Concesionario no encontrado con ID: " + id);
+            throw new RuntimeException("Concesionario no encontrado.");
         }
         return dealership;
     }
@@ -97,6 +91,6 @@ public class DealershipUseCase {
     @CacheEvict(value = "dealerships", allEntries = true)
     public void deleteById(Long id) throws Exception {
         deleteDealership.deleteById(id);
-        logger.info("Concesionario ID {} eliminado exitosamente", id);
+
     }
 }

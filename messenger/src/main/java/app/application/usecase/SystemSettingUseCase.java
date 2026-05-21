@@ -34,7 +34,7 @@ public class SystemSettingUseCase {
                     .map(SystemSetting::getValue)
                     .orElse("{}");
         } catch (Exception e) {
-            logger.error("Error al obtener colores de estados (posible tabla faltante): {}", e.getMessage());
+            logger.error("Error al obtener colores de estados (posible tabla faltante).", e);
             return "{}";
         }
     }

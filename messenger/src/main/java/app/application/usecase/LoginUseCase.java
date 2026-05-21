@@ -66,7 +66,7 @@ public class LoginUseCase {
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
-            throw new BusinessException("Error durante autenticación: " + e.getMessage());
+            throw new BusinessException("Error inesperado durante la autenticación.");
         }
     }
 }

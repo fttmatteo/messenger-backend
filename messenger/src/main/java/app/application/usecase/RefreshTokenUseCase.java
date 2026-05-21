@@ -30,8 +30,8 @@ public class RefreshTokenUseCase {
         } catch (app.domain.exception.BusinessException | app.domain.exception.UnauthorizedException e) {
             throw e;
         } catch (Exception e) {
-            logger.error("Error durante renovación de token: {}", e.getMessage(), e);
-            throw new app.domain.exception.BusinessException("Error durante renovación de token: " + e.getMessage());
+            logger.error("Error inesperado durante la renovación de token", e);
+            throw new app.domain.exception.BusinessException("Error inesperado durante la renovación del token.");
         }
     }
 }

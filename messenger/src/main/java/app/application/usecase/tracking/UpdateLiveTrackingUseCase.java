@@ -112,8 +112,7 @@ public class UpdateLiveTrackingUseCase {
                     trackingPort.saveMessengerName(tracking.getMessengerId(), employee.getFullName());
                 }
             } catch (Exception e) {
-                logger.warn("No se pudo obtener el nombre del mensajero {}: {}",
-                        tracking.getMessengerId(), e.getMessage());
+                logger.warn("No se pudo obtener el nombre del mensajero desde la base de datos.");
             }
         }
     }

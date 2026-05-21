@@ -40,7 +40,7 @@ public class GeocodeDealershipUseCase {
             dealershipPort.save(dealership);
             return dealership;
         } catch (Exception e) {
-            logger.error("Error geocodificando concesionario ID: {}: {}", dealershipId, e.getMessage());
+            logger.error("Error geocodificando concesionario.", e);
             throw e;
         }
     }

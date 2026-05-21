@@ -40,6 +40,5 @@ public class DeleteEmployee {
         }
 
         employeePort.deleteById(id);
-        logger.info("Empleado eliminado exitosamente.");
     }
 }

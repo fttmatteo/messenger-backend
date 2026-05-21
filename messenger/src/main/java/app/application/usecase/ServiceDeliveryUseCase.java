@@ -22,7 +22,6 @@ import app.domain.model.Photo;
 import app.domain.model.ServiceDelivery;
 import app.domain.model.Signature;
 import app.domain.model.enums.Status;
-import app.domain.util.LogSanitizer;
 
 import app.domain.ports.StoragePort;
 import app.domain.services.CreateServiceDelivery;
@@ -68,7 +67,7 @@ public class ServiceDeliveryUseCase {
 
 
     /**
-     * Crea un servicio utilizando un número de placa ingresado manualmente.
+     * Crea un servicio utilizando un número de chasis ingresado manualmente.
      */
     @Caching(evict = {
         @CacheEvict(value = "services", allEntries = true),
@@ -82,8 +81,7 @@ public class ServiceDeliveryUseCase {
         try {
             ServiceDelivery service = createService.create(manualPlateNumber, dealershipId, originDealershipId,
                     messengerId, latitude, longitude);
-            logger.info("Servicio creado exitosamente vía manual - ID: {} | Placa: {} | Mensajero: {}",
-                    service.getIdServiceDelivery(), LogSanitizer.maskPlate(manualPlateNumber), messengerId);
+
             return service;
         } catch (Exception e) {
             throw e;
@@ -129,7 +127,7 @@ public class ServiceDeliveryUseCase {
 
         ServiceDelivery service = searchService.findById(serviceId);
         if (service == null) {
-            throw new RuntimeException("Servicio no encontrado con ID: " + serviceId);
+            throw new RuntimeException("Servicio no encontrado.");
         }
         String plateNumber = service.getPlate().getPlateNumber();
         String timestamp = LocalDateTime.now().format(DATE_FORMAT);
@@ -327,7 +325,7 @@ public class ServiceDeliveryUseCase {
             try {
                 Files.deleteIfExists(Paths.get(path));
             } catch (Exception e) {
-                logger.warn("No se pudo eliminar archivo: {}", e.getMessage());
+                logger.warn("Error al intentar limpiar un archivo temporal.");
             }
         }
     }
