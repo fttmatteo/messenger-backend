@@ -63,8 +63,7 @@ class DeleteServiceDeliveryTest {
 
         BusinessException ex = assertThrows(BusinessException.class, () -> deleteServiceDelivery.deleteById(1L));
 
-        assertEquals("El servicio de entrega que intenta eliminar no existe o ya está en la papelera.",
-                ex.getMessage());
+        assertEquals("El servicio no existe o ya está en la papelera.", ex.getMessage());
     }
 
     @Test
@@ -108,7 +107,7 @@ class DeleteServiceDeliveryTest {
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> deleteServiceDelivery.restore(1L, 1L));
 
-        assertEquals("Solo los administradores pueden restaurar servicios de la papelera.", ex.getMessage());
+        assertEquals("Solo administradores pueden restaurar servicios.", ex.getMessage());
     }
 
     @Test
@@ -154,6 +153,6 @@ class DeleteServiceDeliveryTest {
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> deleteServiceDelivery.archiveService(1L));
 
-        assertEquals("Solo se pueden archivar servicios que estén en la papelera.", ex.getMessage());
+        assertEquals("Solo se pueden archivar servicios en la papelera.", ex.getMessage());
     }
 }

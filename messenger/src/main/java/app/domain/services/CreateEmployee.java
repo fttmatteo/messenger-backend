@@ -1,17 +1,22 @@
 package app.domain.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import app.domain.exception.BusinessException;
 import app.domain.model.Employee;
 import app.domain.ports.EmployeePort;
+import app.domain.util.LogSanitizer;
 
 /**
  * Servicio para crear nuevos empleados con encriptación de contraseña.
  */
 @Service
 public class CreateEmployee {
+
+    private static final Logger logger = LoggerFactory.getLogger(CreateEmployee.class);
 
     @Autowired
     private EmployeePort employeePort;
@@ -31,12 +36,14 @@ public class CreateEmployee {
         }
 
         Employee saved = employeePort.save(employee);
+        logger.info("Empleado creado exitosamente.");
         return saved;
     }
 
     private void validateDocumentIsUnique(Long document) throws Exception {
         if (employeePort.findByDocument(document) != null) {
-            throw new BusinessException("Ya existe un empleado registrado con el documento " + document);
+            logger.warn("Intento de crear empleado con documento duplicado: {}", LogSanitizer.maskDocument(document));
+            throw new BusinessException("Ya existe un empleado registrado con ese documento.");
         }
     }
 }

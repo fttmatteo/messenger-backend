@@ -100,8 +100,7 @@ class CreateEmployeeTest {
             BusinessException exception = assertThrows(BusinessException.class,
                     () -> createEmployee.create(newEmployee));
 
-            assertTrue(exception.getMessage().contains("Ya existe un empleado"));
-            assertTrue(exception.getMessage().contains("123456789"));
+            assertEquals("Ya existe un empleado registrado con ese documento.", exception.getMessage());
             verify(employeePort, never()).save(any());
         }
     }

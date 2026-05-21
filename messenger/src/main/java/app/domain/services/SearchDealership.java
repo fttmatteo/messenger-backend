@@ -1,6 +1,8 @@
 package app.domain.services;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,8 @@ import app.domain.ports.DealershipPort;
  */
 @Service
 public class SearchDealership {
+
+    private static final Logger logger = LoggerFactory.getLogger(SearchDealership.class);
 
     @Autowired
     private DealershipPort dealershipPort;
@@ -31,8 +35,9 @@ public class SearchDealership {
     public Dealership findById(Long id) {
         Dealership dealership = dealershipPort.findById(id);
         if (dealership == null) {
+            logger.warn("Concesionario no encontrado por ID.");
             throw new ResourceNotFoundException(
-                    "El concesionario con ID " + id + " no existe.");
+                    "El concesionario no existe.");
         }
         return dealership;
     }
@@ -43,7 +48,8 @@ public class SearchDealership {
     public Dealership findByName(String name) {
         Dealership dealership = dealershipPort.findByName(name);
         if (dealership == null) {
-            throw new RuntimeException("El concesionario con nombre " + name + " no existe.");
+            logger.warn("Concesionario no encontrado por nombre.");
+            throw new RuntimeException("El concesionario no existe.");
         }
         return dealership;
     }
@@ -54,7 +60,8 @@ public class SearchDealership {
     public Dealership findByUuid(String uuid) {
         Dealership dealership = dealershipPort.findByUuid(uuid);
         if (dealership == null) {
-            throw new ResourceNotFoundException("El concesionario con UUID " + uuid + " no existe.");
+            logger.warn("Concesionario no encontrado por UUID.");
+            throw new ResourceNotFoundException("El concesionario no existe.");
         }
         return dealership;
     }

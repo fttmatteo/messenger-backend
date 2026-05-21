@@ -34,15 +34,18 @@ class ServiceDeliveryBuilderTest {
         void shouldBuildValidCreateData() throws Exception {
             ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest();
             request.setDealershipId("1");
+            request.setOriginDealershipId("2");
             request.setMessengerId("100");
 
             when(validator.idValidator("1")).thenReturn(1L);
+            when(validator.idValidator("2")).thenReturn(2L);
             when(validator.idValidator("100")).thenReturn(100L);
 
             ServiceDeliveryBuilder.ServiceDeliveryCreateData result = builder.buildCreateData(request);
 
             assertNotNull(result);
             assertEquals(1L, result.getDealershipId());
+            assertEquals(2L, result.getOriginDealershipId());
             assertEquals(100L, result.getMessengerId());
         }
 
@@ -52,6 +55,7 @@ class ServiceDeliveryBuilderTest {
         void shouldPropagateExceptionForInvalidId() throws Exception {
             ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest();
             request.setDealershipId("invalid");
+            request.setOriginDealershipId("2");
             request.setMessengerId("100");
 
             when(validator.idValidator("invalid"))
@@ -66,9 +70,11 @@ class ServiceDeliveryBuilderTest {
         void shouldPropagateExceptionForInvalidMessengerId() throws Exception {
             ServiceDeliveryCreateRequest request = new ServiceDeliveryCreateRequest();
             request.setDealershipId("1");
+            request.setOriginDealershipId("2");
             request.setMessengerId("abc");
 
             when(validator.idValidator("1")).thenReturn(1L);
+            when(validator.idValidator("2")).thenReturn(2L);
             when(validator.idValidator("abc"))
                     .thenThrow(new InputsException("ID inválido"));
 
@@ -124,9 +130,10 @@ class ServiceDeliveryBuilderTest {
         @DisplayName("ServiceDeliveryCreateData debe ser inmutable")
         void createDataShouldBeImmutable() {
             ServiceDeliveryBuilder.ServiceDeliveryCreateData data = new ServiceDeliveryBuilder.ServiceDeliveryCreateData(
-                    1L, 100L);
+                    1L, 2L, 100L);
 
             assertEquals(1L, data.getDealershipId());
+            assertEquals(2L, data.getOriginDealershipId());
             assertEquals(100L, data.getMessengerId());
         }
 

@@ -41,8 +41,8 @@ public class WhatsAppNotificationListener {
             return;
         }
 
-        logger.info("Enviando notificación de cambio de estado para chasis {} a {} sesiones activas de WhatsApp del concesionario ID: {}", 
-                app.domain.util.LogSanitizer.maskPlate(plateNumber), activeSessions.size(), dealershipId);
+        logger.info("Enviando notificación de cambio de estado para chasis {} a {} sesiones activas de WhatsApp.",
+                app.domain.util.LogSanitizer.maskPlate(plateNumber), activeSessions.size());
 
         String message = String.format(
                 "🔔 *Notificación de cambio de estado*\n\n" +

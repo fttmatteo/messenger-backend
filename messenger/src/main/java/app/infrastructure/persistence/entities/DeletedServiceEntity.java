@@ -73,6 +73,18 @@ public class DeletedServiceEntity {
     @Column(name = "dealership_zone", length = 100)
     private String dealershipZone;
 
+    @Column(name = "origin_dealership_id", nullable = false)
+    private Long originDealershipId;
+
+    @Column(name = "origin_dealership_name", nullable = false)
+    private String originDealershipName;
+
+    @Column(name = "origin_dealership_address", nullable = false, length = 500)
+    private String originDealershipAddress;
+
+    @Column(name = "origin_dealership_zone", nullable = false, length = 100)
+    private String originDealershipZone;
+
     @Column(name = "plate_number", nullable = false)
     private String plateNumber;
 
@@ -232,6 +244,38 @@ public class DeletedServiceEntity {
 
     public void setDealershipZone(String dealershipZone) {
         this.dealershipZone = dealershipZone;
+    }
+
+    public Long getOriginDealershipId() {
+        return originDealershipId;
+    }
+
+    public void setOriginDealershipId(Long originDealershipId) {
+        this.originDealershipId = originDealershipId;
+    }
+
+    public String getOriginDealershipName() {
+        return originDealershipName;
+    }
+
+    public void setOriginDealershipName(String originDealershipName) {
+        this.originDealershipName = originDealershipName;
+    }
+
+    public String getOriginDealershipAddress() {
+        return originDealershipAddress;
+    }
+
+    public void setOriginDealershipAddress(String originDealershipAddress) {
+        this.originDealershipAddress = originDealershipAddress;
+    }
+
+    public String getOriginDealershipZone() {
+        return originDealershipZone;
+    }
+
+    public void setOriginDealershipZone(String originDealershipZone) {
+        this.originDealershipZone = originDealershipZone;
     }
 
     public String getPlateNumber() {

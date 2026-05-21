@@ -111,6 +111,23 @@ class FullBusinessFlowIntegrationTest extends AbstractIntegrationTest {
                 Long dealershipId = objectMapper.readTree(dealershipResult.getResponse().getContentAsString())
                                 .get("idDealership").asLong();
 
+                DealershipRequest originDealershipRequest = new DealershipRequest();
+                originDealershipRequest.setName("Origin Motors " + System.currentTimeMillis());
+                originDealershipRequest.setAddress("Origin St 123");
+                originDealershipRequest.setPhone("3009876543");
+                originDealershipRequest.setZone("Norte");
+
+                MvcResult originDealershipResult = mockMvc.perform(post("/dealerships/createDealership")
+                                .with(user("999999").roles("ADMIN"))
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(originDealershipRequest)))
+                                .andExpect(status().isCreated())
+                                .andReturn();
+
+                Long originDealershipId = objectMapper.readTree(originDealershipResult.getResponse().getContentAsString())
+                                .get("idDealership").asLong();
+
                 byte[] validImageBytes = createValidPngImage(800, 600);
                 MockMultipartFile imageFile = new MockMultipartFile("image", "plate.png", "image/png",
                                 validImageBytes);
@@ -118,6 +135,7 @@ class FullBusinessFlowIntegrationTest extends AbstractIntegrationTest {
                 MvcResult serviceResult = mockMvc.perform(multipart("/services/createService")
                                 .file(imageFile)
                                 .param("dealershipId", dealershipId.toString())
+                                .param("originDealershipId", originDealershipId.toString())
                                 .param("messengerId", messengerId.toString())
                                 .param("manualPlateNumber", "XYZ7890123")
                                 .with(user("999999").roles("ADMIN"))

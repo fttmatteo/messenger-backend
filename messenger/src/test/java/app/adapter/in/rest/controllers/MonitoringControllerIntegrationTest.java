@@ -66,6 +66,13 @@ class MonitoringControllerIntegrationTest extends AbstractIntegrationTest {
         dealership.setZone("Norte");
         entityManager.persist(dealership);
 
+        DealershipEntity originDealership = new DealershipEntity();
+        originDealership.setName("Origin Monitoring Test");
+        originDealership.setAddress("Calle 200 # 30-40, Bogotá");
+        originDealership.setPhone("3009876543");
+        originDealership.setZone("Sur");
+        entityManager.persist(originDealership);
+
         PlateEntity plate = new PlateEntity();
         plate.setPlateNumber("MON123");
         plate.setPlateType(PlateType.MOTORCYCLE);
@@ -74,6 +81,7 @@ class MonitoringControllerIntegrationTest extends AbstractIntegrationTest {
         ServiceDeliveryEntity service = new ServiceDeliveryEntity();
         service.setMessenger(messenger);
         service.setDealership(dealership);
+        service.setOriginDealership(originDealership);
         service.setPlate(plate);
         service.setCurrentStatus(Status.DELIVERED);
         service.setCreatedAt(LocalDateTime.now());

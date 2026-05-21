@@ -32,6 +32,7 @@ public class ServiceDeliveryMapper {
         entity.setUuid(serviceDelivery.getUuid());
         entity.setPlate(plateMapper.toEntity(serviceDelivery.getPlate()));
         entity.setDealership(dealershipMapper.toEntity(serviceDelivery.getDealership()));
+        entity.setOriginDealership(dealershipMapper.toEntity(serviceDelivery.getOriginDealership()));
         entity.setMessenger(employeeMapper.toEntity(serviceDelivery.getMessenger()));
         entity.setCurrentStatus(serviceDelivery.getCurrentStatus());
         entity.setObservation(serviceDelivery.getObservation());
@@ -158,6 +159,7 @@ public class ServiceDeliveryMapper {
         serviceDelivery.setUuid(entity.getUuid());
         serviceDelivery.setPlate(plateMapper.toDomain(entity.getPlate()));
         serviceDelivery.setDealership(dealershipMapper.toDomain(entity.getDealership()));
+        serviceDelivery.setOriginDealership(dealershipMapper.toDomain(entity.getOriginDealership()));
         serviceDelivery.setMessenger(employeeMapper.toDomain(entity.getMessenger()));
         serviceDelivery.setCurrentStatus(entity.getCurrentStatus());
         serviceDelivery.setObservation(entity.getObservation());

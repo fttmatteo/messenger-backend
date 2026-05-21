@@ -79,8 +79,7 @@ class CreateDealershipTest {
             BusinessException exception = assertThrows(BusinessException.class,
                     () -> createDealership.create(newDealership));
 
-            assertTrue(exception.getMessage().contains("Ya existe un concesionario"));
-            assertTrue(exception.getMessage().contains("Concesionario Test"));
+            assertEquals("Ya existe un concesionario con ese nombre.", exception.getMessage());
             verify(dealershipPort, never()).save(any());
         }
     }

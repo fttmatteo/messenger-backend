@@ -59,6 +59,13 @@ class ServiceDeliveryRepositoryJpaTest extends BaseContainerTest {
         dealership.setZone("Norte");
         dealershipRepository.save(dealership);
 
+        DealershipEntity originDealership = new DealershipEntity();
+        originDealership.setName("Concesionario Origen");
+        originDealership.setAddress("Calle 456");
+        originDealership.setPhone("3009876543");
+        originDealership.setZone("Sur");
+        dealershipRepository.save(originDealership);
+
         PlateEntity plate = new PlateEntity();
         plate.setPlateNumber("KJH987");
         plate.setPlateType(PlateType.MOTORCYCLE);
@@ -67,6 +74,7 @@ class ServiceDeliveryRepositoryJpaTest extends BaseContainerTest {
         ServiceDeliveryEntity service = new ServiceDeliveryEntity();
         service.setMessenger(messenger);
         service.setDealership(dealership);
+        service.setOriginDealership(originDealership);
         service.setPlate(plate);
         service.setCurrentStatus(Status.ASSIGNED);
         service.setDeleted(false);

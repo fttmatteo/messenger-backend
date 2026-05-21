@@ -53,7 +53,7 @@ public class TrashCleanupScheduler {
                 archivedCount++;
             } catch (Exception e) {
                 errorCount++;
-                logger.error("Error archivando servicio ID: {}: {}", service.getIdServiceDelivery(), e.getMessage());
+                logger.error("Error archivando servicio en papelera: {}", e.getMessage());
             }
         }
 

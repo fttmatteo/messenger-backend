@@ -71,7 +71,7 @@ class UpdateDealershipTest {
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> updateDealership.update(1L, new Dealership()));
 
-        assertEquals("El concesionario con ID 1 no existe.", ex.getMessage());
+        assertEquals("El concesionario indicado no existe.", ex.getMessage());
     }
 
     @Test
@@ -86,7 +86,7 @@ class UpdateDealershipTest {
 
         BusinessException ex = assertThrows(BusinessException.class, () -> updateDealership.update(1L, newData));
 
-        assertEquals("Ya existe otro concesionario con el nombre Existing Name", ex.getMessage());
+        assertEquals("Ya existe otro concesionario con ese nombre.", ex.getMessage());
     }
 
     @Test

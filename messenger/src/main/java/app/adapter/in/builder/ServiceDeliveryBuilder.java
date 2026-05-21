@@ -18,9 +18,10 @@ public class ServiceDeliveryBuilder {
 
     public ServiceDeliveryCreateData buildCreateData(ServiceDeliveryCreateRequest request) throws Exception {
         Long dealershipId = validator.idValidator(request.getDealershipId());
+        Long originDealershipId = validator.idValidator(request.getOriginDealershipId());
         Long messengerId = validator.idValidator(request.getMessengerId());
 
-        ServiceDeliveryCreateData data = new ServiceDeliveryCreateData(dealershipId, messengerId);
+        ServiceDeliveryCreateData data = new ServiceDeliveryCreateData(dealershipId, originDealershipId, messengerId);
         if (request.getLatitude() != null && request.getLongitude() != null) {
             data.setLocation(request.getLatitude(), request.getLongitude());
         }
@@ -42,12 +43,14 @@ public class ServiceDeliveryBuilder {
 
     public static class ServiceDeliveryCreateData {
         private final Long dealershipId;
+        private final Long originDealershipId;
         private final Long messengerId;
         private Double latitude;
         private Double longitude;
 
-        public ServiceDeliveryCreateData(Long dealershipId, Long messengerId) {
+        public ServiceDeliveryCreateData(Long dealershipId, Long originDealershipId, Long messengerId) {
             this.dealershipId = dealershipId;
+            this.originDealershipId = originDealershipId;
             this.messengerId = messengerId;
         }
 
@@ -58,6 +61,10 @@ public class ServiceDeliveryBuilder {
 
         public Long getDealershipId() {
             return dealershipId;
+        }
+
+        public Long getOriginDealershipId() {
+            return originDealershipId;
         }
 
         public Long getMessengerId() {

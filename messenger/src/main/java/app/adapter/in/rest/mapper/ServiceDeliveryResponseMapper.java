@@ -67,6 +67,7 @@ public class ServiceDeliveryResponseMapper {
         }
 
         response.setDealership(dealershipMapper.toResponse(service.getDealership()));
+        response.setOriginDealership(dealershipMapper.toResponse(service.getOriginDealership()));
         response.setMessenger(employeeMapper.toResponse(service.getMessenger()));
 
         return response;
@@ -99,6 +100,7 @@ public class ServiceDeliveryResponseMapper {
         }
 
         response.setDealership(dealershipMapper.toResponse(service.getDealership()));
+        response.setOriginDealership(dealershipMapper.toResponse(service.getOriginDealership()));
         response.setMessenger(employeeMapper.toResponse(service.getMessenger()));
 
         if (service.getSignature() != null) {

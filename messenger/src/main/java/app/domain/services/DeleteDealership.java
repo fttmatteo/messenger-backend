@@ -1,5 +1,7 @@
 package app.domain.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import app.domain.exception.BusinessException;
@@ -12,6 +14,8 @@ import app.domain.ports.DealershipPort;
 @Service
 public class DeleteDealership {
 
+    private static final Logger logger = LoggerFactory.getLogger(DeleteDealership.class);
+
     @Autowired
     private DealershipPort dealershipPort;
 
@@ -21,8 +25,10 @@ public class DeleteDealership {
     public void deleteById(Long id) throws Exception {
         Dealership existing = dealershipPort.findById(id);
         if (existing == null) {
-            throw new BusinessException("El concesionario a eliminar no existe.");
+            logger.warn("Intento de eliminar concesionario inexistente.");
+            throw new BusinessException("El concesionario indicado no existe.");
         }
         dealershipPort.deleteById(id);
+        logger.info("Concesionario eliminado exitosamente.");
     }
 }

@@ -91,8 +91,7 @@ public class EmployeeController {
         Employee currentUser = securityHelper.getCurrentUser();
         if (employee.getRole() == Role.ADMIN
                 && !employee.getIdEmployee().equals(currentUser.getIdEmployee())) {
-            logger.warn("Admin {} intentó acceder al perfil de otro admin UUID: {}",
-                    currentUser.getIdEmployee(), uuid);
+            logger.warn("Admin intentó acceder al perfil de otro admin.");
             throw new app.domain.exception.ResourceNotFoundException("Empleado con UUID " + uuid + " no encontrado");
         }
 
@@ -113,8 +112,7 @@ public class EmployeeController {
 
         if (target.getRole() == Role.ADMIN
                 && !target.getIdEmployee().equals(currentUser.getIdEmployee())) {
-            logger.warn("Admin {} intentó modificar a otro admin UUID: {}",
-                    currentUser.getIdEmployee(), uuid);
+            logger.warn("Admin intentó modificar a otro admin.");
             throw new app.domain.exception.BusinessException(
                     "No tiene permisos para modificar a otro administrador.");
         }
@@ -152,8 +150,7 @@ public class EmployeeController {
         }
 
         if (target.getRole() == Role.ADMIN) {
-            logger.warn("Admin {} intentó eliminar a otro admin UUID: {}",
-                    currentUser.getIdEmployee(), uuid);
+            logger.warn("Admin intentó eliminar a otro admin.");
             throw new app.domain.exception.BusinessException(
                     "No tiene permisos para eliminar a otro administrador.");
         }

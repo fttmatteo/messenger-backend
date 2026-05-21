@@ -49,7 +49,7 @@ class SearchServiceDeliveryTest {
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> searchServiceDelivery.findById(99L));
 
-        assertEquals("El servicio con ID 99 no existe o está en la papelera.", ex.getMessage());
+        assertEquals("El servicio no existe o está en la papelera.", ex.getMessage());
     }
 
     @Test

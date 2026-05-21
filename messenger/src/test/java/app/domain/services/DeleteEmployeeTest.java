@@ -61,7 +61,7 @@ class DeleteEmployeeTest {
 
         BusinessException ex = assertThrows(BusinessException.class, () -> deleteEmployee.deleteById(1L));
 
-        assertEquals("No se puede eliminar. El empleado tiene 1 servicios de entrega asociados.", ex.getMessage());
+        assertEquals("No se puede eliminar. El empleado tiene servicios de entrega asociados.", ex.getMessage());
         verify(employeePort, never()).deleteById(anyLong());
     }
 }

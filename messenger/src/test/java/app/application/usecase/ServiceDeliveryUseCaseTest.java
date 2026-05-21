@@ -63,12 +63,12 @@ class ServiceDeliveryUseCaseTest {
         @Test
         @DisplayName("Debe crear servicio con placa manual")
         void shouldCreateServiceWithManualPlate() throws Exception {
-            when(createService.create(eq("XYZ789"), eq(1L), eq(123456L), isNull(), isNull()))
+            when(createService.create(eq("XYZ789"), eq(1L), eq(2L), eq(123456L), isNull(), isNull()))
                     .thenReturn(sampleService);
 
-            serviceDeliveryUseCase.createServiceWithManualPlate("XYZ789", 1L, 123456L, null, null);
+            serviceDeliveryUseCase.createServiceWithManualPlate("XYZ789", 1L, 2L, 123456L, null, null);
 
-            verify(createService).create(eq("XYZ789"), eq(1L), eq(123456L), isNull(), isNull());
+            verify(createService).create(eq("XYZ789"), eq(1L), eq(2L), eq(123456L), isNull(), isNull());
         }
     }
 
