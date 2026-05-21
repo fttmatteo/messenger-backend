@@ -69,8 +69,8 @@ public class TrackingAdapter implements TrackingPort {
 
             redisTemplate.opsForValue().set(key, tracking, TRACKING_TTL_SECONDS, TimeUnit.SECONDS);
         } catch (Exception e) {
-            logger.error("Error guardando tracking en Redis: {}", e.getMessage());
-            throw new RuntimeException("Error al guardar en Redis: " + e.getMessage());
+            logger.error("Error guardando tracking en Redis.", e);
+            throw new RuntimeException("Error al guardar en Redis.");
         }
     }
 
@@ -90,7 +90,7 @@ public class TrackingAdapter implements TrackingPort {
                 return Optional.of(tracking);
             }
         } catch (Exception e) {
-            logger.warn("Error leyendo de Redis para mensajero {}: {}", messengerId, e.getMessage());
+            logger.warn("Error leyendo de Redis para mensajero.", e);
         }
 
         try {
@@ -114,7 +114,7 @@ public class TrackingAdapter implements TrackingPort {
                 return Optional.of(historyTracking);
             }
         } catch (Exception e) {
-            logger.error("Error buscando historial en DB para mensajero {}: {}", messengerId, e.getMessage());
+            logger.error("Error buscando historial en DB para mensajero.", e);
         }
 
         return Optional.empty();
@@ -140,14 +140,13 @@ public class TrackingAdapter implements TrackingPort {
                         activeMessengers.add(tracking);
                     }
                 } catch (Exception e) {
-                    logger.warn("Error deserializando tracking para key {}: {}", key, e.getMessage());
-                    throw new RuntimeException(
-                            "Error al deserializar tracking para key " + key + ": " + e.getMessage());
+                    logger.warn("Error deserializando tracking.", e);
+                    throw new RuntimeException("Error al deserializar tracking.");
                 }
             }
         } catch (Exception e) {
-            logger.error("Error crítico listando mensajeros activos desde Redis: {}", e.getMessage());
-            throw new RuntimeException("Error crítico al listar mensajeros desde Redis: " + e.getMessage());
+            logger.error("Error crítico listando mensajeros activos desde Redis.", e);
+            throw new RuntimeException("Error crítico al listar mensajeros desde Redis.");
         }
 
         return activeMessengers;
@@ -225,7 +224,7 @@ public class TrackingAdapter implements TrackingPort {
             String key = "tracking:name:" + messengerId;
             stringRedisTemplate.opsForValue().set(key, name, 24, TimeUnit.HOURS);
         } catch (Exception e) {
-            logger.warn("Error guardando nombre de mensajero en Redis: {}", e.getMessage());
+            logger.warn("Error guardando nombre de mensajero en Redis.", e);
         }
     }
 }

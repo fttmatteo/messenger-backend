@@ -41,7 +41,7 @@ public class CalculateOptimalRouteUseCase {
             if (dealership.getIsGeolocated() != null && dealership.getIsGeolocated()) {
                 destinations.add(dealership.getLocation());
             } else {
-                logger.warn("Concesionario ID: {} ignorado en ruta por falta de geolocalización", id);
+                logger.warn("Un concesionario fue ignorado en la ruta por falta de geolocalización.");
             }
         }
 

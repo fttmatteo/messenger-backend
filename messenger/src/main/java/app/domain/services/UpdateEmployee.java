@@ -53,7 +53,6 @@ public class UpdateEmployee {
         }
 
         Employee updated = employeePort.save(existingEmployee);
-        logger.info("Empleado actualizado exitosamente.");
         return updated;
     }
 }

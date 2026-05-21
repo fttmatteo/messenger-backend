@@ -139,7 +139,7 @@ public class ServiceDeliveryController {
                 try {
                     fileValidationService.validateSignatureFile(signature);
                 } catch (SecurityException e) {
-                    throw new InputsException("Error en firma: " + e.getMessage());
+                    throw new InputsException("Error al procesar la firma adjunta.");
                 }
                 signatureFile = fileHelper.convertToFile(signature);
                 tempFiles.add(signatureFile);
@@ -153,7 +153,7 @@ public class ServiceDeliveryController {
                         try {
                             fileValidationService.validatePhotoFile(photo);
                         } catch (SecurityException e) {
-                            throw new InputsException("Error en foto: " + e.getMessage());
+                            throw new InputsException("Error al procesar la foto adjunta.");
                         }
                         photoFiles.add(fileHelper.convertToFile(photo));
                     }

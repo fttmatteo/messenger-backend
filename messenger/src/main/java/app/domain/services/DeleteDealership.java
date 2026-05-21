@@ -29,6 +29,5 @@ public class DeleteDealership {
             throw new BusinessException("El concesionario indicado no existe.");
         }
         dealershipPort.deleteById(id);
-        logger.info("Concesionario eliminado exitosamente.");
     }
 }
