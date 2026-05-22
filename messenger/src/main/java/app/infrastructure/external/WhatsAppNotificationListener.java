@@ -36,17 +36,9 @@ public class WhatsAppNotificationListener {
         String plateNumber = (service.getPlate() != null && service.getPlate().getPlateNumber() != null) 
                 ? service.getPlate().getPlateNumber() 
                 : "Desconocido";
-        
-        String dealershipName = (service.getDealership() != null && service.getDealership().getName() != null) 
-                ? service.getDealership().getName() 
-                : "No disponible";
                 
         String statusEmoji = event.getNewStatus() != null ? getStatusEmoji(event.getNewStatus()) : "❓";
         String statusName = event.getNewStatus() != null ? getFriendlyStatusName(event.getNewStatus()) : "DESCONOCIDO";
-        
-        String messengerName = (service.getMessenger() != null && service.getMessenger().getFullName() != null) 
-                ? service.getMessenger().getFullName() 
-                : "Sin asignar";
 
         java.util.List<WhatsAppSession> activeSessions = sessionPort.findActiveSessionsByDealership(dealershipId);
 
@@ -59,9 +51,8 @@ public class WhatsAppNotificationListener {
 
         StringBuilder message = new StringBuilder();
         message.append("🔔 *Notificación de cambio de estado*\n\n");
-        message.append(String.format("La moto con chasis *%s* para el concesionario *%s* ha sido actualizada.\n\n", plateNumber, dealershipName));
+        message.append(String.format("La moto con chasis *%s* ha sido actualizada.\n\n", plateNumber));
         message.append(String.format("*ESTADO:* %s %s\n", statusEmoji, statusName));
-        message.append(String.format("🚚 *Transportista:* %s", messengerName));
 
         String currentObservation = null;
         if (service.getHistory() != null && !service.getHistory().isEmpty()) {
@@ -79,8 +70,6 @@ public class WhatsAppNotificationListener {
         if (currentObservation != null && !currentObservation.trim().isEmpty()) {
             message.append(String.format("\n💬 *Observación:* %s", currentObservation.trim()));
         }
-
-        message.append("\n\n_Presione el botón para ver los detalles completos._");
 
         for (WhatsAppSession session : activeSessions) {
             messagePort.sendReplyButtons(

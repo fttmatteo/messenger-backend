@@ -101,7 +101,7 @@ public class WhatsAppBotService {
                 session.setConversationState(WhatsAppConversationState.MENU);
                 sessionPort.updateSession(session);
                 logger.info("[Autenticación] Sesión llave maestra iniciada por el número {}", LogSanitizer.maskGeneric(from, 4));
-                messagePort.sendTextMessage(from, "🔔 *Notificaciones activadas:*\nRecibirás alertas por cambios en el estado de las motos.\n\n_Si deseas dejar de recibirlas, simplemente usa la opción de Cerrar Sesión en el menú._");
+                messagePort.sendTextMessage(from, "🔔 Notificaciones activadas. Recibirás alertas por cambios en el estado de las motos.\n\n_Si deseas dejar de recibirlas, simplemente usa la opción de Cerrar Sesión en el menú._");
                 sendMenu(from, dealership.getName());
             } else {
                 Optional<Dealership> dealershipOpt = sessionPort.findDealershipByPin(text);
@@ -114,7 +114,7 @@ public class WhatsAppBotService {
                     session.setConversationState(WhatsAppConversationState.MENU);
                     sessionPort.updateSession(session);
                     logger.info("[Autenticación] Sesión iniciada por el número {}.", LogSanitizer.maskGeneric(from, 4));
-                    messagePort.sendTextMessage(from, "🔔 *Notificaciones activadas:*\nRecibirás alertas por cambios en el estado de las motos.\n\n_Si deseas dejar de recibirlas, simplemente usa la opción de Cerrar Sesión en el menú._");
+                    messagePort.sendTextMessage(from, "🔔 Notificaciones activadas. Recibirás alertas por cambios en el estado de las motos.\n\n_Si deseas dejar de recibirlas, simplemente usa la opción de Cerrar Sesión en el menú._");
                     sendMenu(from, dealership.getName());
                 } else {
                     int remaining = rateLimitPort.recordFailedAttempt(from);
@@ -223,7 +223,7 @@ public class WhatsAppBotService {
                                 LogSanitizer.maskGeneric(from, 4));
                         sessionPort.deleteByPhoneNumber(from);
                         messagePort.sendTextMessage(from,
-                                "🔕 *Notificaciones desactivadas*\nA partir de este momento ya no recibirás alertas de cambio de estado.\n\n🚪 Sesión cerrada correctamente.\n\n¡Hasta pronto! 👋. Para ingresar de nuevo, solo escribe un mensaje.");
+                                "🔕 Notificaciones desactivadas. A partir de este momento ya no recibirás alertas de cambio de estado.\n\n🚪 Sesión cerrada correctamente.\n\n¡Hasta pronto! 👋. Para ingresar de nuevo, solo escribe un mensaje.");
                     }
                     default -> {
                         if (looksLikePlate(text)) {
