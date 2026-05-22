@@ -124,7 +124,7 @@ public interface ServiceDeliveryRepository extends JpaRepository<ServiceDelivery
 
 
 
-  @EntityGraph(attributePaths = { "plate", "dealership", "messenger", "history", "history.changedBy" })
+  @EntityGraph(attributePaths = { "plate", "dealership", "messenger" })
   @Query("SELECT DISTINCT s FROM ServiceDeliveryEntity s LEFT JOIN s.history h " +
       "WHERE s.messenger.idEmployee = :messengerId " +
       "AND s.deleted = false " +
@@ -139,19 +139,19 @@ public interface ServiceDeliveryRepository extends JpaRepository<ServiceDelivery
       @Param("endOfDay") LocalDateTime endOfDay,
       Pageable pageable);
 
-  @EntityGraph(attributePaths = { "plate", "dealership", "messenger", "history" })
+  @EntityGraph(attributePaths = { "plate", "dealership", "messenger" })
   Page<ServiceDeliveryEntity> findByPlate_PlateNumberAndDealership_IdDealershipAndDeletedFalse(
       String plateNumber, Long dealershipId, Pageable pageable);
 
-  @EntityGraph(attributePaths = { "plate", "dealership", "messenger", "history" })
+  @EntityGraph(attributePaths = { "plate", "dealership", "messenger" })
   Page<ServiceDeliveryEntity> findByDealership_IdDealershipAndCurrentStatusInAndDeletedFalse(
       Long dealershipId, List<Status> statuses, Pageable pageable);
 
-  @EntityGraph(attributePaths = { "plate", "dealership", "messenger", "history" })
+  @EntityGraph(attributePaths = { "plate", "dealership", "messenger" })
   Page<ServiceDeliveryEntity> findByPlate_PlateNumberAndDeletedFalse(
       String plateNumber, Pageable pageable);
 
-  @EntityGraph(attributePaths = { "plate", "dealership", "messenger", "history" })
+  @EntityGraph(attributePaths = { "plate", "dealership", "messenger" })
   Page<ServiceDeliveryEntity> findByCurrentStatusInAndDeletedFalse(
       List<Status> statuses, Pageable pageable);
 }
