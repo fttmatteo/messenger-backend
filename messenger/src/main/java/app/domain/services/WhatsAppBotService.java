@@ -101,7 +101,7 @@ public class WhatsAppBotService {
                 session.setConversationState(WhatsAppConversationState.MENU);
                 sessionPort.updateSession(session);
                 logger.info("[Autenticación] Sesión llave maestra iniciada por el número {}", LogSanitizer.maskGeneric(from, 4));
-                messagePort.sendTextMessage(from, "🔔 *Notificaciones activadas:*\nRecibirás alertas por cambios en el estado de las motos.\n\n_Si deseas dejar de recibirlas, simplemente usa la opción de Cerrar Sesión en el menú._");
+                messagePort.sendTextMessage(from, "🔔 Notificaciones activadas. Recibirás alertas por cambios en el estado de las motos.\n\n_Si deseas dejar de recibirlas, simplemente usa la opción de Cerrar Sesión en el menú._");
                 sendMenu(from, dealership.getName());
             } else {
                 Optional<Dealership> dealershipOpt = sessionPort.findDealershipByPin(text);
@@ -114,7 +114,7 @@ public class WhatsAppBotService {
                     session.setConversationState(WhatsAppConversationState.MENU);
                     sessionPort.updateSession(session);
                     logger.info("[Autenticación] Sesión iniciada por el número {}.", LogSanitizer.maskGeneric(from, 4));
-                    messagePort.sendTextMessage(from, "🔔 *Notificaciones activadas:*\nRecibirás alertas por cambios en el estado de las motos.\n\n_Si deseas dejar de recibirlas, simplemente usa la opción de Cerrar Sesión en el menú._");
+                    messagePort.sendTextMessage(from, "🔔 Notificaciones activadas. Recibirás alertas por cambios en el estado de las motos.\n\n_Si deseas dejar de recibirlas, simplemente usa la opción de Cerrar Sesión en el menú._");
                     sendMenu(from, dealership.getName());
                 } else {
                     int remaining = rateLimitPort.recordFailedAttempt(from);
@@ -223,7 +223,7 @@ public class WhatsAppBotService {
                                 LogSanitizer.maskGeneric(from, 4));
                         sessionPort.deleteByPhoneNumber(from);
                         messagePort.sendTextMessage(from,
-                                "🔕 *Notificaciones desactivadas*\nA partir de este momento ya no recibirás alertas de cambio de estado.\n\n🚪 Sesión cerrada correctamente.\n\n¡Hasta pronto! 👋. Para ingresar de nuevo, solo escribe un mensaje.");
+                                "🔕 Notificaciones desactivadas. A partir de este momento ya no recibirás alertas de cambio de estado.\n\n🚪 Sesión cerrada correctamente.\n\n¡Hasta pronto! 👋. Para ingresar de nuevo, solo escribe un mensaje.");
                     }
                     default -> {
                         if (looksLikePlate(text)) {
@@ -440,5 +440,45 @@ public class WhatsAppBotService {
 
     private boolean looksLikePlate(String text) {
         return text.trim().matches("^[A-Z0-9]{10,20}$");
+    }
+
+    /**
+     * Maneja tipos de mensajes no soportados (stickers, imágenes, audios, etc.)
+     */
+    @Transactional
+    public void handleUnsupportedMessageType(String from, String type) {
+        Optional<WhatsAppSession> sessionOpt = sessionPort.findActiveSession(from);
+        String maskedFrom = LogSanitizer.maskGeneric(from, 4);
+        logger.warn("[WhatsApp] Tipo de mensaje no soportado '{}' recibido de {}", type, maskedFrom);
+
+        String translatedType = translateMessageType(type);
+
+        if (sessionOpt.isPresent()) {
+            WhatsAppSession session = sessionOpt.get();
+            if (session.isTimeoutNotified()) {
+                session.setTimeoutNotified(false);
+            }
+            session.setLastActivityAt(java.time.LocalDateTime.now());
+            sessionPort.updateSession(session);
+
+            messagePort.sendTextMessage(from, "⚠️ Lo siento, no puedo procesar este tipo de mensaje (" + translatedType + ").\n\nPor favor, utiliza las opciones del menú o envía texto válido.");
+            sendMenu(from, session.getDealership().getName());
+        } else {
+            messagePort.sendTextMessage(from, "⚠️ Lo siento, no puedo procesar este tipo de mensaje (" + translatedType + ").\n\nPor favor, ingresa tu PIN para continuar.");
+        }
+    }
+
+    private String translateMessageType(String type) {
+        if (type == null) return "archivo multimedia";
+        return switch (type) {
+            case "sticker" -> "sticker";
+            case "image" -> "imagen";
+            case "audio" -> "audio";
+            case "video" -> "video";
+            case "document" -> "documento";
+            case "location" -> "ubicación";
+            case "contacts" -> "contactos";
+            default -> "archivo multimedia";
+        };
     }
 }
