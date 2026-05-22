@@ -31,8 +31,7 @@ public class DeletedServiceEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @Column(name = "locked_at")
-    private LocalDateTime lockedAt;
+
 
     @Column(name = "plate_id")
     private Long plateId;
@@ -132,14 +131,6 @@ public class DeletedServiceEntity {
 
     public void setDeletedAt(LocalDateTime deletedAt) {
         this.deletedAt = deletedAt;
-    }
-
-    public LocalDateTime getLockedAt() {
-        return lockedAt;
-    }
-
-    public void setLockedAt(LocalDateTime lockedAt) {
-        this.lockedAt = lockedAt;
     }
 
     public Long getPlateId() {

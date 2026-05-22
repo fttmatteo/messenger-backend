@@ -152,14 +152,7 @@ public class ServiceDeliveryEntity {
     @Column(name = "deleted_at")
     private java.time.LocalDateTime deletedAt;
 
-    /**
-     * @deprecated Este campo ya no se utiliza. Anteriormente marcaba cuando un
-     *             servicio
-     *             entraba en ventana de 72h para edición (estados
-     *             DELIVERED/RESOLVED).
-     */
-    @Column(name = "locked_at")
-    private java.time.LocalDateTime lockedAt;
+
 
     @PrePersist
     protected void onCreate() {
@@ -195,11 +188,4 @@ public class ServiceDeliveryEntity {
         this.deletedAt = deletedAt;
     }
 
-    public java.time.LocalDateTime getLockedAt() {
-        return lockedAt;
-    }
-
-    public void setLockedAt(java.time.LocalDateTime lockedAt) {
-        this.lockedAt = lockedAt;
-    }
 }

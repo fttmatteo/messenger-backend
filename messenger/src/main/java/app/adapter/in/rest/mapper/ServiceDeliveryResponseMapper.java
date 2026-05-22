@@ -52,9 +52,6 @@ public class ServiceDeliveryResponseMapper {
         response.setObservation(service.getObservation());
         response.setCreatedAt(service.getCreatedAt());
 
-        response.setLockedAt(service.getLockedAt());
-        response.setLocked(false);
-
         response.setDeleted(service.isDeleted());
         response.setDeletedAt(service.getDeletedAt());
 
@@ -84,9 +81,6 @@ public class ServiceDeliveryResponseMapper {
         response.setCurrentStatus(service.getCurrentStatus());
         response.setObservation(service.getObservation());
         response.setCreatedAt(service.getCreatedAt());
-
-        response.setLockedAt(service.getLockedAt());
-        response.setLocked(false);
 
         response.setDeleted(service.isDeleted());
         response.setDeletedAt(service.getDeletedAt());

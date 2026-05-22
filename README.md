@@ -494,7 +494,7 @@ erDiagram
         String observation
         LocalDateTime created_at
         LocalDateTime deleted_at
-        LocalDateTime locked_at
+
         Long plate_id
         Long dealership_id
         Long messenger_id

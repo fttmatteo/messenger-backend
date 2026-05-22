@@ -121,7 +121,7 @@ public class ServiceDelivery {
     private java.time.LocalDateTime createdAt;
     private boolean deleted = false;
     private java.time.LocalDateTime deletedAt;
-    private java.time.LocalDateTime lockedAt;
+
 
     public java.time.LocalDateTime getCreatedAt() {
         return createdAt;
@@ -147,11 +147,4 @@ public class ServiceDelivery {
         this.deletedAt = deletedAt;
     }
 
-    public java.time.LocalDateTime getLockedAt() {
-        return lockedAt;
-    }
-
-    public void setLockedAt(java.time.LocalDateTime lockedAt) {
-        this.lockedAt = lockedAt;
-    }
 }
