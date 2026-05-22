@@ -59,7 +59,7 @@ public class WhatsAppNotificationListener {
 
         StringBuilder message = new StringBuilder();
         message.append("🔔 *Notificación de cambio de estado*\n\n");
-        message.append(String.format("La moto con chasis *%s* para el concesionario *%s* ha sido actualizada:\n\n", plateNumber, dealershipName));
+        message.append(String.format("La moto con chasis *%s* para el concesionario *%s* ha sido actualizada.\n\n", plateNumber, dealershipName));
         message.append(String.format("*ESTADO:* %s %s\n", statusEmoji, statusName));
         message.append(String.format("🚚 *Transportista:* %s", messengerName));
 
@@ -80,10 +80,15 @@ public class WhatsAppNotificationListener {
             message.append(String.format("\n💬 *Observación:* %s", currentObservation.trim()));
         }
 
-        message.append("\n\n_Escriba el número de chasis para consultar el detalle completo._");
+        message.append("\n\n_Presione el botón para ver los detalles completos._");
 
         for (WhatsAppSession session : activeSessions) {
-            messagePort.sendTextMessage(session.getPhoneNumber(), message.toString());
+            messagePort.sendReplyButtons(
+                    session.getPhoneNumber(),
+                    message.toString(),
+                    java.util.List.of("Ver detalle"),
+                    java.util.List.of("VIEW_PLATE_" + plateNumber)
+            );
         }
     }
 

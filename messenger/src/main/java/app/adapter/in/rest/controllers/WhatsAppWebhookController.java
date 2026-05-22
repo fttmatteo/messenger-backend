@@ -103,8 +103,8 @@ public class WhatsAppWebhookController {
                 }
             }
         } catch (Exception e) {
-            logger.error("Error procesando webhook. Tamaño del payload: {} bytes. Error: {}",
-                    rawBody != null ? rawBody.length() : 0, e.getMessage());
+            logger.error("Error procesando webhook. Tamaño del payload: {} bytes.",
+                    rawBody != null ? rawBody.length() : 0, e);
         }
 
         return ResponseEntity.ok("EVENT_RECEIVED");

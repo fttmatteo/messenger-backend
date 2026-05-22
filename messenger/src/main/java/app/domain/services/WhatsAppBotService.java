@@ -101,6 +101,7 @@ public class WhatsAppBotService {
                 session.setConversationState(WhatsAppConversationState.MENU);
                 sessionPort.updateSession(session);
                 logger.info("[Autenticación] Sesión llave maestra iniciada por el número {}", LogSanitizer.maskGeneric(from, 4));
+                messagePort.sendTextMessage(from, "🔔 *Notificaciones activadas:*\nRecibirás alertas por cambios en el estado de las motos.\n\n_Si deseas dejar de recibirlas, simplemente usa la opción de Cerrar Sesión en el menú._");
                 sendMenu(from, dealership.getName());
             } else {
                 Optional<Dealership> dealershipOpt = sessionPort.findDealershipByPin(text);
@@ -113,6 +114,7 @@ public class WhatsAppBotService {
                     session.setConversationState(WhatsAppConversationState.MENU);
                     sessionPort.updateSession(session);
                     logger.info("[Autenticación] Sesión iniciada por el número {}.", LogSanitizer.maskGeneric(from, 4));
+                    messagePort.sendTextMessage(from, "🔔 *Notificaciones activadas:*\nRecibirás alertas por cambios en el estado de las motos.\n\n_Si deseas dejar de recibirlas, simplemente usa la opción de Cerrar Sesión en el menú._");
                     sendMenu(from, dealership.getName());
                 } else {
                     int remaining = rateLimitPort.recordFailedAttempt(from);
@@ -131,17 +133,34 @@ public class WhatsAppBotService {
             }
         } else {
             messagePort.sendTextMessage(from,
-                    "🚦 *PLAK* 🚦\n¡Hola! 👋🏼. Aquí podrás consultar el estado de las motos por chasis.\n"
-                            + "🔔 Mantén la sesión activa para recibir notificaciones de estados.\n"
-                            + "`PIN requerido cada 12h o al reiniciar sesión.`\n\n"
+                    "*PLAK*\n\n¡Hola! 👋🏼. Aquí podrás consultar el estado de las motos por chasis.\n\n"
+                            + "_PIN requerido cada 12h o al reiniciar sesión._\n\n"
                             + "🔒 *Ingresa el PIN para continuar:* ");
         }
     }
 
     private void handleAuthenticatedUser(String from, String text, WhatsAppSession session) {
-        WhatsAppConversationState state = session.getConversationState();
         Long dealershipId = session.getDealership().getIdDealership();
         String dealershipName = session.getDealership().getName();
+
+        if (text.startsWith("VIEW_PLATE_")) {
+            String plate = text.substring("VIEW_PLATE_".length());
+            Page<ServiceDelivery> servicesPage = searchService.findByPlateAndDealershipPaginated(plate, dealershipId,
+                    PageRequest.of(0, 5));
+            if (!servicesPage.isEmpty()) {
+                sendPlateDetails(from, servicesPage.getContent());
+            } else {
+                messagePort.sendTextMessage(from,
+                        "⚠️ No se encontró el chasis *" + plate.toUpperCase() + "* en " + dealershipName + ".\n\n"
+                                + "Por favor, verifica que el número sea correcto o consulta más tarde.");
+            }
+            session.setConversationState(WhatsAppConversationState.MENU);
+            sessionPort.updateSession(session);
+            sendMenu(from, dealershipName);
+            return;
+        }
+
+        WhatsAppConversationState state = session.getConversationState();
 
         switch (state) {
             case AWAITING_PLATE -> {
@@ -159,9 +178,11 @@ public class WhatsAppBotService {
                 sendMenu(from, dealershipName);
             }
             case MENU -> {
-                if (text.startsWith("NEXT_PAGE")) {
-                    int nextPage = session.getCurrentPage() + 1;
-                    session.setCurrentPage(nextPage);
+                if (text.startsWith("NEXT_PAGE") || text.startsWith("PREV_PAGE")) {
+                    int newPage = text.startsWith("NEXT_PAGE") 
+                            ? session.getCurrentPage() + 1 
+                            : Math.max(0, session.getCurrentPage() - 1);
+                    session.setCurrentPage(newPage);
                     sessionPort.updateSession(session);
 
                     List<Status> statuses = deserializeStatuses(session.getLastFilterStatuses());
@@ -202,7 +223,7 @@ public class WhatsAppBotService {
                                 LogSanitizer.maskGeneric(from, 4));
                         sessionPort.deleteByPhoneNumber(from);
                         messagePort.sendTextMessage(from,
-                                "🚪 Sesión cerrada correctamente.\n\n¡Hasta pronto! 👋. Para ingresar de nuevo, solo escribe un mensaje.");
+                                "🔕 *Notificaciones desactivadas*\nA partir de este momento ya no recibirás alertas de cambio de estado.\n\n🚪 Sesión cerrada correctamente.\n\n¡Hasta pronto! 👋. Para ingresar de nuevo, solo escribe un mensaje.");
                     }
                     default -> {
                         if (looksLikePlate(text)) {
@@ -302,8 +323,8 @@ public class WhatsAppBotService {
         if (s.getHistory() != null && !s.getHistory().isEmpty()) {
             currentObservation = s.getHistory().stream()
                     .filter(h -> h.getNewStatus() == s.getCurrentStatus())
-                    .map(h -> h.getObservation())
                     .reduce((first, second) -> second)
+                    .map(h -> h.getObservation())
                     .orElse(null);
         }
 
@@ -337,25 +358,34 @@ public class WhatsAppBotService {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("📦 *").append(title).append("*\n");
+        sb.append("*").append(title).append("*\n");
         sb.append("_Página ").append(page + 1).append(" de ").append(resultPage.getTotalPages()).append("_\n\n");
 
         for (ServiceDelivery s : resultPage.getContent()) {
-            sb.append("• ").append(s.getPlate().getPlateNumber())
-                    .append(" (").append(getStatusName(s.getCurrentStatus())).append(")\n");
+            sb.append("• ").append(s.getPlate().getPlateNumber()).append("\n");
         }
 
         sb.append("\n_Escribe el número del chasis para ver detalles._");
 
-        if (resultPage.hasNext()) {
-            messagePort.sendReplyButtons(from, sb.toString(),
-                    List.of("Ver más", "Menú Principal"),
-                    List.of("NEXT_PAGE", "MENU_BACK"));
-        } else {
-            messagePort.sendReplyButtons(from, sb.toString(),
-                    List.of("Menú Principal"),
-                    List.of("MENU_BACK"));
+        boolean hasNext = resultPage.hasNext();
+        boolean hasPrevious = page > 0;
+
+        List<String> buttonNames = new java.util.ArrayList<>();
+        List<String> buttonIds = new java.util.ArrayList<>();
+
+        if (hasPrevious) {
+            buttonNames.add("Atrás");
+            buttonIds.add("PREV_PAGE");
         }
+        if (hasNext) {
+            buttonNames.add("Ver más");
+            buttonIds.add("NEXT_PAGE");
+        }
+        
+        buttonNames.add("Menú Principal");
+        buttonIds.add("MENU_BACK");
+
+        messagePort.sendReplyButtons(from, sb.toString(), buttonNames, buttonIds);
     }
 
     private String serializeStatuses(List<Status> statuses) {

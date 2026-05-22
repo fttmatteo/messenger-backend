@@ -58,7 +58,7 @@ public class WhatsAppTimeoutScheduler {
                 session.setTimeoutNotified(true);
                 sessionPort.updateSession(session);
 
-                logger.debug("[Scheduler] Sesión de {} reseteada silenciosamente por inactividad.", LogSanitizer.maskGeneric(session.getPhoneNumber(), 4));
+                logger.info("[Scheduler] Sesión de {} reseteada silenciosamente por inactividad.", LogSanitizer.maskGeneric(session.getPhoneNumber(), 4));
             } catch (Exception e) {
                 logger.error("[Scheduler] Error procesando timeout silencioso para sessionId={} phone={}: {}",
                         session.getId(), LogSanitizer.maskGeneric(session.getPhoneNumber(), 4), e.getMessage(), e);
