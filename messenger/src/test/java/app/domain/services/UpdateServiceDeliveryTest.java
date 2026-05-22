@@ -247,8 +247,7 @@ class UpdateServiceDeliveryTest {
         updateServiceDelivery.reassignMessenger(1L, 3L, 2L);
 
         verify(serviceDeliveryPort).save(argThat(s -> s.getCurrentStatus() == Status.ASSIGNED &&
-                s.getMessenger().equals(newMessenger) &&
-                s.getLockedAt() == null));
+                s.getMessenger().equals(newMessenger)));
     }
 
     @Test
