@@ -133,9 +133,8 @@ public class WhatsAppBotService {
             }
         } else {
             messagePort.sendTextMessage(from,
-                    "🚦 *PLAK* 🚦\n¡Hola! 👋🏼. Aquí podrás consultar el estado de las motos por chasis.\n"
-                            + "🔔 Mantén la sesión activa para recibir notificaciones de estados.\n"
-                            + "`PIN requerido cada 12h o al reiniciar sesión.`\n\n"
+                    "*PLAK*\n\n¡Hola! 👋🏼. Aquí podrás consultar el estado de las motos por chasis.\n\n"
+                            + "_PIN requerido cada 12h o al reiniciar sesión._\n\n"
                             + "🔒 *Ingresa el PIN para continuar:* ");
         }
     }
