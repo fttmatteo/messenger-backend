@@ -68,7 +68,7 @@ public class WhatsAppNotificationListener {
         }
 
         if (currentObservation != null && !currentObservation.trim().isEmpty()) {
-            message.append(String.format("\n💬 *Observación:* %s", currentObservation.trim()));
+            message.append(String.format("💬 *Observación:* %s", currentObservation.trim()));
         }
 
         for (WhatsAppSession session : activeSessions) {
