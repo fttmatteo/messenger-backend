@@ -441,4 +441,44 @@ public class WhatsAppBotService {
     private boolean looksLikePlate(String text) {
         return text.trim().matches("^[A-Z0-9]{10,20}$");
     }
+
+    /**
+     * Maneja tipos de mensajes no soportados (stickers, imágenes, audios, etc.)
+     */
+    @Transactional
+    public void handleUnsupportedMessageType(String from, String type) {
+        Optional<WhatsAppSession> sessionOpt = sessionPort.findActiveSession(from);
+        String maskedFrom = LogSanitizer.maskGeneric(from, 4);
+        logger.warn("[WhatsApp] Tipo de mensaje no soportado '{}' recibido de {}", type, maskedFrom);
+
+        String translatedType = translateMessageType(type);
+
+        if (sessionOpt.isPresent()) {
+            WhatsAppSession session = sessionOpt.get();
+            if (session.isTimeoutNotified()) {
+                session.setTimeoutNotified(false);
+            }
+            session.setLastActivityAt(java.time.LocalDateTime.now());
+            sessionPort.updateSession(session);
+
+            messagePort.sendTextMessage(from, "⚠️ Lo siento, no puedo procesar este tipo de mensaje (" + translatedType + ").\n\nPor favor, utiliza las opciones del menú o envía texto válido.");
+            sendMenu(from, session.getDealership().getName());
+        } else {
+            messagePort.sendTextMessage(from, "⚠️ Lo siento, no puedo procesar este tipo de mensaje (" + translatedType + ").\n\nPor favor, ingresa tu PIN para continuar.");
+        }
+    }
+
+    private String translateMessageType(String type) {
+        if (type == null) return "archivo multimedia";
+        return switch (type) {
+            case "sticker" -> "sticker";
+            case "image" -> "imagen";
+            case "audio" -> "audio";
+            case "video" -> "video";
+            case "document" -> "documento";
+            case "location" -> "ubicación";
+            case "contacts" -> "contactos";
+            default -> "archivo multimedia";
+        };
+    }
 }

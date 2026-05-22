@@ -95,6 +95,8 @@ public class WhatsAppWebhookController {
                                             String rowId = interactive.getListReply().getId();
                                             botService.processMessage(from, rowId);
                                         }
+                                    } else {
+                                        botService.handleUnsupportedMessageType(from, message.getType());
                                     }
                                 }
                             }
