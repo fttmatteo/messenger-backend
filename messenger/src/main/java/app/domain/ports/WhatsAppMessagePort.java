@@ -16,5 +16,5 @@ public interface WhatsAppMessagePort {
                         java.util.List<String> rowTitles, java.util.List<String> rowDescriptions,
                         java.util.List<String> rowIds);
 
-        boolean sendImage(String to, String imageUrl, String caption);
+        boolean sendDocument(String to, String documentUrl, String caption, String filename);
 }

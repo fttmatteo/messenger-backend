@@ -232,7 +232,16 @@ public class AuthController {
      */
     @PostMapping("/logout")
 
-    public ResponseEntity<Void> logout(HttpServletResponse response) {
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        String accessToken = extractTokenFromCookie(request, "accessToken");
+        if (accessToken != null && loginUseCase.validateToken(accessToken)) {
+            String username = loginUseCase.extractUsername(accessToken);
+            String role = loginUseCase.extractRole(accessToken);
+            logger.info("[Seguridad] Logout exitoso para documento {} con rol {}", 
+                    LogSanitizer.maskDocument(username), role);
+        } else {
+            logger.info("[Seguridad] Logout exitoso (sin token válido en request)");
+        }
 
         Cookie accessTokenCookie = createSecureCookie("accessToken", "", 0, "/");
         response.addCookie(accessTokenCookie);
