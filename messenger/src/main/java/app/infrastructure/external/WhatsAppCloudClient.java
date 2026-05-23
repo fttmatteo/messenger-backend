@@ -129,16 +129,19 @@ public class WhatsAppCloudClient implements WhatsAppMessagePort {
     }
 
     /**
-     * Envía una imagen a un número de WhatsApp.
+     * Envía un documento a un número de WhatsApp.
      */
     @Override
-    public boolean sendImage(String to, String imageUrl, String caption) {
-        Map<String, Object> image = new HashMap<>();
-        image.put("link", imageUrl);
+    public boolean sendDocument(String to, String documentUrl, String caption, String filename) {
+        Map<String, Object> document = new HashMap<>();
+        document.put("link", documentUrl);
         if (caption != null && !caption.isEmpty()) {
-            image.put("caption", caption);
+            document.put("caption", caption);
         }
-        return sendMessage(to, "image", image);
+        if (filename != null && !filename.isEmpty()) {
+            document.put("filename", filename);
+        }
+        return sendMessage(to, "document", document);
     }
 
     private boolean sendMessage(String to, String type, Object data) {

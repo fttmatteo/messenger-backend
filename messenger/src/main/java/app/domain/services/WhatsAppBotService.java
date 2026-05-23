@@ -161,7 +161,7 @@ public class WhatsAppBotService {
                         Photo p = photos.get(i);
                         String url = storagePort.getUrl(p.getPhotoPath());
                         String caption = String.format("📸 Foto %d de %d", (i + 1), photos.size());
-                        messagePort.sendImage(from, url, caption);
+                        messagePort.sendDocument(from, url, caption, "Foto_" + (i + 1) + ".webp");
                         sleep(500);
                     }
                 } else {
