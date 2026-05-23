@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Optional;
 import app.domain.model.enums.WhatsAppConversationState;
 import java.util.stream.Collectors;
+import app.domain.model.Photo;
+import app.domain.model.StatusHistory;
 
 /**
  * Servicio principal del bot de WhatsApp.
@@ -38,6 +40,7 @@ public class WhatsAppBotService {
     private final WhatsAppSessionPort sessionPort;
     private final SearchServiceDelivery searchService;
     private final WhatsAppRateLimitPort rateLimitPort;
+    private final StoragePort storagePort;
 
     public WhatsAppBotService(
             WhatsAppMessagePort messagePort,
@@ -50,6 +53,7 @@ public class WhatsAppBotService {
         this.sessionPort = sessionPort;
         this.searchService = searchService;
         this.rateLimitPort = rateLimitPort;
+        this.storagePort = storagePort;
     }
 
     /**
@@ -142,6 +146,34 @@ public class WhatsAppBotService {
     private void handleAuthenticatedUser(String from, String text, WhatsAppSession session) {
         Long dealershipId = session.getDealership().getIdDealership();
         String dealershipName = session.getDealership().getName();
+
+        if (text.startsWith("VIEW_PHOTOS_")) {
+            try {
+                Long serviceId = Long.parseLong(text.substring("VIEW_PHOTOS_".length()));
+                ServiceDelivery s = searchService.findById(serviceId);
+                Optional<StatusHistory> currentHistoryOpt = s.getHistory().stream()
+                        .filter(h -> h.getNewStatus() == s.getCurrentStatus())
+                        .reduce((first, second) -> second);
+                
+                if (currentHistoryOpt.isPresent() && currentHistoryOpt.get().getPhotos() != null && !currentHistoryOpt.get().getPhotos().isEmpty()) {
+                    List<Photo> photos = currentHistoryOpt.get().getPhotos();
+                    for (int i = 0; i < photos.size(); i++) {
+                        Photo p = photos.get(i);
+                        String url = storagePort.getUrl(p.getPhotoPath());
+                        String caption = String.format("📸 Foto %d de %d", (i + 1), photos.size());
+                        messagePort.sendImage(from, url, caption);
+                        sleep(500);
+                    }
+                } else {
+                    messagePort.sendTextMessage(from, "⚠️ No se encontraron fotos para el estado actual de este chasis.");
+                }
+            } catch (Exception e) {
+                logger.error("[WhatsApp] Error al obtener fotos para servicio", e);
+                messagePort.sendTextMessage(from, "⚠️ Hubo un error al intentar obtener las fotos.");
+            }
+            sendMenu(from, dealershipName);
+            return;
+        }
 
         if (text.startsWith("VIEW_PLATE_")) {
             String plate = text.substring("VIEW_PLATE_".length());
@@ -269,7 +301,23 @@ public class WhatsAppBotService {
 
     private void sendPlateDetails(String from, List<ServiceDelivery> services) {
         for (ServiceDelivery s : services) {
-            messagePort.sendTextMessage(from, formatServiceDetail(s));
+            String message = formatServiceDetail(s);
+            
+            boolean hasPhotos = false;
+            if (s.getHistory() != null && !s.getHistory().isEmpty()) {
+                Optional<StatusHistory> currentHistoryOpt = s.getHistory().stream()
+                        .filter(h -> h.getNewStatus() == s.getCurrentStatus())
+                        .reduce((first, second) -> second);
+                if (currentHistoryOpt.isPresent() && currentHistoryOpt.get().getPhotos() != null && !currentHistoryOpt.get().getPhotos().isEmpty()) {
+                    hasPhotos = true;
+                }
+            }
+
+            if (hasPhotos) {
+                messagePort.sendReplyButtons(from, message, List.of("Ver fotos"), List.of("VIEW_PHOTOS_" + s.getIdServiceDelivery()));
+            } else {
+                messagePort.sendTextMessage(from, message);
+            }
             sleep(500);
         }
     }

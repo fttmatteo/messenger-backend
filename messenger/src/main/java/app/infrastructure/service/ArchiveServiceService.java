@@ -56,7 +56,7 @@ public class ArchiveServiceService implements ArchivePort {
         archivedService.setObservation(service.getObservation());
         archivedService.setCreatedAt(service.getCreatedAt());
         archivedService.setDeletedAt(service.getDeletedAt());
-        archivedService.setLockedAt(service.getLockedAt());
+
 
         if (service.getPlate() != null) {
             archivedService.setPlateId(service.getPlate().getIdPlate());

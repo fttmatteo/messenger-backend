@@ -4,7 +4,7 @@
 
 # Messenger Backend API
 
-<img src="https://img.shields.io/badge/Version-2.0.1-blue.svg" alt="Version">
+<img src="https://img.shields.io/badge/Version-2.0.2-blue.svg" alt="Version">
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.14-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
@@ -494,7 +494,7 @@ erDiagram
         String observation
         LocalDateTime created_at
         LocalDateTime deleted_at
-        LocalDateTime locked_at
+
         Long plate_id
         Long dealership_id
         Long messenger_id

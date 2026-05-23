@@ -21,9 +21,8 @@ public class ServiceDeliveryResponse {
     private List<PhotoResponse> photos = new ArrayList<>();
     private List<StatusHistoryResponse> history = new ArrayList<>();
     private java.time.LocalDateTime createdAt;
-    private java.time.LocalDateTime lockedAt;
-    private java.time.LocalDateTime editDeadline;
-    private boolean isLocked;
+
+
     private boolean deleted;
     private java.time.LocalDateTime deletedAt;
 
@@ -35,29 +34,8 @@ public class ServiceDeliveryResponse {
         this.createdAt = createdAt;
     }
 
-    public java.time.LocalDateTime getLockedAt() {
-        return lockedAt;
-    }
 
-    public void setLockedAt(java.time.LocalDateTime lockedAt) {
-        this.lockedAt = lockedAt;
-    }
 
-    public java.time.LocalDateTime getEditDeadline() {
-        return editDeadline;
-    }
-
-    public void setEditDeadline(java.time.LocalDateTime editDeadline) {
-        this.editDeadline = editDeadline;
-    }
-
-    public boolean isLocked() {
-        return isLocked;
-    }
-
-    public void setLocked(boolean locked) {
-        isLocked = locked;
-    }
 
     public boolean isDeleted() {
         return deleted;
