@@ -31,7 +31,7 @@ public class FileController {
     @Value("${app.storage.path:uploads}")
     private String storageLocation;
 
-    private final String[] subDirectories = { "detections", "signatures", "evidence" };
+    private final String[] subDirectories = { "signatures", "evidence" };
 
     /**
      * Recupera un archivo almacenado (foto, firma) por su nombre.
