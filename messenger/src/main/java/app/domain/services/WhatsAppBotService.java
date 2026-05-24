@@ -162,13 +162,35 @@ public class WhatsAppBotService {
                     String plateNumber = (s.getPlate() != null && s.getPlate().getPlateNumber() != null) 
                             ? s.getPlate().getPlateNumber() 
                             : "Desconocido";
-                    for (int i = 0; i < photos.size(); i++) {
-                        Photo p = photos.get(i);
+                    if (photos.size() == 1) {
+                        Photo p = photos.get(0);
                         String url = storagePort.getUrl(p.getPhotoPath());
-                        String caption = String.format("📸 %d de %d", (i + 1), photos.size());
-                        String fileName = String.format("%d_Foto_%s.webp", (i + 1), plateNumber);
+                        String caption = "📸 Foto de evidencia";
+                        String fileName = String.format("Foto_%s.webp", plateNumber);
                         messagePort.sendDocument(from, url, caption, fileName);
-                        sleep(500);
+                    } else {
+                        java.io.File tempZip = java.nio.file.Files.createTempFile("fotos_" + plateNumber, ".zip").toFile();
+                        try (java.util.zip.ZipOutputStream zos = new java.util.zip.ZipOutputStream(new java.io.FileOutputStream(tempZip))) {
+                            for (int i = 0; i < photos.size(); i++) {
+                                Photo p = photos.get(i);
+                                java.io.File photoFile = storagePort.get(p.getPhotoPath());
+                                if (photoFile != null && photoFile.exists()) {
+                                    java.util.zip.ZipEntry zipEntry = new java.util.zip.ZipEntry(String.format("%d_Foto_%s.webp", (i + 1), plateNumber));
+                                    zos.putNextEntry(zipEntry);
+                                    java.nio.file.Files.copy(photoFile.toPath(), zos);
+                                    zos.closeEntry();
+                                }
+                            }
+                        }
+                        
+                        String zipFileName = String.format("Fotos_%s.zip", plateNumber);
+                        String savedZipPath = storagePort.save(tempZip, "zips", zipFileName);
+                        String zipUrl = storagePort.getUrl(savedZipPath);
+                        
+                        String caption = String.format("📸 %d Fotos de evidencia (Comprimidas)", photos.size());
+                        messagePort.sendDocument(from, zipUrl, caption, zipFileName);
+                        
+                        tempZip.delete();
                     }
                 } else {
                     messagePort.sendTextMessage(from, "⚠️ No se encontraron fotos para el estado actual de este chasis.");
