@@ -8,10 +8,10 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import app.domain.model.Employee;
 import app.domain.model.enums.Role;
-import app.domain.services.CreateEmployee;
-import app.domain.services.DeleteEmployee;
-import app.domain.services.SearchEmployee;
-import app.domain.services.UpdateEmployee;
+import app.application.usecase.employee.CreateEmployeeUseCase;
+import app.application.usecase.employee.DeleteEmployeeUseCase;
+import app.application.usecase.employee.SearchEmployeeUseCase;
+import app.application.usecase.employee.UpdateEmployeeUseCase;
 
 
 /**
@@ -22,16 +22,16 @@ public class EmployeeUseCase {
 
     private static final Logger logger = LoggerFactory.getLogger(EmployeeUseCase.class);
 
-    private final CreateEmployee createEmployee;
-    private final UpdateEmployee updateEmployee;
-    private final SearchEmployee searchEmployee;
-    private final DeleteEmployee deleteEmployee;
+    private final CreateEmployeeUseCase createEmployee;
+    private final UpdateEmployeeUseCase updateEmployee;
+    private final SearchEmployeeUseCase searchEmployee;
+    private final DeleteEmployeeUseCase deleteEmployee;
 
     public EmployeeUseCase(
-            CreateEmployee createEmployee,
-            UpdateEmployee updateEmployee,
-            SearchEmployee searchEmployee,
-            DeleteEmployee deleteEmployee) {
+            CreateEmployeeUseCase createEmployee,
+            UpdateEmployeeUseCase updateEmployee,
+            SearchEmployeeUseCase searchEmployee,
+            DeleteEmployeeUseCase deleteEmployee) {
         this.createEmployee = createEmployee;
         this.updateEmployee = updateEmployee;
         this.searchEmployee = searchEmployee;

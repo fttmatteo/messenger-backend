@@ -1,0 +1,29 @@
+package app.adapter.in.rest.dealership;
+
+import app.domain.model.Dealership;
+import org.springframework.stereotype.Component;
+
+/**
+ * Mapper de Dealership a DealershipResponse para API REST.
+ */
+@Component
+public class DealershipResponseMapper {
+
+    public DealershipResponse toResponse(Dealership dealership) {
+        if (dealership == null) {
+            return null;
+        }
+        DealershipResponse response = new DealershipResponse(
+                dealership.getIdDealership(),
+                dealership.getUuid(),
+                dealership.getName(),
+                dealership.getAddress(),
+                dealership.getPhone(),
+                dealership.getZone(),
+                dealership.getWhatsappPin());
+        response.setLatitude(dealership.getLatitude());
+        response.setLongitude(dealership.getLongitude());
+        response.setIsGeolocated(dealership.getIsGeolocated());
+        return response;
+    }
+}

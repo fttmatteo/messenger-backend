@@ -1,6 +1,6 @@
 package app.infrastructure.config;
 
-import app.adapter.in.rest.response.ErrorResponse;
+import app.adapter.in.rest.common.ErrorResponse;
 import app.domain.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;

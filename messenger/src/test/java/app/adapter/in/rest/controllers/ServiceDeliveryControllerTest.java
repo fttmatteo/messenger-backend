@@ -1,11 +1,12 @@
 package app.adapter.in.rest.controllers;
+import app.adapter.in.rest.delivery.ServiceDeliveryController;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import app.adapter.in.builder.ServiceDeliveryBuilder;
-import app.adapter.in.rest.mapper.ServiceDeliveryResponseMapper;
-import app.adapter.in.rest.response.ServiceDeliveryResponse;
+import app.adapter.in.rest.delivery.ServiceDeliveryResponseMapper;
+import app.adapter.in.rest.delivery.ServiceDeliveryResponse;
 import app.application.usecase.ServiceDeliveryUseCase;
 import app.domain.model.Employee;
 import app.domain.model.Plate;

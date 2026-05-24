@@ -1,4 +1,5 @@
 package app.domain.services;
+import app.domain.ports.ServiceDeliveryPort;
 
 import app.domain.model.Dealership;
 import app.domain.model.WhatsAppSession;
@@ -23,7 +24,7 @@ class WhatsAppBotServiceTest {
     @Mock
     private WhatsAppSessionPort sessionPort;
     @Mock
-    private SearchServiceDelivery searchService;
+    private ServiceDeliveryPort searchService;
     @Mock
     private LocationPort locationPort;
     @Mock
@@ -173,7 +174,7 @@ class WhatsAppBotServiceTest {
         session.setLastFilterStatuses("ASSIGNED");
 
         when(sessionPort.findActiveSession(from)).thenReturn(Optional.of(session));
-        when(searchService.findByDealershipAndStatusesPaginated(anyLong(), anyList(), any())).thenReturn(org.springframework.data.domain.Page.empty());
+        when(searchService.findByDealershipIdAndStatusesPaginated(anyLong(), anyList(), any())).thenReturn(org.springframework.data.domain.Page.empty());
 
         botService.processMessage(from, "NEXT_PAGE");
 

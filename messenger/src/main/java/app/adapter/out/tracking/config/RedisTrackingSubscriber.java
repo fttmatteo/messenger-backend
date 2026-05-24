@@ -1,6 +1,6 @@
 package app.adapter.out.tracking.config;
 
-import app.adapter.in.rest.response.LiveTrackingResponse;
+import app.adapter.in.rest.tracking.LiveTrackingResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

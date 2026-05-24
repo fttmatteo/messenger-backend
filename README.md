@@ -4,7 +4,7 @@
 
 # Messenger Backend API
 
-<img src="https://img.shields.io/badge/Version-2.0.3-blue.svg" alt="Version">
+<img src="https://img.shields.io/badge/Version-3.0.0-blue.svg" alt="Version">
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.14-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
@@ -15,10 +15,6 @@
 
 **Sistema de gestión de entregas de motocicletas por chasis y monitoreo de transportistas.**
 Plataforma inteligente para el control logístico y distribución de motocicletas identificadas por número de chasis, integrada con rastreo satelital continuo de los transportistas en ruta.
-
-**Identificación por Chasis:** Registro y control de inventario de motocicletas basado en su chasis único.
-**Monitoreo Satelital (GPS):** Rastreo geográfico en tiempo real de los transportistas durante su jornada de entrega.
-**Evidencia de Entrega:** Validación mediante firmas táctiles y capturas fotográficas.
 
 [🇺🇸 English Version](./README.en.md)
 
@@ -103,7 +99,6 @@ graph LR
     PERS -.-> PORTS
     CLD -.-> PORTS
     WABA -.-> PORTS
-    VIS -.-> PORTS
     SEC -.-> PORTS
 
     %% Conexiones de Infraestructura
@@ -130,7 +125,7 @@ graph LR
 
 | Componente                | Tecnología                                                                                                    |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| **Framework**             | Spring Boot 3.5.10                                                                                            |
+| **Framework**             | Spring Boot 3.5.14                                                                                            |
 | **Lenguaje**              | Java 17                                                                                                       |
 | **Base de Datos**         | MySQL 8.0+                                                                                                    |
 | **Cache/Streaming**       | Redis                                                                                                         |
@@ -163,11 +158,16 @@ messenger/
 │   │   │   │   ├── controllers/         # REST Controllers
 │   │   │   │   ├── mapper/              # Mappers Request/Response
 │   │   │   │   ├── request/             # DTOs de entrada
-│   │   │   │   └── response/            # DTOs de salida
+│   │   │   │   ├── response/            # DTOs de salida
+│   │   │   │   └── validators/          # Validadores de entrada
 │   │   │   └── websocket/               # Tracking en tiempo real
 │   │   └── out/                         # Adaptadores de salida
 │   │       ├── maps/                    # Google Maps Integration
 │   │       ├── persistence/             # Adaptadores JPA
+│   │       │   ├── adapter/             # Implementación de Puertos JPA
+│   │       │   ├── entities/            # Entidades JPA
+│   │       │   ├── mapper/              # Mappers de Entidad a Dominio
+│   │       │   └── repository/          # Interfaces Spring Data JPA
 │   │       ├── security/                # JWT Adapter
 │   │       ├── storage/                 # Google Cloud Storage
 │   │       ├── tracking/                # Location Tracking
@@ -175,25 +175,22 @@ messenger/
 │   ├── application/
 │   │   └── usecase/                     # 11 Casos de Uso (Monitoreo, Location, Tracking...)
 │   ├── domain/
+│   │   ├── events/                      # Eventos de dominio
 │   │   ├── exception/                   # BusinessException, InputsException...
 │   │   ├── model/                       # 14+ Modelos + 7 Enums + Auth
 │   │   │   └── enums/                   # Role, Status, PlateType...
 │   │   ├── ports/                       # 14 Puertos (interfaces)
-│   │   └── services/                    # Servicios de dominio
+│   │   ├── services/                    # Servicios de dominio
+│   │   └── util/                        # Utilidades de dominio
 │   └── infrastructure/
 │       ├── config/                      # Configuración de Spring
 │       ├── exception/                   # Manejo global de errores
-│       ├── external/                    # Clientes de APIs externas (WhatsApp)
 │       ├── health/                      # Indicadores de salud (Actuator)
-│       ├── helper/                      # Utilidades (Security, File, etc.)
-│       ├── persistence/
-│       │   ├── adapter/                 # Implementación de Puertos JPA
-│       │   ├── entities/                # Entidades JPA
-│       │   ├── mapper/                  # Mappers de Entidad a Dominio
-│       │   └── repository/              # Interfaces Spring Data JPA
+│       ├── helper/                      # Utilidades varias (File, etc.)
 │       ├── scheduler/                   # Tareas programadas (Trash, Timeouts)
-│       ├── security/                    # Filtros y servicios de seguridad
-│       └── service/                     # Servicios de infraestructura
+│       ├── security/                    # Filtros y configuración de seguridad web
+│       ├── service/                     # Servicios de infraestructura
+│       └── storage/                     # Utilidades locales (ImageOptimizer)
 └── src/main/resources/
     ├── application.properties           # Configuración base
     ├── application-local.properties     # Desarrollo local (H2)
@@ -222,7 +219,6 @@ messenger/
 - Base de datos MySQL Local (Dockerizada)
 - **Zero-Config**: Perfil pre-configurado con llaves de prueba y Mocks
 - **Carga de Datos**: Inicialización automática de usuarios (Admin/Messenger) via `DataInitializer`
-
 - Almacenamiento local (LocalStorageAdapter)
 - Logs detallados
 - Perfecto para demostraciones rápidas y desarrollo offline
@@ -523,6 +519,46 @@ erDiagram
         WhatsAppConversationState conversation_state
     }
 
+    deleted_photos {
+        Long id_photo PK
+        Long service_delivery_id FK
+        Long status_history_id FK
+        String photo_path
+        PhotoType photo_type
+        LocalDateTime upload_date
+    }
+
+    deleted_signatures {
+        Long id_signature PK
+        Long service_delivery_id FK
+        String signature_path
+        LocalDateTime created_at
+    }
+
+    deleted_status_history {
+        Long id_status_history PK
+        Long service_delivery_id FK
+        Status previous_status
+        Status new_status
+        LocalDateTime change_date
+        String observation
+        Long changed_by_employee_id FK
+        String changed_by_name
+        String changed_by_document
+        Long signature_id FK
+    }
+
+    deleted_tracking_history {
+        Long history_id PK
+        Long service_delivery_id FK
+        Long messenger_id FK
+        BigDecimal latitude
+        BigDecimal longitude
+        BigDecimal speed
+        TrackingSource source
+        LocalDateTime recorded_at
+    }
+
     employees ||--o{ service_deliveries : "delivers"
     dealerships ||--o{ service_deliveries : "receives"
     plates ||--o{ service_deliveries : "has"
@@ -563,7 +599,6 @@ Las ubicaciones se procesan con baja latencia mediante **Redis** para el estado 
 | Feature                   | Descripción                                           |
 | ------------------------- | ----------------------------------------------------- |
 | **Ubicación en vivo**     | Actualización cada 45 seg (mín. 5s)                   |
-| **Validación de entrega** | INHABILITADO - Radio máximo de 200m del destino       |
 | **Precisión técnica**     | Filtro de error GPS < 100m para historial             |
 | **Historial completo**    | Retención permanente (Archivado histórico)            |
 | **Baja latencia**         | Redis para caché de ubicaciones                       |

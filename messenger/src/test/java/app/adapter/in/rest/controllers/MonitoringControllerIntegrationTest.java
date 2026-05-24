@@ -4,12 +4,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import app.domain.model.enums.Role;
-import app.infrastructure.persistence.entities.DealershipEntity;
-import app.infrastructure.persistence.entities.EmployeeEntity;
-import app.infrastructure.persistence.entities.PlateEntity;
+import app.adapter.out.persistence.entities.DealershipEntity;
+import app.adapter.out.persistence.entities.EmployeeEntity;
+import app.adapter.out.persistence.entities.PlateEntity;
 import app.domain.model.enums.PlateType;
-import app.infrastructure.persistence.entities.ServiceDeliveryEntity;
-import app.infrastructure.persistence.entities.StatusHistoryEntity;
+import app.adapter.out.persistence.entities.ServiceDeliveryEntity;
+import app.adapter.out.persistence.entities.StatusHistoryEntity;
 import app.domain.model.enums.Status;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;

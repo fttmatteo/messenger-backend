@@ -7,10 +7,10 @@ import app.domain.model.Signature;
 import app.domain.model.enums.Status;
 
 import app.domain.ports.StoragePort;
-import app.domain.services.CreateServiceDelivery;
-import app.domain.services.DeleteServiceDelivery;
-import app.domain.services.SearchServiceDelivery;
-import app.domain.services.UpdateServiceDelivery;
+import app.application.usecase.delivery.CreateServiceDeliveryUseCase;
+import app.application.usecase.delivery.DeleteServiceDeliveryUseCase;
+import app.application.usecase.delivery.SearchServiceDeliveryUseCase;
+import app.application.usecase.delivery.UpdateServiceDeliveryUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -29,13 +29,13 @@ import static org.mockito.Mockito.*;
 class ServiceDeliveryUseCaseTest {
 
     @Mock
-    private CreateServiceDelivery createService;
+    private CreateServiceDeliveryUseCase createService;
     @Mock
-    private UpdateServiceDelivery updateService;
+    private UpdateServiceDeliveryUseCase updateService;
     @Mock
-    private SearchServiceDelivery searchService;
+    private SearchServiceDeliveryUseCase searchService;
     @Mock
-    private DeleteServiceDelivery deleteService;
+    private DeleteServiceDeliveryUseCase deleteService;
     @Mock
     private StoragePort storagePort;
     @InjectMocks

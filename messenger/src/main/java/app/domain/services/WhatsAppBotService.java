@@ -3,6 +3,7 @@ package app.domain.services;
 import app.domain.model.Dealership;
 import app.domain.model.ServiceDelivery;
 import app.domain.util.LogSanitizer;
+import app.domain.ports.ServiceDeliveryPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import app.domain.model.WhatsAppSession;
@@ -38,14 +39,14 @@ public class WhatsAppBotService {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private final WhatsAppMessagePort messagePort;
     private final WhatsAppSessionPort sessionPort;
-    private final SearchServiceDelivery searchService;
+    private final ServiceDeliveryPort searchService;
     private final WhatsAppRateLimitPort rateLimitPort;
     private final StoragePort storagePort;
 
     public WhatsAppBotService(
             WhatsAppMessagePort messagePort,
             WhatsAppSessionPort sessionPort,
-            SearchServiceDelivery searchService,
+            ServiceDeliveryPort searchService,
             LocationPort locationPort,
             StoragePort storagePort,
             WhatsAppRateLimitPort rateLimitPort) {
@@ -150,19 +151,46 @@ public class WhatsAppBotService {
         if (text.startsWith("VIEW_PHOTOS_")) {
             try {
                 Long serviceId = Long.parseLong(text.substring("VIEW_PHOTOS_".length()));
-                ServiceDelivery s = searchService.findById(serviceId);
+                ServiceDelivery s = searchService.findByIdActive(serviceId);
+                if (s == null) throw new RuntimeException("Service not found");
                 Optional<StatusHistory> currentHistoryOpt = s.getHistory().stream()
                         .filter(h -> h.getNewStatus() == s.getCurrentStatus())
                         .reduce((first, second) -> second);
                 
                 if (currentHistoryOpt.isPresent() && currentHistoryOpt.get().getPhotos() != null && !currentHistoryOpt.get().getPhotos().isEmpty()) {
                     List<Photo> photos = currentHistoryOpt.get().getPhotos();
-                    for (int i = 0; i < photos.size(); i++) {
-                        Photo p = photos.get(i);
+                    String plateNumber = (s.getPlate() != null && s.getPlate().getPlateNumber() != null) 
+                            ? s.getPlate().getPlateNumber() 
+                            : "Desconocido";
+                    if (photos.size() == 1) {
+                        Photo p = photos.get(0);
                         String url = storagePort.getUrl(p.getPhotoPath());
-                        String caption = String.format("📸 Foto %d de %d", (i + 1), photos.size());
-                        messagePort.sendDocument(from, url, caption, "Foto_" + (i + 1) + ".webp");
-                        sleep(500);
+                        String caption = "📸 Foto de evidencia";
+                        String fileName = String.format("Foto_%s.webp", plateNumber);
+                        messagePort.sendDocument(from, url, caption, fileName);
+                    } else {
+                        java.io.File tempZip = java.nio.file.Files.createTempFile("fotos_" + plateNumber, ".zip").toFile();
+                        try (java.util.zip.ZipOutputStream zos = new java.util.zip.ZipOutputStream(new java.io.FileOutputStream(tempZip))) {
+                            for (int i = 0; i < photos.size(); i++) {
+                                Photo p = photos.get(i);
+                                java.io.File photoFile = storagePort.get(p.getPhotoPath());
+                                if (photoFile != null && photoFile.exists()) {
+                                    java.util.zip.ZipEntry zipEntry = new java.util.zip.ZipEntry(String.format("%d_Foto_%s.webp", (i + 1), plateNumber));
+                                    zos.putNextEntry(zipEntry);
+                                    java.nio.file.Files.copy(photoFile.toPath(), zos);
+                                    zos.closeEntry();
+                                }
+                            }
+                        }
+                        
+                        String zipFileName = String.format("Fotos_%s.zip", plateNumber);
+                        String savedZipPath = storagePort.save(tempZip, "zips", zipFileName);
+                        String zipUrl = storagePort.getUrl(savedZipPath);
+                        
+                        String caption = String.format("📸 %d Fotos de evidencia (Comprimidas)", photos.size());
+                        messagePort.sendDocument(from, zipUrl, caption, zipFileName);
+                        
+                        tempZip.delete();
                     }
                 } else {
                     messagePort.sendTextMessage(from, "⚠️ No se encontraron fotos para el estado actual de este chasis.");
@@ -177,7 +205,7 @@ public class WhatsAppBotService {
 
         if (text.startsWith("VIEW_PLATE_")) {
             String plate = text.substring("VIEW_PLATE_".length());
-            Page<ServiceDelivery> servicesPage = searchService.findByPlateAndDealershipPaginated(plate, dealershipId,
+            Page<ServiceDelivery> servicesPage = searchService.findByPlateAndDealershipPaginated(plate.trim().toUpperCase(), dealershipId,
                     PageRequest.of(0, 5));
             if (!servicesPage.isEmpty()) {
                 sendPlateDetails(from, servicesPage.getContent());
@@ -185,10 +213,10 @@ public class WhatsAppBotService {
                 messagePort.sendTextMessage(from,
                         "⚠️ No se encontró el chasis *" + plate.toUpperCase() + "* en " + dealershipName + ".\n\n"
                                 + "Por favor, verifica que el número sea correcto o consulta más tarde.");
+                sendMenu(from, dealershipName);
             }
             session.setConversationState(WhatsAppConversationState.MENU);
             sessionPort.updateSession(session);
-            sendMenu(from, dealershipName);
             return;
         }
 
@@ -196,18 +224,18 @@ public class WhatsAppBotService {
 
         switch (state) {
             case AWAITING_PLATE -> {
-                Page<ServiceDelivery> servicesPage = searchService.findByPlateAndDealershipPaginated(text, dealershipId,
+                Page<ServiceDelivery> servicesPage = searchService.findByPlateAndDealershipPaginated(text.trim().toUpperCase(), dealershipId,
                         PageRequest.of(0, 5));
                 if (servicesPage.isEmpty()) {
                     messagePort.sendTextMessage(from,
                             "⚠️ No se encontró el chasis *" + text.toUpperCase() + "* en " + dealershipName + ".\n\n"
                                     + "Por favor, verifica que el número sea correcto o consulta más tarde.");
+                    sendMenu(from, dealershipName);
                 } else {
                     sendPlateDetails(from, servicesPage.getContent());
                 }
                 session.setConversationState(WhatsAppConversationState.MENU);
                 sessionPort.updateSession(session);
-                sendMenu(from, dealershipName);
             }
             case MENU -> {
                 if (text.startsWith("NEXT_PAGE") || text.startsWith("PREV_PAGE")) {
@@ -259,11 +287,10 @@ public class WhatsAppBotService {
                     }
                     default -> {
                         if (looksLikePlate(text)) {
-                            Page<ServiceDelivery> servicesPage = searchService.findByPlateAndDealershipPaginated(text,
+                            Page<ServiceDelivery> servicesPage = searchService.findByPlateAndDealershipPaginated(text.trim().toUpperCase(),
                                     dealershipId, PageRequest.of(0, 5));
                             if (!servicesPage.isEmpty()) {
                                 sendPlateDetails(from, servicesPage.getContent());
-                                sendMenu(from, dealershipName);
                             } else {
                                 messagePort.sendTextMessage(from,
                                         "⚠️ No se encontró el chasis *" + text.toUpperCase() + "* en " + dealershipName
@@ -314,9 +341,9 @@ public class WhatsAppBotService {
             }
 
             if (hasPhotos) {
-                messagePort.sendReplyButtons(from, message, List.of("Ver fotos"), List.of("VIEW_PHOTOS_" + s.getIdServiceDelivery()));
+                messagePort.sendReplyButtons(from, message, List.of("Ver fotos", "Menú Principal"), List.of("VIEW_PHOTOS_" + s.getIdServiceDelivery(), "MENU_BACK"));
             } else {
-                messagePort.sendTextMessage(from, message);
+                messagePort.sendReplyButtons(from, message, List.of("Menú Principal"), List.of("MENU_BACK"));
             }
             sleep(500);
         }
@@ -395,7 +422,7 @@ public class WhatsAppBotService {
         }
 
         int page = session.getCurrentPage();
-        Page<ServiceDelivery> resultPage = searchService.findByDealershipAndStatusesPaginated(
+        Page<ServiceDelivery> resultPage = searchService.findByDealershipIdAndStatusesPaginated(
                 dealershipId, statuses, PageRequest.of(page, 10, Sort.by("createdAt").descending()));
 
         if (resultPage.isEmpty() && page == 0) {

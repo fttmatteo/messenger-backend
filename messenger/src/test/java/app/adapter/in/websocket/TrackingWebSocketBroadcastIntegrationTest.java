@@ -4,7 +4,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
-import app.adapter.in.rest.response.LiveTrackingResponse;
+import app.adapter.in.rest.tracking.LiveTrackingResponse;
 import app.support.AbstractIntegrationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

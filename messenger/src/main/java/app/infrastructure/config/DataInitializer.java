@@ -1,8 +1,8 @@
 package app.infrastructure.config;
 
 import app.domain.model.enums.Role;
-import app.infrastructure.persistence.entities.EmployeeEntity;
-import app.infrastructure.persistence.repository.EmployeeRepository;
+import app.adapter.out.persistence.entities.EmployeeEntity;
+import app.adapter.out.persistence.repository.EmployeeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;

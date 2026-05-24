@@ -4,7 +4,7 @@ import app.domain.model.LiveTracking;
 import app.domain.model.Location;
 import app.domain.model.TrackingHistory;
 import app.domain.model.enums.TrackingSource;
-import app.infrastructure.persistence.entities.TrackingHistoryEntity;
+import app.adapter.out.persistence.entities.TrackingHistoryEntity;
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 

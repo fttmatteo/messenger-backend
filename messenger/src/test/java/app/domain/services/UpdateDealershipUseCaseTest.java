@@ -1,0 +1,108 @@
+package app.domain.services;
+import app.application.usecase.dealership.UpdateDealershipUseCase;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import app.domain.exception.BusinessException;
+import app.domain.model.Dealership;
+import app.domain.ports.DealershipPort;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
+@DisplayName("Pruebas unitarias de UpdateDealershipUseCase")
+
+class UpdateDealershipTest {
+
+    @Mock
+    private DealershipPort dealershipPort;
+
+    @InjectMocks
+    private UpdateDealershipUseCase updateDealership;
+
+    private Dealership existingDealership;
+
+    @BeforeEach
+    void setUp() {
+        existingDealership = new Dealership();
+        existingDealership.setIdDealership(1L);
+        existingDealership.setName("Original Name");
+        existingDealership.setAddress("Calle 1");
+        existingDealership.setPhone("111");
+        existingDealership.setZone("Sur");
+    }
+
+    @Test
+    @DisplayName("Debe actualizar campos exitosamente")
+
+    void shouldUpdateFieldsSuccessfully() throws Exception {
+        Dealership newData = new Dealership();
+        newData.setName("New Name");
+        newData.setAddress("Calle 2");
+        newData.setPhone("222");
+        newData.setZone("Norte");
+
+        when(dealershipPort.findById(1L)).thenReturn(existingDealership);
+        when(dealershipPort.findByName("New Name")).thenReturn(null);
+        when(dealershipPort.save(any())).thenReturn(existingDealership);
+
+        updateDealership.update(1L, newData);
+
+        verify(dealershipPort).save(argThat(d -> d.getName().equals("New Name") &&
+                d.getAddress().equals("Calle 2") &&
+                d.getPhone().equals("222") &&
+                d.getZone().equals("Norte")));
+    }
+
+    @Test
+    @DisplayName("Debe lanzar excepción si el ID no se encuentra")
+
+    void shouldThrowExceptionIfIdNotFound() {
+        when(dealershipPort.findById(1L)).thenReturn(null);
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> updateDealership.update(1L, new Dealership()));
+
+        assertEquals("El concesionario indicado no existe.", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Debe lanzar excepción si el nuevo nombre ya existe")
+
+    void shouldThrowExceptionIfNewNameExists() {
+        Dealership newData = new Dealership();
+        newData.setName("Existing Name");
+
+        when(dealershipPort.findById(1L)).thenReturn(existingDealership);
+        when(dealershipPort.findByName("Existing Name")).thenReturn(new Dealership());
+
+        BusinessException ex = assertThrows(BusinessException.class, () -> updateDealership.update(1L, newData));
+
+        assertEquals("Ya existe otro concesionario con ese nombre.", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("No debe validar el nombre si es el mismo")
+
+    void shouldNotValidateNameIfSame() throws Exception {
+        Dealership newData = new Dealership();
+        newData.setName("Original Name");
+        newData.setAddress("Calle 2");
+
+        when(dealershipPort.findById(1L)).thenReturn(existingDealership);
+        when(dealershipPort.save(any())).thenReturn(existingDealership);
+
+        updateDealership.update(1L, newData);
+
+        verify(dealershipPort).save(any());
+    }
+}

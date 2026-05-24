@@ -22,7 +22,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import app.adapter.in.rest.request.ProfileRequest;
+import app.adapter.in.rest.auth.ProfileRequest;
 import app.domain.model.Employee;
 import app.domain.model.enums.Role;
 import app.domain.ports.EmployeePort;

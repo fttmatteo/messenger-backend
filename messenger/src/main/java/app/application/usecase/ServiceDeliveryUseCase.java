@@ -24,10 +24,10 @@ import app.domain.model.Signature;
 import app.domain.model.enums.Status;
 
 import app.domain.ports.StoragePort;
-import app.domain.services.CreateServiceDelivery;
-import app.domain.services.DeleteServiceDelivery;
-import app.domain.services.SearchServiceDelivery;
-import app.domain.services.UpdateServiceDelivery;
+import app.application.usecase.delivery.CreateServiceDeliveryUseCase;
+import app.application.usecase.delivery.DeleteServiceDeliveryUseCase;
+import app.application.usecase.delivery.SearchServiceDeliveryUseCase;
+import app.application.usecase.delivery.UpdateServiceDeliveryUseCase;
 
 
 /**
@@ -45,17 +45,17 @@ public class ServiceDeliveryUseCase {
     private static final Logger logger = LoggerFactory.getLogger(ServiceDeliveryUseCase.class);
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
-    private final CreateServiceDelivery createService;
-    private final UpdateServiceDelivery updateService;
-    private final SearchServiceDelivery searchService;
-    private final DeleteServiceDelivery deleteService;
+    private final CreateServiceDeliveryUseCase createService;
+    private final UpdateServiceDeliveryUseCase updateService;
+    private final SearchServiceDeliveryUseCase searchService;
+    private final DeleteServiceDeliveryUseCase deleteService;
     private final StoragePort storagePort;
 
     public ServiceDeliveryUseCase(
-            CreateServiceDelivery createService,
-            UpdateServiceDelivery updateService,
-            SearchServiceDelivery searchService,
-            DeleteServiceDelivery deleteService,
+            CreateServiceDeliveryUseCase createService,
+            UpdateServiceDeliveryUseCase updateService,
+            SearchServiceDeliveryUseCase searchService,
+            DeleteServiceDeliveryUseCase deleteService,
             StoragePort storagePort) {
         this.createService = createService;
         this.updateService = updateService;

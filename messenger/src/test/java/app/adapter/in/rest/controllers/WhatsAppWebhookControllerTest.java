@@ -1,4 +1,5 @@
 package app.adapter.in.rest.controllers;
+import app.adapter.in.rest.whatsapp.WhatsAppWebhookController;
 
 import app.domain.services.WhatsAppBotService;
 import app.infrastructure.config.WhatsAppConfig;
