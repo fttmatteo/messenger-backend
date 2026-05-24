@@ -84,9 +84,8 @@ public class UpdateServiceDeliveryUseCase {
 
         service.setCurrentStatus(newStatus);
 
-        if (observation != null && !observation.isEmpty()) {
-            service.setObservation(observation);
-        }
+        String trimmedObservation = (observation != null && !observation.trim().isEmpty()) ? observation.trim() : null;
+        service.setObservation(trimmedObservation);
 
         if (signature != null) {
             signature.setUploadDate(LocalDateTime.now());
@@ -116,9 +115,7 @@ public class UpdateServiceDeliveryUseCase {
             history.setSignature(signature);
         }
 
-        if (observation != null) {
-            history.setObservation(observation);
-        }
+        history.setObservation(trimmedObservation);
 
         service.addHistory(history);
 

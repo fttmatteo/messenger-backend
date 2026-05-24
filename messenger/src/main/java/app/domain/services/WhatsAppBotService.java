@@ -138,7 +138,7 @@ public class WhatsAppBotService {
             }
         } else {
             messagePort.sendTextMessage(from,
-                    "*PLAK*\n\n¡Hola! 👋🏼. Aquí podrás consultar el estado de las motos por chasis.\n\n"
+                    "¡Hola! 👋🏼. Aquí podrás consultar el estado de las motos por chasis.\n\n"
                             + "_PIN requerido cada 12h o al reiniciar sesión._\n\n"
                             + "🔒 *Ingresa el PIN para continuar:* ");
         }
@@ -313,7 +313,7 @@ public class WhatsAppBotService {
     private void sendMenu(String from, String dealershipName) {
         String bodyText = String.format("🛞 *%s*\n📋 *¿Qué deseas consultar?*", dealershipName);
         String buttonText = "Ver opciones";
-        String listTitle = "Menú Principal";
+        String listTitle = "Menú principal";
 
         List<String> rowTitles = List.of(
                 "🔍 Consulta específica",
@@ -343,9 +343,9 @@ public class WhatsAppBotService {
             }
 
             if (hasPhotos) {
-                messagePort.sendReplyButtons(from, message, List.of("Ver fotos", "Menú Principal"), List.of("VIEW_PHOTOS_" + s.getIdServiceDelivery(), "MENU_BACK"));
+                messagePort.sendReplyButtons(from, message, List.of("Ver fotos", "Menú principal"), List.of("VIEW_PHOTOS_" + s.getIdServiceDelivery(), "MENU_BACK"));
             } else {
-                messagePort.sendReplyButtons(from, message, List.of("Menú Principal"), List.of("MENU_BACK"));
+                messagePort.sendReplyButtons(from, message, List.of("Menú principal"), List.of("MENU_BACK"));
             }
             sleep(500);
         }
@@ -459,7 +459,7 @@ public class WhatsAppBotService {
             buttonIds.add("NEXT_PAGE");
         }
         
-        buttonNames.add("Menú Principal");
+        buttonNames.add("Menú principal");
         buttonIds.add("MENU_BACK");
 
         messagePort.sendReplyButtons(from, sb.toString(), buttonNames, buttonIds);
