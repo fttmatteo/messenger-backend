@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import app.adapter.in.rest.request.ServiceDeliveryCreateRequest;
 import app.adapter.in.rest.request.ServiceDeliveryUpdateStatusRequest;
-import app.adapter.in.validators.ServiceDeliveryValidator;
+import app.adapter.in.rest.validators.ServiceDeliveryValidator;
 import app.domain.model.enums.Status;
 
 /**

@@ -3,7 +3,7 @@ package app.adapter.in.builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import app.adapter.in.rest.request.DealershipRequest;
-import app.adapter.in.validators.DealershipValidator;
+import app.adapter.in.rest.validators.DealershipValidator;
 import app.domain.model.Dealership;
 
 /**

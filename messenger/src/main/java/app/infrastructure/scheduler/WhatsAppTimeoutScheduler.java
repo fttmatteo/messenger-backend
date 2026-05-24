@@ -5,7 +5,7 @@ import app.domain.ports.WhatsAppMessagePort;
 import app.domain.ports.WhatsAppSessionPort;
 import app.domain.model.enums.WhatsAppConversationState;
 import app.domain.util.LogSanitizer;
-import app.infrastructure.persistence.repository.WhatsAppSessionRepository;
+import app.adapter.out.persistence.repository.WhatsAppSessionRepository;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

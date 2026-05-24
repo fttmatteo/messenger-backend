@@ -28,11 +28,11 @@ class HexagonalArchitectureTest {
         @ArchTest
         static final ArchRule application_should_not_depend_on_infrastructure_implementations = noClasses()
                         .that().resideInAPackage("..application..")
-                        .should().dependOnClassesThat().resideInAPackage("..infrastructure.persistence.adapter..");
+                        .should().dependOnClassesThat().resideInAPackage("..adapter.out.persistence.adapter..");
 
         @ArchTest
         static final ArchRule infrastructure_adapters_should_depend_on_domain_ports = classes()
-                        .that().resideInAPackage("..infrastructure.persistence.adapter..")
+                        .that().resideInAPackage("..adapter.out.persistence.adapter..")
                         .should().dependOnClassesThat().resideInAPackage("..domain.ports..");
 
         @ArchTest
@@ -43,6 +43,6 @@ class HexagonalArchitectureTest {
 
         @ArchTest
         static final ArchRule repository_names_should_end_with_repository = classes()
-                        .that().resideInAPackage("..infrastructure.persistence.repository..")
+                        .that().resideInAPackage("..adapter.out.persistence.repository..")
                         .should().haveSimpleNameEndingWith("Repository");
 }

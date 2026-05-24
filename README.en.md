@@ -16,10 +16,6 @@
 **Motorcycle delivery management system by chassis and carrier monitoring.**
 Intelligent platform for logistic control and distribution of motorcycles identified by chassis number, integrated with continuous satellite tracking of carriers on route.
 
-**Chassis Identification:** Inventory control and registration of motorcycles based on their unique chassis.
-**Satellite Monitoring (GPS):** Real-time geographic tracking of carriers during their delivery day.
-**Evidence of Delivery:** Validation through touch signatures and photographic captures.
-
 [🇪🇸 Versión en Español](./README.md)
 
 </div>
@@ -130,7 +126,7 @@ graph LR
 
 | Component                | Technology                                                                                             |
 | ------------------------ | ------------------------------------------------------------------------------------------------------ |
-| **Framework**            | Spring Boot 3.5.10                                                                                     |
+| **Framework**            | Spring Boot 3.5.14                                                                                     |
 | **Language**             | Java 17                                                                                                |
 | **Database**             | MySQL 8.0+                                                                                             |
 | **Cache/Streaming**      | Redis                                                                                                  |
@@ -563,7 +559,6 @@ Locations are processed with low latency using **Redis** for active status and a
 | Feature                 | Description                                     |
 | ----------------------- | ----------------------------------------------- |
 | **Live location**       | Updates every 45 seconds (5s rate limit)        |
-| **Delivery validation** | DISABLED - Maximum 200m radius from destination |
 | **Technical accuracy**  | < 100m GPS error filtered for history           |
 | **Complete history**    | Permanent retention (Historical Archive)        |
 | **Low latency**         | Redis for location caching                      |

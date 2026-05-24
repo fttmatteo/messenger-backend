@@ -2,8 +2,8 @@ package app.infrastructure.service;
 
 import app.domain.model.ServiceDelivery;
 import app.domain.ports.ArchivePort;
-import app.infrastructure.persistence.entities.*;
-import app.infrastructure.persistence.repository.*;
+import app.adapter.out.persistence.entities.*;
+import app.adapter.out.persistence.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

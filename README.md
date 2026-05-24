@@ -16,10 +16,6 @@
 **Sistema de gestión de entregas de motocicletas por chasis y monitoreo de transportistas.**
 Plataforma inteligente para el control logístico y distribución de motocicletas identificadas por número de chasis, integrada con rastreo satelital continuo de los transportistas en ruta.
 
-**Identificación por Chasis:** Registro y control de inventario de motocicletas basado en su chasis único.
-**Monitoreo Satelital (GPS):** Rastreo geográfico en tiempo real de los transportistas durante su jornada de entrega.
-**Evidencia de Entrega:** Validación mediante firmas táctiles y capturas fotográficas.
-
 [🇺🇸 English Version](./README.en.md)
 
 </div>
@@ -130,7 +126,7 @@ graph LR
 
 | Componente                | Tecnología                                                                                                    |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| **Framework**             | Spring Boot 3.5.10                                                                                            |
+| **Framework**             | Spring Boot 3.5.14                                                                                            |
 | **Lenguaje**              | Java 17                                                                                                       |
 | **Base de Datos**         | MySQL 8.0+                                                                                                    |
 | **Cache/Streaming**       | Redis                                                                                                         |
@@ -563,7 +559,6 @@ Las ubicaciones se procesan con baja latencia mediante **Redis** para el estado 
 | Feature                   | Descripción                                           |
 | ------------------------- | ----------------------------------------------------- |
 | **Ubicación en vivo**     | Actualización cada 45 seg (mín. 5s)                   |
-| **Validación de entrega** | INHABILITADO - Radio máximo de 200m del destino       |
 | **Precisión técnica**     | Filtro de error GPS < 100m para historial             |
 | **Historial completo**    | Retención permanente (Archivado histórico)            |
 | **Baja latencia**         | Redis para caché de ubicaciones                       |

@@ -93,12 +93,7 @@
             "description": "Intervalo de actualización de ubicación en milisegundos (default: 30000 = 30 segundos).",
             "defaultValue": 30000
         },
-        {
-            "name": "tracking.max.distance.validation",
-            "type": "java.lang.Integer",
-            "description": "Distancia máxima en metros para validar ubicación (default: 200m).",
-            "defaultValue": 200
-        },
+
         {
             "name": "tracking.history.retention.days",
             "type": "java.lang.Integer",

@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import app.adapter.in.rest.request.DealershipRequest;
 import app.adapter.in.rest.request.EmployeeRequest;
 import app.domain.model.enums.Role;
-import app.infrastructure.persistence.entities.EmployeeEntity;
+import app.adapter.out.persistence.entities.EmployeeEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;

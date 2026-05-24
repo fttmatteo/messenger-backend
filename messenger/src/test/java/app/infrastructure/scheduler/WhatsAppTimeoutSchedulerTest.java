@@ -3,7 +3,7 @@ package app.infrastructure.scheduler;
 import app.domain.model.WhatsAppSession;
 import app.domain.ports.WhatsAppMessagePort;
 import app.domain.ports.WhatsAppSessionPort;
-import app.infrastructure.persistence.repository.WhatsAppSessionRepository;
+import app.adapter.out.persistence.repository.WhatsAppSessionRepository;
 import app.domain.model.enums.WhatsAppConversationState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
