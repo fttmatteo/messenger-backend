@@ -31,6 +31,8 @@ Intelligent platform for logistic control and distribution of motorcycles identi
 - [API Endpoints](#api-endpoints)
 - [Database Schema](#database-schema)
 - [Real-Time Tracking](#real-time-tracking)
+- [Business Rules](#business-rules)
+- [Trash Management (Soft Delete & Archive)](#trash-management-soft-delete--archive)
 - [Security](#security)
 - [Observability](#observability)
 - [Architecture Verification](#architecture-verification)
@@ -623,7 +625,7 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 - **Distance Matrix**: Time estimation
 - **Reverse Geocoding**: Coordinates → Address
 
-### Business Rules
+## Business Rules
 
 > [!IMPORTANT]
 > **Role-Based Status Transitions**
@@ -636,10 +638,11 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 > [!NOTE]
 > **Evidence Requirements**
 >
-> - **DELIVERED**: Signature is mandatory.
-> - **PENDING**: Signature, at least one photo, and observation are mandatory.
-> - **RETURNED**: At least one photo and observation are mandatory (no signature required).
+> - **DELIVERED**: Advisor signature is mandatory. Photos (maximum 10) and observations are optional.
+> - **PENDING**: Signature, photos (maximum 10), and observations are optional (no longer mandatory).
+> - **RETURNED**: Signature, photos (maximum 10), and observations are optional (no longer mandatory).
 > - **CANCELED** & **RESOLVED**: No additional evidence required.
+
 
 > [!NOTE]
 > **Soft Delete (Trash Bin)**
@@ -653,7 +656,7 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 | `ASSIGNED`  | → `PENDING`, `DELIVERED`, `RETURNED` | → `Any state`                       | ✅ Trash |
 | `RETURNED`  | → `PENDING`, `DELIVERED`             | → `Any state`                       | ✅ Trash |
 | `PENDING`   | → `DELIVERED`, `RETURNED`            | → `Any state`                       | ✅ Trash |
-| `DELIVERED` | → `PENDING`, `RETURNED`              | → `Any state`                       | ✅ Trash |
+| `DELIVERED` | -                                    | → `Any state`                       | ✅ Trash |
 | `CANCELED`  | -                                    | → `Any state` (Reassign → `ASSIGNED`) | ✅ Trash |
 | `RESOLVED`  | -                                    | → `Any state`                       | ✅ Trash |
 
@@ -666,7 +669,7 @@ flowchart LR
     C --> D[Status → ASSIGNED]
 ```
 
-### Trash Management (Soft Delete & Archive)
+## Trash Management (Soft Delete & Archive)
 
 | Action         | Endpoint                              | Description                      |
 | -------------- | ------------------------------------- | -------------------------------- |
@@ -813,6 +816,13 @@ For active development with automatic code reloading (no need to restart contain
 ```bash
 docker-compose -f docker-compose.dev.yml up --build
 ```
+
+> [!IMPORTANT]
+> **Requirements for the Development Profile (dev)**:
+> 
+> - **Real Environment Variables**: Unlike the local profile, the `dev` profile requires you to define real environment variables on your host machine or via a `.env` file (such as Google Maps, Turnstile, and WhatsApp API keys).
+> - **GCP Credentials**: The container expects a Google Cloud Platform credentials JSON file mounted via Docker volumes. By default, it is mapped to `/home/fttmatteo/Documentos/gcp-json/messenger-backend.json` (you can adjust this source path in the volume mapping of `docker-compose.dev.yml` if needed).
+
 
 | Service             | URL                     | Description                      |
 | ------------------- | ----------------------- | -------------------------------- |
@@ -975,8 +985,9 @@ npx cap open android
 - [**Flyway Verification**](./messenger/verify_flyway.sh): Validates database connection and status of Flyway migrations.
 - [**Security Headers Test**](./test-security-headers.sh): Performs automated audit of CSP, CORS, and HTTP security headers.
 - [**Rate Limiting Test**](./test-rate-limiting.sh): Simulates request bursts to validate the effectiveness of Rate Limiting.
+- [**Sync Version**](./sync-version.sh): Syncs the project version.
 
-**Project Specific:**
+**Project:**
 
 - Repository: `messenger-backend`
 - Author: [Mateo Valencia Ardila](https://github.com/fttmatteo)

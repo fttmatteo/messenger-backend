@@ -31,6 +31,8 @@ Plataforma inteligente para el control logístico y distribución de motocicleta
 - [API Endpoints](#api-endpoints)
 - [Esquema de Base de Datos](#esquema-de-base-de-datos)
 - [Tracking en Tiempo Real](#tracking-en-tiempo-real)
+- [Reglas de Negocio](#reglas-de-negocio)
+- [Gestión de Papelera (Soft Delete y Archivo)](#gestión-de-papelera-soft-delete-y-archivo)
 - [Seguridad](#seguridad)
 - [Observabilidad](#observabilidad)
 - [Verificación de Arquitectura](#verificación-de-arquitectura)
@@ -336,7 +338,7 @@ docker run -e SPRING_PROFILES_ACTIVE=local
 > 4. **Llave Maestra (Master PIN)**: Si se ingresa el PIN maestro global, el usuario inicia sesión con el rol de **"Llave Maestra"** (sin asociar a un concesionario específico), lo que le permite consultar los chasis y eventos de **todos los concesionarios** de forma consolidada.
 
 > [!IMPORTANT]
-> **Bot Security**:
+> **Seguridad del Bot**:
 >
 > - **Validación de Webhook**: Usa HMAC-SHA256 con el App Secret de Meta para verificar el origen de la petición.
 > - **Protección por PIN**: Autenticación por PIN de 4 dígitos requerida para acceder a los datos de concesionarios (expira cada 12 horas).
@@ -361,7 +363,7 @@ docker run -e SPRING_PROFILES_ACTIVE=local
 | Método | Endpoint              | Descripción                              |
 | ------ | --------------------- | ---------------------------------------- |
 | `POST` | `/locations/geocode`  | Dirección a coordenadas                  |
-| `POST` | `/locations/route`    | INHABILITADO - Calcular ruta optimizada  |
+| `POST` | `/locations/route`    | Calcular ruta optimizada  |
 | `GET`  | `/locations/distance` | Distancia + tiempo estimado entre puntos |
 | `GET`  | `/locations/reverse`  | Coordenadas a dirección                  |
 
@@ -615,14 +617,7 @@ URL de conexión: `ws://localhost:8080/ws/tracking`
 | `SUB`  | `/topic/tracking/{id}`    | Recibir actualizaciones de un transportista (Panel ADMIN en React) |
 | `SUB`  | `/topic/tracking/all`     | Recibir actualizaciones de todos (Panel ADMIN en React) |
 
-### Integración Google Maps
-
-- **Geocoding**: Dirección ↔ Coordenadas
-- **Directions API**: INHABILITADO - Rutas optimizadas
-- **Distance Matrix**: Estimación de tiempos
-- **Reverse Geocoding**: Coordenadas → Dirección
-
-### Reglas de Negocio
+## Reglas de Negocio
 
 > [!IMPORTANT]
 > **Transiciones de Estado por Rol**
@@ -635,9 +630,9 @@ URL de conexión: `ws://localhost:8080/ws/tracking`
 > [!NOTE]
 > **Requisitos de Evidencia**
 >
-> - **DELIVERED**: Firma obligatoria.
-> - **PENDING**: Firma, al menos una foto y observación obligatorias.
-> - **RETURNED**: Al menos una foto y observación obligatorias (no requiere firma).
+> - **DELIVERED**: Firma del asesor obligatoria. Las fotos (máximo 10) y observaciones son opcionales.
+> - **PENDING**: Firma, fotos (máximo 10) y observaciones opcionales (no obligatorio).
+> - **RETURNED**: Firma, fotos (máximo 10) y observaciones opcionales (no obligatorio).
 > - **CANCELED** & **RESOLVED**: No requieren evidencia adicional.
 
 > [!NOTE]
@@ -652,7 +647,7 @@ URL de conexión: `ws://localhost:8080/ws/tracking`
 | `ASSIGNED`  | → `PENDING`, `DELIVERED`, `RETURNED` | → `Cualquier estado`     | ✅ Papelera |
 | `RETURNED`  | → `PENDING`, `DELIVERED`             | → `Cualquier estado`     | ✅ Papelera |
 | `PENDING`   | → `DELIVERED`, `RETURNED`            | → `Cualquier estado`     | ✅ Papelera |
-| `DELIVERED` | → `PENDING`, `RETURNED`              | → `Cualquier estado`     | ✅ Papelera |
+| `DELIVERED` | -                                    | → `Cualquier estado`     | ✅ Papelera |
 | `CANCELED`  | -                                    | → `Cualquier estado` (Reasignar → `ASSIGNED`) | ✅ Papelera |
 | `RESOLVED`  | -                                    | → `Cualquier estado`     | ✅ Papelera |
 
@@ -665,7 +660,7 @@ flowchart LR
     C --> D[Estado → ASSIGNED]
 ```
 
-### Gestión de Papelera (Soft Delete y Archivo)
+## Gestión de Papelera (Soft Delete y Archivo)
 
 | Acción              | Endpoint                              | Descripción                                        |
 | ------------------- | ------------------------------------- | -------------------------------------------------- |
@@ -813,6 +808,12 @@ Para desarrollo activo con recarga automática de código (sin necesidad de rein
 ```bash
 docker-compose -f docker-compose.dev.yml up --build
 ```
+
+> [!IMPORTANT]
+> **Requisitos para el perfil de Desarrollo (dev)**:
+> 
+> - **Variables de entorno reales**: A diferencia del perfil local, el perfil `dev` requiere que definas variables de entorno reales en tu máquina host o mediante un archivo `.env` (como las claves de Google Maps, Turnstile y la API de WhatsApp).
+> - **Credenciales de GCP**: El contenedor espera un archivo JSON de credenciales de Google Cloud Platform montado en el volumen de Docker. Por defecto está mapeado a `/***/***/***/gcp-json/messenger-backend.json` (puedes ajustar esta ruta de origen en el volumen de `docker-compose.dev.yml` si es necesario).
 
 | Servicio            | URL                     | Descripción                               |
 | ------------------- | ----------------------- | ----------------------------------------- |
@@ -975,8 +976,9 @@ npx cap open android
 - [**Verificación de Flyway**](./messenger/verify_flyway.sh): Valida la conexión a la base de datos y el estado de las migraciones de Flyway.
 - [**Prueba de Headers de Seguridad**](./test-security-headers.sh): Realiza auditoría automatizada sobre políticas CSP, CORS y headers de seguridad HTTP.
 - [**Prueba de Limitación de Tasa**](./test-rate-limiting.sh): Simula ráfagas de peticiones para validar la efectividad de Rate Limiting.
+- [**Sincronización de Versión**](./sync-version.sh): Sincroniza la versión del proyecto.
 
-**Proyecto Específico:**
+**Proyecto:**
 
 - Repositorio: `messenger-backend`
 - Autor: [Mateo Valencia Ardila](https://github.com/fttmatteo)
