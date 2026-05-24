@@ -159,11 +159,15 @@ public class WhatsAppBotService {
                 
                 if (currentHistoryOpt.isPresent() && currentHistoryOpt.get().getPhotos() != null && !currentHistoryOpt.get().getPhotos().isEmpty()) {
                     List<Photo> photos = currentHistoryOpt.get().getPhotos();
+                    String plateNumber = (s.getPlate() != null && s.getPlate().getPlateNumber() != null) 
+                            ? s.getPlate().getPlateNumber() 
+                            : "Desconocido";
                     for (int i = 0; i < photos.size(); i++) {
                         Photo p = photos.get(i);
                         String url = storagePort.getUrl(p.getPhotoPath());
                         String caption = String.format("📸 Foto %d de %d", (i + 1), photos.size());
-                        messagePort.sendDocument(from, url, caption, "Foto_" + (i + 1) + ".webp");
+                        String fileName = String.format("%d_Foto_%s.webp", (i + 1), plateNumber);
+                        messagePort.sendDocument(from, url, caption, fileName);
                         sleep(500);
                     }
                 } else {
@@ -187,10 +191,10 @@ public class WhatsAppBotService {
                 messagePort.sendTextMessage(from,
                         "⚠️ No se encontró el chasis *" + plate.toUpperCase() + "* en " + dealershipName + ".\n\n"
                                 + "Por favor, verifica que el número sea correcto o consulta más tarde.");
+                sendMenu(from, dealershipName);
             }
             session.setConversationState(WhatsAppConversationState.MENU);
             sessionPort.updateSession(session);
-            sendMenu(from, dealershipName);
             return;
         }
 
@@ -204,12 +208,12 @@ public class WhatsAppBotService {
                     messagePort.sendTextMessage(from,
                             "⚠️ No se encontró el chasis *" + text.toUpperCase() + "* en " + dealershipName + ".\n\n"
                                     + "Por favor, verifica que el número sea correcto o consulta más tarde.");
+                    sendMenu(from, dealershipName);
                 } else {
                     sendPlateDetails(from, servicesPage.getContent());
                 }
                 session.setConversationState(WhatsAppConversationState.MENU);
                 sessionPort.updateSession(session);
-                sendMenu(from, dealershipName);
             }
             case MENU -> {
                 if (text.startsWith("NEXT_PAGE") || text.startsWith("PREV_PAGE")) {
@@ -265,7 +269,6 @@ public class WhatsAppBotService {
                                     dealershipId, PageRequest.of(0, 5));
                             if (!servicesPage.isEmpty()) {
                                 sendPlateDetails(from, servicesPage.getContent());
-                                sendMenu(from, dealershipName);
                             } else {
                                 messagePort.sendTextMessage(from,
                                         "⚠️ No se encontró el chasis *" + text.toUpperCase() + "* en " + dealershipName
@@ -316,9 +319,9 @@ public class WhatsAppBotService {
             }
 
             if (hasPhotos) {
-                messagePort.sendReplyButtons(from, message, List.of("Ver fotos"), List.of("VIEW_PHOTOS_" + s.getIdServiceDelivery()));
+                messagePort.sendReplyButtons(from, message, List.of("Ver fotos", "Menú Principal"), List.of("VIEW_PHOTOS_" + s.getIdServiceDelivery(), "MENU_BACK"));
             } else {
-                messagePort.sendTextMessage(from, message);
+                messagePort.sendReplyButtons(from, message, List.of("Menú Principal"), List.of("MENU_BACK"));
             }
             sleep(500);
         }
