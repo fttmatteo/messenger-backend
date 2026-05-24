@@ -173,12 +173,13 @@ public class WhatsAppBotService {
                         try (java.util.zip.ZipOutputStream zos = new java.util.zip.ZipOutputStream(new java.io.FileOutputStream(tempZip))) {
                             for (int i = 0; i < photos.size(); i++) {
                                 Photo p = photos.get(i);
-                                java.io.File photoFile = storagePort.get(p.getPhotoPath());
-                                if (photoFile != null && photoFile.exists()) {
-                                    java.util.zip.ZipEntry zipEntry = new java.util.zip.ZipEntry(String.format("%d_Foto_%s.webp", (i + 1), plateNumber));
-                                    zos.putNextEntry(zipEntry);
-                                    java.nio.file.Files.copy(photoFile.toPath(), zos);
-                                    zos.closeEntry();
+                                try (java.io.InputStream photoStream = storagePort.get(p.getPhotoPath())) {
+                                    if (photoStream != null) {
+                                        java.util.zip.ZipEntry zipEntry = new java.util.zip.ZipEntry(String.format("%d_Foto_%s.webp", (i + 1), plateNumber));
+                                        zos.putNextEntry(zipEntry);
+                                        photoStream.transferTo(zos);
+                                        zos.closeEntry();
+                                    }
                                 }
                             }
                         }
@@ -192,6 +193,7 @@ public class WhatsAppBotService {
                         
                         tempZip.delete();
                     }
+                    sleep(1500);
                 } else {
                     messagePort.sendTextMessage(from, "⚠️ No se encontraron fotos para el estado actual de este chasis.");
                 }
