@@ -99,7 +99,6 @@ graph LR
     PERS -.-> PORTS
     CLD -.-> PORTS
     WABA -.-> PORTS
-    VIS -.-> PORTS
     SEC -.-> PORTS
 
     %% Infrastructure Connections
@@ -159,11 +158,16 @@ messenger/
 │   │   │   │   ├── controllers/         # REST Controllers
 │   │   │   │   ├── mapper/              # Request/Response Mappers
 │   │   │   │   ├── request/             # Input DTOs
-│   │   │   │   └── response/            # Output DTOs
+│   │   │   │   ├── response/            # Output DTOs
+│   │   │   │   └── validators/          # Input Validators
 │   │   │   └── websocket/               # Real-time tracking
 │   │   └── out/                         # Output Adapters
 │   │       ├── maps/                    # Google Maps Integration
 │   │       ├── persistence/             # JPA Adapters
+│   │       │   ├── adapter/             # JPA Port Implementations
+│   │       │   ├── entities/            # JPA Entities
+│   │       │   ├── mapper/              # Entity-to-Domain Mappers
+│   │       │   └── repository/          # Spring Data JPA Repositories
 │   │       ├── security/                # JWT Adapter
 │   │       ├── storage/                 # Google Cloud Storage
 │   │       ├── tracking/                # Location Tracking
@@ -171,25 +175,22 @@ messenger/
 │   ├── application/
 │   │   └── usecase/                     # 11 Use Cases (Monitoring, Settings, Location...)
 │   ├── domain/
+│   │   ├── events/                      # Domain Events
 │   │   ├── exception/                   # BusinessException, InputsException...
 │   │   ├── model/                       # 14+ Models + 7 Enums + Auth
 │   │   │   └── enums/                   # Role, Status, PlateType...
 │   │   ├── ports/                       # 14 Ports (interfaces)
-│   │   └── services/                    # Domain Services
+│   │   ├── services/                    # Domain Services
+│   │   └── util/                        # Domain Utilities
 │   └── infrastructure/
 │       ├── config/                      # Spring Configuration
 │       ├── exception/                   # Global Error Handler
-│       ├── external/                    # External API Clients (WhatsApp)
 │       ├── health/                      # Health Indicators (Actuator)
-│       ├── helper/                      # Utilities (Security, File, etc.)
-│       ├── persistence/
-│       │   ├── adapter/                 # JPA Port Implementations
-│       │   ├── entities/                # JPA Entities
-│       │   ├── mapper/                  # Entity-to-Domain Mappers
-│       │   └── repository/              # Spring Data JPA Repositories
+│       ├── helper/                      # Utilities (File, etc.)
 │       ├── scheduler/                   # Scheduled Jobs (Trash, Timeouts)
-│       ├── security/                    # Security Filters & Services
-│       └── service/                     # Infrastructure Services
+│       ├── security/                    # Security Filters & Web Config
+│       ├── service/                     # Infrastructure Services
+│       └── storage/                     # Local Utilities (ImageOptimizer)
 └── src/main/resources/
     ├── application.properties           # Base Configuration
     ├── application-local.properties     # Local Development (H2)
@@ -517,6 +518,46 @@ erDiagram
         Integer current_page
         LocalDateTime last_activity_at
         WhatsAppConversationState conversation_state
+    }
+
+    deleted_photos {
+        Long id_photo PK
+        Long service_delivery_id FK
+        Long status_history_id FK
+        String photo_path
+        PhotoType photo_type
+        LocalDateTime upload_date
+    }
+
+    deleted_signatures {
+        Long id_signature PK
+        Long service_delivery_id FK
+        String signature_path
+        LocalDateTime created_at
+    }
+
+    deleted_status_history {
+        Long id_status_history PK
+        Long service_delivery_id FK
+        Status previous_status
+        Status new_status
+        LocalDateTime change_date
+        String observation
+        Long changed_by_employee_id FK
+        String changed_by_name
+        String changed_by_document
+        Long signature_id FK
+    }
+
+    deleted_tracking_history {
+        Long history_id PK
+        Long service_delivery_id FK
+        Long messenger_id FK
+        BigDecimal latitude
+        BigDecimal longitude
+        BigDecimal speed
+        TrackingSource source
+        LocalDateTime recorded_at
     }
 
     employees ||--o{ service_deliveries : "delivers"
