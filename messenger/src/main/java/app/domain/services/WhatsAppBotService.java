@@ -3,6 +3,7 @@ package app.domain.services;
 import app.domain.model.Dealership;
 import app.domain.model.ServiceDelivery;
 import app.domain.util.LogSanitizer;
+import app.application.usecase.delivery.SearchServiceDelivery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import app.domain.model.WhatsAppSession;

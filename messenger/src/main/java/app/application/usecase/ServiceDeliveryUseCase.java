@@ -24,10 +24,10 @@ import app.domain.model.Signature;
 import app.domain.model.enums.Status;
 
 import app.domain.ports.StoragePort;
-import app.domain.services.CreateServiceDelivery;
-import app.domain.services.DeleteServiceDelivery;
-import app.domain.services.SearchServiceDelivery;
-import app.domain.services.UpdateServiceDelivery;
+import app.application.usecase.delivery.CreateServiceDelivery;
+import app.application.usecase.delivery.DeleteServiceDelivery;
+import app.application.usecase.delivery.SearchServiceDelivery;
+import app.application.usecase.delivery.UpdateServiceDelivery;
 
 
 /**

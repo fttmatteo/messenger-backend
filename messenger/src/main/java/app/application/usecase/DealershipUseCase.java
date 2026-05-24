@@ -5,10 +5,10 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import app.domain.model.Dealership;
-import app.domain.services.CreateDealership;
-import app.domain.services.DeleteDealership;
-import app.domain.services.SearchDealership;
-import app.domain.services.UpdateDealership;
+import app.application.usecase.dealership.CreateDealership;
+import app.application.usecase.dealership.DeleteDealership;
+import app.application.usecase.dealership.SearchDealership;
+import app.application.usecase.dealership.UpdateDealership;
 
 /**
  * Caso de uso para gestión de concesionarios.

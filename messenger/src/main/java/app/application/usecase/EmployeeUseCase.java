@@ -8,10 +8,10 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import app.domain.model.Employee;
 import app.domain.model.enums.Role;
-import app.domain.services.CreateEmployee;
-import app.domain.services.DeleteEmployee;
-import app.domain.services.SearchEmployee;
-import app.domain.services.UpdateEmployee;
+import app.application.usecase.employee.CreateEmployee;
+import app.application.usecase.employee.DeleteEmployee;
+import app.application.usecase.employee.SearchEmployee;
+import app.application.usecase.employee.UpdateEmployee;
 
 
 /**

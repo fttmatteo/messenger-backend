@@ -1,7 +1,7 @@
 package app.adapter.in.websocket;
 
-import app.adapter.in.rest.request.LiveTrackingRequest;
-import app.adapter.in.rest.response.LiveTrackingResponse;
+import app.adapter.in.rest.tracking.LiveTrackingRequest;
+import app.adapter.in.rest.tracking.LiveTrackingResponse;
 import app.application.usecase.tracking.UpdateLiveTrackingUseCase;
 import app.domain.model.LiveTracking;
 import app.domain.model.Location;

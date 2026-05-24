@@ -1,8 +1,8 @@
 package app.adapter.in.builder;
 
-import app.adapter.in.rest.request.ServiceDeliveryCreateRequest;
-import app.adapter.in.rest.request.ServiceDeliveryUpdateStatusRequest;
-import app.adapter.in.rest.validators.ServiceDeliveryValidator;
+import app.adapter.in.rest.delivery.ServiceDeliveryCreateRequest;
+import app.adapter.in.rest.delivery.ServiceDeliveryUpdateStatusRequest;
+import app.adapter.in.rest.delivery.ServiceDeliveryValidator;
 import app.domain.exception.InputsException;
 import app.domain.model.enums.Status;
 import org.junit.jupiter.api.DisplayName;

@@ -1,5 +1,6 @@
 package app.adapter.in.rest.validators;
 
+import app.adapter.in.rest.delivery.ServiceDeliveryValidator;
 import app.domain.exception.InputsException;
 import app.domain.model.enums.Status;
 import org.junit.jupiter.api.BeforeEach;
@@ -140,11 +141,11 @@ class ServiceDeliveryValidatorTest {
         class ValidChasisTests {
 
             @ParameterizedTest
-            @ValueSource(strings = { 
-                "1HGCM82633A004123",
-                "9C216260H07102143",
-                "MBH1234567890",
-                "VIN1234567890ABCDE"
+            @ValueSource(strings = {
+                    "1HGCM82633A004123",
+                    "9C216260H07102143",
+                    "MBH1234567890",
+                    "VIN1234567890ABCDE"
             })
             @DisplayName("Debe validar números de chasis válidos")
             void shouldValidateValidChasis(String chasis) throws InputsException {

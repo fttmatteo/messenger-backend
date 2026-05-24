@@ -1,4 +1,5 @@
 package app.adapter.in.rest.validators;
+import app.adapter.in.rest.employee.EmployeeValidator;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;

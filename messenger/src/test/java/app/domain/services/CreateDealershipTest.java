@@ -1,4 +1,5 @@
 package app.domain.services;
+import app.application.usecase.dealership.CreateDealership;
 
 import app.domain.exception.BusinessException;
 import app.domain.model.Dealership;

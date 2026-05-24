@@ -1,4 +1,5 @@
 package app.domain.services;
+import app.application.usecase.employee.SearchEmployee;
 
 import app.domain.model.Employee;
 import app.domain.model.enums.Role;

@@ -1,4 +1,5 @@
 package app.domain.services;
+import app.application.usecase.employee.DeleteEmployee;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

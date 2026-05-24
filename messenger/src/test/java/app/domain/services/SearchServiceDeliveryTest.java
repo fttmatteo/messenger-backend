@@ -1,4 +1,5 @@
 package app.domain.services;
+import app.application.usecase.delivery.SearchServiceDelivery;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;

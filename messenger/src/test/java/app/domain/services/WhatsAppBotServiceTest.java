@@ -1,4 +1,5 @@
 package app.domain.services;
+import app.application.usecase.delivery.SearchServiceDelivery;
 
 import app.domain.model.Dealership;
 import app.domain.model.WhatsAppSession;

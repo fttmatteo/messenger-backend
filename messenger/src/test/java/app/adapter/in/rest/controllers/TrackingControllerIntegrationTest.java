@@ -4,8 +4,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import app.adapter.in.rest.request.LiveTrackingRequest;
-import app.adapter.in.rest.request.BulkLocationsRequest;
+import app.adapter.in.rest.tracking.LiveTrackingRequest;
+import app.adapter.in.rest.location.BulkLocationsRequest;
 import app.domain.model.enums.Role;
 import app.domain.model.enums.TrackingStatus;
 import app.adapter.out.persistence.entities.EmployeeEntity;

@@ -2,7 +2,7 @@ package app.adapter.in.builder;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import app.adapter.in.rest.validators.EmployeeValidator;
+import app.adapter.in.rest.employee.EmployeeValidator;
 import app.domain.model.Employee;
 
 /**

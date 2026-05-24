@@ -1,7 +1,7 @@
 package app.infrastructure.config;
 
-import app.adapter.in.rest.response.ErrorDetail;
-import app.adapter.in.rest.response.ErrorResponse;
+import app.adapter.in.rest.common.ErrorDetail;
+import app.adapter.in.rest.common.ErrorResponse;
 import app.domain.exception.BusinessException;
 import app.domain.exception.ExternalServiceException;
 import app.domain.exception.GeolocationException;

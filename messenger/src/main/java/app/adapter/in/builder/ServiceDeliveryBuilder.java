@@ -2,9 +2,9 @@ package app.adapter.in.builder;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import app.adapter.in.rest.request.ServiceDeliveryCreateRequest;
-import app.adapter.in.rest.request.ServiceDeliveryUpdateStatusRequest;
-import app.adapter.in.rest.validators.ServiceDeliveryValidator;
+import app.adapter.in.rest.delivery.ServiceDeliveryCreateRequest;
+import app.adapter.in.rest.delivery.ServiceDeliveryUpdateStatusRequest;
+import app.adapter.in.rest.delivery.ServiceDeliveryValidator;
 import app.domain.model.enums.Status;
 
 /**

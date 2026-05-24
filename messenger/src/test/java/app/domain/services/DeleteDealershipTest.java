@@ -1,4 +1,5 @@
 package app.domain.services;
+import app.application.usecase.dealership.DeleteDealership;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

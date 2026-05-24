@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import app.adapter.in.rest.request.DealershipRequest;
+import app.adapter.in.rest.dealership.DealershipRequest;
 import app.adapter.out.persistence.entities.DealershipEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
