@@ -55,15 +55,18 @@ public class WhatsAppNotificationListener {
         message.append(String.format("*ESTADO:* %s %s\n", statusEmoji, statusName));
 
         String currentObservation = null;
+        boolean foundInHistory = false;
         if (service.getHistory() != null && !service.getHistory().isEmpty()) {
-            currentObservation = service.getHistory().stream()
+            var opt = service.getHistory().stream()
                     .filter(h -> h.getNewStatus() == event.getNewStatus())
-                    .reduce((first, second) -> second)
-                    .map(h -> h.getObservation())
-                    .orElse(null);
+                    .reduce((first, second) -> second);
+            if (opt.isPresent()) {
+                currentObservation = opt.get().getObservation();
+                foundInHistory = true;
+            }
         }
         
-        if (currentObservation == null) {
+        if (!foundInHistory) {
             currentObservation = service.getObservation();
         }
 

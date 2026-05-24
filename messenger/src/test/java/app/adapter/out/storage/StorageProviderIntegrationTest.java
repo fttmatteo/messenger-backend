@@ -49,7 +49,6 @@ class StorageProviderIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("Debe guardar y eliminar localmente")
-
     void shouldSaveAndDeleteLocal() throws IOException {
         String subDir = "test-folder";
         String customName = "my-photo";
@@ -59,8 +58,11 @@ class StorageProviderIntegrationTest extends AbstractIntegrationTest {
         assertTrue(savedPath.contains(subDir));
         assertTrue(savedPath.contains(customName));
 
-        File physicalFile = localStorageAdapter.get(savedPath);
-        assertNotNull(physicalFile);
+        try (java.io.InputStream is = localStorageAdapter.get(savedPath)) {
+            assertNotNull(is);
+        }
+
+        File physicalFile = localStorageAdapter.getStoragePath().resolve(savedPath).toFile();
         assertTrue(physicalFile.exists());
 
         boolean deleted = localStorageAdapter.delete(savedPath);

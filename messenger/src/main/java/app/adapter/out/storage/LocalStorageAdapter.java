@@ -68,15 +68,13 @@ public class LocalStorageAdapter implements StoragePort {
      * Recupera un archivo del almacenamiento local.
      */
     @Override
-    public File get(String path) {
+    public InputStream get(String path) {
         Path filePath = storagePath.resolve(path);
-        File file = filePath.toFile();
-
-        if (file.exists()) {
-            return file;
+        try {
+            return Files.exists(filePath) ? Files.newInputStream(filePath) : null;
+        } catch (IOException e) {
+            return null;
         }
-
-        return null;
     }
 
     @Override

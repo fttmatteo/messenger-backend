@@ -138,7 +138,7 @@ public class WhatsAppBotService {
             }
         } else {
             messagePort.sendTextMessage(from,
-                    "*PLAK*\n\n¡Hola! 👋🏼. Aquí podrás consultar el estado de las motos por chasis.\n\n"
+                    "¡Hola! 👋🏼. Aquí podrás consultar el estado de las motos por chasis.\n\n"
                             + "_PIN requerido cada 12h o al reiniciar sesión._\n\n"
                             + "🔒 *Ingresa el PIN para continuar:* ");
         }
@@ -173,12 +173,13 @@ public class WhatsAppBotService {
                         try (java.util.zip.ZipOutputStream zos = new java.util.zip.ZipOutputStream(new java.io.FileOutputStream(tempZip))) {
                             for (int i = 0; i < photos.size(); i++) {
                                 Photo p = photos.get(i);
-                                java.io.File photoFile = storagePort.get(p.getPhotoPath());
-                                if (photoFile != null && photoFile.exists()) {
-                                    java.util.zip.ZipEntry zipEntry = new java.util.zip.ZipEntry(String.format("%d_Foto_%s.webp", (i + 1), plateNumber));
-                                    zos.putNextEntry(zipEntry);
-                                    java.nio.file.Files.copy(photoFile.toPath(), zos);
-                                    zos.closeEntry();
+                                try (java.io.InputStream photoStream = storagePort.get(p.getPhotoPath())) {
+                                    if (photoStream != null) {
+                                        java.util.zip.ZipEntry zipEntry = new java.util.zip.ZipEntry(String.format("%d_Foto_%s.webp", (i + 1), plateNumber));
+                                        zos.putNextEntry(zipEntry);
+                                        photoStream.transferTo(zos);
+                                        zos.closeEntry();
+                                    }
                                 }
                             }
                         }
@@ -192,6 +193,7 @@ public class WhatsAppBotService {
                         
                         tempZip.delete();
                     }
+                    sleep(1500);
                 } else {
                     messagePort.sendTextMessage(from, "⚠️ No se encontraron fotos para el estado actual de este chasis.");
                 }
@@ -311,7 +313,7 @@ public class WhatsAppBotService {
     private void sendMenu(String from, String dealershipName) {
         String bodyText = String.format("🛞 *%s*\n📋 *¿Qué deseas consultar?*", dealershipName);
         String buttonText = "Ver opciones";
-        String listTitle = "Menú Principal";
+        String listTitle = "Menú principal";
 
         List<String> rowTitles = List.of(
                 "🔍 Consulta específica",
@@ -341,9 +343,9 @@ public class WhatsAppBotService {
             }
 
             if (hasPhotos) {
-                messagePort.sendReplyButtons(from, message, List.of("Ver fotos", "Menú Principal"), List.of("VIEW_PHOTOS_" + s.getIdServiceDelivery(), "MENU_BACK"));
+                messagePort.sendReplyButtons(from, message, List.of("Ver fotos", "Menú principal"), List.of("VIEW_PHOTOS_" + s.getIdServiceDelivery(), "MENU_BACK"));
             } else {
-                messagePort.sendReplyButtons(from, message, List.of("Menú Principal"), List.of("MENU_BACK"));
+                messagePort.sendReplyButtons(from, message, List.of("Menú principal"), List.of("MENU_BACK"));
             }
             sleep(500);
         }
@@ -457,7 +459,7 @@ public class WhatsAppBotService {
             buttonIds.add("NEXT_PAGE");
         }
         
-        buttonNames.add("Menú Principal");
+        buttonNames.add("Menú principal");
         buttonIds.add("MENU_BACK");
 
         messagePort.sendReplyButtons(from, sb.toString(), buttonNames, buttonIds);

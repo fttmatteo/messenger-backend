@@ -638,13 +638,13 @@
                             "mode": "formdata",
                             "formdata": [
                                 {
-                                    "key": "image",
-                                    "type": "file",
-                                    "src": []
-                                },
-                                {
                                     "key": "dealershipId",
                                     "value": "1",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "originDealershipId",
+                                    "value": "2",
                                     "type": "text"
                                 },
                                 {
