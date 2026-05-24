@@ -13,12 +13,12 @@ Para actualizar la versión del proyecto tienes varias opciones según tu sistem
 
 Desde una terminal de PowerShell en la raíz del proyecto:
 ```powershell
-.\sync-version.ps1 1.11.8
+.\sync-version.ps1 3.0.0
 ```
 
 Si recibes un error de Execution Policy:
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\sync-version.ps1 1.11.8
+powershell -ExecutionPolicy Bypass -File .\sync-version.ps1 3.0.0
 ```
 
 ### 2) Linux / macOS — Bash
@@ -26,7 +26,7 @@ powershell -ExecutionPolicy Bypass -File .\sync-version.ps1 1.11.8
 Hemos añadido un script `sync-version.sh` que replica el comportamiento del `.ps1` y es ejecutable en sistemas Unix:
 ```bash
 chmod +x ./sync-version.sh
-./sync-version.sh 1.11.8
+./sync-version.sh 3.0.0
 ```
 
 Este script ejecuta `./mvnw versions:set -DnewVersion=<versión> -DgenerateBackupPoms=false` dentro del directorio `messenger` y actualiza los badges `Version-...` en `README.md` y `README.en.md`.
@@ -49,4 +49,4 @@ Se recomienda seguir el esquema de **Semantic Versioning**:
 
 > **Nota**: Después de ejecutar el script, no olvides realizar un commit con los cambios generados:
 > `git add .`
-> `git commit -m "chore: bump version to 1.11.8"`
+> `git commit -m "chore: bump version to 3.0.0"`
