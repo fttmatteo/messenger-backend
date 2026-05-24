@@ -4,10 +4,10 @@ import app.domain.exception.BusinessException;
 import app.domain.exception.ResourceNotFoundException;
 import app.domain.model.Employee;
 import app.domain.model.enums.Role;
-import app.application.usecase.employee.CreateEmployee;
-import app.application.usecase.employee.DeleteEmployee;
-import app.application.usecase.employee.SearchEmployee;
-import app.application.usecase.employee.UpdateEmployee;
+import app.application.usecase.employee.CreateEmployeeUseCase;
+import app.application.usecase.employee.DeleteEmployeeUseCase;
+import app.application.usecase.employee.SearchEmployeeUseCase;
+import app.application.usecase.employee.UpdateEmployeeUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,16 +25,16 @@ import static org.mockito.Mockito.*;
 class EmployeeUseCaseTest {
 
     @Mock
-    private CreateEmployee createEmployee;
+    private CreateEmployeeUseCase createEmployee;
 
     @Mock
-    private SearchEmployee searchEmployee;
+    private SearchEmployeeUseCase searchEmployee;
 
     @Mock
-    private UpdateEmployee updateEmployee;
+    private UpdateEmployeeUseCase updateEmployee;
 
     @Mock
-    private DeleteEmployee deleteEmployee;
+    private DeleteEmployeeUseCase deleteEmployee;
 
     @InjectMocks
     private EmployeeUseCase employeeUseCase;

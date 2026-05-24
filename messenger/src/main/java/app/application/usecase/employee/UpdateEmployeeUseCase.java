@@ -14,9 +14,9 @@ import app.domain.util.LogSanitizer;
  * Servicio para actualizar datos de empleados.
  */
 @Service
-public class UpdateEmployee {
+public class UpdateEmployeeUseCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(UpdateEmployee.class);
+    private static final Logger logger = LoggerFactory.getLogger(UpdateEmployeeUseCase.class);
 
     @Autowired
     private EmployeePort employeePort;

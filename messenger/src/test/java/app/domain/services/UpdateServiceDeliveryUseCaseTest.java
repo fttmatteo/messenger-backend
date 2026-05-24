@@ -1,5 +1,5 @@
 package app.domain.services;
-import app.application.usecase.delivery.UpdateServiceDelivery;
+import app.application.usecase.delivery.UpdateServiceDeliveryUseCase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,7 +28,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Pruebas unitarias de UpdateServiceDelivery")
+@DisplayName("Pruebas unitarias de UpdateServiceDeliveryUseCase")
 class UpdateServiceDeliveryTest {
 
     @Mock
@@ -41,7 +41,7 @@ class UpdateServiceDeliveryTest {
     private app.domain.ports.TrackingPort trackingPort;
 
     @InjectMocks
-    private UpdateServiceDelivery updateServiceDelivery;
+    private UpdateServiceDeliveryUseCase updateServiceDelivery;
 
     private ServiceDelivery service;
     private Employee messenger;

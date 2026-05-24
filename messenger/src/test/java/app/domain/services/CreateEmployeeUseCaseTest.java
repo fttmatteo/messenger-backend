@@ -1,5 +1,5 @@
 package app.domain.services;
-import app.application.usecase.employee.CreateEmployee;
+import app.application.usecase.employee.CreateEmployeeUseCase;
 
 import app.domain.exception.BusinessException;
 import app.domain.model.Employee;
@@ -19,7 +19,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Pruebas unitarias de CreateEmployee")
+@DisplayName("Pruebas unitarias de CreateEmployeeUseCase")
 class CreateEmployeeTest {
 
     @Mock
@@ -29,7 +29,7 @@ class CreateEmployeeTest {
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
-    private CreateEmployee createEmployee;
+    private CreateEmployeeUseCase createEmployee;
 
     private Employee newEmployee;
 

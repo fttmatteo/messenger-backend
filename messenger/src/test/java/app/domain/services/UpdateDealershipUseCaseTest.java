@@ -1,5 +1,5 @@
 package app.domain.services;
-import app.application.usecase.dealership.UpdateDealership;
+import app.application.usecase.dealership.UpdateDealershipUseCase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -19,7 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Pruebas unitarias de UpdateDealership")
+@DisplayName("Pruebas unitarias de UpdateDealershipUseCase")
 
 class UpdateDealershipTest {
 
@@ -27,7 +27,7 @@ class UpdateDealershipTest {
     private DealershipPort dealershipPort;
 
     @InjectMocks
-    private UpdateDealership updateDealership;
+    private UpdateDealershipUseCase updateDealership;
 
     private Dealership existingDealership;
 

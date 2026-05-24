@@ -1,5 +1,5 @@
 package app.domain.services;
-import app.application.usecase.employee.DeleteEmployee;
+import app.application.usecase.employee.DeleteEmployeeUseCase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -20,7 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Pruebas unitarias de DeleteEmployee")
+@DisplayName("Pruebas unitarias de DeleteEmployeeUseCase")
 class DeleteEmployeeTest {
 
     @Mock
@@ -29,7 +29,7 @@ class DeleteEmployeeTest {
     private ServiceDeliveryPort serviceDeliveryPort;
 
     @InjectMocks
-    private DeleteEmployee deleteEmployee;
+    private DeleteEmployeeUseCase deleteEmployee;
 
     @Test
     @DisplayName("Debe eliminar empleado por ID si no tiene servicios")

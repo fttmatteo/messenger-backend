@@ -12,9 +12,9 @@ import app.domain.ports.DealershipPort;
  * Servicio para eliminar concesionarios.
  */
 @Service
-public class DeleteDealership {
+public class DeleteDealershipUseCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(DeleteDealership.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeleteDealershipUseCase.class);
 
     @Autowired
     private DealershipPort dealershipPort;

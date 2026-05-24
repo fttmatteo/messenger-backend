@@ -1,5 +1,5 @@
 package app.domain.services;
-import app.application.usecase.delivery.DeleteServiceDelivery;
+import app.application.usecase.delivery.DeleteServiceDeliveryUseCase;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -22,7 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Pruebas unitarias de DeleteServiceDelivery")
+@DisplayName("Pruebas unitarias de DeleteServiceDeliveryUseCase")
 class DeleteServiceDeliveryTest {
 
     @Mock
@@ -35,7 +35,7 @@ class DeleteServiceDeliveryTest {
     private ArchivePort archivePort;
 
     @InjectMocks
-    private DeleteServiceDelivery deleteServiceDelivery;
+    private DeleteServiceDeliveryUseCase deleteServiceDelivery;
 
     @Test
     @DisplayName("Debe realizar borrado lógico del servicio")

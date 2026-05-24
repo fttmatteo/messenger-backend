@@ -19,9 +19,9 @@ import app.domain.ports.ServiceDeliveryPort;
  * Servicio para eliminar (soft delete) servicios de entrega.
  */
 @Service
-public class DeleteServiceDelivery {
+public class DeleteServiceDeliveryUseCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(DeleteServiceDelivery.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeleteServiceDeliveryUseCase.class);
 
     @Autowired
     private ServiceDeliveryPort serviceDeliveryPort;

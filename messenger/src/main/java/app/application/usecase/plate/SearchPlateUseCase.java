@@ -12,9 +12,9 @@ import app.domain.util.LogSanitizer;
  * Servicio para búsqueda de placas vehiculares.
  */
 @Service
-public class SearchPlate {
+public class SearchPlateUseCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(SearchPlate.class);
+    private static final Logger logger = LoggerFactory.getLogger(SearchPlateUseCase.class);
 
     @Autowired
     private PlatePort platePort;

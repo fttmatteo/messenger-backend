@@ -13,9 +13,9 @@ import app.domain.ports.ServiceDeliveryPort;
  * Servicio para eliminar empleados validando dependencias.
  */
 @Service
-public class DeleteEmployee {
+public class DeleteEmployeeUseCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(DeleteEmployee.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeleteEmployeeUseCase.class);
 
     @Autowired
     private EmployeePort employeePort;

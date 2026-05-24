@@ -3,7 +3,7 @@ package app.domain.services;
 import app.domain.model.Dealership;
 import app.domain.model.ServiceDelivery;
 import app.domain.util.LogSanitizer;
-import app.application.usecase.delivery.SearchServiceDelivery;
+import app.domain.ports.ServiceDeliveryPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import app.domain.model.WhatsAppSession;
@@ -39,14 +39,14 @@ public class WhatsAppBotService {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private final WhatsAppMessagePort messagePort;
     private final WhatsAppSessionPort sessionPort;
-    private final SearchServiceDelivery searchService;
+    private final ServiceDeliveryPort searchService;
     private final WhatsAppRateLimitPort rateLimitPort;
     private final StoragePort storagePort;
 
     public WhatsAppBotService(
             WhatsAppMessagePort messagePort,
             WhatsAppSessionPort sessionPort,
-            SearchServiceDelivery searchService,
+            ServiceDeliveryPort searchService,
             LocationPort locationPort,
             StoragePort storagePort,
             WhatsAppRateLimitPort rateLimitPort) {
@@ -151,7 +151,8 @@ public class WhatsAppBotService {
         if (text.startsWith("VIEW_PHOTOS_")) {
             try {
                 Long serviceId = Long.parseLong(text.substring("VIEW_PHOTOS_".length()));
-                ServiceDelivery s = searchService.findById(serviceId);
+                ServiceDelivery s = searchService.findByIdActive(serviceId);
+                if (s == null) throw new RuntimeException("Service not found");
                 Optional<StatusHistory> currentHistoryOpt = s.getHistory().stream()
                         .filter(h -> h.getNewStatus() == s.getCurrentStatus())
                         .reduce((first, second) -> second);
@@ -178,7 +179,7 @@ public class WhatsAppBotService {
 
         if (text.startsWith("VIEW_PLATE_")) {
             String plate = text.substring("VIEW_PLATE_".length());
-            Page<ServiceDelivery> servicesPage = searchService.findByPlateAndDealershipPaginated(plate, dealershipId,
+            Page<ServiceDelivery> servicesPage = searchService.findByPlateAndDealershipPaginated(plate.trim().toUpperCase(), dealershipId,
                     PageRequest.of(0, 5));
             if (!servicesPage.isEmpty()) {
                 sendPlateDetails(from, servicesPage.getContent());
@@ -197,7 +198,7 @@ public class WhatsAppBotService {
 
         switch (state) {
             case AWAITING_PLATE -> {
-                Page<ServiceDelivery> servicesPage = searchService.findByPlateAndDealershipPaginated(text, dealershipId,
+                Page<ServiceDelivery> servicesPage = searchService.findByPlateAndDealershipPaginated(text.trim().toUpperCase(), dealershipId,
                         PageRequest.of(0, 5));
                 if (servicesPage.isEmpty()) {
                     messagePort.sendTextMessage(from,
@@ -260,7 +261,7 @@ public class WhatsAppBotService {
                     }
                     default -> {
                         if (looksLikePlate(text)) {
-                            Page<ServiceDelivery> servicesPage = searchService.findByPlateAndDealershipPaginated(text,
+                            Page<ServiceDelivery> servicesPage = searchService.findByPlateAndDealershipPaginated(text.trim().toUpperCase(),
                                     dealershipId, PageRequest.of(0, 5));
                             if (!servicesPage.isEmpty()) {
                                 sendPlateDetails(from, servicesPage.getContent());
@@ -396,7 +397,7 @@ public class WhatsAppBotService {
         }
 
         int page = session.getCurrentPage();
-        Page<ServiceDelivery> resultPage = searchService.findByDealershipAndStatusesPaginated(
+        Page<ServiceDelivery> resultPage = searchService.findByDealershipIdAndStatusesPaginated(
                 dealershipId, statuses, PageRequest.of(page, 10, Sort.by("createdAt").descending()));
 
         if (resultPage.isEmpty() && page == 0) {

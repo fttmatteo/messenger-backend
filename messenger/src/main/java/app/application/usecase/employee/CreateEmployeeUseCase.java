@@ -14,9 +14,9 @@ import app.domain.util.LogSanitizer;
  * Servicio para crear nuevos empleados con encriptación de contraseña.
  */
 @Service
-public class CreateEmployee {
+public class CreateEmployeeUseCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(CreateEmployee.class);
+    private static final Logger logger = LoggerFactory.getLogger(CreateEmployeeUseCase.class);
 
     @Autowired
     private EmployeePort employeePort;

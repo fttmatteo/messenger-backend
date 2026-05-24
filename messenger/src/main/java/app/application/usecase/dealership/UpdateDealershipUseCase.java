@@ -13,9 +13,9 @@ import app.domain.util.LogSanitizer;
  * Servicio para actualizar datos de concesionarios.
  */
 @Service
-public class UpdateDealership {
+public class UpdateDealershipUseCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(UpdateDealership.class);
+    private static final Logger logger = LoggerFactory.getLogger(UpdateDealershipUseCase.class);
 
     @Autowired
     private DealershipPort dealershipPort;

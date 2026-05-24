@@ -15,12 +15,12 @@ import app.domain.ports.ServiceDeliveryPort;
  * Por defecto, excluye los servicios eliminados (en papelera).
  */
 @Service
-public class SearchServiceDelivery {
+public class SearchServiceDeliveryUseCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(SearchServiceDelivery.class);
+    private static final Logger logger = LoggerFactory.getLogger(SearchServiceDeliveryUseCase.class);
     private final ServiceDeliveryPort serviceDeliveryPort;
 
-    public SearchServiceDelivery(ServiceDeliveryPort serviceDeliveryPort) {
+    public SearchServiceDeliveryUseCase(ServiceDeliveryPort serviceDeliveryPort) {
         this.serviceDeliveryPort = serviceDeliveryPort;
     }
 

@@ -1,5 +1,5 @@
 package app.domain.services;
-import app.application.usecase.employee.SearchEmployee;
+import app.application.usecase.employee.SearchEmployeeUseCase;
 
 import app.domain.model.Employee;
 import app.domain.model.enums.Role;
@@ -17,14 +17,14 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Pruebas unitarias de SearchEmployee")
+@DisplayName("Pruebas unitarias de SearchEmployeeUseCase")
 class SearchEmployeeTest {
 
     @Mock
     private EmployeePort employeePort;
 
     @InjectMocks
-    private SearchEmployee searchEmployee;
+    private SearchEmployeeUseCase searchEmployee;
 
     private Employee sampleEmployee;
 

@@ -1,5 +1,5 @@
 package app.domain.services;
-import app.application.usecase.dealership.DeleteDealership;
+import app.application.usecase.dealership.DeleteDealershipUseCase;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Pruebas unitarias de DeleteDealership")
+@DisplayName("Pruebas unitarias de DeleteDealershipUseCase")
 class DeleteDealershipTest {
 
     @Mock
@@ -23,7 +23,7 @@ class DeleteDealershipTest {
     private ServiceDeliveryPort serviceDeliveryPort;
 
     @InjectMocks
-    private DeleteDealership deleteDealership;
+    private DeleteDealershipUseCase deleteDealership;
 
     @Test
     @DisplayName("Debe eliminar concesionario por ID si no tiene servicios")

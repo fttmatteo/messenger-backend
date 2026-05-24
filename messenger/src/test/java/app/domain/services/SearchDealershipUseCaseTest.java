@@ -1,5 +1,5 @@
 package app.domain.services;
-import app.application.usecase.dealership.SearchDealership;
+import app.application.usecase.dealership.SearchDealershipUseCase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -18,14 +18,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Pruebas unitarias de SearchDealership")
+@DisplayName("Pruebas unitarias de SearchDealershipUseCase")
 class SearchDealershipTest {
 
     @Mock
     private DealershipPort dealershipPort;
 
     @InjectMocks
-    private SearchDealership searchDealership;
+    private SearchDealershipUseCase searchDealership;
 
     @Test
     @DisplayName("Debe retornar lista de todos los concesionarios")

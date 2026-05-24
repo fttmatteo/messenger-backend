@@ -1,5 +1,5 @@
 package app.domain.services;
-import app.application.usecase.dealership.CreateDealership;
+import app.application.usecase.dealership.CreateDealershipUseCase;
 
 import app.domain.exception.BusinessException;
 import app.domain.model.Dealership;
@@ -17,14 +17,14 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Pruebas unitarias de CreateDealership")
+@DisplayName("Pruebas unitarias de CreateDealershipUseCase")
 class CreateDealershipTest {
 
     @Mock
     private DealershipPort dealershipPort;
 
     @InjectMocks
-    private CreateDealership createDealership;
+    private CreateDealershipUseCase createDealership;
 
     private Dealership newDealership;
 

@@ -1,5 +1,5 @@
 package app.domain.services;
-import app.application.usecase.plate.SearchPlate;
+import app.application.usecase.plate.SearchPlateUseCase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -14,14 +14,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Pruebas unitarias de SearchPlate")
+@DisplayName("Pruebas unitarias de SearchPlateUseCase")
 class SearchPlateTest {
 
     @Mock
     private PlatePort platePort;
 
     @InjectMocks
-    private SearchPlate searchPlate;
+    private SearchPlateUseCase searchPlate;
 
     @Test
     @DisplayName("Debe buscar placa por ID")

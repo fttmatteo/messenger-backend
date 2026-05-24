@@ -1,5 +1,5 @@
 package app.domain.services;
-import app.application.usecase.delivery.CreateServiceDelivery;
+import app.application.usecase.delivery.CreateServiceDeliveryUseCase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,7 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Pruebas unitarias de CreateServiceDelivery")
+@DisplayName("Pruebas unitarias de CreateServiceDeliveryUseCase")
 class CreateServiceDeliveryTest {
 
     @Mock
@@ -43,7 +43,7 @@ class CreateServiceDeliveryTest {
     @Mock
     private ApplicationEventPublisher eventPublisher;
     @InjectMocks
-    private CreateServiceDelivery createServiceDelivery;
+    private CreateServiceDeliveryUseCase createServiceDelivery;
 
     private Employee messenger;
     private Dealership dealership;

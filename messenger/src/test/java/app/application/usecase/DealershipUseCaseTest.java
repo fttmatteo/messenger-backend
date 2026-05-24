@@ -3,10 +3,10 @@ package app.application.usecase;
 import app.domain.exception.BusinessException;
 import app.domain.exception.ResourceNotFoundException;
 import app.domain.model.Dealership;
-import app.application.usecase.dealership.CreateDealership;
-import app.application.usecase.dealership.DeleteDealership;
-import app.application.usecase.dealership.SearchDealership;
-import app.application.usecase.dealership.UpdateDealership;
+import app.application.usecase.dealership.CreateDealershipUseCase;
+import app.application.usecase.dealership.DeleteDealershipUseCase;
+import app.application.usecase.dealership.SearchDealershipUseCase;
+import app.application.usecase.dealership.UpdateDealershipUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,16 +24,16 @@ import static org.mockito.Mockito.*;
 class DealershipUseCaseTest {
 
     @Mock
-    private CreateDealership createDealership;
+    private CreateDealershipUseCase createDealership;
 
     @Mock
-    private SearchDealership searchDealership;
+    private SearchDealershipUseCase searchDealership;
 
     @Mock
-    private UpdateDealership updateDealership;
+    private UpdateDealershipUseCase updateDealership;
 
     @Mock
-    private DeleteDealership deleteDealership;
+    private DeleteDealershipUseCase deleteDealership;
 
     @InjectMocks
     private DealershipUseCase dealershipUseCase;

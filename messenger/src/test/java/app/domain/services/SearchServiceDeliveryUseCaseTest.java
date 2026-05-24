@@ -1,5 +1,5 @@
 package app.domain.services;
-import app.application.usecase.delivery.SearchServiceDelivery;
+import app.application.usecase.delivery.SearchServiceDeliveryUseCase;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -20,14 +20,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Pruebas unitarias de SearchServiceDelivery")
+@DisplayName("Pruebas unitarias de SearchServiceDeliveryUseCase")
 class SearchServiceDeliveryTest {
 
     @Mock
     private ServiceDeliveryPort serviceDeliveryPort;
 
     @InjectMocks
-    private SearchServiceDelivery searchServiceDelivery;
+    private SearchServiceDeliveryUseCase searchServiceDelivery;
 
     @Test
     @DisplayName("Debe buscar servicio activo por ID")

@@ -5,10 +5,10 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import app.domain.model.Dealership;
-import app.application.usecase.dealership.CreateDealership;
-import app.application.usecase.dealership.DeleteDealership;
-import app.application.usecase.dealership.SearchDealership;
-import app.application.usecase.dealership.UpdateDealership;
+import app.application.usecase.dealership.CreateDealershipUseCase;
+import app.application.usecase.dealership.DeleteDealershipUseCase;
+import app.application.usecase.dealership.SearchDealershipUseCase;
+import app.application.usecase.dealership.UpdateDealershipUseCase;
 
 /**
  * Caso de uso para gestión de concesionarios.
@@ -16,16 +16,16 @@ import app.application.usecase.dealership.UpdateDealership;
 @Service
 public class DealershipUseCase {
 
-    private final CreateDealership createDealership;
-    private final UpdateDealership updateDealership;
-    private final SearchDealership searchDealership;
-    private final DeleteDealership deleteDealership;
+    private final CreateDealershipUseCase createDealership;
+    private final UpdateDealershipUseCase updateDealership;
+    private final SearchDealershipUseCase searchDealership;
+    private final DeleteDealershipUseCase deleteDealership;
 
     public DealershipUseCase(
-            CreateDealership createDealership,
-            UpdateDealership updateDealership,
-            SearchDealership searchDealership,
-            DeleteDealership deleteDealership) {
+            CreateDealershipUseCase createDealership,
+            UpdateDealershipUseCase updateDealership,
+            SearchDealershipUseCase searchDealership,
+            DeleteDealershipUseCase deleteDealership) {
         this.createDealership = createDealership;
         this.updateDealership = updateDealership;
         this.searchDealership = searchDealership;

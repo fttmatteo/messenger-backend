@@ -13,9 +13,9 @@ import app.domain.util.LogSanitizer;
  * Servicio para crear nuevos concesionarios.
  */
 @Service
-public class CreateDealership {
+public class CreateDealershipUseCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(CreateDealership.class);
+    private static final Logger logger = LoggerFactory.getLogger(CreateDealershipUseCase.class);
 
     @Autowired
     private DealershipPort dealershipPort;

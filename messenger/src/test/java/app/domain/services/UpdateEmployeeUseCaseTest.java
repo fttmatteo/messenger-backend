@@ -1,5 +1,5 @@
 package app.domain.services;
-import app.application.usecase.employee.UpdateEmployee;
+import app.application.usecase.employee.UpdateEmployeeUseCase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -21,7 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Pruebas unitarias de UpdateEmployee")
+@DisplayName("Pruebas unitarias de UpdateEmployeeUseCase")
 class UpdateEmployeeTest {
 
     @Mock
@@ -30,7 +30,7 @@ class UpdateEmployeeTest {
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
-    private UpdateEmployee updateEmployee;
+    private UpdateEmployeeUseCase updateEmployee;
 
     private Employee existingEmployee;
 

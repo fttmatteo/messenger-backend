@@ -26,9 +26,9 @@ import app.domain.events.PlateStatusChangedEvent;
  * negocio.
  */
 @Service
-public class UpdateServiceDelivery {
+public class UpdateServiceDeliveryUseCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(UpdateServiceDelivery.class);
+    private static final Logger logger = LoggerFactory.getLogger(UpdateServiceDeliveryUseCase.class);
 
     private static final Set<Status> MESSENGER_ALLOWED_STATES = Set.of(Status.PENDING, Status.DELIVERED,
             Status.RETURNED);

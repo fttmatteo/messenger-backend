@@ -14,9 +14,9 @@ import app.domain.ports.DealershipPort;
  * Servicio para búsqueda de concesionarios.
  */
 @Service
-public class SearchDealership {
+public class SearchDealershipUseCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(SearchDealership.class);
+    private static final Logger logger = LoggerFactory.getLogger(SearchDealershipUseCase.class);
 
     @Autowired
     private DealershipPort dealershipPort;

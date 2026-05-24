@@ -14,9 +14,9 @@ import app.domain.util.LogSanitizer;
  * Servicio para búsqueda de empleados.
  */
 @Service
-public class SearchEmployee {
+public class SearchEmployeeUseCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(SearchEmployee.class);
+    private static final Logger logger = LoggerFactory.getLogger(SearchEmployeeUseCase.class);
 
     @Autowired
     private EmployeePort employeePort;

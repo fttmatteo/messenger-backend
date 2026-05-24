@@ -25,9 +25,9 @@ import app.domain.services.PlateRecognition;
  * Servicio para crear nuevos servicios de entrega con reconocimiento de placa.
  */
 @Service
-public class CreateServiceDelivery {
+public class CreateServiceDeliveryUseCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(CreateServiceDelivery.class);
+    private static final Logger logger = LoggerFactory.getLogger(CreateServiceDeliveryUseCase.class);
 
     @Autowired
     private ServiceDeliveryPort serviceDeliveryPort;
