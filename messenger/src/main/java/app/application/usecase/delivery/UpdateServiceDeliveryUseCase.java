@@ -205,10 +205,6 @@ public class UpdateServiceDeliveryUseCase {
         // ADMIN can change to any state.
     }
 
-    /**
-     * Valida que se adjunten las evidencias (firma, fotos) requeridas para el nuevo
-     * estado. Omite validación si el usuario es administrador.
-     */
     public void validateEvidence(Status status, Signature signature, List<Photo> photos, String observation, Role userRole)
             throws BusinessException {
 
@@ -223,30 +219,6 @@ public class UpdateServiceDeliveryUseCase {
         if (status == Status.DELIVERED) {
             if (signature == null) {
                 throw new BusinessException("Para marcar como ENTREGADO, la firma de recibido es obligatoria.");
-            }
-            return;
-        }
-
-        if (status == Status.RETURNED) {
-            if (photos == null || photos.isEmpty()) {
-                throw new BusinessException(
-                        "Para marcar como DEVUELTO, al menos una foto de evidencia es obligatoria.");
-            }
-            if (observation == null || observation.trim().isEmpty()) {
-                throw new BusinessException("Para marcar como DEVUELTO, la observación es obligatoria.");
-            }
-            return;
-        }
-
-        if (status == Status.PENDING) {
-            if (signature == null) {
-                throw new BusinessException("Para marcar como PENDIENTE, la firma es obligatoria.");
-            }
-            if (photos == null || photos.isEmpty()) {
-                throw new BusinessException("Para marcar como PENDIENTE, al menos una foto es obligatoria.");
-            }
-            if (observation == null || observation.trim().isEmpty()) {
-                throw new BusinessException("Para marcar como PENDIENTE, la observación es obligatoria.");
             }
         }
     }
