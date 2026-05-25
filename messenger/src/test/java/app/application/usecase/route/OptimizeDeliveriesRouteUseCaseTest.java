@@ -145,8 +145,8 @@ class OptimizeDeliveriesRouteUseCaseTest {
 
         ServiceDelivery service2 = new ServiceDelivery();
         service2.setUuid("uuid-service-2");
-        service2.setOriginDealership(origin1); // Mismo origen!
-        service2.setDealership(dest1); // Mismo destino!
+        service2.setOriginDealership(origin1);
+        service2.setDealership(dest1);
 
         when(serviceDeliveryPort.findByUuidActive("uuid-service-1")).thenReturn(service1);
         when(serviceDeliveryPort.findByUuidActive("uuid-service-2")).thenReturn(service2);
@@ -161,17 +161,14 @@ class OptimizeDeliveriesRouteUseCaseTest {
         assertNotNull(deliveryRoute);
         List<DeliveryRouteStep> steps = deliveryRoute.getSteps();
 
-        // Debe haber 4 pasos en total (2 PICKUPs y 2 DELIVERYs)
         assertEquals(4, steps.size());
 
-        // Verificamos que los dos PICKUP tengan el mismo número de orden (mismo paso de parada lógico)
         DeliveryRouteStep step0 = steps.get(0);
         DeliveryRouteStep step1 = steps.get(1);
         assertEquals(StepAction.PICKUP, step0.getAction());
         assertEquals(StepAction.PICKUP, step1.getAction());
         assertEquals(step0.getOrder(), step1.getOrder());
 
-        // Verificamos que los dos DELIVERY tengan el mismo número de orden
         DeliveryRouteStep step2 = steps.get(2);
         DeliveryRouteStep step3 = steps.get(3);
         assertEquals(StepAction.DELIVERY, step2.getAction());
