@@ -9,7 +9,6 @@ import app.adapter.out.persistence.entities.EmployeeEntity;
 import app.adapter.out.persistence.entities.PlateEntity;
 import app.domain.model.enums.PlateType;
 import app.adapter.out.persistence.entities.ServiceDeliveryEntity;
-import app.adapter.out.persistence.entities.StatusHistoryEntity;
 import app.domain.model.enums.Status;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -87,17 +86,16 @@ class MonitoringControllerIntegrationTest extends AbstractIntegrationTest {
         service.setCreatedAt(LocalDateTime.now());
         entityManager.persist(service);
 
-        StatusHistoryEntity history = new StatusHistoryEntity();
-        history.setServiceDelivery(service);
-        history.setNewStatus(Status.DELIVERED);
-        history.setChangeDate(LocalDateTime.now());
-        history.setChangedBy(messenger);
-        history.setDeliveryLatitude(4.0);
-        history.setDeliveryLongitude(-74.0);
-        entityManager.persist(history);
-
-        service.getHistory().add(history);
-        entityManager.merge(service);
+        app.adapter.out.persistence.entities.TimelineEventEntity timelineEvent = new app.adapter.out.persistence.entities.TimelineEventEntity();
+        timelineEvent.setMessengerId(messenger.getIdEmployee());
+        timelineEvent.setEventDate(LocalDate.now());
+        timelineEvent.setTimestamp(LocalDateTime.now());
+        timelineEvent.setStatus(Status.DELIVERED.name());
+        timelineEvent.setPlateNumber("MON123");
+        timelineEvent.setDealershipName("Dealership Monitoring Test");
+        timelineEvent.setChangedByName("Test Messenger");
+        timelineEvent.setChangedByRole("MESSENGER");
+        entityManager.persist(timelineEvent);
 
         entityManager.flush();
 
@@ -106,8 +104,7 @@ class MonitoringControllerIntegrationTest extends AbstractIntegrationTest {
         mockMvc.perform(get("/monitoring/messenger/" + messenger.getUuid() + "/activity")
                 .param("date", today))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.dailyStats.total").value(1))
-                .andExpect(jsonPath("$.dailyStats.delivered").value(1))
+                .andExpect(jsonPath("$.timeline").isArray())
                 .andExpect(jsonPath("$.timeline[0].status").value("DELIVERED"));
     }
 

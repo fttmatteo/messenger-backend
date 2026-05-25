@@ -14,6 +14,8 @@ public interface LocationPort {
 
     Route calculateOptimalRoute(Location origin, List<Location> stops);
 
+    Route calculateRouteWithWaypoints(Location origin, List<Location> stops);
+
     Double calculateDistance(Location from, Location to);
 
     String reverseGeocode(Location location);

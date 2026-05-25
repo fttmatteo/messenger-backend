@@ -1,4 +1,4 @@
-package app.adapter.in.rest.whatsapp;
+package app.adapter.in.rest.system;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -8,23 +8,13 @@ import java.util.List;
  */
 public class MessengerActivityResponse {
 
-    private DailyStats dailyStats;
     private List<ActivityEvent> timeline;
 
     public MessengerActivityResponse() {
     }
 
-    public MessengerActivityResponse(DailyStats dailyStats, List<ActivityEvent> timeline) {
-        this.dailyStats = dailyStats;
+    public MessengerActivityResponse(List<ActivityEvent> timeline) {
         this.timeline = timeline;
-    }
-
-    public DailyStats getDailyStats() {
-        return dailyStats;
-    }
-
-    public void setDailyStats(DailyStats dailyStats) {
-        this.dailyStats = dailyStats;
     }
 
     public List<ActivityEvent> getTimeline() {
@@ -35,77 +25,7 @@ public class MessengerActivityResponse {
         this.timeline = timeline;
     }
 
-    /**
-     * Estadísticas diarias del mensajero.
-     */
-    public static class DailyStats {
-        private int assigned;
-        private int delivered;
-        private int returned;
-        private int canceled;
-        private int pending;
-        private int total;
 
-        public DailyStats() {
-        }
-
-        public DailyStats(int assigned, int delivered, int returned, int canceled, int pending, int total) {
-            this.assigned = assigned;
-            this.delivered = delivered;
-            this.returned = returned;
-            this.canceled = canceled;
-            this.pending = pending;
-            this.total = total;
-        }
-
-        public int getAssigned() {
-            return assigned;
-        }
-
-        public void setAssigned(int assigned) {
-            this.assigned = assigned;
-        }
-
-        public int getDelivered() {
-            return delivered;
-        }
-
-        public void setDelivered(int delivered) {
-            this.delivered = delivered;
-        }
-
-        public int getReturned() {
-            return returned;
-        }
-
-        public void setReturned(int returned) {
-            this.returned = returned;
-        }
-
-        public int getCanceled() {
-            return canceled;
-        }
-
-        public void setCanceled(int canceled) {
-            this.canceled = canceled;
-        }
-
-        public int getPending() {
-            return pending;
-        }
-
-        public void setPending(int pending) {
-            this.pending = pending;
-        }
-
-        public int getTotal() {
-            return total;
-        }
-
-        public void setTotal(int total) {
-            this.total = total;
-        }
-    }
 
     /**
      * Evento de actividad para la línea de tiempo.

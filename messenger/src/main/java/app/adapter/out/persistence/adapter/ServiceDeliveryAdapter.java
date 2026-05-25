@@ -172,17 +172,6 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
 
 
 
-    /**
-     * Busca servicios de un mensajero que tengan actividad en una fecha específica con paginación.
-     */
-    @Override
-    public Page<ServiceDelivery> findByMessengerAndDate(Long messengerId, java.time.LocalDate date, Pageable pageable) {
-        LocalDateTime startOfDay = date.atStartOfDay();
-        LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
-
-        return repository.findByMessengerAndDate(messengerId, startOfDay, endOfDay, pageable)
-                .map(mapper::toDomain);
-    }
 
     /**
      * Busca servicios por número de placa filtrado por concesionario con paginación.

@@ -30,14 +30,13 @@ public interface ServiceDeliveryPort {
         Page<ServiceDelivery> findByMessengerPaginated(Long messengerId, String keyword, Boolean deleted,
                         List<app.domain.model.enums.Status> statuses, Pageable pageable);
 
+        Page<ServiceDelivery> findByPlateAndDealershipPaginated(String plateNumber, Long dealershipId, Pageable pageable);
+
         List<ServiceDelivery> findDeletedExpiredBefore(LocalDateTime date);
 
         void hardDeleteById(Long idServiceDelivery);
 
         int hardDeleteAllDeleted();
-        Page<ServiceDelivery> findByMessengerAndDate(Long messengerId, java.time.LocalDate date, Pageable pageable);
-
-        Page<ServiceDelivery> findByPlateAndDealershipPaginated(String plateNumber, Long dealershipId, Pageable pageable);
 
         Page<ServiceDelivery> findByDealershipIdAndStatusesPaginated(Long dealershipId,
                         List<app.domain.model.enums.Status> statuses, Pageable pageable);

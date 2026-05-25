@@ -1,6 +1,5 @@
 package app.infrastructure.security;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -23,7 +22,7 @@ class SecurityHeadersIntegrationTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("Debe contener cabeceras de seguridad")
     void shouldContainSecurityHeaders() throws Exception {
-        mockMvc.perform(get("/settings/status-colors"))
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/auth/logout"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate"))
                 .andExpect(header().string("X-Content-Type-Options", "nosniff"))
