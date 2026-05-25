@@ -168,6 +168,7 @@ messenger/
 │   │       ├── persistence/             # Adaptadores JPA
 │   │       │   ├── adapter/             # Implementación de Puertos JPA
 │   │       │   ├── entities/            # Entidades JPA
+│   │       │   ├── listener/            # Listeners de eventos de dominio
 │   │       │   ├── mapper/              # Mappers de Entidad a Dominio
 │   │       │   └── repository/          # Interfaces Spring Data JPA
 │   │       ├── security/                # JWT Adapter
@@ -351,12 +352,7 @@ docker run -e SPRING_PROFILES_ACTIVE=local
 > - **Imágenes**: Máx 10MB (WebP)
 > - **Firmas (Estáticas)**: Máx 2MB (WebP)
 
-### Configuraciones del Sistema (`/settings`) - Solo ADMIN
 
-| Método | Endpoint                  | Descripción                                    |
-| ------ | ------------------------- | ---------------------------------------------- |
-| `GET`  | `/settings/status-colors` | Obtener configuración de colores de estados    |
-| `PUT`  | `/settings/status-colors` | Actualizar configuración de colores de estados |
 
 ### Ubicaciones y Rutas (`/locations`)
 
@@ -385,11 +381,11 @@ docker run -e SPRING_PROFILES_ACTIVE=local
 | `GET`  | `/tracking/history/pageable/{uuid}`| Obtener historial de ubicaciones con **paginación**       |
 | `GET`  | `/tracking/service/{uuid}`        | Obtener historial para un servicio específico              |
 
-### Monitoreo (`/monitoring`) - Solo ADMIN
+### Monitoreo y Actividad (`/monitoring`) - Solo ADMIN
 
 | Método | Endpoint                              | Descripción                                            |
 | ------ | ------------------------------------- | ------------------------------------------------------ |
-| `GET`  | `/monitoring/messenger/{uuid}/activity` | Línea de tiempo y estadísticas diarias de un transportista |
+| `GET`  | `/monitoring/messenger/{messengerUuid}/activity` | Línea de tiempo y estadísticas diarias de un transportista |
 
 ---
 
@@ -480,10 +476,18 @@ erDiagram
         LocalDateTime recorded_at
     }
 
-    system_settings {
-        String setting_key PK
-        String setting_value
-        LocalDateTime updated_at
+    messenger_timeline_events {
+        Long id PK
+        Long messenger_id FK
+        LocalDate event_date
+        LocalDateTime timestamp
+        String status
+        String plate_number
+        String dealership_name
+        Double latitude
+        Double longitude
+        String changed_by_name
+        String changed_by_role
     }
 
     deleted_services {
@@ -573,6 +577,7 @@ erDiagram
     employees ||--o{ tracking_history : "tracked"
     service_deliveries ||--o{ tracking_history : "route"
     dealerships ||--o{ wa_sessions : "authorized"
+    employees ||--o{ messenger_timeline_events : "has_timeline"
 ```
 
 ### Enums
