@@ -4,7 +4,7 @@
 
 # Messenger Backend API
 
-<img src="https://img.shields.io/badge/Version-3.0.2-blue.svg" alt="Version">
+<img src="https://img.shields.io/badge/Version-3.0.3-blue.svg" alt="Version">
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.14-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
@@ -168,6 +168,7 @@ messenger/
 │   │       ├── persistence/             # JPA Adapters
 │   │       │   ├── adapter/             # JPA Port Implementations
 │   │       │   ├── entities/            # JPA Entities
+│   │       │   ├── listener/            # Domain event listeners
 │   │       │   ├── mapper/              # Entity-to-Domain Mappers
 │   │       │   └── repository/          # Spring Data JPA Repositories
 │   │       ├── security/                # JWT Adapter
@@ -352,12 +353,7 @@ docker run -e SPRING_PROFILES_ACTIVE=local
 > - **Images**: Max 10MB (WebP)
 > - **Signatures (Static)**: Max 2MB (WebP)
 
-### System Settings (`/settings`) - ADMIN only
 
-| Method | Endpoint                  | Description                       |
-| ------ | ------------------------- | --------------------------------- |
-| `GET`  | `/settings/status-colors` | Get status color configuration    |
-| `PUT`  | `/settings/status-colors` | Update status color configuration |
 
 ### Locations & Routes (`/locations`)
 
@@ -386,11 +382,11 @@ docker run -e SPRING_PROFILES_ACTIVE=local
 | `GET`  | `/tracking/history/pageable/{uuid}`| Get location history with **pagination**          |
 | `GET`  | `/tracking/service/{uuid}`        | Get history for a specific service                |
 
-### Monitoring (`/monitoring`) - ADMIN only
+### Monitoring & Activity (`/monitoring`) - ADMIN only
 
 | Method | Endpoint                              | Description                                         |
 | ------ | ------------------------------------- | --------------------------------------------------- |
-| `GET`  | `/monitoring/messenger/{uuid}/activity` | Get daily activity timeline + stats for a carrier |
+| `GET`  | `/monitoring/messenger/{messengerUuid}/activity` | Get daily activity timeline + stats for a carrier |
 
 ---
 
@@ -481,10 +477,18 @@ erDiagram
         LocalDateTime recorded_at
     }
 
-    system_settings {
-        String setting_key PK
-        String setting_value
-        LocalDateTime updated_at
+    messenger_timeline_events {
+        Long id PK
+        Long messenger_id FK
+        LocalDate event_date
+        LocalDateTime timestamp
+        String status
+        String plate_number
+        String dealership_name
+        Double latitude
+        Double longitude
+        String changed_by_name
+        String changed_by_role
     }
 
     deleted_services {
@@ -574,6 +578,7 @@ erDiagram
     employees ||--o{ tracking_history : "tracked"
     service_deliveries ||--o{ tracking_history : "route"
     dealerships ||--o{ wa_sessions : "authorized"
+    employees ||--o{ messenger_timeline_events : "has_timeline"
 ```
 
 ### Enums

@@ -66,8 +66,10 @@ public class OptimizeDeliveriesRouteUseCase {
         Set<String> pickedUpServices = new HashSet<>();
         Set<String> deliveredServices = new HashSet<>();
 
-        int orderCounter = 1;
+        int orderCounter = 0;
         Location currentLoc = currentPos;
+        Long lastDealershipId = null;
+        StepAction lastAction = null;
 
         while (deliveredServices.size() < activeServices.size()) {
             ServiceDelivery nextService = null;
@@ -106,6 +108,16 @@ public class OptimizeDeliveriesRouteUseCase {
                 break;
             }
 
+            Long currentDealershipId = (nextAction == StepAction.PICKUP) ?
+                    nextService.getOriginDealership().getIdDealership() :
+                    nextService.getDealership().getIdDealership();
+
+            if (!Objects.equals(lastDealershipId, currentDealershipId) || lastAction != nextAction) {
+                orderCounter++;
+                lastDealershipId = currentDealershipId;
+                lastAction = nextAction;
+            }
+
             String uuid = nextService.getUuid();
             if (nextAction == StepAction.PICKUP) {
                 pickedUpServices.add(uuid);
@@ -115,7 +127,7 @@ public class OptimizeDeliveriesRouteUseCase {
                         nextService.getOriginDealership().getIdDealership(),
                         nextService.getOriginDealership().getName(),
                         nextTargetLocation,
-                        orderCounter++
+                        orderCounter
                 ));
             } else {
                 deliveredServices.add(uuid);
@@ -125,7 +137,7 @@ public class OptimizeDeliveriesRouteUseCase {
                         nextService.getDealership().getIdDealership(),
                         nextService.getDealership().getName(),
                         nextTargetLocation,
-                        orderCounter++
+                        orderCounter
                 ));
             }
 
