@@ -133,8 +133,13 @@ public class OptimizeDeliveriesRouteUseCase {
         }
 
         List<Location> orderedLocations = new ArrayList<>();
+        Location lastAddedLocation = null;
         for (DeliveryRouteStep step : steps) {
-            orderedLocations.add(step.getLocation());
+            Location stepLoc = step.getLocation();
+            if (lastAddedLocation == null || !lastAddedLocation.equals(stepLoc)) {
+                orderedLocations.add(stepLoc);
+                lastAddedLocation = stepLoc;
+            }
         }
 
         Route routeDetails = locationPort.calculateRouteWithWaypoints(currentPos, orderedLocations);

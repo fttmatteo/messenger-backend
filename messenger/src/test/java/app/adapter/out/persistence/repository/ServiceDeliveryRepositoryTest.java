@@ -9,7 +9,6 @@ import app.adapter.out.persistence.entities.DealershipEntity;
 import app.adapter.out.persistence.entities.EmployeeEntity;
 import app.adapter.out.persistence.entities.PlateEntity;
 import app.adapter.out.persistence.entities.ServiceDeliveryEntity;
-import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,9 +20,6 @@ import app.support.AbstractIntegrationTest;
 @Transactional
 @DisplayName("Pruebas unitarias de ServiceDeliveryRepository")
 class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
-
-    @Autowired
-    private EntityManager entityManager;
 
     @Autowired
     private ServiceDeliveryRepository repository;
@@ -39,20 +35,6 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
 
 
 
-    private DealershipEntity originDealership;
-
-    private void createAndPersistService(EmployeeEntity messenger, DealershipEntity dealership, PlateEntity plate,
-            Status status, LocalDateTime createdAt) {
-        ServiceDeliveryEntity service = new ServiceDeliveryEntity();
-        service.setMessenger(messenger);
-        service.setDealership(dealership);
-        service.setOriginDealership(originDealership);
-        service.setPlate(plate);
-        service.setCurrentStatus(status);
-        service.setCreatedAt(createdAt);
-        service.setDeleted(false);
-        entityManager.persist(service);
-    }
 
     private EmployeeEntity createEmployee(String document, String name) {
         EmployeeEntity e = new EmployeeEntity();
@@ -79,69 +61,6 @@ class ServiceDeliveryRepositoryTest extends AbstractIntegrationTest {
         return p;
     }
 
-    @Test
-    @DisplayName("Debe buscar servicios por mensajero y fecha")
-
-    void shouldFindServicesByMessengerAndDate() {
-        EmployeeEntity messenger = createEmployee("888888", "Target Messenger");
-        entityManager.persist(messenger);
-
-        EmployeeEntity otherMessenger = createEmployee("777777", "Other Messenger");
-        entityManager.persist(otherMessenger);
-
-        DealershipEntity dealership = createDealership("Target Dealer");
-        entityManager.persist(dealership);
-
-        originDealership = createDealership("Origin Dealer");
-        entityManager.persist(originDealership);
-
-        PlateEntity plate = createPlate("CHASIS0002");
-        entityManager.persist(plate);
-
-        LocalDateTime targetDate = LocalDateTime.of(2025, 1, 15, 10, 0);
-        LocalDateTime otherDate = LocalDateTime.of(2025, 1, 16, 10, 0);
-
-        createAndPersistService(messenger, dealership, plate, Status.ASSIGNED, targetDate);
-
-        ServiceDeliveryEntity serviceWithHistory = new ServiceDeliveryEntity();
-        serviceWithHistory.setMessenger(messenger);
-        serviceWithHistory.setDealership(dealership);
-        serviceWithHistory.setOriginDealership(originDealership);
-        serviceWithHistory.setPlate(plate);
-        serviceWithHistory.setCurrentStatus(Status.DELIVERED);
-        serviceWithHistory.setCreatedAt(otherDate);
-        serviceWithHistory.setDeleted(false);
-        entityManager.persist(serviceWithHistory);
-
-        app.adapter.out.persistence.entities.StatusHistoryEntity history = new app.adapter.out.persistence.entities.StatusHistoryEntity();
-        history.setServiceDelivery(serviceWithHistory);
-        history.setNewStatus(Status.DELIVERED);
-        history.setChangeDate(targetDate);
-        history.setChangedBy(messenger);
-        history.setDeliveryLatitude(1.0);
-        history.setDeliveryLongitude(1.0);
-        entityManager.persist(history);
-
-        serviceWithHistory.getHistory().add(history);
-        entityManager.merge(serviceWithHistory);
-
-        createAndPersistService(messenger, dealership, plate, Status.PENDING, otherDate);
-
-        createAndPersistService(otherMessenger, dealership, plate, Status.ASSIGNED, targetDate);
-
-        entityManager.flush();
-        entityManager.clear();
-
-        org.springframework.data.domain.Page<ServiceDeliveryEntity> results = repository.findByMessengerAndDate(
-                messenger.getIdEmployee(),
-                targetDate.toLocalDate().atStartOfDay(),
-                targetDate.toLocalDate().plusDays(1).atStartOfDay(),
-                org.springframework.data.domain.PageRequest.of(0, 10));
-
-        assertThat(results.getContent()).hasSize(2);
-        assertThat(results.getContent()).extracting(s -> s.getMessenger().getIdEmployee())
-                .containsOnly(messenger.getIdEmployee());
-    }
 
     @Test
     @DisplayName("Debe buscar por palabras clave usando texto completo")

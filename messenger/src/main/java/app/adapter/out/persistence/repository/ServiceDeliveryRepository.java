@@ -124,20 +124,6 @@ public interface ServiceDeliveryRepository extends JpaRepository<ServiceDelivery
 
 
 
-  @EntityGraph(attributePaths = { "plate", "dealership", "messenger" })
-  @Query("SELECT DISTINCT s FROM ServiceDeliveryEntity s LEFT JOIN s.history h " +
-      "WHERE s.messenger.idEmployee = :messengerId " +
-      "AND s.deleted = false " +
-      "AND (" +
-      "   (s.createdAt >= :startOfDay AND s.createdAt < :endOfDay) " +
-      "   OR " +
-      "   (h.changeDate >= :startOfDay AND h.changeDate < :endOfDay) " +
-      ")")
-  Page<ServiceDeliveryEntity> findByMessengerAndDate(
-      @Param("messengerId") Long messengerId,
-      @Param("startOfDay") LocalDateTime startOfDay,
-      @Param("endOfDay") LocalDateTime endOfDay,
-      Pageable pageable);
 
   @EntityGraph(attributePaths = { "plate", "dealership", "messenger" })
   Page<ServiceDeliveryEntity> findByPlate_PlateNumberAndDealership_IdDealershipAndDeletedFalse(

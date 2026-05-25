@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Representa un servicio de entrega de placa vehicular.
+ * Representa un servicio de entrega de chasis vehicular.
  * Contiene la información del vehículo, destino, mensajero asignado e historial
  * de estados.
  */
