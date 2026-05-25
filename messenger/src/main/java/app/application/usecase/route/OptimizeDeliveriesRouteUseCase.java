@@ -118,27 +118,38 @@ public class OptimizeDeliveriesRouteUseCase {
                 lastAction = nextAction;
             }
 
-            String uuid = nextService.getUuid();
             if (nextAction == StepAction.PICKUP) {
-                pickedUpServices.add(uuid);
-                steps.add(new DeliveryRouteStep(
-                        uuid,
-                        StepAction.PICKUP,
-                        nextService.getOriginDealership().getIdDealership(),
-                        nextService.getOriginDealership().getName(),
-                        nextTargetLocation,
-                        orderCounter
-                ));
+                for (ServiceDelivery s : activeServices) {
+                    String uuid = s.getUuid();
+                    if (!pickedUpServices.contains(uuid) &&
+                            Objects.equals(s.getOriginDealership().getIdDealership(), currentDealershipId)) {
+                        pickedUpServices.add(uuid);
+                        steps.add(new DeliveryRouteStep(
+                                uuid,
+                                StepAction.PICKUP,
+                                currentDealershipId,
+                                s.getOriginDealership().getName(),
+                                s.getOriginDealership().getLocation(),
+                                orderCounter
+                        ));
+                    }
+                }
             } else {
-                deliveredServices.add(uuid);
-                steps.add(new DeliveryRouteStep(
-                        uuid,
-                        StepAction.DELIVERY,
-                        nextService.getDealership().getIdDealership(),
-                        nextService.getDealership().getName(),
-                        nextTargetLocation,
-                        orderCounter
-                ));
+                for (ServiceDelivery s : activeServices) {
+                    String uuid = s.getUuid();
+                    if (pickedUpServices.contains(uuid) && !deliveredServices.contains(uuid) &&
+                            Objects.equals(s.getDealership().getIdDealership(), currentDealershipId)) {
+                        deliveredServices.add(uuid);
+                        steps.add(new DeliveryRouteStep(
+                                uuid,
+                                StepAction.DELIVERY,
+                                currentDealershipId,
+                                s.getDealership().getName(),
+                                s.getDealership().getLocation(),
+                                orderCounter
+                        ));
+                    }
+                }
             }
 
             currentLoc = nextTargetLocation;

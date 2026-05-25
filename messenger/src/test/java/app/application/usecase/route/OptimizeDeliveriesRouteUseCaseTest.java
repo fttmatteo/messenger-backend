@@ -120,4 +120,59 @@ class OptimizeDeliveriesRouteUseCaseTest {
             optimizeDeliveriesRoute.execute(0.0, 0.0, List.of("invalid-uuid"))
         );
     }
+
+    @Test
+    @DisplayName("Debe agrupar servicios con el mismo origen en un mismo paso de parada")
+    void shouldGroupServicesWithSameOriginCorrectly() {
+        Dealership origin1 = new Dealership();
+        origin1.setIdDealership(1L);
+        origin1.setName("Concesionario A");
+        origin1.setLatitude(1.0);
+        origin1.setLongitude(1.0);
+        origin1.setIsGeolocated(true);
+
+        Dealership dest1 = new Dealership();
+        dest1.setIdDealership(2L);
+        dest1.setName("Destino A");
+        dest1.setLatitude(2.0);
+        dest1.setLongitude(2.0);
+        dest1.setIsGeolocated(true);
+
+        ServiceDelivery service1 = new ServiceDelivery();
+        service1.setUuid("uuid-service-1");
+        service1.setOriginDealership(origin1);
+        service1.setDealership(dest1);
+
+        ServiceDelivery service2 = new ServiceDelivery();
+        service2.setUuid("uuid-service-2");
+        service2.setOriginDealership(origin1);
+        service2.setDealership(dest1);
+
+        when(serviceDeliveryPort.findByUuidActive("uuid-service-1")).thenReturn(service1);
+        when(serviceDeliveryPort.findByUuidActive("uuid-service-2")).thenReturn(service2);
+
+        Location start = new Location(0.0, 0.0);
+        Route expectedRoute = new Route(start, dest1.getLocation(), Collections.emptyList(), 10000.0, 600L, "polyline-test");
+
+        when(locationPort.calculateRouteWithWaypoints(any(Location.class), anyList())).thenReturn(expectedRoute);
+
+        DeliveryRoute deliveryRoute = optimizeDeliveriesRoute.execute(0.0, 0.0, List.of("uuid-service-1", "uuid-service-2"));
+
+        assertNotNull(deliveryRoute);
+        List<DeliveryRouteStep> steps = deliveryRoute.getSteps();
+
+        assertEquals(4, steps.size());
+
+        DeliveryRouteStep step0 = steps.get(0);
+        DeliveryRouteStep step1 = steps.get(1);
+        assertEquals(StepAction.PICKUP, step0.getAction());
+        assertEquals(StepAction.PICKUP, step1.getAction());
+        assertEquals(step0.getOrder(), step1.getOrder());
+
+        DeliveryRouteStep step2 = steps.get(2);
+        DeliveryRouteStep step3 = steps.get(3);
+        assertEquals(StepAction.DELIVERY, step2.getAction());
+        assertEquals(StepAction.DELIVERY, step3.getAction());
+        assertEquals(step2.getOrder(), step3.getOrder());
+    }
 }
