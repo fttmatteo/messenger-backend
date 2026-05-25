@@ -3,6 +3,8 @@ package app.adapter.in.rest.location;
 import app.adapter.in.rest.tracking.RouteResponse;
 import app.domain.model.Location;
 import app.domain.model.Route;
+import app.domain.model.DeliveryRoute;
+import app.domain.model.DeliveryRouteStep;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +62,41 @@ public class LocationResponseMapper {
         response.setDurationSeconds(route.getDurationSeconds());
         response.setDurationFormatted(formatDuration(route.getDurationSeconds()));
         response.setPolyline(route.getPolyline());
+
+        return response;
+    }
+
+    public OptimizeDeliveriesResponse toOptimizeDeliveriesResponse(DeliveryRoute deliveryRoute) {
+        if (deliveryRoute == null) {
+            return null;
+        }
+
+        OptimizeDeliveriesResponse response = new OptimizeDeliveriesResponse();
+
+        List<OptimizeDeliveriesResponse.DeliveryRouteStepResponse> stepResponses = new ArrayList<>();
+        if (deliveryRoute.getSteps() != null) {
+            for (DeliveryRouteStep step : deliveryRoute.getSteps()) {
+                stepResponses.add(new OptimizeDeliveriesResponse.DeliveryRouteStepResponse(
+                        step.getServiceUuid(),
+                        step.getAction().name(),
+                        step.getDealershipId(),
+                        step.getDealershipName(),
+                        step.getLocation().getLatitude(),
+                        step.getLocation().getLongitude(),
+                        step.getOrder()
+                ));
+            }
+        }
+        response.setSteps(stepResponses);
+
+        Route route = deliveryRoute.getRouteDetails();
+        if (route != null) {
+            response.setDistanceMeters(route.getDistanceMeters());
+            response.setDistanceKilometers(route.getDistanceKilometers());
+            response.setDurationSeconds(route.getDurationSeconds());
+            response.setDurationFormatted(formatDuration(route.getDurationSeconds()));
+            response.setPolyline(route.getPolyline());
+        }
 
         return response;
     }

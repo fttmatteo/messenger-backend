@@ -131,6 +131,48 @@ public class GoogleMapsAdapter implements LocationPort {
     }
 
     /**
+     * Calcula una ruta directa con múltiples paradas preservando su orden original.
+     */
+    @Override
+    public Route calculateRouteWithWaypoints(Location origin, List<Location> stops) {
+        if (stops == null || stops.isEmpty()) {
+            throw new GeolocationException("Debe proporcionar al menos una parada");
+        }
+
+        try {
+            Location destination = stops.get(stops.size() - 1);
+            List<Location> waypoints = stops.size() > 1 ? stops.subList(0, stops.size() - 1) : List.of();
+
+            DirectionsApiRequest request = DirectionsApi.newRequest(context)
+                    .origin(mapper.toLatLng(origin))
+                    .destination(mapper.toLatLng(destination))
+                    .mode(TravelMode.DRIVING)
+                    .language("es")
+                    .optimizeWaypoints(false);
+
+            if (!waypoints.isEmpty()) {
+                String[] waypointStrings = mapper.toWaypointStrings(waypoints);
+                request.waypoints(waypointStrings);
+            }
+
+            DirectionsResult result = request.await();
+
+            if (result == null || result.routes == null || result.routes.length == 0) {
+                throw new GeolocationException(
+                        "No se pudo calcular la ruta con paradas");
+            }
+
+            return mapper.toRoute(result);
+        } catch (GeolocationException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Error calculando ruta con paradas: {}", e.getMessage());
+            throw new GeolocationException(
+                    "Error al calcular la ruta con paradas: " + e.getMessage());
+        }
+    }
+
+    /**
      * Calcula la distancia en metros entre dos ubicaciones utilizando Distance
      * Matrix API.
      */
@@ -155,6 +197,7 @@ public class GoogleMapsAdapter implements LocationPort {
         } catch (GeolocationException e) {
             throw e;
         } catch (Exception e) {
+            logger.error("Error al calcular distancia: {}", e.getMessage());
             throw new GeolocationException(
                     "Error al calcular la distancia: " + e.getMessage());
         }

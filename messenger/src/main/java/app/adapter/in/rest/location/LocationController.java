@@ -5,8 +5,10 @@ import app.adapter.in.rest.tracking.DistanceResponse;
 import app.adapter.in.rest.tracking.RouteResponse;
 import app.application.usecase.location.GeocodeDealershipUseCase;
 import app.application.usecase.route.CalculateOptimalRouteUseCase;
+import app.application.usecase.route.OptimizeDeliveriesRouteUseCase;
 import app.domain.model.Location;
 import app.domain.model.Route;
+import app.domain.model.DeliveryRoute;
 import app.domain.ports.LocationPort;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,8 @@ public class LocationController {
     private GeocodeDealershipUseCase geocodeDealership;
     @Autowired
     private CalculateOptimalRouteUseCase calculateOptimalRoute;
+    @Autowired
+    private OptimizeDeliveriesRouteUseCase optimizeDeliveriesRoute;
     @Autowired
     private LocationPort locationPort;
     @Autowired
@@ -55,6 +59,23 @@ public class LocationController {
                 request.getOriginLongitude(),
                 request.getDealershipIds());
         return ResponseEntity.ok(responseMapper.toRouteResponse(route));
+    }
+
+    /**
+     * Calcula la ruta y secuencia óptima de paradas para múltiples entregas
+     * con orígenes y destinos diferentes.
+     */
+    @PostMapping("/route/optimize-services")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<OptimizeDeliveriesResponse> optimizeServicesRoute(
+            @Valid @RequestBody OptimizeDeliveriesRequest request) {
+        org.slf4j.LoggerFactory.getLogger(LocationController.class).info(
+                "Solicitud de optimización de rutas recibida para {} servicios", request.getServiceUuids().size());
+        DeliveryRoute deliveryRoute = optimizeDeliveriesRoute.execute(
+                request.getCurrentLatitude(),
+                request.getCurrentLongitude(),
+                request.getServiceUuids());
+        return ResponseEntity.ok(responseMapper.toOptimizeDeliveriesResponse(deliveryRoute));
     }
 
     /**
