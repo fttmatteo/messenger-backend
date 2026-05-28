@@ -60,8 +60,8 @@ public class WhatsAppTimeoutScheduler {
 
                 logger.info("[Scheduler] Sesión de {} reseteada silenciosamente por inactividad.", LogSanitizer.maskGeneric(session.getPhoneNumber(), 4));
             } catch (Exception e) {
-                logger.error("[Scheduler] Error procesando timeout silencioso para sessionId={} phone={}: {}",
-                        session.getId(), LogSanitizer.maskGeneric(session.getPhoneNumber(), 4), e.getMessage(), e);
+                logger.error("[Scheduler] Error procesando timeout silencioso para phone={}: {}",
+                        LogSanitizer.maskGeneric(session.getPhoneNumber(), 4), e.getMessage(), e);
             }
         }
     }

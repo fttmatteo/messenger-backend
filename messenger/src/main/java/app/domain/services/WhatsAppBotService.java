@@ -494,14 +494,14 @@ public class WhatsAppBotService {
     private String getStatusName(Status status) {
         return switch (status) {
             case PENDING -> "PENDIENTE";
-            case ASSIGNED -> "ASIGNADO";
-            case DELIVERED -> "ENTREGADO";
-            case RETURNED -> "DEVUELTO";
-            case CANCELED -> "CANCELADO";
-            case RESOLVED -> "REVISADO";
-            case FAILED -> "FALLIDO";
-            case DELETED -> "ELIMINADO";
-            case SCHEDULED -> "PROGRAMADO";
+            case ASSIGNED -> "ASIGNADA";
+            case DELIVERED -> "ENTREGADA";
+            case RETURNED -> "DEVUELTA";
+            case CANCELED -> "CANCELADA";
+            case RESOLVED -> "REVISADA";
+            case FAILED -> "FALLIDA";
+            case DELETED -> "ELIMINADA";
+            case SCHEDULED -> "PROGRAMADA";
         };
     }
 
