@@ -190,7 +190,7 @@ messenger/
 │       ├── exception/                   # Global Error Handler
 │       ├── health/                      # Health Indicators (Actuator)
 │       ├── helper/                      # Utilities (File, etc.)
-│       ├── scheduler/                   # Scheduled Jobs (Trash, Timeouts)
+│       ├── scheduler/                   # Scheduled Jobs (Trash, Timeouts, ServiceActivation)
 │       ├── security/                    # Security Filters & Web Config
 │       ├── service/                     # Infrastructure Services
 │       └── storage/                     # Local Utilities (ImageOptimizer)
@@ -318,7 +318,7 @@ docker run -e SPRING_PROFILES_ACTIVE=local
 
 | Method   | Endpoint                         | Description                                                  |
 | -------- | -------------------------------- | ------------------------------------------------------------ |
-| `POST`   | `/services/createService`        | Create service (multipart: image + data)                     |
+| `POST`   | `/services/createService`        | Create service (Supports scheduling with `scheduledAt`)      |
 | `PUT`    | `/services/updateService/{uuid}` | Update status (multipart: status + evidence)                 |
 | `PUT`    | `/services/reassign/{uuid}`      | Reassign to another carrier (ADMIN/CANCELED)               |
 | `GET`    | `/services/findByServiceId/{uuid}`| Get service by UUID                                         |
@@ -434,6 +434,7 @@ erDiagram
         String observation
         Long signature_id FK
         LocalDateTime created_at
+        LocalDateTime scheduled_at
         Boolean deleted
         LocalDateTime deleted_at
     }
@@ -497,6 +498,7 @@ erDiagram
         String observation
         LocalDateTime created_at
         LocalDateTime deleted_at
+        LocalDateTime scheduled_at
 
         Long plate_id
         Long dealership_id
@@ -587,7 +589,7 @@ erDiagram
 | ------------------ | ----------------------------------------------------------------------------------------------------- |
 | **Role**           | `ADMIN`, `MESSENGER`                                                                                  |
 | **PlateType**      | `MOTORCYCLE`                                                                                          |
-| **Status**         | `ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED`, `DELETED`                     |
+| **Status**         | `SCHEDULED`, `ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED`, `DELETED`                     |
 | **PhotoType**      | `EVIDENCE`                                                                                            |
 | **TrackingStatus** | `ACTIVE`, `INACTIVE`, `OFFLINE`                                                                       |
 | **TrackingSource** | `GPS`, `NETWORK`, `MANUAL`                                                                            |
@@ -651,13 +653,20 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 
 > [!NOTE]
 > **Soft Delete (Trash Bin)**
+>
 > Deleted services are moved to a **trash bin** and permanently deleted after **60 days**.
 > Admins can restore services from the trash before permanent deletion.
+
+> [!NOTE]
+> **Scheduled States (`SCHEDULED`)**
+>
+> Services created with a future date (`scheduledAt`) enter the `SCHEDULED` state. An automated background process (`ServiceActivationScheduler`) checks every minute and activates them (changing their state to `ASSIGNED`) once their scheduled date is reached.
 
 ### State Rules
 
 | State       | Carrier                              | Admin                               | Delete   |
 | ----------- | ------------------------------------ | ----------------------------------- | -------- |
+| `SCHEDULED` | -                                    | → `Any state`                       | ✅ Trash |
 | `ASSIGNED`  | → `PENDING`, `DELIVERED`, `RETURNED` | → `Any state`                       | ✅ Trash |
 | `RETURNED`  | → `PENDING`, `DELIVERED`             | → `Any state`                       | ✅ Trash |
 | `PENDING`   | → `DELIVERED`, `RETURNED`            | → `Any state`                       | ✅ Trash |

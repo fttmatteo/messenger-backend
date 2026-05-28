@@ -2,7 +2,7 @@
     "info": {
         "_postman_id": "messenger-api-collection",
         "name": "Messenger API - Backend",
-        "description": "Complete API documentation for the Messenger/Delivery Management System Backend.\n\nVersion: 1.13.3\n\n## Authentication\nThis API uses a **Hybrid Authentication System**:\n- **Web Clients**: Use secure `HttpOnly` Cookies (automatically handled by browsers).\n- **Mobile/API Clients**: Use `Authorization: Bearer {{token}}`.\n\n## Image Optimization\n- **Dual Pipeline**: Supports pre-compressed WebP images from frontend (1280px max) for data saving.\n- **Storage**: All evidences are stored and served in WebP format.\n\n## Roles & Security\n- **ADMIN**: Full access to all modules and user management.\n- **MESSENGER**: Access limited to assigned deliveries and real-time tracking.\n- **Rate Limiting**: 10 req/min for Auth, 100 req/min for general API (managed via Redis).\n\n## Bot Security (WhatsApp)\n- **HMAC-SHA256**: All webhooks are validated using Meta's App Secret.\n- **PIN Protection**: 4-digit PIN required (12h TTL).\n- **Brute Force**: 15min lockout after 3 failed attempts.",
+        "description": "Complete API documentation for the Messenger/Delivery Management System Backend.\n\nVersion: 3.1.1\n\n## Authentication\nThis API uses a **Hybrid Authentication System**:\n- **Web Clients**: Use secure `HttpOnly` Cookies (automatically handled by browsers).\n- **Mobile/API Clients**: Use `Authorization: Bearer {{token}}`.\n\n## Image Optimization\n- **Dual Pipeline**: Supports pre-compressed WebP images from frontend (1280px max) for data saving.\n- **Storage**: All evidences are stored and served in WebP format.\n\n## Scheduled Services\n- Services can be created with a `scheduledAt` date to enter the `SCHEDULED` state.\n- A background cron job automatically activates them to `ASSIGNED` when the date is reached.\n\n## Roles & Security\n- **ADMIN**: Full access to all modules and user management.\n- **MESSENGER**: Access limited to assigned deliveries and real-time tracking.\n- **Rate Limiting**: 10 req/min for Auth, 100 req/min for general API (managed via Redis).\n\n## Bot Security (WhatsApp)\n- **HMAC-SHA256**: All webhooks are validated using Meta's App Secret.\n- **PIN Protection**: 4-digit PIN required (12h TTL).\n- **Brute Force**: 15min lockout after 3 failed attempts.",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "variable": [
@@ -656,6 +656,12 @@
                                     "key": "manualPlateNumber",
                                     "value": "",
                                     "type": "text"
+                                },
+                                {
+                                    "key": "scheduledAt",
+                                    "value": "2026-12-31T23:59:59",
+                                    "type": "text",
+                                    "disabled": true
                                 },
                                 {
                                     "key": "latitude",
