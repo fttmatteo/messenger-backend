@@ -96,8 +96,8 @@ public class WhatsAppNotificationListener {
             case RETURNED: return "DEVUELTA";
             case RESOLVED: return "REVISADA";
             case CANCELED: return "CANCELADA";
-            case FAILED: return "FALLIDO";
-            case DELETED: return "ELIMINADO";
+            case FAILED: return "FALLIDA";
+            case DELETED: return "ELIMINADA";
             default: return status.name();
         }
     }

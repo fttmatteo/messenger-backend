@@ -228,7 +228,7 @@ public class UpdateServiceDeliveryUseCase {
         service.addHistory(history);
 
         ServiceDelivery saved = serviceDeliveryPort.save(service);
-        logger.info("Servicio programado {} activado exitosamente a ASSIGNED por el sistema.", serviceId);
+        logger.info("Servicio programado activado exitosamente a ASSIGNED por el sistema.");
         eventPublisher.publishEvent(new PlateStatusChangedEvent(saved, previousStatus, Status.ASSIGNED));
         return saved;
     }

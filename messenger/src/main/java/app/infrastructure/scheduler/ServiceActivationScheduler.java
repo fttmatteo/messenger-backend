@@ -51,7 +51,7 @@ public class ServiceActivationScheduler {
                 activatedCount++;
             } catch (Exception e) {
                 errorCount++;
-                logger.error("Error activando servicio programado ID {}: {}", service.getIdServiceDelivery(), e.getMessage());
+                logger.error("Error activando servicio programado: {}", e.getMessage());
             }
         }
 
