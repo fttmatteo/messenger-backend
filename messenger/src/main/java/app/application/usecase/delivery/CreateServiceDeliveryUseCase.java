@@ -46,10 +46,20 @@ public class CreateServiceDeliveryUseCase {
 
     /**
      * Crea un nuevo servicio de entrega, asocia el chasis (creándolo si no existe)
-     * y asigna el servicio al transportista y concesionario indicados.
+     * y asigna el servicio al transportista y concesionario indicados (Sobrecarga compatible).
      */
     public ServiceDelivery create(String plateNumber, Long dealershipId, Long originDealershipId,
             Long messengerId, Double latitude, Double longitude)
+            throws Exception {
+        return create(plateNumber, dealershipId, originDealershipId, messengerId, latitude, longitude, null);
+    }
+
+    /**
+     * Crea un nuevo servicio de entrega, asocia el chasis (creándolo si no existe)
+     * y asigna el servicio al transportista y concesionario indicados.
+     */
+    public ServiceDelivery create(String plateNumber, Long dealershipId, Long originDealershipId,
+            Long messengerId, Double latitude, Double longitude, LocalDateTime scheduledAt)
             throws Exception {
 
         String maskedPlate = LogSanitizer.maskPlate(plateNumber);
@@ -101,17 +111,29 @@ public class CreateServiceDeliveryUseCase {
             logger.debug("Chasis {} creada con tipo: {}", maskedPlate, plate.getPlateType());
         }
 
+        if (scheduledAt != null && scheduledAt.isBefore(LocalDateTime.now())) {
+            logger.warn("Fallo al crear servicio para chasis {}: fecha programada es en el pasado.", maskedPlate);
+            throw new app.domain.exception.InputsException("La fecha de programación debe ser en el futuro.");
+        }
+
+        Status initialStatus = scheduledAt != null 
+                ? Status.SCHEDULED 
+                : Status.ASSIGNED;
+
         ServiceDelivery service = new ServiceDelivery();
         service.setPlate(plate);
         service.setDealership(dealership);
         service.setOriginDealership(originDealership);
         service.setMessenger(messenger);
-        service.setCurrentStatus(Status.ASSIGNED);
+        service.setCurrentStatus(initialStatus);
+        if (initialStatus == Status.SCHEDULED) {
+            service.setScheduledAt(scheduledAt);
+        }
         service.setObservation(null);
 
         StatusHistory history = new StatusHistory();
         history.setPreviousStatus(null);
-        history.setNewStatus(Status.ASSIGNED);
+        history.setNewStatus(initialStatus);
         history.setChangeDate(LocalDateTime.now());
         history.setChangedBy(messenger);
         history.setDeliveryLatitude(latitude);
@@ -121,7 +143,7 @@ public class CreateServiceDeliveryUseCase {
 
         ServiceDelivery saved = serviceDeliveryPort.save(service);
 
-        if (latitude != null && longitude != null) {
+        if (initialStatus == Status.ASSIGNED && latitude != null && longitude != null) {
             app.domain.model.TrackingHistory tracking = new app.domain.model.TrackingHistory();
             tracking.setMessengerId(messenger.getIdEmployee());
             tracking.setServiceDeliveryId(saved.getIdServiceDelivery());
@@ -139,9 +161,9 @@ public class CreateServiceDeliveryUseCase {
             logger.debug("Ubicación de seguimiento registrada para chasis {}", maskedPlate);
         }
 
-        eventPublisher.publishEvent(new PlateStatusChangedEvent(saved, null, Status.ASSIGNED));
+        eventPublisher.publishEvent(new PlateStatusChangedEvent(saved, null, initialStatus));
 
-        logger.info("Servicio de entrega creado exitosamente para chasis {}.", maskedPlate);
+        logger.info("Servicio de entrega creado exitosamente para chasis {} con estado {}.", maskedPlate, initialStatus);
 
         return saved;
     }

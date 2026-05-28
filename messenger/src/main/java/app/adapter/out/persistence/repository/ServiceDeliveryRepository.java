@@ -140,4 +140,8 @@ public interface ServiceDeliveryRepository extends JpaRepository<ServiceDelivery
   @EntityGraph(attributePaths = { "plate", "dealership", "messenger" })
   Page<ServiceDeliveryEntity> findByCurrentStatusInAndDeletedFalse(
       List<Status> statuses, Pageable pageable);
+
+  @EntityGraph(attributePaths = { "plate", "dealership", "messenger" })
+  List<ServiceDeliveryEntity> findByCurrentStatusAndScheduledAtLessThanEqualAndDeletedFalse(
+      Status currentStatus, LocalDateTime scheduledAt);
 }

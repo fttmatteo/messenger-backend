@@ -202,4 +202,12 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
             .findByDealership_IdDealershipAndCurrentStatusInAndDeletedFalse(dealershipId, statuses, pageable)
             .map(mapper::toDomain);
     }
+
+    @Override
+    public List<ServiceDelivery> findScheduledPendingActivation(LocalDateTime date) {
+        return repository.findByCurrentStatusAndScheduledAtLessThanEqualAndDeletedFalse(
+                app.domain.model.enums.Status.SCHEDULED, date).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
 }

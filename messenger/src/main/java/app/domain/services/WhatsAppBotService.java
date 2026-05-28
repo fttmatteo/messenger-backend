@@ -378,7 +378,11 @@ public class WhatsAppBotService {
         StringBuilder message = new StringBuilder();
         message.append(String.format("🛵 *%s*\n\n", plateNumber));
         message.append(String.format("*ESTADO:* %s %s\n", statusEmoji, statusName));
-        message.append(String.format("⏱️ *Fecha de asignación:* %s\n", s.getCreatedAt() != null ? s.getCreatedAt().format(DATE_FORMAT) : "No disponible"));
+        if (s.getCurrentStatus() == Status.SCHEDULED) {
+            message.append(String.format("⏱️ *Fecha programada:* %s\n", s.getScheduledAt() != null ? s.getScheduledAt().format(DATE_FORMAT) : "No disponible"));
+        } else {
+            message.append(String.format("⏱️ *Fecha de asignación:* %s\n", s.getCreatedAt() != null ? s.getCreatedAt().format(DATE_FORMAT) : "No disponible"));
+        }
 
         if (s.getCurrentStatus() == Status.DELIVERED || s.getCurrentStatus() == Status.RESOLVED) {
             String deliveryDateStr = "No disponible";
@@ -499,6 +503,7 @@ public class WhatsAppBotService {
             case RESOLVED -> "REVISADO";
             case FAILED -> "FALLIDO";
             case DELETED -> "ELIMINADO";
+            case SCHEDULED -> "PROGRAMADO";
         };
     }
 
@@ -512,6 +517,7 @@ public class WhatsAppBotService {
             case RESOLVED -> "✍🏻";
             case FAILED -> "⚠️";
             case DELETED -> "🗑️";
+            case SCHEDULED -> "📅";
         };
     }
 

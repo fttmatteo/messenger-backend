@@ -21,6 +21,7 @@ public class EmployeeRequest {
     @Pattern(regexp = "^\\d{10}$", message = "El teléfono debe tener 10 dígitos")
     private String phone;
 
+    @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
     private String password;
 
     @NotBlank(message = "El rol es requerido")

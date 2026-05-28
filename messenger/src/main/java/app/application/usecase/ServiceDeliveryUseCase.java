@@ -74,13 +74,25 @@ public class ServiceDeliveryUseCase {
         @CacheEvict(value = "service-details", allEntries = true)
     })
     @Transactional(rollbackFor = Exception.class)
-
     public ServiceDelivery createServiceWithManualPlate(String manualPlateNumber, Long dealershipId,
             Long originDealershipId, Long messengerId, Double latitude, Double longitude) throws Exception {
-        
         try {
             ServiceDelivery service = createService.create(manualPlateNumber, dealershipId, originDealershipId,
                     messengerId, latitude, longitude);
+            return service;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+
+    public ServiceDelivery createServiceWithManualPlate(String manualPlateNumber, Long dealershipId,
+            Long originDealershipId, Long messengerId, Double latitude, Double longitude, LocalDateTime scheduledAt) throws Exception {
+        
+        try {
+            ServiceDelivery service = createService.create(manualPlateNumber, dealershipId, originDealershipId,
+                    messengerId, latitude, longitude, scheduledAt);
 
             return service;
         } catch (Exception e) {

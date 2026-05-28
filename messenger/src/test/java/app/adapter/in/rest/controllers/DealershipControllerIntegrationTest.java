@@ -71,6 +71,9 @@ class DealershipControllerIntegrationTest extends AbstractIntegrationTest {
     void shouldDenyCreateForMessenger() throws Exception {
         DealershipRequest request = new DealershipRequest();
         request.setName("Forbidden Dealer");
+        request.setAddress("Calle 123");
+        request.setPhone("3001234567");
+        request.setZone("Norte");
 
         mockMvc.perform(post("/dealerships/createDealership")
                 .with(csrf())

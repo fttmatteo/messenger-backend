@@ -224,4 +224,42 @@ class CreateServiceDeliveryTest {
                 tracking.getLocation().getLongitude().equals(-75.5812) &&
                 tracking.getSource() == app.domain.model.enums.TrackingSource.MANUAL));
     }
+
+    @Test
+    @DisplayName("Debe lanzar excepción si la fecha programada es en el pasado")
+    void shouldThrowExceptionIfScheduledDateIsInPast() {
+        when(employeePort.findById(12345678L)).thenReturn(messenger);
+        when(dealershipPort.findById(1L)).thenReturn(dealership);
+        when(dealershipPort.findById(2L)).thenReturn(dealershipOrigin);
+
+        java.time.LocalDateTime pastDate = java.time.LocalDateTime.now().minusDays(1);
+
+        app.domain.exception.InputsException exception = assertThrows(app.domain.exception.InputsException.class,
+                () -> createServiceDelivery.create("ABC1234567", 1L, 2L, 12345678L, null, null, pastDate));
+
+        assertEquals("La fecha de programación debe ser en el futuro.", exception.getMessage());
+        verify(serviceDeliveryPort, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Debe crear servicio con estado SCHEDULED si se provee fecha futura")
+    void shouldCreateServiceWithScheduledStatusIfFutureDateProvided() throws Exception {
+        when(employeePort.findById(12345678L)).thenReturn(messenger);
+        when(dealershipPort.findById(1L)).thenReturn(dealership);
+        when(dealershipPort.findById(2L)).thenReturn(dealershipOrigin);
+        when(platePort.findByPlateNumber("ABC1234567")).thenReturn(plate);
+
+        java.time.LocalDateTime futureDate = java.time.LocalDateTime.now().plusDays(1);
+
+        app.domain.model.ServiceDelivery savedService = new app.domain.model.ServiceDelivery();
+        savedService.setIdServiceDelivery(100L);
+        savedService.setCurrentStatus(Status.SCHEDULED);
+        when(serviceDeliveryPort.save(any())).thenReturn(savedService);
+
+        createServiceDelivery.create("ABC1234567", 1L, 2L, 12345678L, null, null, futureDate);
+
+        verify(serviceDeliveryPort).save(argThat(service -> 
+                service.getCurrentStatus() == Status.SCHEDULED &&
+                service.getScheduledAt().equals(futureDate)));
+    }
 }

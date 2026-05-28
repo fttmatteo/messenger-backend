@@ -131,4 +131,56 @@ class ServiceDeliveryControllerTest {
         }
     }
 
+    @Nested
+    @DisplayName("Creación de servicios")
+    class CreateServiceTests {
+
+        @Test
+        @DisplayName("Debe parsear scheduledAt y pasar la fecha al caso de uso")
+        void shouldParseScheduledAtAndPassToUseCase() throws Exception {
+            Employee admin = new Employee();
+            admin.setIdEmployee(1L);
+            admin.setRole(Role.ADMIN);
+
+            when(securityHelper.getCurrentUser()).thenReturn(admin);
+
+            app.adapter.in.rest.delivery.ServiceDeliveryCreateRequest mockRequest = 
+                new app.adapter.in.rest.delivery.ServiceDeliveryCreateRequest("1", "2");
+            mockRequest.setOriginDealershipId("2");
+            mockRequest.setManualPlateNumber("ABC1234567");
+            
+            ServiceDeliveryBuilder.ServiceDeliveryCreateData mockData = 
+                new ServiceDeliveryBuilder.ServiceDeliveryCreateData(1L, 2L, 2L);
+            
+            when(builder.buildCreateData(any())).thenReturn(mockData);
+
+            ServiceDelivery mockCreatedService = new ServiceDelivery();
+            mockCreatedService.setIdServiceDelivery(100L);
+            when(serviceDeliveryUseCase.createServiceWithManualPlate(
+                    anyString(), anyLong(), anyLong(), anyLong(), 
+                    any(), any(), any(java.time.LocalDateTime.class)))
+                .thenReturn(mockCreatedService);
+
+            when(responseMapper.toResponse(mockCreatedService)).thenReturn(sampleResponse);
+
+            mockMvc.perform(post("/services/createService")
+                    .param("dealershipId", "1")
+                    .param("originDealershipId", "2")
+                    .param("messengerId", "2")
+                    .param("manualPlateNumber", "ABC1234567")
+                    .param("scheduledAt", "2050-01-01T12:00:00Z"))
+                    .andExpect(status().isCreated());
+
+            verify(serviceDeliveryUseCase).createServiceWithManualPlate(
+                eq("ABC1234567"), 
+                eq(1L), 
+                eq(2L), 
+                eq(2L), 
+                isNull(), 
+                isNull(), 
+                argThat(date -> date != null && date.getYear() == 2050)
+            );
+        }
+    }
+
 }
