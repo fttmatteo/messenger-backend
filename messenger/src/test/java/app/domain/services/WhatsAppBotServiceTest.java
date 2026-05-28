@@ -25,8 +25,7 @@ class WhatsAppBotServiceTest {
     private WhatsAppSessionPort sessionPort;
     @Mock
     private ServiceDeliveryPort searchService;
-    @Mock
-    private LocationPort locationPort;
+
     @Mock
     private StoragePort storagePort;
     @Mock

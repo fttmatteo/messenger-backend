@@ -1,7 +1,7 @@
 package app.infrastructure.scheduler;
 
 import app.domain.model.WhatsAppSession;
-import app.domain.ports.WhatsAppMessagePort;
+
 import app.domain.ports.WhatsAppSessionPort;
 import app.adapter.out.persistence.repository.WhatsAppSessionRepository;
 import app.domain.model.enums.WhatsAppConversationState;
@@ -21,16 +21,15 @@ import static org.mockito.Mockito.*;
 class WhatsAppTimeoutSchedulerTest {
 
     private WhatsAppSessionPort sessionPort;
-    private WhatsAppMessagePort messagePort;
+
     private WhatsAppSessionRepository sessionRepository;
     private WhatsAppTimeoutScheduler scheduler;
 
     @BeforeEach
     void setUp() {
         sessionPort = mock(WhatsAppSessionPort.class);
-        messagePort = mock(WhatsAppMessagePort.class);
         sessionRepository = mock(WhatsAppSessionRepository.class);
-        scheduler = new WhatsAppTimeoutScheduler(sessionPort, messagePort, sessionRepository);
+        scheduler = new WhatsAppTimeoutScheduler(sessionPort, sessionRepository);
     }
 
     @Test
@@ -54,7 +53,7 @@ class WhatsAppTimeoutSchedulerTest {
 
         scheduler.checkInactivityTimeouts();
 
-        verify(messagePort, never()).sendTextMessage(anyString(), anyString());
+
 
         ArgumentCaptor<WhatsAppSession> sessionCaptor = ArgumentCaptor.forClass(WhatsAppSession.class);
         verify(sessionPort, times(2)).updateSession(sessionCaptor.capture());
@@ -80,7 +79,7 @@ class WhatsAppTimeoutSchedulerTest {
 
         scheduler.checkInactivityTimeouts();
 
-        verify(messagePort, never()).sendTextMessage(anyString(), anyString());
+
         verify(sessionPort, never()).updateSession(any());
     }
 
