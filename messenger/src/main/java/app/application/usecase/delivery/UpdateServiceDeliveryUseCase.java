@@ -84,7 +84,7 @@ public class UpdateServiceDeliveryUseCase {
 
         service.setCurrentStatus(newStatus);
 
-        String trimmedObservation = (observation != null && !observation.trim().isEmpty()) ? observation.trim() : null;
+        String trimmedObservation = observation != null && !observation.trim().isEmpty() ? observation.trim() : null;
         service.setObservation(trimmedObservation);
 
         if (signature != null) {
@@ -193,6 +193,9 @@ public class UpdateServiceDeliveryUseCase {
         }
 
         if (userRole == Role.MESSENGER) {
+            if (currentStatus == Status.SCHEDULED) {
+                throw new BusinessException("No tienes permiso para modificar un servicio programado.");
+            }
             if (!MESSENGER_ALLOWED_STATES.contains(newStatus)) {
                 throw new BusinessException(
                         "Como mensajero solo puedes cambiar el estado a: PENDING, DELIVERED o RETURNED. " +
@@ -200,6 +203,34 @@ public class UpdateServiceDeliveryUseCase {
             }
         }
         // ADMIN can change to any state.
+    }
+
+    /**
+     * Activa un servicio programado cambiando su estado a ASSIGNED (ejecutado por el planificador).
+     */
+    public ServiceDelivery activateScheduledService(Long serviceId) throws Exception {
+        ServiceDelivery service = serviceDeliveryPort.findByIdActive(serviceId);
+        if (service == null) {
+            throw new BusinessException("El servicio no existe o está en la papelera.");
+        }
+        if (service.getCurrentStatus() != Status.SCHEDULED) {
+            throw new BusinessException("El servicio no está en estado programado. Estado actual: " + service.getCurrentStatus());
+        }
+
+        Status previousStatus = service.getCurrentStatus();
+        service.setCurrentStatus(Status.ASSIGNED);
+
+        StatusHistory history = new StatusHistory();
+        history.setPreviousStatus(previousStatus);
+        history.setNewStatus(Status.ASSIGNED);
+        history.setChangeDate(LocalDateTime.now());
+        history.setChangedBy(null);
+        service.addHistory(history);
+
+        ServiceDelivery saved = serviceDeliveryPort.save(service);
+        logger.info("Servicio programado {} activado exitosamente a ASSIGNED por el sistema.", serviceId);
+        eventPublisher.publishEvent(new PlateStatusChangedEvent(saved, previousStatus, Status.ASSIGNED));
+        return saved;
     }
 
     public void validateEvidence(Status status, Signature signature, List<Photo> photos, String observation, Role userRole)
@@ -213,10 +244,8 @@ public class UpdateServiceDeliveryUseCase {
             return;
         }
 
-        if (status == Status.DELIVERED) {
-            if (signature == null) {
-                throw new BusinessException("Para marcar como ENTREGADO, la firma de recibido es obligatoria.");
-            }
+        if (status == Status.DELIVERED && signature == null) {
+            throw new BusinessException("Para marcar como ENTREGADO, la firma de recibido es obligatoria.");
         }
     }
 }

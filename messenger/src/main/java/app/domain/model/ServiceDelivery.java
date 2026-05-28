@@ -121,6 +121,7 @@ public class ServiceDelivery {
     private java.time.LocalDateTime createdAt;
     private boolean deleted = false;
     private java.time.LocalDateTime deletedAt;
+    private java.time.LocalDateTime scheduledAt;
 
 
     public java.time.LocalDateTime getCreatedAt() {
@@ -129,6 +130,14 @@ public class ServiceDelivery {
 
     public void setCreatedAt(java.time.LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public java.time.LocalDateTime getScheduledAt() {
+        return scheduledAt;
+    }
+
+    public void setScheduledAt(java.time.LocalDateTime scheduledAt) {
+        this.scheduledAt = scheduledAt;
     }
 
     public boolean isDeleted() {

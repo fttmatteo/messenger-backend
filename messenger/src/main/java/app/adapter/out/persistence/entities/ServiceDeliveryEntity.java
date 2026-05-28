@@ -152,6 +152,9 @@ public class ServiceDeliveryEntity {
     @Column(name = "deleted_at")
     private java.time.LocalDateTime deletedAt;
 
+    @Column(name = "scheduled_at")
+    private java.time.LocalDateTime scheduledAt;
+
 
 
     @PrePersist
@@ -170,6 +173,14 @@ public class ServiceDeliveryEntity {
 
     public void setCreatedAt(java.time.LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public java.time.LocalDateTime getScheduledAt() {
+        return scheduledAt;
+    }
+
+    public void setScheduledAt(java.time.LocalDateTime scheduledAt) {
+        this.scheduledAt = scheduledAt;
     }
 
     public boolean isDeleted() {

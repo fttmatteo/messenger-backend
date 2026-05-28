@@ -1,7 +1,7 @@
 package app.infrastructure.scheduler;
 
 import app.domain.model.WhatsAppSession;
-import app.domain.ports.WhatsAppMessagePort;
+
 import app.domain.ports.WhatsAppSessionPort;
 import app.domain.model.enums.WhatsAppConversationState;
 import app.domain.util.LogSanitizer;
@@ -30,7 +30,7 @@ public class WhatsAppTimeoutScheduler {
     private final WhatsAppSessionPort sessionPort;
     private final WhatsAppSessionRepository sessionRepository;
 
-    public WhatsAppTimeoutScheduler(WhatsAppSessionPort sessionPort, WhatsAppMessagePort messagePort,
+    public WhatsAppTimeoutScheduler(WhatsAppSessionPort sessionPort,
             WhatsAppSessionRepository sessionRepository) {
         this.sessionPort = sessionPort;
         this.sessionRepository = sessionRepository;

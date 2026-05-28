@@ -98,7 +98,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     public Page<ServiceDelivery> findAllPaginated(String keyword, Boolean deleted,
             List<app.domain.model.enums.Status> statuses, Pageable pageable) {
         Page<ServiceDeliveryEntity> entityPage;
-        List<String> statusStrings = (statuses != null && !statuses.isEmpty())
+        List<String> statusStrings = statuses != null && !statuses.isEmpty()
                 ? statuses.stream().map(Enum::name).collect(Collectors.toList())
                 : null;
 
@@ -121,7 +121,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
     public Page<ServiceDelivery> findByMessengerPaginated(Long messengerId, String keyword, Boolean deleted,
             List<app.domain.model.enums.Status> statuses, Pageable pageable) {
         Page<ServiceDeliveryEntity> entityPage;
-        List<String> statusStrings = (statuses != null && !statuses.isEmpty())
+        List<String> statusStrings = statuses != null && !statuses.isEmpty()
                 ? statuses.stream().map(Enum::name).collect(Collectors.toList())
                 : null;
 
@@ -201,5 +201,13 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
         return repository
             .findByDealership_IdDealershipAndCurrentStatusInAndDeletedFalse(dealershipId, statuses, pageable)
             .map(mapper::toDomain);
+    }
+
+    @Override
+    public List<ServiceDelivery> findScheduledPendingActivation(LocalDateTime date) {
+        return repository.findByCurrentStatusAndScheduledAtLessThanEqualAndDeletedFalse(
+                app.domain.model.enums.Status.SCHEDULED, date).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
     }
 }

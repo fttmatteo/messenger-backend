@@ -40,4 +40,6 @@ public interface ServiceDeliveryPort {
 
         Page<ServiceDelivery> findByDealershipIdAndStatusesPaginated(Long dealershipId,
                         List<app.domain.model.enums.Status> statuses, Pageable pageable);
+
+        List<ServiceDelivery> findScheduledPendingActivation(LocalDateTime date);
 }

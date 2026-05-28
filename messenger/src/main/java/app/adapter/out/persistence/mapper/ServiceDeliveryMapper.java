@@ -39,6 +39,7 @@ public class ServiceDeliveryMapper {
         entity.setCreatedAt(serviceDelivery.getCreatedAt());
         entity.setDeleted(serviceDelivery.isDeleted());
         entity.setDeletedAt(serviceDelivery.getDeletedAt());
+        entity.setScheduledAt(serviceDelivery.getScheduledAt());
 
 
         Map<Long, PhotoEntity> existingPhotoCache = new HashMap<>();
@@ -209,6 +210,7 @@ public class ServiceDeliveryMapper {
         serviceDelivery.setCreatedAt(entity.getCreatedAt());
         serviceDelivery.setDeleted(entity.isDeleted());
         serviceDelivery.setDeletedAt(entity.getDeletedAt());
+        serviceDelivery.setScheduledAt(entity.getScheduledAt());
 
 
         return serviceDelivery;

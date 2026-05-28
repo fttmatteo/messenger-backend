@@ -55,8 +55,7 @@ public class UpdateLiveTrackingUseCase {
         if (location != null && location.isValid()) {
             Double accuracy = location.getAccuracy();
 
-            if (accuracy != null && accuracy > MAX_ACCEPTABLE_ACCURACY_METERS) {
-            } else {
+            if (accuracy == null || accuracy <= MAX_ACCEPTABLE_ACCURACY_METERS) {
                 TrackingHistory history = new TrackingHistory();
                 history.setMessengerId(incomingTracking.getMessengerId());
                 history.setLocation(location);

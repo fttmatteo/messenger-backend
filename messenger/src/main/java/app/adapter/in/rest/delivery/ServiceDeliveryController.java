@@ -67,7 +67,8 @@ public class ServiceDeliveryController {
             @RequestParam(value = "messengerId", required = false) String messengerId,
             @RequestParam(value = "manualPlateNumber", required = false) String manualPlateNumber,
             @RequestParam(value = "latitude", required = false) Double latitude,
-            @RequestParam(value = "longitude", required = false) Double longitude) throws Exception {
+            @RequestParam(value = "longitude", required = false) Double longitude,
+            @RequestParam(value = "scheduledAt", required = false) String scheduledAtStr) throws Exception {
 
         Employee currentUser = securityHelper.getCurrentUser();
 
@@ -88,8 +89,22 @@ public class ServiceDeliveryController {
 
         ServiceDeliveryBuilder.ServiceDeliveryCreateData data = builder.buildCreateData(request);
 
-        if (manualPlateNumber == null || manualPlateNumber.isEmpty()) {
+        if (manualPlateNumber == null || manualPlateNumber.trim().isEmpty()) {
             throw new InputsException("El chasis es requerido para crear el servicio.");
+        }
+        if (manualPlateNumber.length() < 10 || manualPlateNumber.length() > 20) {
+            throw new InputsException("El chasis debe tener entre 10 y 20 caracteres.");
+        }
+
+        java.time.LocalDateTime scheduledAt = null;
+        if (scheduledAtStr != null && !scheduledAtStr.trim().isEmpty()) {
+            try {
+                scheduledAt = java.time.OffsetDateTime.parse(scheduledAtStr, java.time.format.DateTimeFormatter.ISO_DATE_TIME)
+                        .atZoneSameInstant(java.time.ZoneId.systemDefault())
+                        .toLocalDateTime();
+            } catch (Exception e) {
+                scheduledAt = java.time.LocalDateTime.parse(scheduledAtStr, java.time.format.DateTimeFormatter.ISO_DATE_TIME);
+            }
         }
         
         ServiceDelivery created = serviceDeliveryUseCase.createServiceWithManualPlate(
@@ -98,7 +113,8 @@ public class ServiceDeliveryController {
                 data.getOriginDealershipId(),
                 data.getMessengerId(),
                 data.getLatitude(),
-                data.getLongitude());
+                data.getLongitude(),
+                scheduledAt);
         
         return ResponseEntity.status(HttpStatus.CREATED).body(responseMapper.toResponse(created));
     }
@@ -206,6 +222,9 @@ public class ServiceDeliveryController {
         Employee currentUser = securityHelper.getCurrentUser();
 
         if (currentUser.getRole() == Role.MESSENGER) {
+            if (service.getCurrentStatus() == app.domain.model.enums.Status.SCHEDULED) {
+                throw new UnauthorizedException("No tienes permiso para ver este servicio");
+            }
             if (service.getMessenger() == null ||
                     !service.getMessenger().getIdEmployee().equals(currentUser.getIdEmployee())) {
                 throw new UnauthorizedException("No tienes permiso para ver este servicio");
@@ -242,8 +261,24 @@ public class ServiceDeliveryController {
 
         if (currentUser.getRole() == Role.MESSENGER) {
             Long messengerId = currentUser.getIdEmployee();
+            List<app.domain.model.enums.Status> finalStatuses;
+            if (statusEnums == null || statusEnums.isEmpty()) {
+                finalStatuses = List.of(
+                    app.domain.model.enums.Status.ASSIGNED,
+                    app.domain.model.enums.Status.PENDING,
+                    app.domain.model.enums.Status.DELIVERED,
+                    app.domain.model.enums.Status.RETURNED,
+                    app.domain.model.enums.Status.CANCELED,
+                    app.domain.model.enums.Status.RESOLVED,
+                    app.domain.model.enums.Status.FAILED
+                );
+            } else {
+                finalStatuses = statusEnums.stream()
+                    .filter(s -> s != app.domain.model.enums.Status.SCHEDULED)
+                    .collect(Collectors.toList());
+            }
             servicePage = serviceDeliveryUseCase.findByMessengerPaginated(
-                    messengerId, page, size, sortBy, sortDirection, search, statusEnums);
+                    messengerId, page, size, sortBy, sortDirection, search, finalStatuses);
         } else {
             servicePage = serviceDeliveryUseCase.findAllPaginated(
                     page, size, sortBy, sortDirection, search, statusEnums);
