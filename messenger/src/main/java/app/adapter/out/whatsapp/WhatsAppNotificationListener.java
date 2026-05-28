@@ -36,7 +36,7 @@ public class WhatsAppNotificationListener {
         app.domain.model.ServiceDelivery service = event.getServiceDelivery();
         Long dealershipId = event.getDealershipId();
         
-        String plateNumber = (service.getPlate() != null && service.getPlate().getPlateNumber() != null) 
+        String plateNumber = service.getPlate() != null && service.getPlate().getPlateNumber() != null 
                 ? service.getPlate().getPlateNumber() 
                 : "Desconocido";
                 

@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import app.domain.model.WhatsAppSession;
 import app.domain.model.enums.Status;
-import app.domain.ports.LocationPort;
 import app.domain.ports.WhatsAppMessagePort;
 import app.domain.ports.WhatsAppSessionPort;
 import app.domain.ports.WhatsAppRateLimitPort;
@@ -47,7 +46,6 @@ public class WhatsAppBotService {
             WhatsAppMessagePort messagePort,
             WhatsAppSessionPort sessionPort,
             ServiceDeliveryPort searchService,
-            LocationPort locationPort,
             StoragePort storagePort,
             WhatsAppRateLimitPort rateLimitPort) {
         this.messagePort = messagePort;
@@ -69,7 +67,7 @@ public class WhatsAppBotService {
                 .orElse(WhatsAppConversationState.AWAITING_PIN);
 
         String maskedFrom = LogSanitizer.maskGeneric(from, 4);
-        String logContent = (currentState == WhatsAppConversationState.AWAITING_PIN && sessionOpt.isEmpty()) ? "****"
+        String logContent = currentState == WhatsAppConversationState.AWAITING_PIN && sessionOpt.isEmpty() ? "****"
                 : LogSanitizer.maskGeneric(text, 2);
         logger.debug("[WhatsApp] Mensaje recibido de {}: {}", maskedFrom, logContent);
 
@@ -159,7 +157,7 @@ public class WhatsAppBotService {
                 
                 if (currentHistoryOpt.isPresent() && currentHistoryOpt.get().getPhotos() != null && !currentHistoryOpt.get().getPhotos().isEmpty()) {
                     List<Photo> photos = currentHistoryOpt.get().getPhotos();
-                    String plateNumber = (s.getPlate() != null && s.getPlate().getPlateNumber() != null) 
+                    String plateNumber = s.getPlate() != null && s.getPlate().getPlateNumber() != null 
                             ? s.getPlate().getPlateNumber() 
                             : "Desconocido";
                     if (photos.size() == 1) {
@@ -175,7 +173,7 @@ public class WhatsAppBotService {
                                 Photo p = photos.get(i);
                                 try (java.io.InputStream photoStream = storagePort.get(p.getPhotoPath())) {
                                     if (photoStream != null) {
-                                        java.util.zip.ZipEntry zipEntry = new java.util.zip.ZipEntry(String.format("%d_Foto_%s.webp", (i + 1), plateNumber));
+                                        java.util.zip.ZipEntry zipEntry = new java.util.zip.ZipEntry(String.format("%d_Foto_%s.webp", i + 1, plateNumber));
                                         zos.putNextEntry(zipEntry);
                                         photoStream.transferTo(zos);
                                         zos.closeEntry();
@@ -360,7 +358,7 @@ public class WhatsAppBotService {
     }
 
     private String formatServiceDetail(ServiceDelivery s) {
-        String plateNumber = (s.getPlate() != null && s.getPlate().getPlateNumber() != null) 
+        String plateNumber = s.getPlate() != null && s.getPlate().getPlateNumber() != null 
                 ? s.getPlate().getPlateNumber() 
                 : "Desconocido";
 

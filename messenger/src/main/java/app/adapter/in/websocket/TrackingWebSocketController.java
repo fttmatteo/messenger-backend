@@ -61,11 +61,7 @@ public class TrackingWebSocketController {
             logger.debug("Update de mensajero filtrado por rate limiting.");
             return;
         }
-        if (request.getLatitude() != null && request.getLongitude() != null) {
-            if (request.getLatitude() == 0 && request.getLongitude() == 0) {
-            } else {
-            }
-        }
+
 
         LiveTracking domainTracking = new LiveTracking();
         domainTracking.setMessengerId(messengerId);

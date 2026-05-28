@@ -56,11 +56,9 @@ public class CookieHandshakeInterceptor implements HandshakeInterceptor {
             if (cookies != null) {
                 logger.debug("Handshake: encontradas {} cookies", cookies.length);
                 for (Cookie cookie : cookies) {
-                    if ("accessToken".equals(cookie.getName())) {
-                        if (!attributes.containsKey("accessToken")) {
-                            attributes.put("accessToken", cookie.getValue());
-                            logger.info("Token accessToken encontrado en cookie y copiado a atributos de sesión");
-                        }
+                    if ("accessToken".equals(cookie.getName()) && !attributes.containsKey("accessToken")) {
+                        attributes.put("accessToken", cookie.getValue());
+                        logger.info("Token accessToken encontrado en cookie y copiado a atributos de sesión");
                     }
                 }
             } else {

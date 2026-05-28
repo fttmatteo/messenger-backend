@@ -84,7 +84,7 @@ public class UpdateServiceDeliveryUseCase {
 
         service.setCurrentStatus(newStatus);
 
-        String trimmedObservation = (observation != null && !observation.trim().isEmpty()) ? observation.trim() : null;
+        String trimmedObservation = observation != null && !observation.trim().isEmpty() ? observation.trim() : null;
         service.setObservation(trimmedObservation);
 
         if (signature != null) {
@@ -244,10 +244,8 @@ public class UpdateServiceDeliveryUseCase {
             return;
         }
 
-        if (status == Status.DELIVERED) {
-            if (signature == null) {
-                throw new BusinessException("Para marcar como ENTREGADO, la firma de recibido es obligatoria.");
-            }
+        if (status == Status.DELIVERED && signature == null) {
+            throw new BusinessException("Para marcar como ENTREGADO, la firma de recibido es obligatoria.");
         }
     }
 }

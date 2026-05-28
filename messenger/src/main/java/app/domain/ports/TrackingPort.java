@@ -24,9 +24,9 @@ public interface TrackingPort {
             LocalDate date,
             Pageable pageable);
 
-    java.util.List<TrackingHistory> getHistoryByService(Long serviceDeliveryId);
+    List<TrackingHistory> getHistoryByService(Long serviceDeliveryId);
 
-    java.util.Optional<String> getMessengerName(Long messengerId);
+    Optional<String> getMessengerName(Long messengerId);
 
     void saveMessengerName(Long messengerId, String name);
 }
