@@ -105,13 +105,38 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
         if (keyword != null && !keyword.trim().isEmpty()) {
             String keywordLike = "%" + keyword + "%";
             String keywordBoolean = keyword.trim() + "*";
-            entityPage = repository.searchAll(keywordLike, keywordBoolean, deleted, statusStrings, pageable);
+            entityPage = repository.searchAll(keywordLike, keywordBoolean, deleted, statusStrings, translateNativePageable(pageable));
         } else if (statuses != null && !statuses.isEmpty()) {
             entityPage = repository.findByDeletedAndCurrentStatusIn(deleted, statuses, pageable);
         } else {
             entityPage = repository.findByDeleted(deleted, pageable);
         }
         return entityPage.map(mapper::toDomain);
+    }
+
+    private Pageable translateNativePageable(Pageable pageable) {
+        if (pageable.getSort().isSorted()) {
+            List<org.springframework.data.domain.Sort.Order> orders = pageable.getSort().stream().map(order -> {
+                String property = order.getProperty();
+                String nativeProperty = property;
+                if ("createdAt".equals(property)) {
+                    nativeProperty = "created_at";
+                } else if ("currentStatus".equals(property)) {
+                    nativeProperty = "current_status";
+                } else if ("plateNumber".equals(property)) {
+                    nativeProperty = "id_service_delivery"; // Safe fallback for native query
+                } else if ("dealershipName".equals(property)) {
+                    nativeProperty = "dealership_id"; 
+                } else if ("originDealershipName".equals(property)) {
+                    nativeProperty = "origin_dealership_id"; 
+                } else if ("messengerName".equals(property)) {
+                    nativeProperty = "messenger_id"; 
+                }
+                return new org.springframework.data.domain.Sort.Order(order.getDirection(), nativeProperty);
+            }).collect(Collectors.toList());
+            return org.springframework.data.domain.PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), org.springframework.data.domain.Sort.by(orders));
+        }
+        return pageable;
     }
 
     /**
@@ -129,7 +154,7 @@ public class ServiceDeliveryAdapter implements ServiceDeliveryPort {
             String keywordLike = "%" + keyword + "%";
             String keywordBoolean = keyword.trim() + "*";
             entityPage = repository.searchByMessenger(messengerId, keywordLike, keywordBoolean, deleted, statusStrings,
-                    pageable);
+                    translateNativePageable(pageable));
         } else if (statuses != null && !statuses.isEmpty()) {
             entityPage = repository.findByMessenger_IdEmployeeAndDeletedAndCurrentStatusIn(messengerId, deleted,
                     statuses,
