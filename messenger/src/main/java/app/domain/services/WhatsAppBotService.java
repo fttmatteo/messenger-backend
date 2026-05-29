@@ -12,6 +12,8 @@ import app.domain.ports.WhatsAppMessagePort;
 import app.domain.ports.WhatsAppSessionPort;
 import app.domain.ports.WhatsAppRateLimitPort;
 import app.domain.ports.StoragePort;
+import app.domain.ports.WhatsAppUserTermsPort;
+import app.domain.ports.AppConfigPort;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -41,18 +43,24 @@ public class WhatsAppBotService {
     private final ServiceDeliveryPort searchService;
     private final WhatsAppRateLimitPort rateLimitPort;
     private final StoragePort storagePort;
+    private final WhatsAppUserTermsPort userTermsPort;
+    private final AppConfigPort configPort;
 
     public WhatsAppBotService(
             WhatsAppMessagePort messagePort,
             WhatsAppSessionPort sessionPort,
             ServiceDeliveryPort searchService,
             StoragePort storagePort,
-            WhatsAppRateLimitPort rateLimitPort) {
+            WhatsAppRateLimitPort rateLimitPort,
+            WhatsAppUserTermsPort userTermsPort,
+            AppConfigPort configPort) {
         this.messagePort = messagePort;
         this.sessionPort = sessionPort;
         this.searchService = searchService;
         this.rateLimitPort = rateLimitPort;
         this.storagePort = storagePort;
+        this.userTermsPort = userTermsPort;
+        this.configPort = configPort;
     }
 
     /**
@@ -86,6 +94,24 @@ public class WhatsAppBotService {
     }
 
     private void handleUnauthenticatedUser(String from, String text) {
+        if (!userTermsPort.hasAccepted(from)) {
+            if ("ACCEPT_TERMS".equals(text) || "Acepto".equalsIgnoreCase(text.trim())) {
+                userTermsPort.saveAcceptance(from);
+                messagePort.sendTextMessage(from,
+                        "¡Gracias por aceptar! 👋🏼.\nAquí podrás consultar el estado de las motos por chasis.\n\n"
+                                + "_PIN requerido cada 12h o al reiniciar sesión._\n\n"
+                                + "🔒 *Ingresa el PIN para continuar:* ");
+            } else {
+                String termsMsg = "¡Hola! 👋🏼 Bienvenido a PLAK.\n\n"
+                        + "Antes de continuar, es necesario que leas y aceptes nuestros Términos y Condiciones y Política de Privacidad:\n\n"
+                        + "📄 Términos y Condiciones: " + configPort.getFrontendUrl() + "/terminos-condiciones\n"
+                        + "🔒 Política de Privacidad: " + configPort.getFrontendUrl() + "/politica-privacidad\n\n"
+                        + "Por favor, presiona el botón 'Acepto' para confirmar.";
+                messagePort.sendReplyButtons(from, termsMsg, java.util.List.of("Acepto"), java.util.List.of("ACCEPT_TERMS"));
+            }
+            return;
+        }
+
         if (rateLimitPort.isBlocked(from)) {
             logger.warn("Usuario {} bloqueado por exceso de intentos de PIN.", LogSanitizer.maskGeneric(from, 4));
             messagePort.sendTextMessage(from,
@@ -283,7 +309,7 @@ public class WhatsAppBotService {
                                 LogSanitizer.maskGeneric(from, 4));
                         sessionPort.deleteByPhoneNumber(from);
                         messagePort.sendTextMessage(from,
-                                "🔕 Notificaciones desactivadas. A partir de este momento ya no recibirás alertas de cambio de estado.\n\n🚪 Sesión cerrada correctamente.\n\n¡Hasta pronto! 👋. Para ingresar de nuevo, solo escribe un mensaje.");
+                                "🚪 Sesión cerrada correctamente.\n\n🔕 Notificaciones desactivadas. A partir de este momento ya no recibirás alertas de cambio de estado.\n\n¡Hasta pronto! 👋. Para ingresar de nuevo, solo escribe un mensaje.");
                     }
                     default -> {
                         if (looksLikePlate(text)) {

@@ -30,6 +30,10 @@ class WhatsAppBotServiceTest {
     private StoragePort storagePort;
     @Mock
     private WhatsAppRateLimitPort rateLimitPort;
+    @Mock
+    private WhatsAppUserTermsPort userTermsPort;
+    @Mock
+    private AppConfigPort configPort;
 
     @InjectMocks
     private WhatsAppBotService botService;
@@ -37,6 +41,8 @@ class WhatsAppBotServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        when(userTermsPort.hasAccepted(anyString())).thenReturn(true);
+        when(configPort.getFrontendUrl()).thenReturn("http://localhost:5173");
     }
 
     @Test
