@@ -13,7 +13,7 @@ import app.domain.ports.WhatsAppSessionPort;
 import app.domain.ports.WhatsAppRateLimitPort;
 import app.domain.ports.StoragePort;
 import app.domain.ports.WhatsAppUserTermsPort;
-import app.infrastructure.config.WhatsAppConfig;
+import app.domain.ports.AppConfigPort;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -44,7 +44,7 @@ public class WhatsAppBotService {
     private final WhatsAppRateLimitPort rateLimitPort;
     private final StoragePort storagePort;
     private final WhatsAppUserTermsPort userTermsPort;
-    private final WhatsAppConfig config;
+    private final AppConfigPort configPort;
 
     public WhatsAppBotService(
             WhatsAppMessagePort messagePort,
@@ -53,14 +53,14 @@ public class WhatsAppBotService {
             StoragePort storagePort,
             WhatsAppRateLimitPort rateLimitPort,
             WhatsAppUserTermsPort userTermsPort,
-            WhatsAppConfig config) {
+            AppConfigPort configPort) {
         this.messagePort = messagePort;
         this.sessionPort = sessionPort;
         this.searchService = searchService;
         this.rateLimitPort = rateLimitPort;
         this.storagePort = storagePort;
         this.userTermsPort = userTermsPort;
-        this.config = config;
+        this.configPort = configPort;
     }
 
     /**
@@ -104,8 +104,8 @@ public class WhatsAppBotService {
             } else {
                 String termsMsg = "¡Hola! 👋🏼 Bienvenido a PLAK.\n\n"
                         + "Antes de continuar, es necesario que leas y aceptes nuestros Términos y Condiciones y Política de Privacidad:\n\n"
-                        + "📄 Términos y Condiciones: " + config.getFrontendUrl() + "/terminos-condiciones\n"
-                        + "🔒 Política de Privacidad: " + config.getFrontendUrl() + "/politica-privacidad\n\n"
+                        + "📄 Términos y Condiciones: " + configPort.getFrontendUrl() + "/terminos-condiciones\n"
+                        + "🔒 Política de Privacidad: " + configPort.getFrontendUrl() + "/politica-privacidad\n\n"
                         + "Por favor, presiona el botón 'Acepto' para confirmar.";
                 messagePort.sendReplyButtons(from, termsMsg, java.util.List.of("Acepto"), java.util.List.of("ACCEPT_TERMS"));
             }
