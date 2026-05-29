@@ -23,7 +23,7 @@ public class ServiceDeliveryResponse {
     private List<PhotoResponse> photos = new ArrayList<>();
     private List<StatusHistoryResponse> history = new ArrayList<>();
     private java.time.LocalDateTime createdAt;
-
+    private java.time.LocalDateTime scheduledAt;
 
     private boolean deleted;
     private java.time.LocalDateTime deletedAt;
@@ -34,6 +34,14 @@ public class ServiceDeliveryResponse {
 
     public void setCreatedAt(java.time.LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public java.time.LocalDateTime getScheduledAt() {
+        return scheduledAt;
+    }
+
+    public void setScheduledAt(java.time.LocalDateTime scheduledAt) {
+        this.scheduledAt = scheduledAt;
     }
 
 

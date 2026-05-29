@@ -4,7 +4,7 @@
 
 # Messenger Backend API
 
-<img src="https://img.shields.io/badge/Version-3.1.1-blue.svg" alt="Version">
+<img src="https://img.shields.io/badge/Version-3.2.0-blue.svg" alt="Version">
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.14-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
@@ -190,7 +190,7 @@ messenger/
 │       ├── exception/                   # Manejo global de errores
 │       ├── health/                      # Indicadores de salud (Actuator)
 │       ├── helper/                      # Utilidades varias (File, etc.)
-│       ├── scheduler/                   # Tareas programadas (Trash, Timeouts)
+│       ├── scheduler/                   # Tareas programadas (Trash, Timeouts, ServiceActivation)
 │       ├── security/                    # Filtros y configuración de seguridad web
 │       ├── service/                     # Servicios de infraestructura
 │       └── storage/                     # Utilidades locales (ImageOptimizer)
@@ -317,7 +317,7 @@ docker run -e SPRING_PROFILES_ACTIVE=local
 
 | Método   | Endpoint                         | Descripción                                                          |
 | -------- | -------------------------------- | -------------------------------------------------------------------- |
-| `POST`   | `/services/createService`        | Crear servicio                                                       |
+| `POST`   | `/services/createService`        | Crear servicio (Soporta programación con `scheduledAt`)              |
 | `PUT`    | `/services/updateService/{uuid}` | Actualizar estado (multipart: estado + evidencias)                   |
 | `PUT`    | `/services/reassign/{uuid}`      | Reasignar a otro transportista (ADMIN/CANCELED)                          |
 | `GET`    | `/services/findByServiceId/{uuid}`| Obtener servicio por UUID                                            |
@@ -433,6 +433,7 @@ erDiagram
         String observation
         Long signature_id FK
         LocalDateTime created_at
+        LocalDateTime scheduled_at
         Boolean deleted
         LocalDateTime deleted_at
     }
@@ -496,6 +497,7 @@ erDiagram
         String observation
         LocalDateTime created_at
         LocalDateTime deleted_at
+        LocalDateTime scheduled_at
 
         Long plate_id
         Long dealership_id
@@ -586,7 +588,7 @@ erDiagram
 | ------------------ | --------------------------------------------------------------------------------------------------------- |
 | **Role**           | `ADMIN`, `MESSENGER`                                                                                      |
 | **PlateType**      | `MOTORCYCLE`                                             |
-| **Status**         | `ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED`, `DELETED` |
+| **Status**         | `SCHEDULED`, `ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED`, `DELETED` |
 | **PhotoType**      | `EVIDENCE`                                                                             |
 | **TrackingStatus** | `ACTIVE`, `INACTIVE`, `OFFLINE`                                                                           |
 | **TrackingSource** | `GPS`, `NETWORK`, `MANUAL`                                                                                |
@@ -642,13 +644,20 @@ URL de conexión: `ws://localhost:8080/ws/tracking`
 
 > [!NOTE]
 > **Eliminación Suave (Papelera)**
+>
 > Los servicios eliminados se mueven a una **papelera** y se archivan permanentemente después de **60 días**.
 > Los administradores pueden restaurar servicios de la papelera antes de la eliminación permanente.
+
+> [!NOTE]
+> **Estados Programados (`SCHEDULED`)**
+>
+> Los servicios creados con una fecha futura (`scheduledAt`) entran en estado `SCHEDULED`. Un proceso automático en segundo plano (`ServiceActivationScheduler`) revisa cada minuto y los activa (cambiando su estado a `ASSIGNED`) una vez que se cumple su fecha programada.
 
 ### Reglas de Estados
 
 | Estado      | Transportista                        | Admin                    | Eliminar    |
 | ----------- | ------------------------------------ | ------------------------ | ----------- |
+| `SCHEDULED` | -                                    | → `Cualquier estado`     | ✅ Papelera |
 | `ASSIGNED`  | → `PENDING`, `DELIVERED`, `RETURNED` | → `Cualquier estado`     | ✅ Papelera |
 | `RETURNED`  | → `PENDING`, `DELIVERED`             | → `Cualquier estado`     | ✅ Papelera |
 | `PENDING`   | → `DELIVERED`, `RETURNED`            | → `Cualquier estado`     | ✅ Papelera |
