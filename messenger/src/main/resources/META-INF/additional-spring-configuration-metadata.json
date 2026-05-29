@@ -63,5 +63,10 @@
     "name": "whatsapp.master-pin",
     "type": "java.lang.String",
     "description": "A description for 'whatsapp.master-pin'"
+  },
+  {
+    "name": "whatsapp.frontend-url",
+    "type": "java.lang.String",
+    "description": "A description for 'whatsapp.frontend-url'"
   }
 ]}
