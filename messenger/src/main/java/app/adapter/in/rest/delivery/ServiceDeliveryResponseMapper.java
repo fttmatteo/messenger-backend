@@ -52,7 +52,7 @@ public class ServiceDeliveryResponseMapper {
         response.setCurrentStatus(service.getCurrentStatus());
         response.setObservation(service.getObservation());
         response.setCreatedAt(service.getCreatedAt());
-
+        response.setScheduledAt(service.getScheduledAt());
         response.setDeleted(service.isDeleted());
         response.setDeletedAt(service.getDeletedAt());
 
@@ -82,6 +82,7 @@ public class ServiceDeliveryResponseMapper {
         response.setCurrentStatus(service.getCurrentStatus());
         response.setObservation(service.getObservation());
         response.setCreatedAt(service.getCreatedAt());
+        response.setScheduledAt(service.getScheduledAt());
 
         response.setDeleted(service.isDeleted());
         response.setDeletedAt(service.getDeletedAt());
