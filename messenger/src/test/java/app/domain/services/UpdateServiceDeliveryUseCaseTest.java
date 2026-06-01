@@ -403,14 +403,6 @@ class UpdateServiceDeliveryTest {
     }
 
     @Test
-    @DisplayName("testValidateEvidence con estado fallido debe continuar")
-    void testValidateEvidence_FailedStatus_FallsThrough() {
-        org.junit.jupiter.api.Assertions.assertDoesNotThrow(() ->
-            updateServiceDelivery.validateEvidence(Status.FAILED, null, null, null, Role.MESSENGER)
-        );
-    }
-
-    @Test
     @DisplayName("Debe manejar fotos no nulas vacías al actualizar")
     void shouldHandleNonNullEmptyPhotosOnUpdate() throws Exception {
         when(serviceDeliveryPort.findByIdActive(1L)).thenReturn(service);

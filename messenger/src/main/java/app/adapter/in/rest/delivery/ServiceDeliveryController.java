@@ -299,8 +299,7 @@ public class ServiceDeliveryController {
                     app.domain.model.enums.Status.DELIVERED,
                     app.domain.model.enums.Status.RETURNED,
                     app.domain.model.enums.Status.CANCELED,
-                    app.domain.model.enums.Status.RESOLVED,
-                    app.domain.model.enums.Status.FAILED
+                    app.domain.model.enums.Status.RESOLVED
                 );
             } else {
                 finalStatuses = statusEnums.stream()

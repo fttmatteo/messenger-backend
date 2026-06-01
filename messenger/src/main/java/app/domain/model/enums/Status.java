@@ -10,7 +10,6 @@ public enum Status {
     RETURNED, 
     CANCELED, 
     RESOLVED, 
-    FAILED, 
     DELETED,
     SCHEDULED 
 }
