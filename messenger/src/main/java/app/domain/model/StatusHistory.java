@@ -19,6 +19,10 @@ public class StatusHistory {
     private Double deliveryLongitude;
     private Signature signature;
     private String observation;
+    private String snapshotOriginDealershipName;
+    private String snapshotDestinationDealershipName;
+    private Long snapshotOriginDealershipId;
+    private Long snapshotDestinationDealershipId;
 
     public Long getIdStatusHistory() {
         return idStatusHistory;
@@ -119,4 +123,37 @@ public class StatusHistory {
             this.deliveryLongitude = location.getLongitude();
         }
     }
+
+    public String getSnapshotOriginDealershipName() {
+        return snapshotOriginDealershipName;
+    }
+
+    public void setSnapshotOriginDealershipName(String snapshotOriginDealershipName) {
+        this.snapshotOriginDealershipName = snapshotOriginDealershipName;
+    }
+
+    public String getSnapshotDestinationDealershipName() {
+        return snapshotDestinationDealershipName;
+    }
+
+    public void setSnapshotDestinationDealershipName(String snapshotDestinationDealershipName) {
+        this.snapshotDestinationDealershipName = snapshotDestinationDealershipName;
+    }
+
+    public Long getSnapshotOriginDealershipId() {
+        return snapshotOriginDealershipId;
+    }
+
+    public void setSnapshotOriginDealershipId(Long snapshotOriginDealershipId) {
+        this.snapshotOriginDealershipId = snapshotOriginDealershipId;
+    }
+
+    public Long getSnapshotDestinationDealershipId() {
+        return snapshotDestinationDealershipId;
+    }
+
+    public void setSnapshotDestinationDealershipId(Long snapshotDestinationDealershipId) {
+        this.snapshotDestinationDealershipId = snapshotDestinationDealershipId;
+    }
+
 }

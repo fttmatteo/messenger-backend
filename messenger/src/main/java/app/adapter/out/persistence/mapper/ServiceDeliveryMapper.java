@@ -74,6 +74,10 @@ public class ServiceDeliveryMapper {
                 hEntity.setDeliveryLongitude(h.getDeliveryLongitude());
                 hEntity.setServiceDelivery(entity);
                 hEntity.setObservation(h.getObservation());
+                hEntity.setSnapshotOriginDealershipId(h.getSnapshotOriginDealershipId());
+                hEntity.setSnapshotOriginDealershipName(h.getSnapshotOriginDealershipName());
+                hEntity.setSnapshotDestinationDealershipId(h.getSnapshotDestinationDealershipId());
+                hEntity.setSnapshotDestinationDealershipName(h.getSnapshotDestinationDealershipName());
 
                 if (h.getSignature() != null) {
                     SignatureEntity sEntity = getOrCreateSignatureEntity(h.getSignature(), existingSignatureCache,
@@ -190,6 +194,10 @@ public class ServiceDeliveryMapper {
                 history.setDeliveryLatitude(h.getDeliveryLatitude());
                 history.setDeliveryLongitude(h.getDeliveryLongitude());
                 history.setObservation(h.getObservation());
+                history.setSnapshotOriginDealershipId(h.getSnapshotOriginDealershipId());
+                history.setSnapshotOriginDealershipName(h.getSnapshotOriginDealershipName());
+                history.setSnapshotDestinationDealershipId(h.getSnapshotDestinationDealershipId());
+                history.setSnapshotDestinationDealershipName(h.getSnapshotDestinationDealershipName());
 
                 if (h.getSignature() != null) {
                     Signature signature = new Signature();

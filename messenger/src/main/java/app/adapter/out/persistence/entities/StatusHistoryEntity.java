@@ -53,6 +53,18 @@ public class StatusHistoryEntity {
     @Column(name = "observation", length = 2048)
     private String observation;
 
+    @Column(name = "snapshot_origin_dealership_id")
+    private Long snapshotOriginDealershipId;
+
+    @Column(name = "snapshot_origin_dealership_name")
+    private String snapshotOriginDealershipName;
+
+    @Column(name = "snapshot_destination_dealership_id")
+    private Long snapshotDestinationDealershipId;
+
+    @Column(name = "snapshot_destination_dealership_name")
+    private String snapshotDestinationDealershipName;
+
     public Long getIdStatusHistory() {
         return idStatusHistory;
     }
@@ -139,5 +151,37 @@ public class StatusHistoryEntity {
 
     public void setDeliveryLongitude(Double deliveryLongitude) {
         this.deliveryLongitude = deliveryLongitude;
+    }
+
+    public Long getSnapshotOriginDealershipId() {
+        return snapshotOriginDealershipId;
+    }
+
+    public void setSnapshotOriginDealershipId(Long snapshotOriginDealershipId) {
+        this.snapshotOriginDealershipId = snapshotOriginDealershipId;
+    }
+
+    public String getSnapshotOriginDealershipName() {
+        return snapshotOriginDealershipName;
+    }
+
+    public void setSnapshotOriginDealershipName(String snapshotOriginDealershipName) {
+        this.snapshotOriginDealershipName = snapshotOriginDealershipName;
+    }
+
+    public Long getSnapshotDestinationDealershipId() {
+        return snapshotDestinationDealershipId;
+    }
+
+    public void setSnapshotDestinationDealershipId(Long snapshotDestinationDealershipId) {
+        this.snapshotDestinationDealershipId = snapshotDestinationDealershipId;
+    }
+
+    public String getSnapshotDestinationDealershipName() {
+        return snapshotDestinationDealershipName;
+    }
+
+    public void setSnapshotDestinationDealershipName(String snapshotDestinationDealershipName) {
+        this.snapshotDestinationDealershipName = snapshotDestinationDealershipName;
     }
 }

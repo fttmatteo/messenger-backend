@@ -209,6 +209,36 @@ public class ServiceDeliveryController {
     }
 
     /**
+     * Edita el origen y/o destino de un servicio en estado CANCELED (solo ADMIN).
+     * Genera un registro en el historial de estados con snapshot del cambio.
+     * Funciona igual que reasignar: solo permitido cuando el servicio está cancelado.
+     */
+    @PutMapping("/editRoute/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ServiceDeliveryResponse> editRoute(
+            @PathVariable String uuid,
+            @RequestBody Map<String, Long> request) throws Exception {
+
+        Long newDealershipId = request.get("dealershipId");
+        Long newOriginDealershipId = request.get("originDealershipId");
+
+        if (newDealershipId == null && newOriginDealershipId == null) {
+            throw new InputsException("Debe indicar al menos un nuevo destino u origen.");
+        }
+
+        Employee currentUser = securityHelper.getCurrentUser();
+        ServiceDelivery serviceForId = serviceDeliveryUseCase.findByUuid(uuid);
+
+        ServiceDelivery updated = serviceDeliveryUseCase.editRoute(
+                serviceForId.getIdServiceDelivery(),
+                newDealershipId,
+                newOriginDealershipId,
+                currentUser.getIdEmployee());
+
+        return ResponseEntity.ok(responseMapper.toResponse(updated));
+    }
+
+    /**
      * Busca un servicio por su ID.
      */
     @GetMapping("/findByServiceId/{uuid}")

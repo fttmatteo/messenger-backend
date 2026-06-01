@@ -38,6 +38,8 @@ public class UpdateServiceDeliveryUseCase {
     @Autowired
     private EmployeePort employeePort;
     @Autowired
+    private app.domain.ports.DealershipPort dealershipPort;
+    @Autowired
     private app.domain.ports.TrackingPort trackingPort;
     @Autowired
     private ApplicationEventPublisher eventPublisher;
@@ -117,6 +119,15 @@ public class UpdateServiceDeliveryUseCase {
 
         history.setObservation(trimmedObservation);
 
+        if (service.getOriginDealership() != null) {
+            history.setSnapshotOriginDealershipId(service.getOriginDealership().getIdDealership());
+            history.setSnapshotOriginDealershipName(service.getOriginDealership().getName());
+        }
+        if (service.getDealership() != null) {
+            history.setSnapshotDestinationDealershipId(service.getDealership().getIdDealership());
+            history.setSnapshotDestinationDealershipName(service.getDealership().getName());
+        }
+
         service.addHistory(history);
 
         if (latitude != null && longitude != null) {
@@ -173,7 +184,18 @@ public class UpdateServiceDeliveryUseCase {
         history.setPreviousStatus(previousStatus);
         history.setNewStatus(Status.ASSIGNED);
         history.setChangeDate(LocalDateTime.now());
-        history.setChangedBy(admin);
+        history.setChangedBy(newMessenger);
+        history.setObservation("Reasignado a " + newMessenger.getFullName() + " por administrador");
+
+        if (service.getOriginDealership() != null) {
+            history.setSnapshotOriginDealershipId(service.getOriginDealership().getIdDealership());
+            history.setSnapshotOriginDealershipName(service.getOriginDealership().getName());
+        }
+        if (service.getDealership() != null) {
+            history.setSnapshotDestinationDealershipId(service.getDealership().getIdDealership());
+            history.setSnapshotDestinationDealershipName(service.getDealership().getName());
+        }
+
         service.addHistory(history);
 
         ServiceDelivery saved = serviceDeliveryPort.save(service);
@@ -225,6 +247,16 @@ public class UpdateServiceDeliveryUseCase {
         history.setNewStatus(Status.ASSIGNED);
         history.setChangeDate(LocalDateTime.now());
         history.setChangedBy(null);
+
+        if (service.getOriginDealership() != null) {
+            history.setSnapshotOriginDealershipId(service.getOriginDealership().getIdDealership());
+            history.setSnapshotOriginDealershipName(service.getOriginDealership().getName());
+        }
+        if (service.getDealership() != null) {
+            history.setSnapshotDestinationDealershipId(service.getDealership().getIdDealership());
+            history.setSnapshotDestinationDealershipName(service.getDealership().getName());
+        }
+
         service.addHistory(history);
 
         ServiceDelivery saved = serviceDeliveryPort.save(service);
@@ -247,5 +279,84 @@ public class UpdateServiceDeliveryUseCase {
         if (status == Status.DELIVERED && signature == null) {
             throw new BusinessException("Para marcar como ENTREGADO, la firma de recibido es obligatoria.");
         }
+    }
+
+    /**
+     * Edita el origen y/o destino de un servicio. Solo ADMIN, solo en CANCELED.
+     * Funciona igual que reassignMessenger: requiere que el servicio esté cancelado.
+     * Registra el cambio en el historial con snapshot del estado anterior.
+     */
+    public ServiceDelivery editRoute(Long serviceId, Long newDealershipId, Long newOriginDealershipId,
+            Long adminUserId) throws Exception {
+
+        ServiceDelivery service = serviceDeliveryPort.findByIdActive(serviceId);
+        if (service == null) {
+            throw new BusinessException("El servicio no existe o está en la papelera.");
+        }
+
+        Employee admin = employeePort.findById(adminUserId);
+        if (admin == null || admin.getRole() != Role.ADMIN) {
+            logger.warn("Intento no autorizado de editar ruta de servicio por usuario sin rol ADMIN.");
+            throw new BusinessException("Solo los administradores pueden editar la ruta del servicio.");
+        }
+
+        if (service.getCurrentStatus() != Status.CANCELED) {
+            throw new BusinessException("Solo se puede editar la ruta de servicios en estado CANCELED. Estado actual: "
+                    + service.getCurrentStatus());
+        }
+
+        StatusHistory history = new StatusHistory();
+        history.setPreviousStatus(Status.CANCELED);
+        history.setNewStatus(Status.CANCELED); 
+        history.setChangeDate(LocalDateTime.now());
+        history.setChangedBy(admin);
+        history.setObservation("Edición de ruta por administrador");
+
+        app.domain.model.Dealership newDealership = null;
+        app.domain.model.Dealership newOriginDealership = null;
+
+        if (newDealershipId != null) {
+            newDealership = dealershipPort.findById(newDealershipId);
+            if (newDealership == null) {
+                throw new BusinessException("El concesionario de destino indicado no existe.");
+            }
+        }
+
+        if (newOriginDealershipId != null) {
+            newOriginDealership = dealershipPort.findById(newOriginDealershipId);
+            if (newOriginDealership == null) {
+                throw new BusinessException("El concesionario de origen indicado no existe.");
+            }
+        }
+
+        Long finalDealershipId = newDealershipId != null ? newDealershipId
+                : service.getDealership().getIdDealership();
+        Long finalOriginId = newOriginDealershipId != null ? newOriginDealershipId
+                : service.getOriginDealership().getIdDealership();
+        if (finalDealershipId.equals(finalOriginId)) {
+            throw new BusinessException("El concesionario de origen no puede ser el mismo que el destino.");
+        }
+
+        if (newDealership != null) {
+            service.setDealership(newDealership);
+        }
+        if (newOriginDealership != null) {
+            service.setOriginDealership(newOriginDealership);
+        }
+
+        if (service.getOriginDealership() != null) {
+            history.setSnapshotOriginDealershipId(service.getOriginDealership().getIdDealership());
+            history.setSnapshotOriginDealershipName(service.getOriginDealership().getName());
+        }
+        if (service.getDealership() != null) {
+            history.setSnapshotDestinationDealershipId(service.getDealership().getIdDealership());
+            history.setSnapshotDestinationDealershipName(service.getDealership().getName());
+        }
+
+        service.addHistory(history);
+
+        ServiceDelivery saved = serviceDeliveryPort.save(service);
+        logger.info("Ruta del servicio editada por administrador. Origen y/o destino actualizados.");
+        return saved;
     }
 }

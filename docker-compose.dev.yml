@@ -4,6 +4,7 @@
 # Comandos útiles:
 # - Iniciar: docker-compose -f docker-compose.dev.yml up --build
 # - Detener: docker-compose -f docker-compose.dev.yml down
+# - Reiniciar: docker-compose -f docker-compose.dev.yml restart messenger-backend
 # - Ver logs: docker-compose -f docker-compose.dev.yml logs -f
 # - Solo infra: docker-compose -f docker-compose.dev.yml up messenger-db messenger-redis phpmyadmin
 

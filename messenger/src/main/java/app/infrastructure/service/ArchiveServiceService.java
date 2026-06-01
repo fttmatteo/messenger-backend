@@ -109,6 +109,10 @@ public class ArchiveServiceService implements ArchivePort {
                 archivedHistory.setNewStatus(history.getNewStatus());
                 archivedHistory.setChangeDate(history.getChangeDate());
                 archivedHistory.setObservation(history.getObservation());
+                archivedHistory.setSnapshotOriginDealershipId(history.getSnapshotOriginDealershipId());
+                archivedHistory.setSnapshotOriginDealershipName(history.getSnapshotOriginDealershipName());
+                archivedHistory.setSnapshotDestinationDealershipId(history.getSnapshotDestinationDealershipId());
+                archivedHistory.setSnapshotDestinationDealershipName(history.getSnapshotDestinationDealershipName());
 
                 if (history.getChangedBy() != null) {
                     archivedHistory.setChangedByEmployeeId(history.getChangedBy().getIdEmployee());
