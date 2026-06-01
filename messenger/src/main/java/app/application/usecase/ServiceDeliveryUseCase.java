@@ -196,6 +196,19 @@ public class ServiceDeliveryUseCase {
     }
 
     /**
+     * Edita la ruta de un servicio cancelado (origen y/o destino). Solo admin.
+     */
+    @Caching(evict = {
+        @CacheEvict(value = "services", allEntries = true),
+        @CacheEvict(value = "service-details", allEntries = true)
+    })
+    @Transactional(rollbackFor = Exception.class)
+    public ServiceDelivery editRoute(Long serviceId, Long newDealershipId, Long newOriginDealershipId,
+            Long adminUserId) throws Exception {
+        return updateService.editRoute(serviceId, newDealershipId, newOriginDealershipId, adminUserId);
+    }
+
+    /**
      * Busca un servicio por su ID (versión de solo lectura).
      */
     @Cacheable(value = "service-details", key = "'id:' + #id")

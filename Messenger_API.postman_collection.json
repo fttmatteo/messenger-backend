@@ -797,6 +797,44 @@
                     "response": []
                 },
                 {
+                    "name": "Edit Route (Admin)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"originDealershipId\": 1,\n    \"dealershipId\": 2\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/services/editRoute/{{uuid}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "services",
+                                "editRoute",
+                                "{{uuid}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
                     "name": "Get Service By ID",
                     "request": {
                         "auth": {

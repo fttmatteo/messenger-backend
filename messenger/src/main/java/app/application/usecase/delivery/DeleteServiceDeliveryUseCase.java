@@ -66,6 +66,16 @@ public class DeleteServiceDeliveryUseCase {
         history.setNewStatus(Status.DELETED);
         history.setChangeDate(LocalDateTime.now());
         history.setChangedBy(user);
+
+        if (service.getOriginDealership() != null) {
+            history.setSnapshotOriginDealershipId(service.getOriginDealership().getIdDealership());
+            history.setSnapshotOriginDealershipName(service.getOriginDealership().getName());
+        }
+        if (service.getDealership() != null) {
+            history.setSnapshotDestinationDealershipId(service.getDealership().getIdDealership());
+            history.setSnapshotDestinationDealershipName(service.getDealership().getName());
+        }
+
         service.addHistory(history);
         service.setDeleted(true);
         service.setDeletedAt(LocalDateTime.now());
@@ -109,6 +119,16 @@ public class DeleteServiceDeliveryUseCase {
         history.setNewStatus(service.getCurrentStatus());
         history.setChangeDate(LocalDateTime.now());
         history.setChangedBy(user);
+
+        if (service.getOriginDealership() != null) {
+            history.setSnapshotOriginDealershipId(service.getOriginDealership().getIdDealership());
+            history.setSnapshotOriginDealershipName(service.getOriginDealership().getName());
+        }
+        if (service.getDealership() != null) {
+            history.setSnapshotDestinationDealershipId(service.getDealership().getIdDealership());
+            history.setSnapshotDestinationDealershipName(service.getDealership().getName());
+        }
+
         service.addHistory(history);
 
         ServiceDelivery restored = serviceDeliveryPort.save(service);

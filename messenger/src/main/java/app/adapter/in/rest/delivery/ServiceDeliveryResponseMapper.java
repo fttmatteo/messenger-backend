@@ -131,6 +131,11 @@ public class ServiceDeliveryResponseMapper {
                                 h.getDeliveryLongitude(),
                                 h.getObservation());
 
+                        historyResponse.setSnapshotOriginDealershipId(h.getSnapshotOriginDealershipId());
+                        historyResponse.setSnapshotOriginDealershipName(h.getSnapshotOriginDealershipName());
+                        historyResponse.setSnapshotDestinationDealershipId(h.getSnapshotDestinationDealershipId());
+                        historyResponse.setSnapshotDestinationDealershipName(h.getSnapshotDestinationDealershipName());
+
                         if (h.getPhotos() != null) {
                             historyResponse.setPhotos(h.getPhotos().stream()
                                     .map(p -> new PhotoResponse(

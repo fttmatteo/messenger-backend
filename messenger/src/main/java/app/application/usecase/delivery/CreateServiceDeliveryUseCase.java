@@ -138,6 +138,10 @@ public class CreateServiceDeliveryUseCase {
         history.setChangedBy(messenger);
         history.setDeliveryLatitude(latitude);
         history.setDeliveryLongitude(longitude);
+        history.setSnapshotOriginDealershipId(originDealership.getIdDealership());
+        history.setSnapshotOriginDealershipName(originDealership.getName());
+        history.setSnapshotDestinationDealershipId(dealership.getIdDealership());
+        history.setSnapshotDestinationDealershipName(dealership.getName());
 
         service.addHistory(history);
 

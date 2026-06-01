@@ -4,7 +4,7 @@
 
 # Messenger Backend API
 
-<img src="https://img.shields.io/badge/Version-3.2.0-blue.svg" alt="Version">
+<img src="https://img.shields.io/badge/Version-3.3.0-blue.svg" alt="Version">
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.14-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
@@ -319,7 +319,8 @@ docker run -e SPRING_PROFILES_ACTIVE=local
 | -------- | -------------------------------- | -------------------------------------------------------------------- |
 | `POST`   | `/services/createService`        | Crear servicio (Soporta programación con `scheduledAt`)              |
 | `PUT`    | `/services/updateService/{uuid}` | Actualizar estado (multipart: estado + evidencias)                   |
-| `PUT`    | `/services/reassign/{uuid}`      | Reasignar a otro transportista (ADMIN/CANCELED)                          |
+| `PUT`    | `/services/reassign/{uuid}`      | Reasignar a otro transportista (ADMIN/CANCELED)                      |
+| `PUT`    | `/services/editRoute/{uuid}`     | Modificar concesionario origen/destino (ADMIN/CANCELED)              |
 | `GET`    | `/services/findByServiceId/{uuid}`| Obtener servicio por UUID                                            |
 | `GET`    | `/services/allServicesPageable`  | Listar servicios con **paginación, búsqueda y ordenamiento**         |
 
@@ -464,6 +465,10 @@ erDiagram
         Double delivery_latitude
         Double delivery_longitude
         String observation
+        Long snapshot_origin_dealership_id
+        String snapshot_origin_dealership_name
+        Long snapshot_destination_dealership_id
+        String snapshot_destination_dealership_name
     }
 
     tracking_history {
@@ -554,6 +559,10 @@ erDiagram
         String changed_by_name
         String changed_by_document
         Long signature_id FK
+        Long snapshot_origin_dealership_id
+        String snapshot_origin_dealership_name
+        Long snapshot_destination_dealership_id
+        String snapshot_destination_dealership_name
     }
 
     deleted_tracking_history {
@@ -632,7 +641,7 @@ URL de conexión: `ws://localhost:8080/ws/tracking`
 > - **MESSENGER** solo puede cambiar a los estados: `PENDING`, `DELIVERED`, `RETURNED`.
 > - **ADMIN** puede cambiar a todos los estados permitidos (`ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED`).
 > - Los servicios pueden ser modificados en cualquier momento sin importar su estado actual.
-> - Los administradores pueden reasignar servicios en estado **CANCELED** a otro transportista.
+> - Los administradores pueden reasignar servicios o modificar la ruta de envío si el estado actual es **CANCELED**.
 
 > [!NOTE]
 > **Requisitos de Evidencia**
@@ -662,7 +671,7 @@ URL de conexión: `ws://localhost:8080/ws/tracking`
 | `RETURNED`  | → `PENDING`, `DELIVERED`             | → `Cualquier estado`     | ✅ Papelera |
 | `PENDING`   | → `DELIVERED`, `RETURNED`            | → `Cualquier estado`     | ✅ Papelera |
 | `DELIVERED` | -                                    | → `Cualquier estado`     | ✅ Papelera |
-| `CANCELED`  | -                                    | → `Cualquier estado` (Reasignar → `ASSIGNED`) | ✅ Papelera |
+| `CANCELED`  | -                                    | → `Cualquier estado` (Reasignar → `ASSIGNED`, Editar Ruta) | ✅ Papelera |
 | `RESOLVED`  | -                                    | → `Cualquier estado`     | ✅ Papelera |
 
 ### Flujo de Reasignación
