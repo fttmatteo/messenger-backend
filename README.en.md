@@ -321,6 +321,7 @@ docker run -e SPRING_PROFILES_ACTIVE=local
 | `POST`   | `/services/createService`        | Create service (Supports scheduling with `scheduledAt`)      |
 | `PUT`    | `/services/updateService/{uuid}` | Update status (multipart: status + evidence)                 |
 | `PUT`    | `/services/reassign/{uuid}`      | Reassign to another carrier (ADMIN/CANCELED)               |
+| `PUT`    | `/services/editRoute/{uuid}`     | Modify origin/destination dealership (ADMIN/CANCELED)      |
 | `GET`    | `/services/findByServiceId/{uuid}`| Get service by UUID                                         |
 | `GET`    | `/services/allServicesPageable`  | List services with **pagination, search & sorting**          |
 
@@ -465,6 +466,10 @@ erDiagram
         Double delivery_latitude
         Double delivery_longitude
         String observation
+        Long snapshot_origin_dealership_id
+        String snapshot_origin_dealership_name
+        Long snapshot_destination_dealership_id
+        String snapshot_destination_dealership_name
     }
 
     tracking_history {
@@ -555,6 +560,10 @@ erDiagram
         String changed_by_name
         String changed_by_document
         Long signature_id FK
+        Long snapshot_origin_dealership_id
+        String snapshot_origin_dealership_name
+        Long snapshot_destination_dealership_id
+        String snapshot_destination_dealership_name
     }
 
     deleted_tracking_history {
@@ -640,7 +649,7 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 > - **CARRIER** can only change to: `PENDING`, `DELIVERED`, `RETURNED` statuses.
 > - **ADMIN** can change to all allowed statuses (`ASSIGNED`, `PENDING`, `DELIVERED`, `RETURNED`, `CANCELED`, `RESOLVED`).
 > - Services can be modified at any time regardless of their current state.
-> - Admins can reassign **CANCELED** services to another carrier.
+> - Admins can reassign services or modify the delivery route if the current state is **CANCELED**.
 
 > [!NOTE]
 > **Evidence Requirements**
@@ -671,7 +680,7 @@ Connection URL: `ws://localhost:8080/ws/tracking`
 | `RETURNED`  | → `PENDING`, `DELIVERED`             | → `Any state`                       | ✅ Trash |
 | `PENDING`   | → `DELIVERED`, `RETURNED`            | → `Any state`                       | ✅ Trash |
 | `DELIVERED` | -                                    | → `Any state`                       | ✅ Trash |
-| `CANCELED`  | -                                    | → `Any state` (Reassign → `ASSIGNED`) | ✅ Trash |
+| `CANCELED`  | -                                    | → `Any state` (Reassign → `ASSIGNED`, Edit Route) | ✅ Trash |
 | `RESOLVED`  | -                                    | → `Any state`                       | ✅ Trash |
 
 ### Reassignment Flow
