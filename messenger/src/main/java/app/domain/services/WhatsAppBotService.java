@@ -525,7 +525,6 @@ public class WhatsAppBotService {
             case RETURNED -> "DEVUELTA";
             case CANCELED -> "CANCELADA";
             case RESOLVED -> "REVISADA";
-            case FAILED -> "FALLIDA";
             case DELETED -> "ELIMINADA";
             case SCHEDULED -> "PROGRAMADA";
         };
@@ -539,7 +538,6 @@ public class WhatsAppBotService {
             case RETURNED -> "↩️";
             case CANCELED -> "❌";
             case RESOLVED -> "✍🏻";
-            case FAILED -> "⚠️";
             case DELETED -> "🗑️";
             case SCHEDULED -> "📅";
         };

@@ -30,7 +30,8 @@ public class WhatsAppNotificationListener {
     @Async("whatsappTaskExecutor")
     @EventListener
     public void handlePlateStatusChanged(PlateStatusChangedEvent event) {
-        if (event.getNewStatus() == app.domain.model.enums.Status.SCHEDULED) {
+        if (event.getNewStatus() == app.domain.model.enums.Status.SCHEDULED ||
+            event.getNewStatus() == app.domain.model.enums.Status.CANCELED) {
             return;
         }
         app.domain.model.ServiceDelivery service = event.getServiceDelivery();
@@ -96,7 +97,6 @@ public class WhatsAppNotificationListener {
             case RETURNED: return "DEVUELTA";
             case RESOLVED: return "REVISADA";
             case CANCELED: return "CANCELADA";
-            case FAILED: return "FALLIDA";
             case DELETED: return "ELIMINADA";
             default: return status.name();
         }
@@ -111,7 +111,6 @@ public class WhatsAppNotificationListener {
             case RETURNED: return "↩️";
             case CANCELED: return "❌";
             case RESOLVED: return "✍🏻";
-            case FAILED: return "⚠️";
             case DELETED: return "🗑️";
             default: return "❓";
         }
