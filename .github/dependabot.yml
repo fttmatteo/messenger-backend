@@ -1,52 +1,52 @@
 # Configuración de Dependabot
 # Crea PRs automáticamente para actualizar dependencias.
 # https://docs.github.com/en/code-security/dependabot
-# 
-# version: 2
-# 
-# updates:
-#   # GitHub Actions
-#   - package-ecosystem: "github-actions"
-#     directory: "/"
-#     target-branch: "develop"
-#     schedule:
-#       interval: "daily"
-#       time: "08:00"
-#       timezone: "America/Bogota" # Hora local del equipo
-#     commit-message:
-#       prefix: "ci(deps)"
-#     labels:
-#       - "dependencies"
-#       - "github-actions"
-#     groups:
-#       actions-patch-updates:
-#         update-types:
-#           - "patch"
-#     ignore:
-#       - dependency-name: "*"
-#         update-types: 
-#           - "version-update:semver-major"
-#           - "version-update:semver-minor"
-# 
-#   # Maven
-#   - package-ecosystem: "maven"
-#     directory: "/messenger"
-#     target-branch: "develop"
-#     schedule:
-#       interval: "daily"
-#       time: "08:00"
-#       timezone: "America/Bogota" # Sincronizado con CI de actions
-#     commit-message:
-#       prefix: "build(deps)"
-#     labels:
-#       - "dependencies"
-#       - "java"
-#     groups:
-#       maven-patch-updates:
-#         update-types:
-#           - "patch"
-#     ignore:
-#       - dependency-name: "*"
-#         update-types: 
-#           - "version-update:semver-major"
-#           - "version-update:semver-minor"
+
+version: 2
+
+updates:
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "develop"
+    schedule:
+      interval: "daily"
+      time: "08:00"
+      timezone: "America/Bogota" # Hora local del equipo
+    commit-message:
+      prefix: "ci(deps)"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    groups:
+      actions-patch-updates:
+        update-types:
+          - "patch"
+    ignore:
+      - dependency-name: "*"
+        update-types: 
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
+
+  # Maven (dependencias de Java)
+  - package-ecosystem: "maven"
+    directory: "/messenger"
+    target-branch: "develop"
+    schedule:
+      interval: "daily"
+      time: "08:00"
+      timezone: "America/Bogota" # Sincronizado con CI de actions
+    commit-message:
+      prefix: "build(deps)"
+    labels:
+      - "dependencies"
+      - "java"
+    groups:
+      maven-patch-updates:
+        update-types:
+          - "patch"
+    ignore:
+      - dependency-name: "*"
+        update-types: 
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
